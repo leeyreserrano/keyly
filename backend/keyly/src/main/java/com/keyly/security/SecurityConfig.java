@@ -13,7 +13,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ping").permitAll() // Permet accedir a les rutes sense autentificar
+                        .requestMatchers("/ping", "/sucursals", "/sucursal", "/sucursal/{id}").permitAll() // Permet accedir a les rutes sense autentificar
                         .anyRequest().authenticated());
 
         return http.build();
