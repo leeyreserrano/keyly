@@ -22,6 +22,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(MockitoExtension.class)
 public class SucursalTest {
 
+    /**
+     * POSTMAN TEST
+     * 
+     * {
+     * "nom": "Prova",
+     * "direccio": "Carrer 4",
+     * "ciutat": "Barcelona",
+     * "pais": "España",
+     * "telefon": "+34 679664352",
+     * "correu": "prova@gmail.com"
+     * }
+     * 
+     */
+
     @Mock
     private SucursalService service;
 
@@ -30,11 +44,11 @@ public class SucursalTest {
 
     @Test
     void getAllSucursales() {
-        List<Sucursal> lista = List.of(
+        List<Sucursal> sucursals = List.of(
                 new Sucursal(1L, "Sucursal1", "Dir1", "BCN", "España", "123", "a@a.com"),
                 new Sucursal(2L, "Sucursal2", "Dir2", "Madrid", "España", "456", "b@b.com"));
 
-        when(service.getAllSucursals()).thenReturn(lista);
+        when(service.getAllSucursals()).thenReturn(sucursals);
 
         ResponseEntity<List<Sucursal>> response = controller.getSucursals();
 

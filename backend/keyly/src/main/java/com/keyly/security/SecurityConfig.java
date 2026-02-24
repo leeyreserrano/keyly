@@ -8,13 +8,33 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    // Las rutas que se pasen por el requestMatchers, permite conectarse sin hacer login a las rutas
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //     http
+    //             .csrf(csrf -> csrf.disable())
+    //             .authorizeHttpRequests(auth -> auth
+    //                     .requestMatchers(
+    //                         "/sucursals"
+    //                     ).permitAll() // Permet accedir a les rutes sense autentificar
+    //                     .anyRequest().authenticated());
+
+    //     return http.build();
+    // }
+
+    /**
+     * Habilita todas las conexiones para ir haciendo pruebas
+     * 
+     * @param http
+     * @return
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ping", "/sucursals", "/sucursal", "/sucursal/{id}").permitAll() // Permet accedir a les rutes sense autentificar
-                        .anyRequest().authenticated());
+                        .anyRequest().permitAll());
 
         return http.build();
     }
