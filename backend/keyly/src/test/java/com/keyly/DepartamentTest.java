@@ -24,16 +24,16 @@ import com.keyly.service.SucursalService;
 @ExtendWith(MockitoExtension.class)
 public class DepartamentTest {
 
-    /**
-     * POSTMAN TEST
-     * 
-     * {
-     * "sucursal": {
-     * "id": "2"
-     * },
-     * "nom": "Metrologia"
-     * }
-     * 
+    /*
+      POSTMAN TEST
+      
+      {
+      "sucursal": {
+      "id": "2"
+      },
+      "nom": "Metrologia"
+      }
+      
      */
 
     @Mock
@@ -57,7 +57,7 @@ public class DepartamentTest {
     void getAllDepartaments() {
         when(service.getAllDepartaments()).thenReturn(departaments);
 
-        ResponseEntity<List<Departament>> response = controller.getDepartaments();
+        ResponseEntity<List<Departament>> response = controller.getAllDepartaments();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());

@@ -29,7 +29,7 @@ public class DepartamentController {
     private SucursalService sucursalService;
 
     @GetMapping("departaments")
-    public ResponseEntity<List<Departament>> getDepartaments() {
+    public ResponseEntity<List<Departament>> getAllDepartaments() {
         return ResponseEntity.ok(service.getAllDepartaments());
     }
 

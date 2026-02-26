@@ -22,18 +22,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(MockitoExtension.class)
 public class SucursalTest {
 
-    /**
-     * POSTMAN TEST
-     * 
-     * {
-     * "nom": "Prova",
-     * "direccio": "Carrer 4",
-     * "ciutat": "Barcelona",
-     * "pais": "España",
-     * "telefon": "+34 679664352",
-     * "correu": "prova@gmail.com"
-     * }
-     * 
+    /*
+     POSTMAN TEST
+      
+      {
+      "nom": "Prova",
+      "direccio": "Carrer 4",
+      "ciutat": "Barcelona",
+      "pais": "España",
+      "telefon": "+34 679664352",
+      "correu": "prova@gmail.com"
+      }
+     
      */
 
     @Mock
