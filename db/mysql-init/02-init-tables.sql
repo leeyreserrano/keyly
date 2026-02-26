@@ -40,8 +40,8 @@ CREATE TABLE `Usuaris` (
   `rol_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NOT NULL,
   `correu` VARCHAR(255) NOT NULL UNIQUE,
+  `imatge` VARCHAR(255),
   `contrasenya_master` VARCHAR(60) NOT NULL,
-  `salt` TEXT NOT NULL,
   `data_creacio` DATE NOT NULL,
   `data_ultim_login` DATE NOT NULL,
   `pot_administrar` BOOLEAN NOT NULL,
@@ -54,6 +54,7 @@ CREATE TABLE `Usuaris` (
 CREATE TABLE `Bagul` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `usuari_id` BIGINT NOT NULL,
+  `favorit` BOOLEAN DEFAULT FALSE,
   `nom` VARCHAR(255) NOT NULL,
   `correu` VARCHAR(255) NOT NULL,
   `imatge` VARCHAR(255) NULL,
@@ -64,15 +65,6 @@ CREATE TABLE `Bagul` (
   `ultim_access` DATE NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_bagul_usuari` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
-);
-
-CREATE TABLE `Favorits` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `usuari_id` BIGINT NOT NULL,
-  `item_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_favorits_usuari` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`),
-  CONSTRAINT `fk_favorits_item` FOREIGN KEY (`item_id`) REFERENCES `Bagul` (`id`)
 );
 
 CREATE TABLE `Carpetes` (
