@@ -1,7 +1,7 @@
 USE keyly;
 
 CREATE TABLE `Sucursals` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `nom` VARCHAR(255) NOT NULL,
   `direccio` VARCHAR(255) NOT NULL,
   `ciutat` VARCHAR(255) NOT NULL,
@@ -11,30 +11,31 @@ CREATE TABLE `Sucursals` (
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `Departament` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `sucursal_id` BIGINT NOT NULL,
-  `nom` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_departament_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
-);
-
-CREATE TABLE `Rols` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `sucursal_id` BIGINT NOT NULL,
-  `nom` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_rol_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
-);
-
 CREATE TABLE `Dominis` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `nom` VARCHAR(255) NOT NULL,
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `domini` VARCHAR(255) NOT NULL UNIQUE,
   PRIMARY KEY (`id`)
 );
 
+CREATE TABLE `Rols` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `sucursal_id` BIGINT NOT NULL,
+  `nom` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_rols_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
+);
+
+
+CREATE TABLE `Departaments` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `sucursal_id` BIGINT NOT NULL,
+  `nom` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `dk_departaments_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
+);
+
 CREATE TABLE `Usuaris` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
   `departament_id` BIGINT NOT NULL,
   `rol_id` BIGINT NOT NULL,
@@ -43,54 +44,63 @@ CREATE TABLE `Usuaris` (
   `imatge` VARCHAR(255),
   `contrasenya_master` VARCHAR(60) NOT NULL,
   `data_creacio` DATE NOT NULL,
-  `data_ultim_login` DATE NOT NULL,
-  `pot_administrar` BOOLEAN NOT NULL,
+  `data_ultim_login` DATE,
+  `pot_administrar` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_usuari_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`),
-  CONSTRAINT `fk_usuari_rol` FOREIGN KEY (`rol_id`) REFERENCES `Rols` (`id`),
-  CONSTRAINT `fk_usuari_departament` FOREIGN KEY (`departament_id`) REFERENCES `Departament` (`id`)
+  CONSTRAINT `fk_usuaris_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`),
+  CONSTRAINT `fk_usuaris_rols` FOREIGN KEY (`rol_id`) REFERENCES `Rols` (`id`),
+  CONSTRAINT `fk_usuaris_departaments` FOREIGN KEY (`departament_id`) REFERENCES `Departaments` (`id`)
 );
 
-CREATE TABLE `Bagul` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `usuari_id` BIGINT NOT NULL,
-  `favorit` BOOLEAN DEFAULT FALSE,
-  `nom` VARCHAR(255) NOT NULL,
-  `correu` VARCHAR(255) NOT NULL,
-  `imatge` VARCHAR(255) NULL,
-  `contrasenya` TEXT NOT NULL,
-  `iv` TEXT NOT NULL,
+CREATE TABLE `Baguls` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `propietari_id` BIGINT NOT NULL,
+  `data_creacio` DATE NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_baguls_usuaris` FOREIGN KEY (`propietari_id`) REFERENCES `Usuaris` (`id`)
+);
+
+CREATE TABLE `Items` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `bagul_id` BIGINT NOT NULL,
+  `titol` VARCHAR(255) NOT NULL,
+  `nom_usuari` VARCHAR(255) NOT NULL,
+  `contrasenya` VARBINARY(512) NOT NULL,
+  `iv` VARBINARY(12) NOT NULL,
+  `url` VARCHAR(255) NULL,
+  `notes` TEXT NULL,
+  `favorit` BOOLEAN NULL DEFAULT FALSE,
   `data_creacio` DATE NOT NULL,
   `data_editat` DATE NULL,
   `ultim_access` DATE NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_bagul_usuari` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
+  CONSTRAINT `fk_items_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`)
 );
 
 CREATE TABLE `Carpetes` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `propietari_id` BIGINT NOT NULL,
-  `nom` VARCHAR(255) NOT NULL,
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `bagul_id` BIGINT NOT NULL,
+  `nom` VARCHAR(255) NULL,
   `data_creacio` DATE NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_carpetes_propietari` FOREIGN KEY (`propietari_id`) REFERENCES `Usuaris` (`id`)
+  CONSTRAINT `fk_carpetes_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`)
 );
 
 CREATE TABLE `Carpetes_Items` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
   `carpeta_id` BIGINT NOT NULL,
   `item_id` BIGINT NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_carpetes_items_item` FOREIGN KEY (`item_id`) REFERENCES `Bagul` (`id`),
-  CONSTRAINT `fk_carpetes_items_carpeta` FOREIGN KEY (`carpeta_id`) REFERENCES `Carpetes` (`id`)
+  CONSTRAINT `fk_carpetes_items_carpetes` FOREIGN KEY (`carpeta_id`) REFERENCES `Carpetes` (`id`),
+  CONSTRAINT `fk_carpetes_items_items` FOREIGN KEY (`item_id`) REFERENCES `Items` (`id`)
 );
 
-CREATE TABLE `Carpetes_Compartides` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `carpeta_id` BIGINT NOT NULL,
+CREATE TABLE `Compartits` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `usuari_id` BIGINT NOT NULL,
-  `permisos` ENUM('lectura','escritura','administrador') NOT NULL,
+  `tipus_entitat` ENUM('carpeta','item') NOT NULL,
+  `entitat_id` BIGINT NOT NULL,
+  `permisos` ENUM('lectura','escriptura','administrador') NOT NULL,
+  `data_creacio` DATE NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_carpetes_compartides_carpeta` FOREIGN KEY (`carpeta_id`) REFERENCES `Carpetes` (`id`),
-  CONSTRAINT `fk_carpetes_compartides_usuari` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
+  KEY `idx_compartits` (`tipus_entitat`, `entitat_id`),
+  CONSTRAINT `fk_compartits_usuaris` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
 );
