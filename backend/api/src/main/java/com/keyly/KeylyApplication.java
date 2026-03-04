@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /*
+	TODO - HACER DTO
 	TODO - Optimizar consultas
 	TODO - Devolver los errores en formato json
 	TODO - Darle un par de vueltas a los delete, se hace una consulta innecesaria desde mi punto de vista en el controller

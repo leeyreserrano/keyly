@@ -1,6 +1,8 @@
 package com.keyly.model;
 
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -10,15 +12,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = "carpetas")
+@ToString(exclude = "carpetas")
 @Entity
 @Table(name = "Items")
 public class Item {
@@ -27,6 +35,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
+
+    @ManyToMany(mappedBy = "items")
+    @JsonManagedReference
+    private Set<Carpeta> carpetas = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "bagul_id", nullable = false)
@@ -39,7 +51,7 @@ public class Item {
     private String nomUsuari;
 
     @Column(name = "contrasenya")
-    private byte[] contrasenya;
+    private String contrasenya;
 
     @Column(name = "iv")
     private byte[] iv;
@@ -64,5 +76,15 @@ public class Item {
     @CreationTimestamp
     @Column(name = "ultim_access", updatable = true)
     private Date dataUltimAcces;
+
+    public void addCarpeta(Carpeta carpeta) {
+        carpetas.add(carpeta);
+        carpeta.getItems().add(this);
+    }
+
+    public void removeCarpeta(Carpeta carpeta) {
+        carpetas.remove(carpeta);
+        carpeta.getItems().remove(this);
+    }
 
 }
