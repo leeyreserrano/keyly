@@ -2,6 +2,7 @@ USE keyly;
 
 CREATE TABLE `Sucursals` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `nom` VARCHAR(255) NOT NULL,
   `direccio` VARCHAR(255) NOT NULL,
   `ciutat` VARCHAR(255) NOT NULL,
@@ -13,12 +14,16 @@ CREATE TABLE `Sucursals` (
 
 CREATE TABLE `Dominis` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
+  `sucursal_id` BIGINT NOT NULL,
   `domini` VARCHAR(255) NOT NULL UNIQUE,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_dominis_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
 );
 
 CREATE TABLE `Rols` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -28,6 +33,7 @@ CREATE TABLE `Rols` (
 
 CREATE TABLE `Departaments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -36,6 +42,7 @@ CREATE TABLE `Departaments` (
 
 CREATE TABLE `Usuaris` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
   `departament_id` BIGINT NOT NULL,
   `rol_id` BIGINT NOT NULL,
@@ -54,6 +61,7 @@ CREATE TABLE `Usuaris` (
 
 CREATE TABLE `Baguls` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `propietari_id` BIGINT NOT NULL,
   `data_creacio` DATE NOT NULL,
   PRIMARY KEY (`id`),
@@ -62,6 +70,7 @@ CREATE TABLE `Baguls` (
 
 CREATE TABLE `Items` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `bagul_id` BIGINT NOT NULL,
   `titol` VARCHAR(255) NOT NULL,
   `nom_usuari` VARCHAR(255) NOT NULL,
@@ -79,6 +88,7 @@ CREATE TABLE `Items` (
 
 CREATE TABLE `Carpetes` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `bagul_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NULL,
   `data_creacio` DATE NOT NULL,
@@ -95,6 +105,7 @@ CREATE TABLE `Carpetes_Items` (
 
 CREATE TABLE `Compartits` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
   `usuari_id` BIGINT NOT NULL,
   `tipus_entitat` ENUM('CARPETA','ITEM') NOT NULL,
   `entitat_id` BIGINT NOT NULL,
