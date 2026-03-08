@@ -1,13 +1,21 @@
 package com.keyly.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.model.Carpeta;
 import com.keyly.model.Compartit;
+import com.keyly.model.Item;
 import com.keyly.model.Usuari;
+import com.keyly.model.enums.TipusEntitat;
+import com.keyly.model.request.CompartitRequest;
+import com.keyly.model.response.CarpetaResponse;
+import com.keyly.model.response.CompartitResponse;
+import com.keyly.model.response.ItemResponse;
 import com.keyly.repo.CompartitRepo;
 
 @Service
@@ -19,28 +27,130 @@ public class CompartitService {
     @Autowired
     private UsuariService usuariService;
 
+    @Autowired
+    private CarpetaService carpetaService;
+
+    @Autowired
+    private ItemService itemService;
+
     public List<Compartit> getAllCompartits() {
         return repo.findAll();
     }
 
-    public Compartit getById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el id: " + id));
+    public CompartitResponse getByUuid(UUID uuid) {
+        Compartit c = repo.findByUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid));
+
+        if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
+            Carpeta carpeta = carpetaService.getEntityById(c.getEntitatId());
+
+            return new CompartitResponse(c, new CarpetaResponse(carpeta));
+        }
+
+        Item item = itemService.getEntityById(c.getEntitatId());
+
+        return new CompartitResponse(c, new ItemResponse(item));
     }
 
-    public Compartit save(Compartit c) {
-        Usuari u = usuariService.getById(c.getUsuari().getId());
-
-        c.setUsuari(u);
-
-        repo.save(c);
-
-        return getById(c.getId());
+    public Compartit getEntityByUuid(UUID uuid) {
+        return repo.findByUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid));
     }
 
-    public void delete(Compartit c) {
-        Compartit compartit = getById(c.getId());
+    public CompartitResponse save(CompartitRequest c) {
+        Usuari u = usuariService.getEntityByUuid(c.usuariUuid());
 
-        repo.deleteById(compartit.getId());
+        Compartit compartit = new Compartit(u, c);
+
+        Compartit compartitGuardat = repo.save(compartit);
+
+        return getByUuid(compartitGuardat.getUuid());
+    }
+
+    public CompartitResponse update(UUID uuid, CompartitRequest request) {
+        Compartit compartitGuardat = getEntityByUuid(uuid);
+
+        Usuari u = usuariService.getEntityByUuid(request.usuariUuid());
+
+        compartitGuardat.setUsuari(u);
+        compartitGuardat.setTipusEntitat(request.tipusEntitat());
+        compartitGuardat.setPermisos(request.permisos());
+        if (request.tipusEntitat() == TipusEntitat.CARPETA) {
+            Carpeta carpeta = carpetaService
+                    .getEntityById(carpetaService.getEntityByUuid(request.entitatUuid()).getId());
+            compartitGuardat.setEntitatId(carpeta.getId());
+            return new CompartitResponse(repo.save(compartitGuardat), new CarpetaResponse(carpeta));
+        }
+        Item item = itemService.getEntityById(itemService.getEntityByUuid(request.entitatUuid()).getId());
+        compartitGuardat.setEntitatId(item.getId());
+        return new CompartitResponse(repo.save(compartitGuardat), new ItemResponse(item));
+    }
+
+    public CompartitResponse deleteByUuid(UUID uuid) {
+        Compartit c = repo.findByUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid));
+
+        if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
+            Carpeta carpeta = carpetaService.getEntityById(c.getEntitatId());
+
+            return new CompartitResponse(repo.deleteByUuid(uuid).orElseThrow(
+                    () -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid)), new CarpetaResponse(carpeta));
+        }
+        Item item = itemService.getEntityById(c.getEntitatId());
+
+        return new CompartitResponse(repo.deleteByUuid(uuid).orElseThrow(
+                () -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid)), new ItemResponse(item));
+    }
+
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
+
+    @Deprecated
+    public CompartitResponse getById(Long id) {
+        Compartit c = repo.findById(id)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el id: " + id));
+
+        if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
+            Carpeta carpeta = carpetaService.getEntityById(c.getEntitatId());
+
+            return new CompartitResponse(c, new CarpetaResponse(carpeta));
+        }
+
+        Item item = itemService.getEntityById(c.getEntitatId());
+
+        return new CompartitResponse(c, new ItemResponse(item));
+    }
+
+    @Deprecated
+    public Compartit getEntityById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el id: " + id));
+    }
+
+    @Deprecated
+    public CompartitResponse update(Long id, CompartitRequest request) {
+        Compartit compartitGuardat = getEntityById(id);
+
+        Usuari u = usuariService.getEntityByUuid(request.usuariUuid());
+
+        compartitGuardat.setUsuari(u);
+        compartitGuardat.setTipusEntitat(request.tipusEntitat());
+        compartitGuardat.setPermisos(request.permisos());
+        if (request.tipusEntitat() == TipusEntitat.CARPETA) {
+            Carpeta carpeta = carpetaService
+                    .getEntityById(carpetaService.getEntityByUuid(request.entitatUuid()).getId());
+            compartitGuardat.setEntitatId(carpeta.getId());
+            return new CompartitResponse(repo.save(compartitGuardat), new CarpetaResponse(carpeta));
+        }
+        Item item = itemService.getEntityById(itemService.getEntityByUuid(request.entitatUuid()).getId());
+        compartitGuardat.setEntitatId(item.getId());
+        return new CompartitResponse(repo.save(compartitGuardat), new ItemResponse(item));
+    }
+
+    @Deprecated
+    public void deleteById(Long id) {
+        repo.deleteById(id);
     }
 
 }

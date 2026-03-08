@@ -1,13 +1,16 @@
 package com.keyly.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keyly.model.Rol;
+import com.keyly.model.request.RolRequest;
+import com.keyly.model.response.RolResponse;
 import com.keyly.service.RolService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,52 +27,63 @@ public class RolController {
     private RolService service;
 
     @GetMapping("rols")
-    public ResponseEntity<List<Rol>> getAllRols() {
+    public ResponseEntity<List<RolResponse>> getAllRols() {
         return ResponseEntity.ok(service.getAllRols());
     }
 
-    @GetMapping("rol/{id}")
-    public ResponseEntity<Rol> getRol(@PathVariable Long id) {
-        Rol rol = service.getById(id);
-
-        return ResponseEntity.ok(rol);
-    }
-
     @PostMapping("rol")
-    public ResponseEntity<Rol> addRol(@RequestBody Rol r) {
-        Rol rol = service.save(r);
+    public ResponseEntity<RolResponse> addRol(@RequestBody RolRequest r) {
+        RolResponse rol = service.save(r);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(rol);
     }
 
     @PostMapping("rols")
-    public ResponseEntity<List<Rol>> addRols(@RequestBody List<Rol> rs) {
-        for (Rol r : rs) {
+    public ResponseEntity<List<RolResponse>> addRols(@RequestBody List<RolRequest> rs) {
+        List<RolResponse> responses = new ArrayList<>();
+        for (RolRequest r : rs) {
             service.save(r);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(rs);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @PutMapping("rol/{id}")
-    public ResponseEntity<Rol> updateRol(@PathVariable Long id, @RequestBody Rol rolActualitzat) {
-        Rol rol = service.getById(id);
+    @PutMapping("rol/{uuid}")
+    public ResponseEntity<RolResponse> updateRol(@PathVariable UUID uuid, @RequestBody RolRequest request) {
+        RolResponse response = service.update(uuid, request);
 
-        rol.setNom(rolActualitzat.getNom());
-        rol.setSucursal(rolActualitzat.getSucursal());
-
-        Rol rolGuardat = service.save(rol);
-
-        return ResponseEntity.ok(rolGuardat);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("rol/{id}")
-    public ResponseEntity<Rol> deleteRol(@PathVariable Long id) {
-        Rol rol = service.getById(id);
+    @DeleteMapping("rol/{uuid}")
+    public ResponseEntity<RolResponse> deleteRol(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.deleteByUuid(uuid));
+    }
 
-        service.delete(rol);
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
 
-        return ResponseEntity.ok(rol);
+    @Deprecated
+    @GetMapping("rol/id/{id}")
+    public ResponseEntity<RolResponse> getRol(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    @Deprecated
+    @PutMapping("rol/id/{id}")
+    public ResponseEntity<RolResponse> updateRol(@PathVariable Long id, @RequestBody RolRequest rolActualitzat) {
+        RolResponse response = service.update(id, rolActualitzat);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Deprecated
+    @DeleteMapping("rol/id/{id}")
+    public ResponseEntity<RolResponse> deleteRol(@PathVariable Long id) {
+        service.deleteById(id);
+
+        return ResponseEntity.ok(null);
     }
 
 }

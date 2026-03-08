@@ -1,8 +1,13 @@
 package com.keyly.model;
 
 import java.sql.Date;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
+import com.keyly.model.request.UsuariRequest;
+import com.keyly.model.response.UsuariResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +32,10 @@ public class Usuari {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
+
+    @UuidGenerator
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
 
     @ManyToOne
     @JoinColumn(name = "sucursal_id", nullable = false)
@@ -62,5 +71,27 @@ public class Usuari {
 
     @Column(name = "pot_administrar")
     private Boolean potAdministrar;
+
+    public Usuari(Sucursal sucursal, Departament departament, Rol rol, UsuariRequest request) {
+        this.sucursal = sucursal;
+        this.departament = departament;
+        this.rol = rol;
+        this.nom = request.nom();
+        this.correu = request.correu();
+        this.imatge = request.imatge();
+        this.potAdministrar = request.potAdministrar();
+    }
+
+    public Usuari(Sucursal sucursal, Departament departament, Rol rol, UsuariResponse response) {
+        this.sucursal = sucursal;
+        this.departament = departament;
+        this.rol = rol;
+        this.nom = response.nom();
+        this.correu = response.correu();
+        this.imatge = response.imatge();
+        this.dataCreacio = response.dataCreacio();
+        this.dataUltimLogin = response.ultimLogin();
+        this.potAdministrar = response.potAdministrar();
+    }
 
 }

@@ -1,8 +1,14 @@
 package com.keyly.model;
 
 import java.sql.Date;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
+import com.keyly.model.enums.Permisos;
+import com.keyly.model.enums.TipusEntitat;
+import com.keyly.model.request.CompartitRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +36,10 @@ public class Compartit {
     @Column
     private Long id;
 
+    @UuidGenerator
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
     @ManyToOne
     @JoinColumn(name = "usuari_id", nullable = false)
     private Usuari usuari;
@@ -49,15 +59,10 @@ public class Compartit {
     @Column(name = "data_creacio", updatable = false)
     private Date dataCreacio;
 
-}
+    public Compartit(Usuari usuari, CompartitRequest request) {
+        this.usuari = usuari;
+        this.tipusEntitat = request.tipusEntitat();
+        this.permisos = request.permisos();
+    }
 
-enum TipusEntitat {
-    CARPETA,
-    ITEM
-}
-
-enum Permisos {
-    LECTURA,
-    ESCRIPTURA,
-    ADMINISTRADOR
 }

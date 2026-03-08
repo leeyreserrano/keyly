@@ -1,13 +1,16 @@
 package com.keyly.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keyly.model.Departament;
+import com.keyly.model.request.DepartamentRequest;
+import com.keyly.model.response.DepartamentResponse;
 import com.keyly.service.DepartamentService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,56 +27,73 @@ public class DepartamentController {
     private DepartamentService service;
 
     @GetMapping("departaments")
-    public ResponseEntity<List<Departament>> getAllDepartaments() {
+    public ResponseEntity<List<DepartamentResponse>> getAllDepartaments() {
         return ResponseEntity.ok(service.getAllDepartaments());
     }
 
-    @GetMapping("departament/{id}")
-    public ResponseEntity<Departament> getDepartament(@PathVariable Long id) {
-        Departament departament = service.getById(id);
+    @GetMapping("departament/{uuid}")
+    public ResponseEntity<DepartamentResponse> getDepartament(@PathVariable UUID uuid) {
+        DepartamentResponse departament = service.getByUuid(uuid);
 
         return ResponseEntity.ok(departament);
-
     }
 
     @PostMapping("departament")
-    public ResponseEntity<Departament> addDepartament(@RequestBody Departament d) {
-        Departament departament = service.save(d);
+    public ResponseEntity<DepartamentResponse> addDepartament(@RequestBody DepartamentRequest d) {
+        DepartamentResponse departament = service.save(d);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(departament);
     }
 
     @PostMapping("departaments")
-    public ResponseEntity<List<Departament>> addDepartaments(@RequestBody List<Departament> ds) {
-        for (Departament d : ds) {
-            service.save(d);
+    public ResponseEntity<List<DepartamentResponse>> addDepartaments(@RequestBody List<DepartamentRequest> ds) {
+        List<DepartamentResponse> responses = new ArrayList<>();
+        for (DepartamentRequest d : ds) {
+            responses.add(service.save(d));
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ds);
-    }
-    
-
-    @PutMapping("departament/{id}")
-    public ResponseEntity<Departament> updateDepartament(@PathVariable Long id,
-            @RequestBody Departament departamentActualitzat) {
-
-        Departament departament = service.getById(id);
-
-        departament.setNom(departamentActualitzat.getNom());
-        departament.setSucursal(departamentActualitzat.getSucursal());
-
-        Departament departamentGuardat = service.save(departament);
-
-        return ResponseEntity.ok(departamentGuardat);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @DeleteMapping("departament/{id}")
-    public ResponseEntity<Departament> deleteDepartament(@PathVariable Long id) {
-        Departament departament = service.getById(id);
+    @PutMapping("departament/{uuid}")
+    public ResponseEntity<DepartamentResponse> updateDepartament(@PathVariable UUID uuid, @RequestBody DepartamentRequest request) {
+        DepartamentResponse response = service.update(uuid, request);
 
-        service.delete(departament);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("departament/{uuid}")
+    public ResponseEntity<DepartamentResponse> deleteDepartament(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.deleteByUuid(uuid));
+    }
+
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
+
+    @Deprecated
+    @GetMapping("departament/id/{id}")
+    public ResponseEntity<DepartamentResponse> getDepartament(@PathVariable Long id) {
+        DepartamentResponse departament = service.getById(id);
 
         return ResponseEntity.ok(departament);
+    }
+
+    @Deprecated
+    @PutMapping("departament/id/{id}")
+    public ResponseEntity<DepartamentResponse> updateDepartament(@PathVariable Long id,
+            @RequestBody DepartamentRequest departamentActualitzat) {
+        DepartamentResponse response = service.update(id, departamentActualitzat);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Deprecated
+    @DeleteMapping("departament/id/{id}")
+    public ResponseEntity<DepartamentResponse> deleteDepartament(@PathVariable Long id) {
+        service.deleteById(id);
+
+        return ResponseEntity.ok(null);
     }
 
 }

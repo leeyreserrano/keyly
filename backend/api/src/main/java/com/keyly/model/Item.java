@@ -3,8 +3,10 @@ package com.keyly.model;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +22,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.keyly.model.request.ItemRequest;
+
 import lombok.ToString;
 
 @NoArgsConstructor
@@ -35,6 +39,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
+
+    @UuidGenerator
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
 
     @ManyToMany(mappedBy = "items")
     @JsonManagedReference
@@ -85,6 +93,16 @@ public class Item {
     public void removeCarpeta(Carpeta carpeta) {
         carpetas.remove(carpeta);
         carpeta.getItems().remove(this);
+    }
+
+    public Item(Bagul bagul, ItemRequest request) {
+        this.bagul = bagul;
+        this.titol = request.titol();
+        this.nomUsuari = request.nomUsuari();
+        this.contrasenya = request.contrasenya();
+        this.url = request.url();
+        this.notes = request.notes();
+        this.favorit = request.favorit();
     }
 
 }

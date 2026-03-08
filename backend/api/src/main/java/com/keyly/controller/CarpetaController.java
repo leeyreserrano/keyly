@@ -1,7 +1,7 @@
 package com.keyly.controller;
 
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.Carpeta;
-import com.keyly.model.Item;
+import com.keyly.model.request.CarpetaRequest;
+import com.keyly.model.request.ItemRequest;
+import com.keyly.model.response.CarpetaResponse;
+import com.keyly.model.response.ItemResponse;
 import com.keyly.service.CarpetaService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,72 +29,121 @@ public class CarpetaController {
     private CarpetaService service;
 
     @GetMapping("carpetes")
-    public ResponseEntity<List<Carpeta>> getAllCarpetes() {
+    public ResponseEntity<List<CarpetaResponse>> getAllCarpetes() {
         return ResponseEntity.ok(service.getAllCarpetes());
     }
-    
-    @GetMapping("carpeta/{id}")
-    public ResponseEntity<Carpeta> getCarpeta(@PathVariable Long id) {
-        Carpeta carpeta = service.getById(id);
+
+    @GetMapping("carpeta/{uuid}")
+    public ResponseEntity<CarpetaResponse> getCarpeta(@PathVariable UUID uuid) {
+        CarpetaResponse carpeta = service.getByUuid(uuid);
 
         return ResponseEntity.ok(carpeta);
     }
 
-    @GetMapping("carpeta/{id}/item")
-    public ResponseEntity<Set<Item>> getCarpetaItems(@PathVariable Long id) {
-        Set<Item> items = service.getCarpetaItem(id);
+    @GetMapping("carpeta/{uuid}/item")
+    public ResponseEntity<List<ItemResponse>> getCarpetaItems(@PathVariable UUID uuid) {
+        List<ItemResponse> items = service.getCarpetaItem(uuid);
 
         return ResponseEntity.ok(items);
     }
- 
+
     @PostMapping("carpeta")
-    public ResponseEntity<Carpeta> addCarpeta(@RequestBody Carpeta c) {
-        Carpeta carpeta = service.save(c);
+    public ResponseEntity<CarpetaResponse> addCarpeta(@RequestBody CarpetaRequest c) {
+        CarpetaResponse carpeta = service.save(c);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(carpeta);
     }
-    
-    @PostMapping("carpetes")
-    public ResponseEntity<List<Carpeta>> addCarpetes(@RequestBody List<Carpeta> cs) {
-        for (Carpeta c : cs) {
-            service.save(c);
-        }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(cs);
+    @PostMapping("carpetes")
+    public ResponseEntity<List<CarpetaResponse>> addCarpetes(@RequestBody List<CarpetaRequest> cs) {
+        List<CarpetaResponse> responses = cs
+                .stream()
+                .map(carpeta -> service.save(carpeta))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @PostMapping("carpeta/{carpetaId}/item")
-    public ResponseEntity<Carpeta> addItemToCarpeta(@PathVariable Long carpetaId, @RequestBody Item item) {
-        Carpeta c = service.saveItemToCarpeta(carpetaId, item);
+    @PostMapping("carpeta/{carpetaUuid}/item")
+    public ResponseEntity<CarpetaResponse> addItemToCarpeta(@PathVariable UUID carpetaUuid,
+            @RequestBody ItemRequest item) {
+        CarpetaResponse c = service.saveItemToCarpeta(carpetaUuid, item);
 
         return ResponseEntity.ok(c);
     }
-    
 
-    @PutMapping("carpeta/{id}")
-    public ResponseEntity<Carpeta> updateCarpeta(@PathVariable Long id, @RequestBody Carpeta carpetaActualitzada) {
-        Carpeta carpeta = service.getById(id);
+    @PutMapping("carpeta/{uuid}")
+    public ResponseEntity<CarpetaResponse> updateCarpeta(@PathVariable UUID uuid,
+            @RequestBody CarpetaRequest carpetaActualitzada) {
 
-        carpeta.setBagul(carpetaActualitzada.getBagul());
-        carpeta.setNom(carpetaActualitzada.getNom());
-
-        Carpeta carpetaGuardada = service.save(carpeta);
+        CarpetaResponse carpetaGuardada = service.update(uuid, carpetaActualitzada);
 
         return ResponseEntity.ok(carpetaGuardada);
     }
 
-    @DeleteMapping("carpeta/{id}")
-    public ResponseEntity<Carpeta> deleteCarpeta(@PathVariable Long id) {
-        Carpeta carpeta = service.getById(id);
+    @DeleteMapping("carpeta/{uuid}")
+    public ResponseEntity<CarpetaResponse> deleteCarpeta(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.deleteByUuid(uuid));
+    }
 
-        service.delete(carpeta);
+    @DeleteMapping("carpeta/{carpetaUuid}/item/{itemUuid}")
+    public ResponseEntity<HttpStatus> deleteItemInCarpeta(@PathVariable UUID carpetaUuid, @PathVariable UUID itemUuid) {
+        service.deleteItemInCarpeta(carpetaUuid, itemUuid);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
+
+    @Deprecated
+    @GetMapping("carpeta/id/{id}")
+    public ResponseEntity<CarpetaResponse> getCarpeta(@PathVariable Long id) {
+        CarpetaResponse carpeta = service.getById(id);
 
         return ResponseEntity.ok(carpeta);
     }
 
-    @DeleteMapping("carpeta/{id}/item")
-    public ResponseEntity<HttpStatus> deleteItemInCarpeta(@PathVariable Long id, @RequestBody Item item) {
-        service.deleteItemInCarpeta(id, item);
+    @Deprecated
+    @GetMapping("carpeta/id/{id}/item")
+    public ResponseEntity<List<ItemResponse>> getCarpetaItems(@PathVariable Long id) {
+        List<ItemResponse> items = service.getCarpetaItem(id);
+
+        return ResponseEntity.ok(items);
+    }
+
+    @Deprecated
+    @PostMapping("carpeta/id/{carpetaId}/item")
+    public ResponseEntity<CarpetaResponse> addItemToCarpeta(@PathVariable Long carpetaId,
+            @RequestBody ItemRequest item) {
+        CarpetaResponse c = service.saveItemToCarpeta(carpetaId, item);
+
+        return ResponseEntity.ok(c);
+    }
+
+    @Deprecated
+    @PutMapping("carpeta/id/{id}")
+    public ResponseEntity<CarpetaResponse> updateCarpeta(@PathVariable Long id,
+            @RequestBody CarpetaRequest carpetaActualitzada) {
+
+        CarpetaResponse carpetaGuardada = service.update(id, carpetaActualitzada);
+
+        return ResponseEntity.ok(carpetaGuardada);
+    }
+
+    @Deprecated
+    @DeleteMapping("carpeta/id/{id}")
+    public ResponseEntity<Carpeta> deleteCarpeta(@PathVariable Long id) {
+        service.deleteById(id);
+
+        return ResponseEntity.ok(null);
+    }
+
+    @Deprecated
+    @DeleteMapping("carpeta/id/{carpetaId}/item/{itemId}")
+    public ResponseEntity<HttpStatus> deleteItemInCarpeta(@PathVariable Long carpetId, @PathVariable Long itemId) {
+        service.deleteItemInCarpeta(carpetId, itemId);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }

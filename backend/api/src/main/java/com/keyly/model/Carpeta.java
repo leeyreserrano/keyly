@@ -3,8 +3,10 @@ package com.keyly.model;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +23,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.keyly.model.request.CarpetaRequest;
+import com.keyly.model.response.CarpetaResponse;
+
 import lombok.ToString;
 
 @NoArgsConstructor
@@ -35,6 +40,10 @@ public class Carpeta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @UuidGenerator
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
 
     @ManyToMany
     @JoinTable(
@@ -64,6 +73,17 @@ public class Carpeta {
     public void removeItem(Item item) {
         items.remove(item);
         item.getCarpetas().remove(this);
+    }
+
+    public Carpeta(Bagul bagul, CarpetaRequest request) {
+        this.bagul = bagul;
+        this.nom = request.nom();
+    }
+
+    public Carpeta(Bagul bagul, CarpetaResponse response) {
+        this.bagul = bagul;
+        this.nom = response.nom();
+        this.dataCreacio = response.dataCreacio();
     }
 
 }

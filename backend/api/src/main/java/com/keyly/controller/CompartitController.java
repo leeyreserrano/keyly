@@ -1,6 +1,7 @@
 package com.keyly.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.Compartit;
+import com.keyly.model.request.CompartitRequest;
+import com.keyly.model.response.CompartitResponse;
 import com.keyly.service.CompartitService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,50 +31,70 @@ public class CompartitController {
         return ResponseEntity.ok(service.getAllCompartits());
     }
 
-    @GetMapping("compartit/{id}")
-    public ResponseEntity<Compartit> getCompartit(@PathVariable Long id) {
-        Compartit compartit = service.getById(id);
+    @GetMapping("compartit/{uuid}")
+    public ResponseEntity<CompartitResponse> getCompartit(@PathVariable UUID uuid) {
+        CompartitResponse compartit = service.getByUuid(uuid);
 
         return ResponseEntity.ok(compartit);
     }
 
     @PostMapping("compartit")
-    public ResponseEntity<Compartit> addCompartit(@RequestBody Compartit c) {
-        Compartit compartit = service.save(c);
+    public ResponseEntity<CompartitResponse> addCompartit(@RequestBody CompartitRequest c) {
+        CompartitResponse compartit = service.save(c);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(compartit);
     }
 
     @PostMapping("compartits")
-    public ResponseEntity<List<Compartit>> addCompartits(@RequestBody List<Compartit> cs) {
-        for (Compartit c : cs) {
-            service.save(c);
-        }
+    public ResponseEntity<List<CompartitResponse>> addCompartits(@RequestBody List<CompartitRequest> cs) {
+        List<CompartitResponse> responses = cs
+                .stream()
+                .map(compartit -> service.save(compartit))
+                .toList();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(cs);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
-    
-    @PutMapping("compartit/{id}")
-    public ResponseEntity<Compartit> updateCompartit(@PathVariable Long id, @RequestBody Compartit compartitActualitzat) {
-        Compartit compartit = service.getById(id);
 
-        compartit.setUsuari(compartitActualitzat.getUsuari());
-        compartit.setTipusEntitat(compartitActualitzat.getTipusEntitat());
-        compartit.setEntitatId(compartitActualitzat.getEntitatId());
-        compartit.setPermisos(compartitActualitzat.getPermisos());
+    @PutMapping("compartit/{uuid}")
+    public ResponseEntity<CompartitResponse> updateCompartit(@PathVariable UUID uuid,
+            @RequestBody CompartitRequest compartitActualitzat) {
+        return ResponseEntity.ok(service.update(uuid, compartitActualitzat));
+    }
 
-        Compartit compartitGuardat = service.save(compartit);
+    @DeleteMapping("compartit/{uuid}")
+    public ResponseEntity<Compartit> deleteCompartit(@PathVariable UUID uuid) {
+        service.deleteByUuid(uuid);
+
+        return ResponseEntity.ok(null);
+    }
+
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
+
+    @Deprecated
+    @GetMapping("compartit/id/{id}")
+    public ResponseEntity<CompartitResponse> getCompartit(@PathVariable Long id) {
+        CompartitResponse compartit = service.getById(id);
+
+        return ResponseEntity.ok(compartit);
+    }
+
+    @Deprecated
+    @PutMapping("compartit/id/{id}")
+    public ResponseEntity<CompartitResponse> updateCompartit(@PathVariable Long id,
+            @RequestBody CompartitRequest compartitActualitzat) {
+        CompartitResponse compartitGuardat = service.update(id, compartitActualitzat);
 
         return ResponseEntity.ok(compartitGuardat);
     }
 
-    @DeleteMapping("compartit/{id}")
+    @Deprecated
+    @DeleteMapping("compartit/id/{id}")
     public ResponseEntity<Compartit> deleteCompartit(@PathVariable Long id) {
-        Compartit compartit = service.getById(id);
+        service.deleteById(id);
 
-        service.delete(compartit);
-
-        return ResponseEntity.ok(compartit);
+        return ResponseEntity.ok(null);
     }
 
 }

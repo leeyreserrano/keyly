@@ -1,13 +1,16 @@
 package com.keyly.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keyly.model.Domini;
+import com.keyly.model.request.DominiRequest;
+import com.keyly.model.response.DominiResponse;
 import com.keyly.service.DominiService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,51 +34,71 @@ public class DominiController {
     private DominiService service;
 
     @GetMapping("dominis")
-    public ResponseEntity<List<Domini>> getAllDominis() {
+    public ResponseEntity<List<DominiResponse>> getAllDominis() {
         return ResponseEntity.ok(service.getAllDominis());
     }
 
-    @GetMapping("domini/{id}")
-    public ResponseEntity<Domini> getDomini(@PathVariable Long id) {
-        Domini domini = service.getById(id);
+    @GetMapping("domini/{uuid}")
+    public ResponseEntity<DominiResponse> getDomini(@PathVariable UUID uuid) {
+        DominiResponse domini = service.getByUuid(uuid);
 
-        return ResponseEntity.ok(domini);
+        return ResponseEntity.status(HttpStatus.CREATED).body(domini);
     }
 
     @PostMapping("domini")
-    public ResponseEntity<Domini> addDomini(@RequestBody Domini d) {
-        Domini domini = service.save(d);
+    public ResponseEntity<DominiResponse> addDomini(@RequestBody DominiRequest d) {
+        DominiResponse domini = service.save(d);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(domini);
     }
 
     @PostMapping("dominis")
-    public ResponseEntity<List<Domini>> addDominis(@RequestBody List<Domini> ds) {
-        for (Domini d : ds) {
-            service.save(d);
+    public ResponseEntity<List<DominiResponse>> addDominis(@RequestBody List<DominiRequest> ds) {
+        List<DominiResponse> responses = new ArrayList<>();
+        for (DominiRequest d : ds) {
+            responses.add(service.save(d));
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ds);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @PutMapping("domini/{id}")
-    public ResponseEntity<Domini> updateDomini(@PathVariable Long id, @RequestBody Domini dominiActualitzat) {
-        Domini domini = service.getById(id);
+    @PutMapping("domini/{uuid}")
+    public ResponseEntity<DominiResponse> updateDomini(@PathVariable UUID uuid, @RequestBody DominiRequest request) {
+        DominiResponse response = service.update(uuid, request);
 
-        domini.setDomini(dominiActualitzat.getDomini());
-
-        Domini dominiGuardat = service.save(domini);
-
-        return ResponseEntity.ok(dominiGuardat);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("domini/{id}")
-    public ResponseEntity<Domini> deleteDomini(@PathVariable Long id) {
-        Domini domini = service.getById(id);
+    @DeleteMapping("domini/{uuid}")
+    public ResponseEntity<DominiResponse> deleteDomini(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.deleteByUuid(uuid));
+    }
 
-        service.delete(domini);
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
+
+    @Deprecated
+    @GetMapping("domini/id/{id}")
+    public ResponseEntity<DominiResponse> getDomini(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    @Deprecated
+    @PutMapping("domini/id/{id}")
+    public ResponseEntity<DominiResponse> updateDomini(@PathVariable Long id,
+            @RequestBody DominiRequest dominiActualitzat) {
+        DominiResponse domini = service.update(id, dominiActualitzat);
 
         return ResponseEntity.ok(domini);
+    }
+
+    @Deprecated
+    @DeleteMapping("domini/id/{id}")
+    public ResponseEntity<DominiResponse> deleteDomini(@PathVariable Long id) {
+        service.getById(id);
+
+        return ResponseEntity.ok(null);
     }
 
 }

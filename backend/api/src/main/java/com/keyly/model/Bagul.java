@@ -1,8 +1,12 @@
 package com.keyly.model;
 
 import java.sql.Date;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
+import com.keyly.model.response.BagulResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,6 +32,10 @@ public class Bagul {
     @Column
     private Long id;
 
+    @UuidGenerator
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
     @ManyToOne
     @JoinColumn(name = "propietari_id", nullable = false)
     private Usuari propietari;
@@ -35,5 +43,20 @@ public class Bagul {
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
     private Date dataCreacio;
+
+    public Bagul(Usuari propietari) {
+        this.propietari = propietari;
+    }
+
+    public Bagul(BagulResponse response) {
+        Sucursal s = new Sucursal(response.usuariResponse().sucursalResponse());
+
+        this.propietari = new Usuari(
+            new Sucursal(response.usuariResponse().sucursalResponse()),
+            new Departament(s ,response.usuariResponse().departamentResponse()),
+            new Rol(s, response.usuariResponse().rolResponse()),
+            response.usuariResponse()
+        );
+    }
 
 }

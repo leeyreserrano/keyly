@@ -1,13 +1,15 @@
 package com.keyly.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keyly.model.Bagul;
+import com.keyly.model.request.BagulRequest;
+import com.keyly.model.response.BagulResponse;
 import com.keyly.service.BagulService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,51 +26,72 @@ public class BagulController {
     private BagulService service;
 
     @GetMapping("contrasenyes")
-    public ResponseEntity<List<Bagul>> getAllContrasenyes() {
+    public ResponseEntity<List<BagulResponse>> getAllContrasenyes() {
         return ResponseEntity.ok(service.getAllContrasenyes());
     }
 
-    @GetMapping("bagul/{id}")
-    public ResponseEntity<Bagul> getContrasenya(@PathVariable Long id) {
-        Bagul bagul = service.getById(id);
+    @GetMapping("bagul/{uuid}")
+    public ResponseEntity<BagulResponse> getBagul(@PathVariable UUID uuid) {
+        BagulResponse bagul = service.getByUuid(uuid);
 
         return ResponseEntity.ok(bagul);
     }
 
     @PostMapping("bagul")
-    public ResponseEntity<Bagul> addBagul(@RequestBody Bagul b) {
-        Bagul bagul = service.save(b);
+    public ResponseEntity<BagulResponse> addBagul(@RequestBody BagulRequest b) {
+        BagulResponse bagul = service.save(b);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(bagul);
     }
 
     @PostMapping("baguls")
-    public ResponseEntity<List<Bagul>> addBaguls(@RequestBody List<Bagul> bs) {
-        for (Bagul b : bs) {
-            service.save(b);
-        }
+    public ResponseEntity<List<BagulResponse>> addBaguls(@RequestBody List<BagulRequest> bs) {
+        List<BagulResponse> responses = bs
+                .stream()
+                .map(request -> service.save(request))
+                .toList();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(bs);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @PutMapping("bagul/{id}")
-    public ResponseEntity<Bagul> updateBagul(@PathVariable Long id, @RequestBody Bagul bagulActualitzat) {
-        Bagul bagul = service.getById(id);
+    @PutMapping("bagul/{uuid}")
+    public ResponseEntity<BagulResponse> updateBagul(@PathVariable UUID uuid, @RequestBody BagulRequest request) {
+        BagulResponse response = service.update(uuid, request);
 
-        bagul.setPropietari(bagulActualitzat.getPropietari());
-
-        Bagul bagulGuardat = service.save(bagul);
-
-        return ResponseEntity.ok(bagulGuardat);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("bagul/{id}")
-    public ResponseEntity<Bagul> deleteBagul(@PathVariable Long id) {
-        Bagul bagul = service.getById(id);
+    @DeleteMapping("bagul/{uuid}")
+    public ResponseEntity<BagulResponse> deleteBagul(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.deleteByUuid(uuid));
+    }
 
-        service.delete(bagul);
+    /*
+     * Métodos que desaparecerán en futuras versiones
+     */
+
+    @Deprecated
+    @GetMapping("bagul/id/{id}")
+    public ResponseEntity<BagulResponse> getContrasenya(@PathVariable Long id) {
+        BagulResponse bagul = service.getById(id);
 
         return ResponseEntity.ok(bagul);
+    }
+
+    @Deprecated
+    @PutMapping("bagul/id/{id}")
+    public ResponseEntity<BagulResponse> updateBagul(@PathVariable Long id, @RequestBody BagulRequest bagulActualitzat) {
+        BagulResponse response = service.update(id, bagulActualitzat);
+
+        return ResponseEntity.ok(response);
+    }
+
+        @Deprecated
+    @DeleteMapping("bagul/id/{id}")
+    public ResponseEntity<BagulResponse> deleteBagul(@PathVariable Long id) {
+        service.deleteById(id);
+
+        return ResponseEntity.ok(null);
     }
 
 }
