@@ -48,8 +48,8 @@ public class Compartit {
     @Column(name = "tipus_entitat", nullable = false)
     private TipusEntitat tipusEntitat;
 
-    @Column(name = "entitat_id")
-    private Long entitatId;
+    @Column(name = "entitat_uuid")
+    private UUID entitatUuid;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "permisos", nullable = false)
@@ -62,7 +62,9 @@ public class Compartit {
     public Compartit(Usuari usuari, CompartitRequest request) {
         this.usuari = usuari;
         this.tipusEntitat = request.tipusEntitat();
+        this.entitatUuid = request.entitatUuid();
         this.permisos = request.permisos();
     }
+
 
 }

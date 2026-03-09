@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keyly.model.Item;
 import com.keyly.model.request.ItemRequest;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.service.ItemService;
@@ -88,10 +87,8 @@ public class ItemController {
 
     @Deprecated
     @DeleteMapping("item/id/{id}")
-    public ResponseEntity<Item> deleteItem(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(null);
+    public ResponseEntity<ItemResponse> deleteItem(@PathVariable Long id) {
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

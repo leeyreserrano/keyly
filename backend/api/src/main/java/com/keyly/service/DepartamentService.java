@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.DepartamentMapper;
 import com.keyly.model.Departament;
 import com.keyly.model.Sucursal;
 import com.keyly.model.request.DepartamentRequest;
@@ -22,6 +23,9 @@ public class DepartamentService {
     @Autowired
     private SucursalService sucursalService;
 
+    @Autowired
+    private DepartamentMapper mapper;
+
     public List<DepartamentResponse> getAllDepartaments() {
         return repo.findAll()
                 .stream()
@@ -36,8 +40,22 @@ public class DepartamentService {
         return new DepartamentResponse(departament);
     }
 
+    public Departament getDepartamentEntityByUuid(UUID uuid) {
+        Departament departament = repo.findByUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Departament no trobada amb el uuid: " + uuid));
+
+        return departament;
+    }
+
+    public Departament getDepartamentEntityById(Long id) {
+        Departament departament = repo.findById(id)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Departament no trobada amb el id: " + id));
+
+        return departament;
+    }
+
     public DepartamentResponse save(DepartamentRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
         Departament departament = new Departament();
 
@@ -50,16 +68,27 @@ public class DepartamentService {
     }
 
     public DepartamentResponse update(UUID uuid, DepartamentRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+        Sucursal s = null;
 
-        Departament departament = new Departament(s, getByUuid(uuid));
- 
-        return new DepartamentResponse(repo.save(departament));
+        if (request.sucursalUuid() != null)
+            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
+
+        Departament d = getDepartamentEntityByUuid(uuid);
+
+        if (s != null)
+            d.setSucursal(s);
+
+        mapper.updateDepartamentFromDto(request, d);
+
+        return new DepartamentResponse(repo.save(d));
     }
 
     public DepartamentResponse deleteByUuid(UUID uuid) {
-        return new DepartamentResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Departament no trobat amb el uuid: " + uuid)));
+        DepartamentResponse departament = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return departament;
     }
 
     /*
@@ -76,18 +105,25 @@ public class DepartamentService {
 
     @Deprecated
     public DepartamentResponse update(Long id, DepartamentRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
-        Departament departament = new Departament(s, getById(id));
+        Departament d = getDepartamentEntityById(id);
 
-        Departament departamentGuardat = repo.save(departament);
+        if (s != null)
+            d.setSucursal(s);
 
-        return new DepartamentResponse(departamentGuardat);
+        mapper.updateDepartamentFromDto(request, d);
+
+        return new DepartamentResponse(repo.save(d));
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public DepartamentResponse deleteById(Long id) {
+        DepartamentResponse departament = getById(id);
+
         repo.deleteById(id);
+
+        return departament;
     }
 
 }

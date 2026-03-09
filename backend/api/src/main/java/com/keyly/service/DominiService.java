@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.keyly.exception.CorreuExistentException;
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.DominiMapper;
 import com.keyly.model.Domini;
 import com.keyly.model.Sucursal;
 import com.keyly.model.request.DominiRequest;
@@ -24,6 +25,9 @@ public class DominiService {
     @Autowired
     private SucursalService sucursalService;
 
+    @Autowired
+    private DominiMapper mapper;
+
     public List<DominiResponse> getAllDominis() {
         return repo.findAll()
                 .stream()
@@ -38,8 +42,13 @@ public class DominiService {
         return new DominiResponse(domini);
     }
 
+    public Domini getDominiEntityByUuid(UUID uuid) {
+        return repo.findByUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el uuid: " + uuid));
+    }
+
     public DominiResponse save(DominiRequest d) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(d.sucursalUuid()));
+        Sucursal s = sucursalService.getSucursalEntityByUuid(d.sucursalUuid());
 
         if (!esDominiValid(d.domini())) {
             throw new CorreuExistentException("El domini " + d.domini() + " no és un domini válid.");
@@ -56,22 +65,30 @@ public class DominiService {
     }
 
     public DominiResponse update(UUID uuid, DominiRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+        Sucursal s = null;
+
+        if (request.sucursalUuid() != null)
+            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
         if (!esDominiValid(request.domini()) && request.domini() != null) {
             throw new CorreuExistentException("El domini " + request.domini() + " no és un domini válid.");
         }
 
-        Domini domini = new Domini(s, getByUuid(uuid));
+        Domini domini = getDominiEntityByUuid(uuid);
 
-        Domini dominiGuardat = repo.save(domini);
+        if (s != null) domini.setSucursal(s);
 
-        return getByUuid(dominiGuardat.getUuid());
+        mapper.updateDominiFromDto(request, domini);
+
+        return new DominiResponse(repo.save(domini));
     }
 
     public DominiResponse deleteByUuid(UUID uuid) {
-        return new DominiResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el uuid: " + uuid)));
+        DominiResponse domini = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return domini;
     }
 
     public boolean esDominiValid(String domini) {
@@ -93,24 +110,35 @@ public class DominiService {
     }
 
     @Deprecated
+    public Domini getDominiEntityById(Long id) {
+        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el id: " + id));
+
+    }
+
+    @Deprecated
     public DominiResponse update(Long id, DominiRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
         if (!esDominiValid(request.domini()) && request.domini() != null) {
             throw new CorreuExistentException("El domini " + request.domini() + " no és un domini válid.");
         }
 
-        Domini domini = new Domini(s, getById(id));
+        Domini domini = getDominiEntityById(id);
 
         domini.setSucursal(s);
-        domini.setDomini(request.domini());
+
+        mapper.updateDominiFromDto(request, domini);
 
         return new DominiResponse(repo.save(domini));
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public DominiResponse deleteById(Long id) {
+        DominiResponse domini = getById(id);
+
         repo.deleteById(id);
+
+        return domini;
     }
 
 }

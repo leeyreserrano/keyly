@@ -6,13 +6,13 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-import com.keyly.model.Sucursal;
-import com.keyly.model.request.SucursalRequest;
+import com.keyly.model.Rol;
+import com.keyly.model.request.RolRequest;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface SucursalMapper {
+public interface RolMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateSucursalFromDto(SucursalRequest dto, @MappingTarget Sucursal entity);
+    void updateRolFromDto(RolRequest dto, @MappingTarget Rol entity);
 
 }

@@ -96,9 +96,7 @@ public class DominiController {
     @Deprecated
     @DeleteMapping("domini/id/{id}")
     public ResponseEntity<DominiResponse> deleteDomini(@PathVariable Long id) {
-        service.getById(id);
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

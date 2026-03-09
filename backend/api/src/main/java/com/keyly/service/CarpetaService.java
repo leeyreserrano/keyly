@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.CarpetaMapper;
 import com.keyly.model.Bagul;
 import com.keyly.model.Carpeta;
 import com.keyly.model.Item;
 import com.keyly.model.request.CarpetaRequest;
-import com.keyly.model.request.ItemRequest;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.repo.CarpetaRepo;
@@ -27,6 +27,9 @@ public class CarpetaService {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private CarpetaMapper mapper;
 
     public List<CarpetaResponse> getAllCarpetes() {
         return repo.findAll()
@@ -48,13 +51,13 @@ public class CarpetaService {
         return carpeta.items();
     }
 
-    public Carpeta getEntityByUuid(UUID uuid) {
+    public Carpeta getCarpetaEntityByUuid(UUID uuid) {
         return repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid: " + uuid));
     }
 
     public CarpetaResponse save(CarpetaRequest c) {
-        Bagul b = bagulService.getEntityByUuid(c.bagulUuid());
+        Bagul b = bagulService.getBagulEntityByUuid(c.bagulUuid());
 
         Carpeta carpeta = new Carpeta(b, c);
 
@@ -63,9 +66,9 @@ public class CarpetaService {
         return getByUuid(carpetaGuardada.getUuid());
     }
 
-    public CarpetaResponse saveItemToCarpeta(UUID uuid, ItemRequest item) {
-        Carpeta carpeta = getEntityByUuid(uuid);
-        Item itemRecuperat = new Item(carpeta.getBagul(), item);
+    public CarpetaResponse saveItemToCarpeta(UUID carpetaUuid, UUID itemUuid) {
+        Carpeta carpeta = getCarpetaEntityByUuid(carpetaUuid);
+        Item itemRecuperat = itemService.getItemEntityByUuid(itemUuid);
 
         carpeta.addItem(itemRecuperat);
         repo.save(carpeta);
@@ -74,22 +77,30 @@ public class CarpetaService {
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
-        Carpeta carpetaGuardada = getEntityByUuid(uuid);
+        Bagul b = bagulService.getBagulEntityByUuid(request.bagulUuid());
 
-        carpetaGuardada.setBagul(bagulService.getEntityByUuid(request.bagulUuid()));
-        carpetaGuardada.setNom(request.nom());
+        Carpeta carpeta = getCarpetaEntityByUuid(uuid);
 
-        return new CarpetaResponse(repo.save(carpetaGuardada));
+        carpeta.setBagul(b);
+
+        mapper.updateCarpetaFromDto(request, carpeta);
+
+        Carpeta carpetaGuardada = repo.save(carpeta);
+
+        return new CarpetaResponse(carpetaGuardada);
     }
 
     public CarpetaResponse deleteByUuid(UUID uuid) {
-        return new CarpetaResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid: " + uuid)));
+        CarpetaResponse carpeta = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return carpeta;
     }
 
     public void deleteItemInCarpeta(UUID carpetaUuid, UUID itemUuid) {
-        Carpeta carpeta = getEntityByUuid(carpetaUuid);
-        Item itemRecuperat = itemService.getEntityByUuid(itemUuid);
+        Carpeta carpeta = getCarpetaEntityByUuid(carpetaUuid);
+        Item itemRecuperat = itemService.getItemEntityByUuid(itemUuid);
         carpeta.removeItem(itemRecuperat);
         repo.save(carpeta);
     }
@@ -112,40 +123,38 @@ public class CarpetaService {
     }
 
     @Deprecated
-    public Carpeta getEntityById(Long id) {
+    public Carpeta getCarpetaEntityById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el id: " + id));
     }
 
     @Deprecated
-    public CarpetaResponse saveItemToCarpeta(Long id, ItemRequest item) {
-        Carpeta carpeta = getEntityById(id);
-        Item itemRecuperat = new Item(carpeta.getBagul(), item);
-
-        carpeta.addItem(itemRecuperat);
-        repo.save(carpeta);
-
-        return getById(carpeta.getId());
-    }
-
-    @Deprecated
     public CarpetaResponse update(Long id, CarpetaRequest request) {
-        Carpeta carpetaGuardada = getEntityById(id);
+        Bagul bagul = bagulService.getBagulEntityByUuid(request.bagulUuid());
 
-        carpetaGuardada.setBagul(bagulService.getEntityByUuid(request.bagulUuid()));
-        carpetaGuardada.setNom(request.nom());
+        Carpeta carpeta = getCarpetaEntityById(id);
 
-        return new CarpetaResponse(repo.save(carpetaGuardada));
+        carpeta.setBagul(bagul);
+
+        mapper.updateCarpetaFromDto(request, carpeta);
+
+        Carpeta carpetaGuardada = repo.save(carpeta);
+
+        return new CarpetaResponse(carpetaGuardada);
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public CarpetaResponse deleteById(Long id) {
+        CarpetaResponse carpeta = getById(id);
+
         repo.deleteById(id);
+
+        return carpeta;
     }
 
     @Deprecated
     public void deleteItemInCarpeta(Long carpetaId, Long itemId) {
-        Carpeta carpeta = getEntityById(carpetaId);
+        Carpeta carpeta = getCarpetaEntityById(carpetaId);
         Item itemRecuperat = itemService.getEntityById(itemId);
         carpeta.removeItem(itemRecuperat);
         repo.save(carpeta);

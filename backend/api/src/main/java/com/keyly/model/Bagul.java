@@ -49,13 +49,13 @@ public class Bagul {
     }
 
     public Bagul(BagulResponse response) {
-        Sucursal s = new Sucursal(response.usuariResponse().sucursalResponse());
+        Sucursal s = new Sucursal(response.usuari().sucursal());
 
         this.propietari = new Usuari(
-            new Sucursal(response.usuariResponse().sucursalResponse()),
-            new Departament(s ,response.usuariResponse().departamentResponse()),
-            new Rol(s, response.usuariResponse().rolResponse()),
-            response.usuariResponse()
+            new Sucursal(response.usuari().sucursal()),
+            new Departament(s ,response.usuari().departament()),
+            new Rol(s, response.usuari().rol()),
+            response.usuari()
         );
     }
 

@@ -7,7 +7,7 @@ import com.keyly.model.Item;
 
 public record ItemResponse(
         UUID uuid,
-        BagulResponse bagulResponse,
+        BagulResponse bagul,
         String titol,
         String nomUsuari,
         String contrasenya,

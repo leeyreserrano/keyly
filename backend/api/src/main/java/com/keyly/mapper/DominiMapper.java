@@ -6,13 +6,13 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
-import com.keyly.model.Sucursal;
-import com.keyly.model.request.SucursalRequest;
+import com.keyly.model.Domini;
+import com.keyly.model.request.DominiRequest;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface SucursalMapper {
+public interface DominiMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateSucursalFromDto(SucursalRequest dto, @MappingTarget Sucursal entity);
+    void updateDominiFromDto(DominiRequest dto, @MappingTarget Domini entity);
 
 }

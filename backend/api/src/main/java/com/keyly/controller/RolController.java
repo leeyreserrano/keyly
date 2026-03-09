@@ -1,6 +1,5 @@
 package com.keyly.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
+
 @RestController
 public class RolController {
 
@@ -31,6 +31,12 @@ public class RolController {
         return ResponseEntity.ok(service.getAllRols());
     }
 
+    @GetMapping("rol/{uuid}")
+    public ResponseEntity<RolResponse> getRol(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.getByUuid(uuid));
+    }
+    
+
     @PostMapping("rol")
     public ResponseEntity<RolResponse> addRol(@RequestBody RolRequest r) {
         RolResponse rol = service.save(r);
@@ -40,10 +46,10 @@ public class RolController {
 
     @PostMapping("rols")
     public ResponseEntity<List<RolResponse>> addRols(@RequestBody List<RolRequest> rs) {
-        List<RolResponse> responses = new ArrayList<>();
-        for (RolRequest r : rs) {
-            service.save(r);
-        }
+        List<RolResponse> responses = rs
+                .stream()
+                .map(rol -> service.save(rol))
+                .toList();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
@@ -81,9 +87,7 @@ public class RolController {
     @Deprecated
     @DeleteMapping("rol/id/{id}")
     public ResponseEntity<RolResponse> deleteRol(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

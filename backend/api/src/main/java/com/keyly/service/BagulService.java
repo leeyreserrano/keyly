@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.BagulMapper;
 import com.keyly.model.Bagul;
 import com.keyly.model.Usuari;
 import com.keyly.model.request.BagulRequest;
@@ -22,7 +23,10 @@ public class BagulService {
     @Autowired
     private UsuariService usuariService;
 
-    public List<BagulResponse> getAllContrasenyes() {
+    @Autowired
+    private BagulMapper mapper;
+
+    public List<BagulResponse> getAllBaguls() {
         return repo.findAll()
                 .stream()
                 .map(bagul -> new BagulResponse(bagul))
@@ -36,13 +40,13 @@ public class BagulService {
         return new BagulResponse(bagul);
     }
 
-    public Bagul getEntityByUuid(UUID uuid) {
+    public Bagul getBagulEntityByUuid(UUID uuid) {
         return repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Bagul no trobat amb el uuid: " + uuid));
     }
 
     public BagulResponse save(BagulRequest b) {
-        Usuari usuari = usuariService.getEntityByUuid(b.propietariUuid());
+        Usuari usuari = usuariService.getUsuariEntityByUuid(b.propietariUuid());
 
         Bagul bagul = new Bagul(usuari);
 
@@ -52,16 +56,21 @@ public class BagulService {
     }
 
     public BagulResponse update(UUID uuid, BagulRequest request) {
-        Bagul bagul = getEntityByUuid(uuid);
+        Bagul bagul = getBagulEntityByUuid(uuid);
 
-        bagul.setPropietari(usuariService.getEntityByUuid(request.propietariUuid()));
+        bagul.setPropietari(usuariService.getUsuariEntityByUuid(request.propietariUuid()));
+
+        mapper.updateBagulFromDto(request, bagul);
 
         return new BagulResponse(repo.save(bagul));
     }
 
     public BagulResponse deleteByUuid(UUID uuid) {
-        return new BagulResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Bagul no trobat amb el uuid: " + uuid)));
+        BagulResponse bagul = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return bagul;
     }
 
     /*
@@ -77,22 +86,28 @@ public class BagulService {
     }
 
     @Deprecated
-    public Bagul getEntityById(Long id) {
+    public Bagul getBagulEntityById(Long id) {
         return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Bagul no trobat amb el id: " + id));
     }
 
     @Deprecated
     public BagulResponse update(Long id, BagulRequest request) {
-        Bagul bagul = getEntityById(id);
+        Bagul bagul = getBagulEntityById(id);
 
-        bagul.setPropietari(usuariService.getEntityByUuid(request.propietariUuid()));
+        bagul.setPropietari(usuariService.getUsuariEntityByUuid(request.propietariUuid()));
+
+        mapper.updateBagulFromDto(request, bagul);
 
         return new BagulResponse(repo.save(bagul));
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public BagulResponse deleteById(Long id) {
+        BagulResponse bagul = getById(id);
+
         repo.deleteById(id);
+
+        return bagul;
     }
 
 }

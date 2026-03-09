@@ -40,9 +40,7 @@ public class UsuariController {
 
     @GetMapping("usuari/{uuid}")
     public ResponseEntity<UsuariResponse> getUsuari(@PathVariable UUID uuid) {
-        UsuariResponse usuari = service.getByUuid(uuid);
-
-        return ResponseEntity.ok(usuari);
+        return ResponseEntity.ok(service.getByUuid(uuid));
     }
 
     @PostMapping("usuari")
@@ -91,7 +89,7 @@ public class UsuariController {
      */
 
     @Deprecated
-    @GetMapping("usuari/{id}")
+    @GetMapping("usuari/id/{id}")
     public ResponseEntity<UsuariResponse> getUsuari(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
@@ -108,9 +106,7 @@ public class UsuariController {
     @Deprecated
     @DeleteMapping("usuari/id/{id}")
     public ResponseEntity<UsuariResponse> deleteUsuari(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
     // [x] Login provisional para ir probando

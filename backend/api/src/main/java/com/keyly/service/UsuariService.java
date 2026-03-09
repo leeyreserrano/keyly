@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.keyly.exception.CorreuExistentException;
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.UsuariMapper;
 import com.keyly.model.Departament;
 import com.keyly.model.Rol;
 import com.keyly.model.Sucursal;
@@ -35,6 +36,9 @@ public class UsuariService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UsuariMapper mapper;
+
     public List<UsuariResponse> getAllUsuaris() {
         return repo.findAll()
                 .stream()
@@ -49,15 +53,15 @@ public class UsuariService {
         return new UsuariResponse(usuari);
     }
 
-    public Usuari getEntityByUuid(UUID uuid) {
+    public Usuari getUsuariEntityByUuid(UUID uuid) {
         return repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid));
     }
 
     public UsuariResponse save(UsuariRequest u) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(u.sucursalUuid()));
-        Departament d = new Departament(s, departamentService.getByUuid(u.departamentUuid()));
-        Rol r = new Rol(s, rolService.getByUuid(u.rolUuid()));
+        Sucursal s = sucursalService.getSucursalEntityByUuid(u.sucursalUuid());
+        Departament d = departamentService.getDepartamentEntityByUuid(u.departamentUuid());
+        Rol r = rolService.getRolEntityByUuid(u.rolUuid());
 
         if (repo.existsByCorreu(u.correu())) {
             throw new CorreuExistentException("El correu: " + u.correu() + " ja existeix.");
@@ -75,30 +79,37 @@ public class UsuariService {
     }
 
     public UsuariResponse update(UUID uuid, UsuariRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
-        Departament d = new Departament(s, departamentService.getByUuid(request.departamentUuid()));
-        Rol r = new Rol(s, rolService.getByUuid(request.rolUuid()));
+        Sucursal s = null;
+        Departament d = null;
+        Rol r = null;
 
-        Usuari usuariGuardat = getEntityByUuid(uuid);
+        if (request.sucursalUuid() != null)
+            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
+        if (request.departamentUuid() != null)
+            d = departamentService.getDepartamentEntityByUuid(request.departamentUuid());
+        if (request.rolUuid() != null)
+            r = rolService.getRolEntityByUuid(request.rolUuid());
 
-        usuariGuardat.setSucursal(s);
-        usuariGuardat.setDepartament(d);
-        usuariGuardat.setRol(r);
-        usuariGuardat.setNom(request.nom());
-        usuariGuardat.setCorreu(request.correu());
-        usuariGuardat.setImatge(request.imatge());
-        usuariGuardat.setPotAdministrar(request.potAdministrar());
+        Usuari usuari = getUsuariEntityByUuid(uuid);
 
-        String contrasenyaCruda = request.contrasenya();
-        String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
-        usuariGuardat.setContrasenya(contrasenyaEncriptada);
+        if (s != null)
+            usuari.setSucursal(s);
+        if (d != null)
+            usuari.setDepartament(d);
+        if (r != null)
+            usuari.setRol(r);
 
-        return new UsuariResponse(repo.save(usuariGuardat));
+        mapper.updateUsuariFromDto(request, usuari);
+
+        return new UsuariResponse(repo.save(usuari));
     }
 
     public UsuariResponse deleteByUuid(UUID uuid) {
-        return new UsuariResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid)));
+        UsuariResponse usuari = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return usuari;
     }
 
     public boolean login(UUID uuid, String contrasenya) {
@@ -116,25 +127,48 @@ public class UsuariService {
 
     @Deprecated
     public UsuariResponse getById(Long id) {
-
         return new UsuariResponse(repo.findById(id)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id)));
     }
 
+    public Usuari getUsuariEntityById(Long id) {
+        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id));
+    }
+
     @Deprecated
     public UsuariResponse update(Long id, UsuariRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
-        Departament d = new Departament(s, departamentService.getByUuid(request.departamentUuid()));
-        Rol r = new Rol(s, rolService.getByUuid(request.rolUuid()));
+        Sucursal s = null;
+        Departament d = null;
+        Rol r = null;
+        
+        if (request.sucursalUuid() != null)
+            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
+        if (request.departamentUuid() != null)
+            d = departamentService.getDepartamentEntityByUuid(request.departamentUuid());
+        if (request.rolUuid() != null)
+            r = rolService.getRolEntityByUuid(request.rolUuid());
 
-        Usuari usuari = new Usuari(s, d, r, getById(id));
+        Usuari usuari = getUsuariEntityById(id);
+
+        if (s != null)
+            usuari.setSucursal(s);
+        if (d != null)
+            usuari.setDepartament(d);
+        if (r != null)
+            usuari.setRol(r);
+
+        mapper.updateUsuariFromDto(request, usuari);
 
         return new UsuariResponse(repo.save(usuari));
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public UsuariResponse deleteById(Long id) {
+        UsuariResponse usuari = getById(id);
+
         repo.deleteById(id);
+
+        return usuari;
     }
 
     @Deprecated

@@ -87,10 +87,8 @@ public class SucursalController {
 
     @Deprecated
     @DeleteMapping("sucursal/id/{id}")
-    public ResponseEntity<HttpStatus> deleteSucursal(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(HttpStatus.ACCEPTED);
+    public ResponseEntity<SucursalResponse> deleteSucursal(@PathVariable Long id) {
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

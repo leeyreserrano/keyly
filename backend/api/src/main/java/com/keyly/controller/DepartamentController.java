@@ -91,9 +91,7 @@ public class DepartamentController {
     @Deprecated
     @DeleteMapping("departament/id/{id}")
     public ResponseEntity<DepartamentResponse> deleteDepartament(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

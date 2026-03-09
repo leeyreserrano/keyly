@@ -2,6 +2,9 @@ package com.keyly.model.request;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+
 public record ItemRequest(
         UUID bagulUuid,
         String titol,
@@ -9,6 +12,7 @@ public record ItemRequest(
         String contrasenya,
         String url,
         String notes,
-        boolean favorit) {
+        @JsonSetter(nulls = Nulls.AS_EMPTY)
+        Boolean favorit) {
 
 }

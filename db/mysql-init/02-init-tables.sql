@@ -108,10 +108,10 @@ CREATE TABLE `Compartits` (
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `usuari_id` BIGINT NOT NULL,
   `tipus_entitat` ENUM('CARPETA','ITEM') NOT NULL,
-  `entitat_id` BIGINT NOT NULL,
+  `entitat_uuid` BINARY(16) NOT NULL,
   `permisos` ENUM('LECTURA','ESCRIPTURA','ADMINISTRADOR') NOT NULL,
   `data_creacio` DATE NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_compartits` (`tipus_entitat`, `entitat_id`),
+  KEY `idx_compartits` (`tipus_entitat`, `entitat_uuid`),
   CONSTRAINT `fk_compartits_usuaris` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
 );

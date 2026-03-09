@@ -25,9 +25,9 @@ public class BagulController {
     @Autowired
     private BagulService service;
 
-    @GetMapping("contrasenyes")
-    public ResponseEntity<List<BagulResponse>> getAllContrasenyes() {
-        return ResponseEntity.ok(service.getAllContrasenyes());
+    @GetMapping("baguls")
+    public ResponseEntity<List<BagulResponse>> getAllBaguls() {
+        return ResponseEntity.ok(service.getAllBaguls());
     }
 
     @GetMapping("bagul/{uuid}")
@@ -89,9 +89,7 @@ public class BagulController {
         @Deprecated
     @DeleteMapping("bagul/id/{id}")
     public ResponseEntity<BagulResponse> deleteBagul(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

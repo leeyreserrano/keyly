@@ -7,9 +7,9 @@ import com.keyly.model.Usuari;
 
 public record UsuariResponse(
         UUID uuid,
-        SucursalResponse sucursalResponse,
-        DepartamentResponse departamentResponse,
-        RolResponse rolResponse,
+        SucursalResponse sucursal,
+        DepartamentResponse departament,
+        RolResponse rol,
         String nom,
         String correu,
         String imatge,

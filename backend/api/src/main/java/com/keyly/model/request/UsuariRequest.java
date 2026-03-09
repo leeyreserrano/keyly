@@ -10,6 +10,6 @@ public record UsuariRequest(
         String correu,
         String imatge,
         String contrasenya,
-        boolean potAdministrar) {
+        Boolean potAdministrar) {
 
 }

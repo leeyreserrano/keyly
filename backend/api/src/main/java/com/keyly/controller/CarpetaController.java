@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.keyly.model.Carpeta;
 import com.keyly.model.request.CarpetaRequest;
-import com.keyly.model.request.ItemRequest;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.service.CarpetaService;
@@ -64,10 +62,10 @@ public class CarpetaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @PostMapping("carpeta/{carpetaUuid}/item")
+    @PostMapping("carpeta/{carpetaUuid}/item/{itemUuid}")
     public ResponseEntity<CarpetaResponse> addItemToCarpeta(@PathVariable UUID carpetaUuid,
-            @RequestBody ItemRequest item) {
-        CarpetaResponse c = service.saveItemToCarpeta(carpetaUuid, item);
+            @PathVariable UUID itemUuid) {
+        CarpetaResponse c = service.saveItemToCarpeta(carpetaUuid, itemUuid);
 
         return ResponseEntity.ok(c);
     }
@@ -114,15 +112,6 @@ public class CarpetaController {
     }
 
     @Deprecated
-    @PostMapping("carpeta/id/{carpetaId}/item")
-    public ResponseEntity<CarpetaResponse> addItemToCarpeta(@PathVariable Long carpetaId,
-            @RequestBody ItemRequest item) {
-        CarpetaResponse c = service.saveItemToCarpeta(carpetaId, item);
-
-        return ResponseEntity.ok(c);
-    }
-
-    @Deprecated
     @PutMapping("carpeta/id/{id}")
     public ResponseEntity<CarpetaResponse> updateCarpeta(@PathVariable Long id,
             @RequestBody CarpetaRequest carpetaActualitzada) {
@@ -134,16 +123,14 @@ public class CarpetaController {
 
     @Deprecated
     @DeleteMapping("carpeta/id/{id}")
-    public ResponseEntity<Carpeta> deleteCarpeta(@PathVariable Long id) {
-        service.deleteById(id);
-
-        return ResponseEntity.ok(null);
+    public ResponseEntity<CarpetaResponse> deleteCarpeta(@PathVariable Long id) {
+        return ResponseEntity.ok(service.deleteById(id));
     }
 
     @Deprecated
     @DeleteMapping("carpeta/id/{carpetaId}/item/{itemId}")
-    public ResponseEntity<HttpStatus> deleteItemInCarpeta(@PathVariable Long carpetId, @PathVariable Long itemId) {
-        service.deleteItemInCarpeta(carpetId, itemId);
+    public ResponseEntity<HttpStatus> deleteItemInCarpeta(@PathVariable Long carpetaId, @PathVariable Long itemId) {
+        service.deleteItemInCarpeta(carpetaId, itemId);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }

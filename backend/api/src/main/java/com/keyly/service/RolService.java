@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.RolMapper;
 import com.keyly.model.Rol;
 import com.keyly.model.Sucursal;
 import com.keyly.model.request.RolRequest;
@@ -22,6 +23,9 @@ public class RolService {
     @Autowired
     private SucursalService sucursalService;
 
+    @Autowired
+    private RolMapper mapper;
+
     public List<RolResponse> getAllRols() {
         return repo.findAll()
                 .stream()
@@ -34,22 +38,15 @@ public class RolService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el uuid: " + uuid)));
     }
 
-    public RolResponse save(RolRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
-
-        Rol rol = new Rol();
-
-        rol.setSucursal(s);
-
-        repo.save(rol);
-
-        return getByUuid(rol.getUuid());
+    public Rol getRolEntityByUuid(UUID uuid) {
+        return repo.findByUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el uuid: " + uuid));
     }
 
-    public RolResponse update(UUID uuid, RolRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+    public RolResponse save(RolRequest request) {
+        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
-        Rol rol = new Rol(s, getByUuid(uuid));
+        Rol rol = new Rol();
 
         rol.setSucursal(s);
         rol.setNom(request.nom());
@@ -57,9 +54,24 @@ public class RolService {
         return new RolResponse(repo.save(rol));
     }
 
+    public RolResponse update(UUID uuid, RolRequest request) {
+        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
+
+        Rol rol = getRolEntityByUuid(uuid);
+
+        rol.setSucursal(s);
+
+        mapper.updateRolFromDto(request, rol);
+
+        return new RolResponse(repo.save(rol));
+    }
+
     public RolResponse deleteByUuid(UUID uuid) {
-        return new RolResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el uuid: " + uuid)));
+        RolResponse rol = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return rol;
     }
 
     /*
@@ -73,22 +85,36 @@ public class RolService {
     }
 
     @Deprecated
-    public RolResponse update(Long id, RolRequest request) {
-        Sucursal s = new Sucursal(sucursalService.getByUuid(request.sucursalUuid()));
+    public Rol getRolEntityById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el id: " + id));
 
-        Rol rol = new Rol(s, getById(id));
-
-        rol.setSucursal(s);
-        rol.setNom(request.nom());
-
-        Rol rolGuardat = repo.save(rol);
-
-        return new RolResponse(rolGuardat);
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public RolResponse update(Long id, RolRequest request) {
+        Sucursal s = null;
+
+        if (request.sucursalUuid() != null)
+            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
+
+        Rol rol = getRolEntityById(id);
+
+        if (s != null)
+            rol.setSucursal(s);
+
+        mapper.updateRolFromDto(request, rol);
+
+        return new RolResponse(repo.save(rol));
+    }
+
+    @Deprecated
+    public RolResponse deleteById(Long id) {
+        RolResponse rol = getById(id);
+
         repo.deleteById(id);
+
+        return rol;
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.mapper.ItemMapper;
 import com.keyly.model.Bagul;
 import com.keyly.model.Carpeta;
 import com.keyly.model.Item;
@@ -26,6 +27,9 @@ public class ItemService {
 
     @Autowired
     private BagulService bagulService;
+
+    @Autowired
+    private ItemMapper mapper;
 
     @Autowired
     @Lazy
@@ -45,13 +49,13 @@ public class ItemService {
         return new ItemResponse(item);
     }
 
-    public Item getEntityByUuid(UUID uuid) {
+    public Item getItemEntityByUuid(UUID uuid) {
         return repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
     }
 
     public ItemResponse save(ItemRequest i) {
-        Bagul b = bagulService.getEntityByUuid(i.bagulUuid());
+        Bagul b = bagulService.getBagulEntityByUuid(i.bagulUuid());
 
         Item item = new Item(b, i);
 
@@ -63,7 +67,7 @@ public class ItemService {
             Set<Carpeta> managed = new HashSet<>();
 
             for (Carpeta c : new HashSet<>(item.getCarpetas())) {
-                Carpeta carpeta = carpetaService.getEntityByUuid(c.getUuid());
+                Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(c.getUuid());
                 managed.add(carpeta);
             }
             item.setCarpetas(managed);
@@ -78,26 +82,22 @@ public class ItemService {
         return getByUuid(itemGuardat.getUuid());
     }
 
-    public ItemResponse update(UUID uuid, ItemRequest itemActualitzat) {
-        Bagul b = bagulService.getEntityByUuid(itemActualitzat.bagulUuid());
+    public ItemResponse update(UUID uuid, ItemRequest request) {
+        Item item = getItemEntityByUuid(uuid);
 
-        Item itemGuardat = getEntityByUuid(uuid);
+        item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
-        itemGuardat.setBagul(b);
-        itemGuardat.setTitol(itemActualitzat.titol());
-        itemGuardat.setContrasenya(itemActualitzat.contrasenya());
-        itemGuardat.setUrl(itemActualitzat.url());
-        itemGuardat.setNotes(itemActualitzat.notes());
-        itemGuardat.setFavorit(itemActualitzat.favorit());
+        mapper.updateItemFromDto(request, item);
 
-        repo.save(itemGuardat);
-
-        return getById(itemGuardat.getId());
+        return new ItemResponse(repo.save(item));
     }
 
     public ItemResponse deleteByUuid(UUID uuid) {
-        return new ItemResponse(repo.deleteByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid)));
+        ItemResponse item = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return item;
     }
 
     /*
@@ -116,26 +116,23 @@ public class ItemService {
     }
 
     @Deprecated
-    public ItemResponse update(Long id, ItemRequest itemActualitzat) {
-        Bagul b = bagulService.getEntityByUuid(itemActualitzat.bagulUuid());
+    public ItemResponse update(Long id, ItemRequest request) {
+        Item item = getEntityById(id);
 
-        Item itemGuardat = getEntityById(id);
+        item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
-        itemGuardat.setBagul(b);
-        itemGuardat.setTitol(itemActualitzat.titol());
-        itemGuardat.setContrasenya(itemActualitzat.contrasenya());
-        itemGuardat.setUrl(itemActualitzat.url());
-        itemGuardat.setNotes(itemActualitzat.notes());
-        itemGuardat.setFavorit(itemActualitzat.favorit());
+        mapper.updateItemFromDto(request, item);
 
-        repo.save(itemGuardat);
-
-        return getById(itemGuardat.getId());
+        return new ItemResponse(repo.save(item));
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public ItemResponse deleteById(Long id) {
+        ItemResponse item = getById(id);
+
         repo.deleteById(id);
+
+        return item;
     }
 
 }

@@ -6,7 +6,7 @@ import com.keyly.model.Bagul;
 
 public record BagulResponse(
         UUID uuid,
-        UsuariResponse usuariResponse) {
+        UsuariResponse usuari) {
 
     public BagulResponse(Bagul b) {
         this(b.getUuid(), new UsuariResponse(b.getPropietari()));

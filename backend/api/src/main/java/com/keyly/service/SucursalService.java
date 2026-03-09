@@ -31,7 +31,7 @@ public class SucursalService {
                 .toList();
     }
 
-    private Sucursal getSucursalEntityByUuid(UUID uuid) {
+    public Sucursal getSucursalEntityByUuid(UUID uuid) {
         return repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el uuid: " + uuid));
     }
@@ -60,7 +60,11 @@ public class SucursalService {
     }
 
     public SucursalResponse deleteByUuid(UUID uuid) {
-        return new SucursalResponse(repo.deleteByUuid(uuid).orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el uuid: " + uuid)));
+        SucursalResponse sucursal = getByUuid(uuid);
+
+        repo.deleteByUuid(uuid);
+
+        return sucursal;
     }
 
     /*
@@ -76,24 +80,31 @@ public class SucursalService {
     }
 
     @Deprecated
+    public Sucursal getEntityById(Long id) {
+        Sucursal sucursal = repo.findById(id)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el id: " + id));
+
+        return sucursal;
+    }
+
+    @Deprecated
     public SucursalResponse update(Long id, SucursalRequest sucursalRequest) {
-        Sucursal s = new Sucursal();
+        Sucursal sucursalGuardada = getEntityById(id);
 
-        s.setNom(sucursalRequest.nom());
-        s.setDireccio(sucursalRequest.direccio());
-        s.setCiutat(sucursalRequest.ciutat());
-        s.setPais(sucursalRequest.pais());
-        s.setTelefon(sucursalRequest.telefon());
-        s.setCorreu(sucursalRequest.correu());
+        mapper.updateSucursalFromDto(sucursalRequest, sucursalGuardada);
 
-        Sucursal sucursalGuardat = repo.save(s);
+        Sucursal sucursalGuardat = repo.save(sucursalGuardada);
 
         return new SucursalResponse(sucursalGuardat);
     }
 
     @Deprecated
-    public void deleteById(Long id) {
+    public SucursalResponse deleteById(Long id) {
+        SucursalResponse sucursal = getById(id);
+
         repo.deleteById(id);
+
+        return sucursal;
     }
 
 }

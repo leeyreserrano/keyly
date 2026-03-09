@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.keyly.model.Compartit;
-import com.keyly.model.Usuari;
 
 @Repository
 public interface CompartitRepo extends JpaRepository<Compartit, Long> {

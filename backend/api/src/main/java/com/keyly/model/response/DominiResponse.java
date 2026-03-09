@@ -6,7 +6,7 @@ import com.keyly.model.Domini;
 
 public record DominiResponse(
         UUID uuid,
-        SucursalResponse sucursalResponse,
+        SucursalResponse sucursal,
         String domini) {
 
     public DominiResponse(Domini d) {

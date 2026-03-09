@@ -9,7 +9,7 @@ import com.keyly.model.enums.TipusEntitat;
 
 public record CompartitResponse(
         UUID uuid,
-        UsuariResponse usuariResponse,
+        UsuariResponse usuari,
         TipusEntitat tipusEntitat,
         CarpetaResponse carpetaUuid,
         ItemResponse itemUuid,

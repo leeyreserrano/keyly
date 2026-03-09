@@ -8,7 +8,7 @@ import com.keyly.model.Carpeta;
 
 public record CarpetaResponse(
         UUID uuid,
-        BagulResponse bagulResponse,
+        BagulResponse bagul,
         List<ItemResponse> items,
         String nom,
         Date dataCreacio) {

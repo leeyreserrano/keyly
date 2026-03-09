@@ -42,12 +42,12 @@ public class CompartitService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid));
 
         if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
-            Carpeta carpeta = carpetaService.getEntityById(c.getEntitatId());
+            Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(c.getUuid());
 
             return new CompartitResponse(c, new CarpetaResponse(carpeta));
         }
 
-        Item item = itemService.getEntityById(c.getEntitatId());
+        Item item = itemService.getItemEntityByUuid(c.getEntitatUuid());
 
         return new CompartitResponse(c, new ItemResponse(item));
     }
@@ -58,7 +58,7 @@ public class CompartitService {
     }
 
     public CompartitResponse save(CompartitRequest c) {
-        Usuari u = usuariService.getEntityByUuid(c.usuariUuid());
+        Usuari u = usuariService.getUsuariEntityByUuid(c.usuariUuid());
 
         Compartit compartit = new Compartit(u, c);
 
@@ -70,36 +70,24 @@ public class CompartitService {
     public CompartitResponse update(UUID uuid, CompartitRequest request) {
         Compartit compartitGuardat = getEntityByUuid(uuid);
 
-        Usuari u = usuariService.getEntityByUuid(request.usuariUuid());
+        Usuari u = usuariService.getUsuariEntityByUuid(request.usuariUuid());
 
         compartitGuardat.setUsuari(u);
         compartitGuardat.setTipusEntitat(request.tipusEntitat());
         compartitGuardat.setPermisos(request.permisos());
         if (request.tipusEntitat() == TipusEntitat.CARPETA) {
             Carpeta carpeta = carpetaService
-                    .getEntityById(carpetaService.getEntityByUuid(request.entitatUuid()).getId());
-            compartitGuardat.setEntitatId(carpeta.getId());
+                    .getCarpetaEntityByUuid(request.entitatUuid());
+            compartitGuardat.setEntitatUuid(request.entitatUuid());
             return new CompartitResponse(repo.save(compartitGuardat), new CarpetaResponse(carpeta));
         }
-        Item item = itemService.getEntityById(itemService.getEntityByUuid(request.entitatUuid()).getId());
-        compartitGuardat.setEntitatId(item.getId());
+        Item item = itemService.getItemEntityByUuid(request.entitatUuid());
+        compartitGuardat.setEntitatUuid(item.getUuid());
         return new CompartitResponse(repo.save(compartitGuardat), new ItemResponse(item));
     }
 
-    public CompartitResponse deleteByUuid(UUID uuid) {
-        Compartit c = repo.findByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid));
-
-        if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
-            Carpeta carpeta = carpetaService.getEntityById(c.getEntitatId());
-
-            return new CompartitResponse(repo.deleteByUuid(uuid).orElseThrow(
-                    () -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid)), new CarpetaResponse(carpeta));
-        }
-        Item item = itemService.getEntityById(c.getEntitatId());
-
-        return new CompartitResponse(repo.deleteByUuid(uuid).orElseThrow(
-                () -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid)), new ItemResponse(item));
+    public void deleteByUuid(UUID uuid) {
+        repo.deleteByUuid(uuid);
     }
 
     /*
@@ -112,12 +100,12 @@ public class CompartitService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el id: " + id));
 
         if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
-            Carpeta carpeta = carpetaService.getEntityById(c.getEntitatId());
+            Carpeta carpeta = carpetaService.getCarpetaEntityById(c.getId());
 
             return new CompartitResponse(c, new CarpetaResponse(carpeta));
         }
 
-        Item item = itemService.getEntityById(c.getEntitatId());
+        Item item = itemService.getEntityById(c.getId());
 
         return new CompartitResponse(c, new ItemResponse(item));
     }
@@ -132,19 +120,19 @@ public class CompartitService {
     public CompartitResponse update(Long id, CompartitRequest request) {
         Compartit compartitGuardat = getEntityById(id);
 
-        Usuari u = usuariService.getEntityByUuid(request.usuariUuid());
+        Usuari u = usuariService.getUsuariEntityByUuid(request.usuariUuid());
 
         compartitGuardat.setUsuari(u);
         compartitGuardat.setTipusEntitat(request.tipusEntitat());
         compartitGuardat.setPermisos(request.permisos());
         if (request.tipusEntitat() == TipusEntitat.CARPETA) {
             Carpeta carpeta = carpetaService
-                    .getEntityById(carpetaService.getEntityByUuid(request.entitatUuid()).getId());
-            compartitGuardat.setEntitatId(carpeta.getId());
+                    .getCarpetaEntityById(carpetaService.getCarpetaEntityByUuid(request.entitatUuid()).getId());
+            compartitGuardat.setId(carpeta.getId());
             return new CompartitResponse(repo.save(compartitGuardat), new CarpetaResponse(carpeta));
         }
-        Item item = itemService.getEntityById(itemService.getEntityByUuid(request.entitatUuid()).getId());
-        compartitGuardat.setEntitatId(item.getId());
+        Item item = itemService.getEntityById(itemService.getItemEntityByUuid(request.entitatUuid()).getId());
+        compartitGuardat.setId(item.getId());
         return new CompartitResponse(repo.save(compartitGuardat), new ItemResponse(item));
     }
 

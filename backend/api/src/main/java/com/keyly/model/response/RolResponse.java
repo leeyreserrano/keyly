@@ -6,7 +6,7 @@ import com.keyly.model.Rol;
 
 public record RolResponse(
         UUID uuid,
-        SucursalResponse sucursalResponse,
+        SucursalResponse sucursal,
         String nom) {
 
     public RolResponse(Rol r) {
