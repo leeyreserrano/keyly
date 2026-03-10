@@ -15,5 +15,16 @@ services:
       - mysql-data:/var/lib/mysql
       - ./db/mysql-init:/docker-entrypoint-initdb.d
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui:v5.32.0
+    container_name: swagger-container
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
+    environment:
+      # use URL variable to avoid entrypoint copying the file onto itself
+      SWAGGER_JSON_URL: /openapi.json
+
 volumes:
   mysql-data:
