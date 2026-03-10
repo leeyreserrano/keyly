@@ -19,7 +19,7 @@ services:
     image: swaggerapi/swagger-ui:v5.32.0
     container_name: swagger-container
     ports:
-      - "8085:8080"
+      - "8123:8080"
     volumes:
       - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
     environment:
