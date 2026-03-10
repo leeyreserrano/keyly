@@ -61,9 +61,7 @@ public class CarpetaService {
 
         Carpeta carpeta = new Carpeta(b, c);
 
-        Carpeta carpetaGuardada = repo.save(carpeta);
-
-        return getByUuid(carpetaGuardada.getUuid());
+        return new CarpetaResponse(repo.save(carpeta));
     }
 
     public CarpetaResponse saveItemToCarpeta(UUID carpetaUuid, UUID itemUuid) {

@@ -50,9 +50,7 @@ public class BagulService {
 
         Bagul bagul = new Bagul(usuari);
 
-        Bagul bagulGuardat = repo.save(bagul);
-
-        return getByUuid(bagulGuardat.getUuid());
+        return new BagulResponse(repo.save(bagul));
     }
 
     public BagulResponse update(UUID uuid, BagulRequest request) {

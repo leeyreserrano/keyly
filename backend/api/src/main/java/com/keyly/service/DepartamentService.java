@@ -62,9 +62,7 @@ public class DepartamentService {
         departament.setSucursal(s);
         departament.setNom(request.nom());
 
-        Departament departamentGuardat = repo.save(departament);
-
-        return getByUuid(departamentGuardat.getUuid());
+        return new DepartamentResponse(repo.save(departament));
     }
 
     public DepartamentResponse update(UUID uuid, DepartamentRequest request) {

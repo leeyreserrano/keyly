@@ -77,9 +77,7 @@ public class ItemService {
             }
         }
 
-        Item itemGuardat = repo.save(item);
-
-        return getByUuid(itemGuardat.getUuid());
+        return new ItemResponse(repo.save(item));
     }
 
     public ItemResponse update(UUID uuid, ItemRequest request) {

@@ -73,9 +73,7 @@ public class UsuariService {
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
         usuari.setContrasenya(contrasenyaEncriptada);
 
-        Usuari usuariGuardat = repo.save(usuari);
-
-        return getByUuid(usuariGuardat.getUuid());
+        return new UsuariResponse(repo.save(usuari));
     }
 
     public UsuariResponse update(UUID uuid, UsuariRequest request) {

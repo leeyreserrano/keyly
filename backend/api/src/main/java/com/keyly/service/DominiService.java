@@ -59,9 +59,7 @@ public class DominiService {
         domini.setSucursal(s);
         domini.setDomini(d.domini());
 
-        Domini dominiGuardat = repo.save(domini);
-
-        return getByUuid(dominiGuardat.getUuid());
+        return new DominiResponse(repo.save(domini));
     }
 
     public DominiResponse update(UUID uuid, DominiRequest request) {

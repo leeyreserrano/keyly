@@ -12,13 +12,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GestorGlobalExcepcions {
 
     @ExceptionHandler(EntitatNoTrobadaException.class)
-    public ResponseEntity<String> noTrobat(EntitatNoTrobadaException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> noTrobat(EntitatNoTrobadaException e) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(CorreuExistentException.class)
-    public ResponseEntity<String> correuExistent(CorreuExistentException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> correuExistent(CorreuExistentException e) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
 }
