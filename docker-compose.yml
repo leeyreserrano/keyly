@@ -1,8 +1,6 @@
 services:
   backend:
-    build: 
-      context: ./backend
-      dockerfile: api/Dockerfile
+    build: ./backend/api
     container_name: springboot
     ports:
       - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
@@ -40,6 +38,20 @@ services:
       SWAGGER_JSON_URL: /openapi.json
     networks:
       - network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "8124:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./backend/swagger:/usr/share/nginx/html/swagger
+      # - ./frontend/build:/usr/share/nginx/html/frontend # cuando tengas frontend
+    networks:
+      - network
+    depends_on:
+      - backend
 
 volumes:
   mysql-data:
