@@ -2,8 +2,8 @@ services:
   backend:
     build: ./backend/api
     container_name: springboot
-    ports:
-      - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
+    # ports:
+    #   - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
     networks:
       - network
     depends_on:
@@ -43,7 +43,7 @@ services:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - "8124:80"
+      - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./backend/swagger:/usr/share/nginx/html/swagger
