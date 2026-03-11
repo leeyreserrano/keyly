@@ -35,7 +35,7 @@ services:
     volumes:
       - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
     environment:
-      SWAGGER_JSON_URL: /openapi.json
+      SWAGGER_JSON_URL: /swagger/openapi.json
     networks:
       - network
 
