@@ -46,7 +46,7 @@ services:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./backend/swagger:/usr/share/nginx/html/swagger
+      - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
       # - ./frontend/build:/usr/share/nginx/html/frontend # cuando tengas frontend
     networks:
       - network
