@@ -23,7 +23,6 @@ services:
     volumes:
       - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
     environment:
-      # use URL variable to avoid entrypoint copying the file onto itself
       SWAGGER_JSON_URL: /openapi.json
 
 volumes:

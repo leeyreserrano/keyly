@@ -1,6 +1,6 @@
 package com.keyly.model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -63,11 +63,11 @@ public class Usuari {
 
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
-    private Date dataCreacio;
+    private LocalDateTime dataCreacio;
 
     @CreationTimestamp
     @Column(name = "data_ultim_login", updatable = true)
-    private Date dataUltimLogin;
+    private LocalDateTime dataUltimLogin;
 
     @Column(name = "pot_administrar")
     private Boolean potAdministrar;

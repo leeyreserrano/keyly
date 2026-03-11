@@ -60,7 +60,7 @@ public class DepartamentService {
         Departament departament = new Departament();
 
         departament.setSucursal(s);
-        departament.setNom(request.nom());
+        departament.setDomini(request.nom());
 
         return new DepartamentResponse(repo.save(departament));
     }

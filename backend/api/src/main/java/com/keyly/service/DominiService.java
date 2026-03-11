@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.keyly.exception.CorreuExistentException;
+import com.keyly.exception.DominiInvalidException;
 import com.keyly.exception.EntitatNoTrobadaException;
 import com.keyly.mapper.DominiMapper;
 import com.keyly.model.Domini;
@@ -48,11 +48,13 @@ public class DominiService {
     }
 
     public DominiResponse save(DominiRequest d) {
-        Sucursal s = sucursalService.getSucursalEntityByUuid(d.sucursalUuid());
+        if (!esDominiValid(d.domini()))
+            throw new DominiInvalidException("El domini " + d.domini() + " no és un domini válid.");
 
-        if (!esDominiValid(d.domini())) {
-            throw new CorreuExistentException("El domini " + d.domini() + " no és un domini válid.");
-        }
+        if (repo.existsByDomini(d.domini()))
+            throw new DominiInvalidException("El domini " + d.domini() + " ja existeix.");
+
+        Sucursal s = sucursalService.getSucursalEntityByUuid(d.sucursalUuid());
 
         Domini domini = new Domini();
 
@@ -63,18 +65,22 @@ public class DominiService {
     }
 
     public DominiResponse update(UUID uuid, DominiRequest request) {
+        if (!esDominiValid(request.domini()) && request.domini() != null) {
+            throw new DominiInvalidException("El domini " + request.domini() + " no és un domini válid.");
+        }
+
+        if (repo.existsByDomini(request.domini()))
+            throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
+
         Sucursal s = null;
 
         if (request.sucursalUuid() != null)
             s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
-        if (!esDominiValid(request.domini()) && request.domini() != null) {
-            throw new CorreuExistentException("El domini " + request.domini() + " no és un domini válid.");
-        }
-
         Domini domini = getDominiEntityByUuid(uuid);
 
-        if (s != null) domini.setSucursal(s);
+        if (s != null)
+            domini.setSucursal(s);
 
         mapper.updateDominiFromDto(request, domini);
 
@@ -115,11 +121,14 @@ public class DominiService {
 
     @Deprecated
     public DominiResponse update(Long id, DominiRequest request) {
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         if (!esDominiValid(request.domini()) && request.domini() != null) {
-            throw new CorreuExistentException("El domini " + request.domini() + " no és un domini válid.");
+            throw new DominiInvalidException("El domini " + request.domini() + " no és un domini válid.");
         }
+
+        if (repo.existsByDomini(request.domini()))
+            throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
+
+        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
 
         Domini domini = getDominiEntityById(id);
 

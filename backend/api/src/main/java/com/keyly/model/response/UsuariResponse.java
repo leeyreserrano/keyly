@@ -1,6 +1,6 @@
 package com.keyly.model.response;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.keyly.model.Usuari;
@@ -13,8 +13,8 @@ public record UsuariResponse(
         String nom,
         String correu,
         String imatge,
-        Date dataCreacio,
-        Date ultimLogin,
+        LocalDateTime dataCreacio,
+        LocalDateTime ultimLogin,
         boolean potAdministrar) {
 
     public UsuariResponse(Usuari u) {

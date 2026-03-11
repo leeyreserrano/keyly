@@ -20,13 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
-/*
- TODO - Pensar en meter una opción para permitir cualquier dominio
- TODO - Validación del dominio, que no tenga espacios, minusculas, que sea un dominio, que pueda empezar 
- por arroba o no, en caso de no empezar por arroba tendrá que insertarlo el servidor
- TODO - Que los dominios no se puedan repetir y asignarle un error personalizado
-*/
-
 @RestController
 public class DominiController {
 

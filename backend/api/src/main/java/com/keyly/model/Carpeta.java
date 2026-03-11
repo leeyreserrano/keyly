@@ -1,6 +1,6 @@
 package com.keyly.model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -63,7 +63,7 @@ public class Carpeta {
 
     @CreationTimestamp
     @Column(name = "data_creacio")
-    private Date dataCreacio;
+    private LocalDateTime dataCreacio;
 
     public void addItem(Item item) {
         items.add(item);

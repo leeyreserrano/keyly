@@ -30,12 +30,11 @@ CREATE TABLE `Rols` (
   CONSTRAINT `fk_rols_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
 );
 
-
 CREATE TABLE `Departaments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
-  `nom` VARCHAR(255) NOT NULL,
+  `domini` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `dk_departaments_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
 );
@@ -50,8 +49,8 @@ CREATE TABLE `Usuaris` (
   `correu` VARCHAR(255) NOT NULL UNIQUE,
   `imatge` VARCHAR(255),
   `contrasenya_master` VARCHAR(60) NOT NULL,
-  `data_creacio` DATE NOT NULL,
-  `data_ultim_login` DATE,
+  `data_creacio` TIMESTAMP NOT NULL,
+  `data_ultim_login` TIMESTAMP,
   `pot_administrar` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_usuaris_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`),
@@ -63,7 +62,7 @@ CREATE TABLE `Baguls` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `propietari_id` BIGINT NOT NULL,
-  `data_creacio` DATE NOT NULL,
+  `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_baguls_usuaris` FOREIGN KEY (`propietari_id`) REFERENCES `Usuaris` (`id`)
 );
@@ -79,9 +78,9 @@ CREATE TABLE `Items` (
   `url` VARCHAR(255) NULL,
   `notes` TEXT NULL,
   `favorit` BOOLEAN NULL DEFAULT FALSE,
-  `data_creacio` DATE NOT NULL,
-  `data_editat` DATE NULL,
-  `ultim_access` DATE NULL,
+  `data_creacio` TIMESTAMP NOT NULL,
+  `data_editat` TIMESTAMP NULL,
+  `ultim_access` TIMESTAMP NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_items_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`)
 );
@@ -91,7 +90,7 @@ CREATE TABLE `Carpetes` (
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `bagul_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NULL,
-  `data_creacio` DATE NOT NULL,
+  `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_carpetes_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`)
 );
@@ -110,8 +109,17 @@ CREATE TABLE `Compartits` (
   `tipus_entitat` ENUM('CARPETA','ITEM') NOT NULL,
   `entitat_uuid` BINARY(16) NOT NULL,
   `permisos` ENUM('LECTURA','ESCRIPTURA','ADMINISTRADOR') NOT NULL,
-  `data_creacio` DATE NOT NULL,
+  `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_compartits` (`tipus_entitat`, `entitat_uuid`),
   CONSTRAINT `fk_compartits_usuaris` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
+);
+
+CREATE TABLE `Config` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
+  `sucursal_id` BIGINT NOT NULL,
+  `permetre_tots_dominis` BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_config_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
 );
