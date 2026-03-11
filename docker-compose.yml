@@ -1,4 +1,16 @@
 services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: api/Dockerfile
+    container_name: springboot
+    ports:
+      - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
+    networks:
+      - network
+    depends_on:
+      - db
+
   db:
     image: mysql:8.0
     container_name: mysql-container
@@ -14,17 +26,24 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./db/mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - network
 
   swagger-ui:
     image: swaggerapi/swagger-ui:v5.32.0
     container_name: swagger-container
     ports:
-      - "8123:8080"
+      - "${SWAGGER_PORT_LOCAL}:${SWAGGER_PORT_DOCKER}"
     volumes:
       - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
     environment:
-      # use URL variable to avoid entrypoint copying the file onto itself
       SWAGGER_JSON_URL: /openapi.json
+    networks:
+      - network
 
 volumes:
   mysql-data:
+
+networks:
+  network:
+    driver: bridge

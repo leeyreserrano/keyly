@@ -1,6 +1,6 @@
 package com.keyly.model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -57,7 +57,7 @@ public class Compartit {
 
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
-    private Date dataCreacio;
+    private LocalDateTime dataCreacio;
 
     public Compartit(Usuari usuari, CompartitRequest request) {
         this.usuari = usuari;

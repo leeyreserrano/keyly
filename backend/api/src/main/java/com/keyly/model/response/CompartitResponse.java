@@ -1,6 +1,6 @@
 package com.keyly.model.response;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.keyly.model.Compartit;
@@ -14,7 +14,7 @@ public record CompartitResponse(
         CarpetaResponse carpetaUuid,
         ItemResponse itemUuid,
         Permisos permisos,
-        Date dataCreacio) {
+        LocalDateTime dataCreacio) {
 
     public CompartitResponse(Compartit c, CarpetaResponse carpeta) {
         this(

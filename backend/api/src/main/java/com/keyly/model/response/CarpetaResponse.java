@@ -1,6 +1,6 @@
 package com.keyly.model.response;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public record CarpetaResponse(
         BagulResponse bagul,
         List<ItemResponse> items,
         String nom,
-        Date dataCreacio) {
+        LocalDateTime dataCreacio) {
 
     public CarpetaResponse(Carpeta c) {
         this(

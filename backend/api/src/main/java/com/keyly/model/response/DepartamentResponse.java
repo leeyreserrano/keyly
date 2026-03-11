@@ -13,7 +13,7 @@ public record DepartamentResponse(
         this(
                 d.getUuid(),
                 new SucursalResponse(d.getSucursal()),
-                d.getNom());
+                d.getDomini());
     }
 
 }

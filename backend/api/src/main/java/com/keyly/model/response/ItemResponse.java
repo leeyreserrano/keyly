@@ -1,6 +1,6 @@
 package com.keyly.model.response;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.keyly.model.Item;
@@ -14,9 +14,9 @@ public record ItemResponse(
         String url,
         String notes,
         boolean favorit,
-        Date dataCreacio,
-        Date dataEditat,
-        Date ultimAccess) {
+        LocalDateTime dataCreacio,
+        LocalDateTime dataEditat,
+        LocalDateTime ultimAccess) {
 
     public ItemResponse(Item i) {
         this(

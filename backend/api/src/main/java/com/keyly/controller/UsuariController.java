@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /*
-    TODO - Validación del mail, sin espacios, en minuscula, que sea un mail, que cumpla con la tabla de dominios
-    TODO - Al cambiar la contrasenya, se deberá de volver a encriptar todas las contraseñas del usuario en la bd con la nueva contraseña
+    TODO - Al cambiar la contrasenya, se deberá de volver a encriptar todas las contraseñas del usuario en la bd con la nueva contraseña (JWT hecho)
     TODO - Manejar las imagenes de los usuarios
 */
 

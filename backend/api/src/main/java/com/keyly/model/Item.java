@@ -1,6 +1,6 @@
 package com.keyly.model;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -75,15 +75,15 @@ public class Item {
 
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
-    private Date dataCreacio;
+    private LocalDateTime dataCreacio;
 
     @CreationTimestamp
     @Column(name = "data_editat", updatable = true)
-    private Date dataEditat;
+    private LocalDateTime dataEditat;
 
     @CreationTimestamp
     @Column(name = "ultim_access", updatable = true)
-    private Date dataUltimAcces;
+    private LocalDateTime dataUltimAcces;
 
     public void addCarpeta(Carpeta carpeta) {
         carpetas.add(carpeta);

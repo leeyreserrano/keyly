@@ -16,6 +16,8 @@ public interface DominiRepo extends JpaRepository<Domini, Long> {
 
     Optional<Domini> findByUuid(UUID uuid);
 
+    boolean existsByDomini(String domini);
+
     @Modifying
     @Transactional
     void deleteByUuid(UUID uuid);
