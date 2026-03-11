@@ -16,11 +16,14 @@ import com.keyly.model.request.SucursalRequest;
 import com.keyly.model.response.SucursalResponse;
 import com.keyly.service.SucursalService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@Tag(name = "Controller de sucursals")
 public class SucursalController {
 
     @Autowired
