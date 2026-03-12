@@ -6,7 +6,7 @@ if curl --output /dev/null --silent --head --fail http://localhost:8081/api/v3/a
     rm -f openapi.json
 
     # Decarrega el nou
-    curl -f http://localhost:8081/api/v3/api-docs -o openapi.json
+    curl -f http://localhost:8081/api/v3/api-docs -o ~/keyly/backend/swagger/openapi.json
 
     echo "Fitxer descarregat."
 else

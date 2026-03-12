@@ -1,4 +1,4 @@
-# springdoc:
-#   swagger-ui:
-#     operationsSorter: method
-#     tagsSorter: alpha
+springdoc:
+  swagger-ui:
+    operationsSorter: method
+    tagsSorter: alpha
