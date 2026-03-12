@@ -2,7 +2,6 @@ package com.keyly.service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,9 +66,6 @@ public class UsuariService {
         if (repo.existsByCorreu(u.correu()))
             throw new CorreuExistentException("El correu: " + u.correu() + " ja existeix.");
 
-        if (correuValid(u.correu()) && u.correu() != null)
-            throw new CorreuExistentException("El correu: " + u.correu() + " no és un correu valid.");
-
         Usuari usuari = new Usuari(s, d, r, u);
 
         String contrasenyaCruda = u.contrasenya();
@@ -83,9 +79,6 @@ public class UsuariService {
         Sucursal s = null;
         Departament d = null;
         Rol r = null;
-
-        if (correuValid(request.correu()) && request.correu() != null)
-            throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
 
         if (request.sucursalUuid() != null)
             s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
@@ -125,12 +118,6 @@ public class UsuariService {
         return passwordEncoder.matches(contrasenya, contrasenyaBD);
     }
 
-    public boolean correuValid(String correu) {
-        final String regex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)+$";
-
-        return Pattern.matches(regex, correu);
-    }
-
     /*
      * Métodos que desaparecerán en futuras versiones
      */
@@ -150,9 +137,6 @@ public class UsuariService {
         Sucursal s = null;
         Departament d = null;
         Rol r = null;
-
-        if (correuValid(request.correu()) && request.correu() != null)
-            throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
 
         if (request.sucursalUuid() != null)
             s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
