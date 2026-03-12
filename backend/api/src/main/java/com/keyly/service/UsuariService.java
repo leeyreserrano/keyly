@@ -1,6 +1,5 @@
 package com.keyly.service;
 
-import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -127,7 +126,7 @@ public class UsuariService {
     }
 
     public boolean correuValid(String correu) {
-        final String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        final String regex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)+$";
 
         return Pattern.matches(regex, correu);
     }
