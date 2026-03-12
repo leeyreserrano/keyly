@@ -1,5 +1,6 @@
 package com.keyly.service;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -67,8 +68,8 @@ public class UsuariService {
         if (repo.existsByCorreu(u.correu()))
             throw new CorreuExistentException("El correu: " + u.correu() + " ja existeix.");
 
-        // if (correuValid(u.correu()) && u.correu() != null)
-        //     throw new CorreuExistentException("El correu: " + u.correu() + " no és un correu valid.");
+        if (correuValid(u.correu()) && u.correu() != null)
+            throw new CorreuExistentException("El correu: " + u.correu() + " no és un correu valid.");
 
         Usuari usuari = new Usuari(s, d, r, u);
 
@@ -84,8 +85,8 @@ public class UsuariService {
         Departament d = null;
         Rol r = null;
 
-        // if (correuValid(request.correu()) && request.correu() != null)
-        //     throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
+        if (correuValid(request.correu()) && request.correu() != null)
+            throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
 
         if (request.sucursalUuid() != null)
             s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
@@ -125,12 +126,10 @@ public class UsuariService {
         return passwordEncoder.matches(contrasenya, contrasenyaBD);
     }
 
-    // TODO CAMBIAR REGEX
-
     public boolean correuValid(String correu) {
-        final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        final String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
-        return Pattern.matches(EMAIL_REGEX, correu);
+        return Pattern.matches(regex, correu);
     }
 
     /*
@@ -153,8 +152,8 @@ public class UsuariService {
         Departament d = null;
         Rol r = null;
 
-        // if (correuValid(request.correu()) && request.correu() != null)
-        //     throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
+        if (correuValid(request.correu()) && request.correu() != null)
+            throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
 
         if (request.sucursalUuid() != null)
             s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
