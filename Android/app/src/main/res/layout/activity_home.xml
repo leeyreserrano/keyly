@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="299dp"
+            android:background="@drawable/section_logo_login"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/logo_keyly"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="270dp"
+                    app:srcCompat="@drawable/logo_keyly_sin_letras" />
+
+                <ImageView
+                    android:id="@+id/icon_notification"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/icon_notification" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtVResum"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/airbnb_cereal_w_bd"
+                android:text="Resum"
+                android:textColor="@color/black"
+                android:textSize="20dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_resum"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/icon_notification" />
+
+                    <TextView
+                        android:id="@+id/txtVFortes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/manrope_regular"
+                        android:gravity="center"
+                        android:text="Fortes"
+                        android:textColor="@color/light_grey"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/txtVFortesQty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:gravity="center"
+                        android:text="22"
+                        android:textColor="@color/black"
+                        android:textSize="20dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="@drawable/background_resum"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/icon_notification" />
+
+                    <TextView
+                        android:id="@+id/txtVCompromeses"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/manrope_regular"
+                        android:gravity="center"
+                        android:text="Compromesses"
+                        android:textColor="@color/light_grey"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/txtVCompromessesQty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:gravity="center"
+                        android:text="22"
+                        android:textColor="@color/black"
+                        android:textSize="20dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_resum"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/icon_notification" />
+
+                    <TextView
+                        android:id="@+id/txtVDebils"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/manrope_regular"
+                        android:gravity="center"
+                        android:text="Dèbils"
+                        android:textColor="@color/light_grey"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/txtVDebilsQty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:gravity="center"
+                        android:text="22"
+                        android:textColor="@color/black"
+                        android:textSize="20dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btn_filtre_tot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="92dp"
+                android:minHeight="30dp"
+                android:text="Tot"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_filtres_home"/>
+
+            <Button
+                android:id="@+id/btn_filtre_usades"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:minWidth="92dp"
+                android:minHeight="30dp"
+                android:text="Més usades"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_filtres_home"/>
+
+            <Button
+                android:id="@+id/btn_filtre_favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="92dp"
+                android:minHeight="30dp"
+                android:text="Favorites"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_filtres_home"/>
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerItems"
+            android:layout_width="match_parent"
+            android:layout_height="268dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp" />
+
+        <LinearLayout
+            android:id="@+id/layoutError"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:background="@drawable/background_error"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingStart="20dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ERROR"
+                android:fontFamily="@font/airbnb_cereal_w_bd"
+                android:textSize="25dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No hi ha connexió"
+                android:fontFamily="@font/manrope_regular"
+                android:textSize="20dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white"
+        app:itemIconTint="#9046CF"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/menu_app" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

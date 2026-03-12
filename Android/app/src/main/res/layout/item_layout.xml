@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="370dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/background_item_layout"
+    android:elevation="5dp"
+    android:padding="8dp"
+    android:layout_marginBottom="15dp"
+    android:gravity="left">
+
+    <ImageView
+        android:id="@+id/imgIconItem"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/icon_notification"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/txtNameItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Item"
+            android:textSize="20dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/airbnb_cereal_w_bd"/>
+
+        <TextView
+            android:id="@+id/txtNameUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="correu@domini.cat"
+            android:textSize="17dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/manrope_regular"/>
+
+    </LinearLayout>
+
+</LinearLayout>

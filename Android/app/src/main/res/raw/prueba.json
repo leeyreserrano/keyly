@@ -1,0 +1,25 @@
+[
+    {
+        "id": 1,
+        "titol": "Item1",
+        "nom_usuari": "usuari1",
+        "contrasenya": "1234",
+        "url": "https://github.com/",
+        "notes": "notes1",
+        "data_creacio": "2026-03-05",
+        "data_editat": "2026-03-05",
+        "ultim_access": "2026-03-05"
+    },
+
+    {
+        "id": 2,
+        "titol": "Item2",
+        "nom_usuari": "usuari2",
+        "contrasenya": "1234",
+        "url": "https://github.com/",
+        "notes": "notes2",
+        "data_creacio": "2026-03-05",
+        "data_editat": "2026-03-05",
+        "ultim_access": "2026-03-05"
+    }
+]

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:orientation="vertical">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="387dp"
+        android:background="@drawable/section_logo_login">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="388dp"
+            app:srcCompat="@drawable/logo_keyly" />
+    </FrameLayout>
+
+    <EditText
+        android:id="@+id/editTextTextEmailAddress"
+        android:layout_width="352dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="100px"
+        android:padding="30px"
+        android:background="@drawable/edit_text_enabled"
+        android:hint="email@domini.cat"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/editTextTextPassword"
+        android:layout_width="352dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50px"
+        android:padding="30px"
+        android:background="@drawable/edit_text_enabled"
+        android:hint="································"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="352dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50px"
+        android:text="Log In"
+        android:textSize="17dp"
+        android:fontFamily="@font/airbnb_cereal_w_bd"
+        android:textAllCaps="false"
+        android:background="@drawable/background_buttons"
+        android:textColor="@color/white" />
+</LinearLayout>
