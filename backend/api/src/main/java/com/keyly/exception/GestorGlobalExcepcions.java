@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.validation.ConstraintViolationException;
+
 /**
  * Classe que recull totes les excepcions que puguin sortir
  */
@@ -34,8 +36,8 @@ public class GestorGlobalExcepcions {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ConstraintViolationException ex) {
         ErrorResponse e = new ErrorResponse(400, "Correu no válid");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
     }
