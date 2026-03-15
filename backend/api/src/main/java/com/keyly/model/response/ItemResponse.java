@@ -16,9 +16,10 @@ public record ItemResponse(
         boolean favorit,
         LocalDateTime dataCreacio,
         LocalDateTime dataEditat,
-        LocalDateTime ultimAccess) {
+        LocalDateTime ultimAccess,
+        boolean dinsDeCarpeta) {
 
-    public ItemResponse(Item i) {
+    public ItemResponse(Item i, boolean dinsDeCarpeta) {
         this(
                 i.getUuid(),
                 new BagulResponse(i.getBagul()),
@@ -30,7 +31,8 @@ public record ItemResponse(
                 i.getFavorit(),
                 i.getDataCreacio(),
                 i.getDataEditat(),
-                i.getDataUltimAcces());
+                i.getDataUltimAcces(),
+                dinsDeCarpeta);
     }
 
 }

@@ -19,7 +19,7 @@ public record CarpetaResponse(
                 new BagulResponse(c.getBagul()),
                 c.getItems()
                         .stream()
-                        .map(item -> new ItemResponse(item))
+                        .map(item -> new ItemResponse(item, true))
                         .toList(),
                 c.getNom(),
                 c.getDataCreacio());

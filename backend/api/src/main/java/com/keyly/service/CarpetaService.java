@@ -45,6 +45,12 @@ public class CarpetaService {
         return new CarpetaResponse(carpeta);
     }
 
+    /**
+     * Llistat dels items dins d'una carpeta per UUID.
+     * 
+     * @param uuid Identificador de la carpeta
+     * @return Tots els items associats a la carpeta
+     */
     public List<ItemResponse> getCarpetaItem(UUID uuid) {
         CarpetaResponse carpeta = getByUuid(uuid);
 
@@ -101,6 +107,10 @@ public class CarpetaService {
         Item itemRecuperat = itemService.getItemEntityByUuid(itemUuid);
         carpeta.removeItem(itemRecuperat);
         repo.save(carpeta);
+    }
+
+    public boolean hasItemInAnyCarpeta(UUID itemUuid) {
+        return repo.existsItemInCarpetes(itemUuid);
     }
 
     /*

@@ -49,7 +49,7 @@ public class CompartitService {
 
         Item item = itemService.getItemEntityByUuid(c.getEntitatUuid());
 
-        return new CompartitResponse(c, new ItemResponse(item));
+        return new CompartitResponse(c, new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())));
     }
 
     public Compartit getEntityByUuid(UUID uuid) {
@@ -83,7 +83,9 @@ public class CompartitService {
         }
         Item item = itemService.getItemEntityByUuid(request.entitatUuid());
         compartitGuardat.setEntitatUuid(item.getUuid());
-        return new CompartitResponse(repo.save(compartitGuardat), new ItemResponse(item));
+
+        return new CompartitResponse(repo.save(compartitGuardat),
+                new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())));
     }
 
     public void deleteByUuid(UUID uuid) {
@@ -107,7 +109,7 @@ public class CompartitService {
 
         Item item = itemService.getEntityById(c.getId());
 
-        return new CompartitResponse(c, new ItemResponse(item));
+        return new CompartitResponse(c, new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())));
     }
 
     @Deprecated
@@ -133,7 +135,8 @@ public class CompartitService {
         }
         Item item = itemService.getEntityById(itemService.getItemEntityByUuid(request.entitatUuid()).getId());
         compartitGuardat.setId(item.getId());
-        return new CompartitResponse(repo.save(compartitGuardat), new ItemResponse(item));
+        return new CompartitResponse(repo.save(compartitGuardat),
+                new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())));
     }
 
     @Deprecated

@@ -1,5 +1,3 @@
-- Validación de que el correo de un usuario al ser creado sea un correo
-
 - El item tiene que saber si está dentro de una carpeta o no
 
 - Los endpoints de creación múltiple, tratar que pasa si alguno falla en la creación
