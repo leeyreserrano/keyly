@@ -21,7 +21,7 @@ public interface CarpetaRepo extends JpaRepository<Carpeta, Long> {
     SELECT EXISTS (
         SELECT 1
         FROM Carpetes_Items ci
-        JOIN items i ON i.id = ci.item_id
+        JOIN Items i ON i.id = ci.item_id
         WHERE i.uuid = :uuid
     )
     """, nativeQuery = true)
