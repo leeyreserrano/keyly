@@ -110,7 +110,7 @@ public class CarpetaService {
     }
 
     public boolean hasItemInAnyCarpeta(UUID itemUuid) {
-        return repo.existsItemInCarpetes(itemUuid);
+        return (repo.existItemInCarpetes(itemUuid) > 0) ? true : false;
     }
 
     /*
