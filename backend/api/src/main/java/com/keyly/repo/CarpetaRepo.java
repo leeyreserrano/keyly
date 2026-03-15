@@ -18,13 +18,14 @@ public interface CarpetaRepo extends JpaRepository<Carpeta, Long> {
     Optional<Carpeta> findByUuid(UUID uuid);
 
     @Query(value = """
-    SELECT EXISTS (
-        SELECT 1
-        FROM Carpetes_Items ci
-        JOIN Items i ON i.id = ci.item_id
-        WHERE i.uuid = :uuid
-    )
-    """, nativeQuery = true)
+                SELECT CASE
+                    WHEN COUNT(*) > 0 THEN true
+                    ELSE false
+                END
+                FROM Carpetes_Items ci
+                JOIN Items i ON i.id = ci.item_id
+                WHERE i.uuid = :uuid
+            """, nativeQuery = true)
     boolean existsItemInCarpetes(UUID uuid);
 
     @Modifying
