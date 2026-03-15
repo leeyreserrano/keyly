@@ -7,8 +7,7 @@ services:
     networks:
       - network
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   db:
     image: mysql:8.0
@@ -27,12 +26,6 @@ services:
       - ./db/mysql-init:/docker-entrypoint-initdb.d
     networks:
       - network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 30s
 
   swagger-ui:
     image: swaggerapi/swagger-ui:v5.32.0
