@@ -1,5 +1,9 @@
 - El item tiene que saber si está dentro de una carpeta o no
 
+- Que al iniciar las tablas se llenen de items solitas
+
+- Darle una vuelta a la relación entre usuarios y baules, quizás deba de ser 1..1
+
 - Los endpoints de creación múltiple, tratar que pasa si alguno falla en la creación
 
 - Manejar las imagenes de los usuarios
