@@ -20,7 +20,7 @@ public interface CarpetaRepo extends JpaRepository<Carpeta, Long> {
     @Query(value = """
     SELECT EXISTS (
         SELECT 1
-        FROM carpetes_items ci
+        FROM Carpetes_Items ci
         JOIN items i ON i.id = ci.item_id
         WHERE i.uuid = :uuid
     )
