@@ -1,5 +1,9 @@
 - Arreglar problema con config, el parametro de totsdominispermesos no se actualiza
 
+- Añadir el fix para las updates, no es necesario que pasen las uuid de lo que dependan si no se va a cambiar
+
+- Cambiar put's por patch's
+
 - Comprovación de que un telefono sea un telefono en sucursals
 
 - Darle una vuelta a la relación entre usuarios y baules, quizás deba de ser 1..1
