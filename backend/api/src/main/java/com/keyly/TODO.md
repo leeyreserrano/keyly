@@ -1,6 +1,12 @@
 - Que al iniciar las tablas se llenen de items solitas
 
+- Que comprueve de la config si el dominio que se intenta meter del usuario esté en la config o que estén todos permitidos
+
+- Comprovación de que un telefono sea un telefono en sucursals
+
 - Darle una vuelta a la relación entre usuarios y baules, quizás deba de ser 1..1
+
+- Darle una vuelta a la tabla compartits en el atributo entitat_uuid, quizás habría que poner la id en vez de la uuid
 
 - Los endpoints de creación múltiple, tratar que pasa si alguno falla en la creación
 
