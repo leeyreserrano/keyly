@@ -20,8 +20,8 @@ public class GestorGlobalExcepcions {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @ExceptionHandler(CorreuExistentException.class)
-    public ResponseEntity<ErrorResponse> correuExistent(CorreuExistentException e) {
+    @ExceptionHandler(CorreuException.class)
+    public ResponseEntity<ErrorResponse> correuExistent(CorreuException e) {
         ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

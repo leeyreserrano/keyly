@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.keyly.exception.CorreuExistentException;
+import com.keyly.exception.CorreuException;
 import com.keyly.exception.EntitatNoTrobadaException;
 import com.keyly.mapper.UsuariMapper;
 import com.keyly.model.Departament;
@@ -15,6 +15,8 @@ import com.keyly.model.Rol;
 import com.keyly.model.Sucursal;
 import com.keyly.model.Usuari;
 import com.keyly.model.request.UsuariRequest;
+import com.keyly.model.response.ConfigResponse;
+import com.keyly.model.response.DominiResponse;
 import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.UsuariRepo;
 
@@ -29,6 +31,12 @@ public class UsuariService {
 
     @Autowired
     private DepartamentService departamentService;
+
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private DominiService dominiService;
 
     @Autowired
     private RolService rolService;
@@ -63,10 +71,10 @@ public class UsuariService {
         Departament d = departamentService.getDepartamentEntityByUuid(u.departamentUuid());
         Rol r = rolService.getRolEntityByUuid(u.rolUuid());
 
-        if (repo.existsByCorreu(u.correu()))
-            throw new CorreuExistentException("El correu: " + u.correu() + " ja existeix.");
-
         Usuari usuari = new Usuari(s, d, r, u);
+
+        if (!correuValid(usuari))
+            throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
 
         String contrasenyaCruda = u.contrasenya();
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
@@ -98,6 +106,9 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
+        if (!correuValid(usuari))
+            throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
+
         return new UsuariResponse(repo.save(usuari));
     }
 
@@ -116,6 +127,39 @@ public class UsuariService {
         String contrasenyaBD = u.getContrasenya();
 
         return passwordEncoder.matches(contrasenya, contrasenyaBD);
+    }
+
+    /**
+     * Comprova que un correu no existeixi i que el seu domini estigui permés
+     * 
+     * @param correu Correu del usuari
+     * @return Si es valid
+     */
+    public boolean correuValid(Usuari u) {
+        if (repo.existsByCorreu(u.getCorreu()))
+            throw new CorreuException("El correu: " + u.getCorreu() + " ja existeix.");
+
+        ConfigResponse configResponse = configService.getConfigBySucursalUuid(u.getSucursal().getUuid());
+
+        List<DominiResponse> dominiResponse = dominiService.getDominisBySucursalUuid(u.getSucursal().getUuid());
+
+        String dominiCorreuUsuari = u.getCorreu().substring(u.getCorreu().indexOf('@'));
+
+        if (!dominiService.esDominiValid(dominiCorreuUsuari)) {
+            return false;
+        }
+
+        if (configResponse.permetreTotsDominis()) {
+            return true;
+        }
+
+        for (DominiResponse domini : dominiResponse) {
+            if (domini.domini().equals(dominiCorreuUsuari)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /*
@@ -155,6 +199,9 @@ public class UsuariService {
             usuari.setRol(r);
 
         mapper.updateUsuariFromDto(request, usuari);
+
+        if (!correuValid(usuari))
+            throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
 
         return new UsuariResponse(repo.save(usuari));
     }
