@@ -1,5 +1,3 @@
-- Que al iniciar las tablas se llenen de items solitas
-
 - Que comprueve de la config si el dominio que se intenta meter del usuario esté en la config o que estén todos permitidos
 
 - Comprovación de que un telefono sea un telefono en sucursals
