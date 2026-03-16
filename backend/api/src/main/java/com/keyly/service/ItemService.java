@@ -87,7 +87,8 @@ public class ItemService {
     public ItemResponse update(UUID uuid, ItemRequest request) {
         Item item = getItemEntityByUuid(uuid);
 
-        item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
+        if (!request.bagulUuid().equals(null))
+            item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateItemFromDto(request, item);
 
@@ -125,7 +126,8 @@ public class ItemService {
     public ItemResponse update(Long id, ItemRequest request) {
         Item item = getEntityById(id);
 
-        item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
+        if (!request.bagulUuid().equals(null))
+            item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateItemFromDto(request, item);
 
