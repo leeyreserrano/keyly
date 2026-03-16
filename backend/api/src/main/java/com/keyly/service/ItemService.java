@@ -87,7 +87,7 @@ public class ItemService {
     public ItemResponse update(UUID uuid, ItemRequest request) {
         Item item = getItemEntityByUuid(uuid);
 
-        if (!request.bagulUuid().equals(null))
+        if (request.bagulUuid() != null)
             item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateItemFromDto(request, item);
