@@ -38,12 +38,12 @@ public class Domini {
     @JoinColumn(name = "sucursal_id", nullable = false)
     private Sucursal sucursal;
 
-    @Column(name = "departament", nullable = false)
-    private String departament;
+    @Column(name = "domini", nullable = false)
+    private String domini;
 
     public Domini(Sucursal s, DominiResponse response) {
         this.sucursal = s;
-        this.departament = response.domini();
+        this.domini = response.domini();
     }
 
 }

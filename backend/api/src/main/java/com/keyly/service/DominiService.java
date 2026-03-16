@@ -59,7 +59,7 @@ public class DominiService {
         Domini domini = new Domini();
 
         domini.setSucursal(s);
-        domini.setDepartament(d.domini());
+        domini.setDomini(d.domini());
 
         return new DominiResponse(repo.save(domini));
     }
