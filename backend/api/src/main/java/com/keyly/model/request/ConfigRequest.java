@@ -1,6 +1,6 @@
 package com.keyly.model.request;
 
 public record ConfigRequest(
-        Boolean permetreTotsDominis) {
+                Boolean permetreTotsDominis) {
 
 }

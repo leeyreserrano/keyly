@@ -1,5 +1,3 @@
-- Arreglar problema con config, el parametro de totsdominispermesos no se actualiza
-
 - Añadir el fix para las updates, no es necesario que pasen las uuid de lo que dependan si no se va a cambiar
 
 - Cambiar put's por patch's
