@@ -20,7 +20,7 @@ public interface DominiRepo extends JpaRepository<Domini, Long> {
     Optional<Domini> findByUuid(UUID uuid);
 
     @Query(value = """
-            SELECT *
+            SELECT d.id, d.uuid, d.sucursal_id, d.domini
             FROM Dominis d
             JOIN Sucursals s ON d.sucursal_id = s.id
             WHERE s.uuid = :sucursalUuid
