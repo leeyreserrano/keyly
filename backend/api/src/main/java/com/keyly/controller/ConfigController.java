@@ -64,7 +64,7 @@ public class ConfigController {
         return ResponseEntity.ok(service.updateConfig(uuid, c));
     }
 
-    @Operation(summary = "Obté una config per la UUID d'una sucursal")
+    @Operation(summary = "Actualitza una config per la UUID d'una sucursal")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Config trobada"),
         @ApiResponse(responseCode = "404", description = "Config o sucursal no trobada")

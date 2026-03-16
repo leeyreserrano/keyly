@@ -1,4 +1,4 @@
-- Que comprueve de la config si el dominio que se intenta meter del usuario esté en la config o que estén todos permitidos
+- Arreglar problema con config, el parametro de totsdominispermesos no se actualiza
 
 - Comprovación de que un telefono sea un telefono en sucursals
 
