@@ -34,7 +34,7 @@ CREATE TABLE `Departaments` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
-  `domini` VARCHAR(255) NOT NULL,
+  `departament` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `dk_departaments_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
 );
