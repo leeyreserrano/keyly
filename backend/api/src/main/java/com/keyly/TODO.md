@@ -1,5 +1,3 @@
-- Nginx https
-
 - Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento
 
 - Manejar las imagenes de los usuarios (preguntar opinión al PROFESOR)

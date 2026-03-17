@@ -19,6 +19,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      LANG: C.UTF-8
     ports:
       - "${MYSQL_PORT_LOCAL}:${MYSQL_PORT_DOCKER}"
     volumes:
@@ -26,6 +27,8 @@ services:
       - ./db/mysql-init:/docker-entrypoint-initdb.d
     networks:
       - network
+    command: 
+      --character-set-server=utf8mb4
 
   swagger-ui:
     image: swaggerapi/swagger-ui:v5.32.0
