@@ -4,31 +4,34 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.keyly.model.Usuari;
+import com.keyly.model.response.basics.DepartamentResponseBasic;
+import com.keyly.model.response.basics.RolResponseBasic;
+import com.keyly.model.response.basics.SucursalResponseBasic;
 
 public record UsuariResponse(
         UUID uuid,
-        SucursalResponse sucursal,
-        DepartamentResponse departament,
-        RolResponse rol,
         String nom,
         String correu,
         String imatge,
         LocalDateTime dataCreacio,
         LocalDateTime ultimLogin,
-        boolean potAdministrar) {
+        boolean potAdministrar,
+        SucursalResponseBasic sucursal,
+        DepartamentResponseBasic departament,
+        RolResponseBasic rol) {
 
     public UsuariResponse(Usuari u) {
         this(
                 u.getUuid(),
-                new SucursalResponse(u.getSucursal()),
-                new DepartamentResponse(u.getDepartament()),
-                new RolResponse(u.getRol()),
                 u.getNom(),
                 u.getCorreu(),
                 u.getImatge(),
                 u.getDataCreacio(),
                 u.getDataUltimLogin(),
-                u.getPotAdministrar());
+                u.getPotAdministrar(),
+                new SucursalResponseBasic(u.getSucursal()),
+                new DepartamentResponseBasic(u.getDepartament()),
+                new RolResponseBasic(u.getRol()));
     }
 
 }

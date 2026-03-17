@@ -6,8 +6,6 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.keyly.model.response.BagulResponse;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,17 +44,6 @@ public class Bagul {
 
     public Bagul(Usuari propietari) {
         this.propietari = propietari;
-    }
-
-    public Bagul(BagulResponse response) {
-        Sucursal s = new Sucursal(response.usuari().sucursal());
-
-        this.propietari = new Usuari(
-            new Sucursal(response.usuari().sucursal()),
-            new Departament(s ,response.usuari().departament()),
-            new Rol(s, response.usuari().rol()),
-            response.usuari()
-        );
     }
 
 }

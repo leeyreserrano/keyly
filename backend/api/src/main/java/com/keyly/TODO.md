@@ -1,7 +1,3 @@
-- Cambiar put's por patch's
-
-- Arreglar la redundancia en los responses
-
 - Comprovación de que un telefono sea un telefono en sucursals
 
 - Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento

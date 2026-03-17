@@ -52,9 +52,12 @@ public class CarpetaService {
      * @return Tots els items associats a la carpeta
      */
     public List<ItemResponse> getCarpetaItem(UUID uuid) {
-        CarpetaResponse carpeta = getByUuid(uuid);
+        Carpeta carpeta = getCarpetaEntityByUuid(uuid);
 
-        return carpeta.items();
+        return carpeta.getItems()
+                .stream()
+                .map(item -> new ItemResponse(item, true))
+                .toList();
     }
 
     public Carpeta getCarpetaEntityByUuid(UUID uuid) {
@@ -82,7 +85,7 @@ public class CarpetaService {
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
         Carpeta carpeta = getCarpetaEntityByUuid(uuid);
-        
+
         if (request.bagulUuid() != null)
             carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
@@ -124,9 +127,12 @@ public class CarpetaService {
 
     @Deprecated
     public List<ItemResponse> getCarpetaItem(Long id) {
-        CarpetaResponse carpeta = getById(id);
+        Carpeta carpeta = getCarpetaEntityById(id);
 
-        return carpeta.items();
+        return carpeta.getItems()
+                .stream()
+                .map(item -> new ItemResponse(item, true))
+                .toList();
     }
 
     @Deprecated
@@ -138,7 +144,7 @@ public class CarpetaService {
     @Deprecated
     public CarpetaResponse update(Long id, CarpetaRequest request) {
         Carpeta carpeta = getCarpetaEntityById(id);
-        
+
         if (request.bagulUuid() != null)
             carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
