@@ -1,7 +1,5 @@
 - Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento
 
-- Darle una vuelta a la tabla compartits en el atributo entitat_uuid, quizás habría que poner la id en vez de la uuid
-
 - Manejar las imagenes de los usuarios (preguntar opinión al PROFESOR)
 
 - Plantear la opción de que el administrador pueda elegir cuanto tiempo pasa antes de dar el aviso de que la contraseña debería de cambiarse
