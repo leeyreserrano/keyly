@@ -2,8 +2,6 @@
 
 - Manejar las imagenes de los usuarios (preguntar opinión al PROFESOR)
 
-- Plantear la opción de que el administrador pueda elegir cuanto tiempo pasa antes de dar el aviso de que la contraseña debería de cambiarse
-
 - JWT
 
 - Gestionar las contraseñas seguras (Una vez el jwt esté hecho)

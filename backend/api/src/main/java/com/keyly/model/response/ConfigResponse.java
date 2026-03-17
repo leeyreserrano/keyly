@@ -6,10 +6,11 @@ import com.keyly.model.Config;
 
 public record ConfigResponse(
         UUID uuid,
-        boolean permetreTotsDominis) {
+        boolean permetreTotsDominis,
+        int diesExpiracio) {
 
     public ConfigResponse(Config c) {
-        this(c.getUuid(), c.getPermetreTotsDominis());
+        this(c.getUuid(), c.getPermetreTotsDominis(), c.getDiesExpiracio());
     }
 
 }

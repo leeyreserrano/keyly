@@ -120,6 +120,7 @@ CREATE TABLE `Config` (
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
   `permetre_tots_dominis` BOOLEAN NOT NULL DEFAULT FALSE,
+  `dies_expiracio` INT,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_config_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
 );

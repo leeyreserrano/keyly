@@ -38,4 +38,7 @@ public class Config {
     @Column(name = "permetre_tots_dominis")
     private Boolean permetreTotsDominis;
 
+    @Column(name = "dies_expiracio")
+    private int diesExpiracio;
+
 }

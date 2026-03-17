@@ -9,11 +9,13 @@ BEGIN
   INSERT INTO Config (
     uuid,
     sucursal_id,
-    permetre_tots_dominis
+    permetre_tots_dominis,
+    dies_expiracio
   ) VALUES (
     UUID_TO_BIN(UUID()),
     NEW.id,
-    FALSE
+    FALSE,
+    30
   );
 END$$
 
