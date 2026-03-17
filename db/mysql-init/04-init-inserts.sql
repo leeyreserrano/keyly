@@ -36,12 +36,6 @@ contrasenya_master, data_creacio,pot_administrar) VALUES
 (UUID_TO_BIN(UUID()), 1, 2, 1, 'Pau', 'p@gmail.com',
 '$2a$12$uQT50ira624UjVe3Two7ieM21fvJeGK.20.OU8g1U9up8ltJCXmVe', NOW(), false);
 
-INSERT INTO Baguls (uuid, propietari_id, data_creacio) VALUES
-(UUID_TO_BIN(UUID()), 1, NOW()),
-(UUID_TO_BIN(UUID()), 2, NOW()),
-(UUID_TO_BIN(UUID()), 1, NOW()),
-(UUID_TO_BIN(UUID()), 1, NOW());
-
 INSERT INTO Carpetes (uuid, bagul_id, nom, data_creacio) VALUES
 (UUID_TO_BIN(UUID()), 1, 'Mail', NOW()),
 (UUID_TO_BIN(UUID()), 2, 'Trabajo', NOW()),

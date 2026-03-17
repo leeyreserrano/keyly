@@ -18,7 +18,7 @@ CREATE TABLE `Dominis` (
   `sucursal_id` BIGINT NOT NULL,
   `domini` VARCHAR(255) NOT NULL UNIQUE,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_dominis_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
+  CONSTRAINT `fk_dominis_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Rols` (
@@ -27,7 +27,7 @@ CREATE TABLE `Rols` (
   `sucursal_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_rols_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
+  CONSTRAINT `fk_rols_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Departaments` (
@@ -36,7 +36,7 @@ CREATE TABLE `Departaments` (
   `sucursal_id` BIGINT NOT NULL,
   `departament` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `dk_departaments_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
+  CONSTRAINT `dk_departaments_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Usuaris` (
@@ -61,10 +61,10 @@ CREATE TABLE `Usuaris` (
 CREATE TABLE `Baguls` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `uuid` BINARY(16) NOT NULL UNIQUE,
-  `propietari_id` BIGINT NOT NULL,
+  `propietari_id` BIGINT NOT NULL UNIQUE,
   `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_baguls_usuaris` FOREIGN KEY (`propietari_id`) REFERENCES `Usuaris` (`id`)
+  CONSTRAINT `fk_baguls_usuaris` FOREIGN KEY (`propietari_id`) REFERENCES `Usuaris` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Items` (
@@ -82,7 +82,7 @@ CREATE TABLE `Items` (
   `data_editat` TIMESTAMP NULL,
   `ultim_access` TIMESTAMP NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_items_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`)
+  CONSTRAINT `fk_items_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Carpetes` (
@@ -92,14 +92,14 @@ CREATE TABLE `Carpetes` (
   `nom` VARCHAR(255) NULL,
   `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_carpetes_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`)
+  CONSTRAINT `fk_carpetes_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Carpetes_Items` (
   `carpeta_id` BIGINT NOT NULL,
   `item_id` BIGINT NOT NULL,
-  CONSTRAINT `fk_carpetes_items_carpetes` FOREIGN KEY (`carpeta_id`) REFERENCES `Carpetes` (`id`),
-  CONSTRAINT `fk_carpetes_items_items` FOREIGN KEY (`item_id`) REFERENCES `Items` (`id`)
+  CONSTRAINT `fk_carpetes_items_carpetes` FOREIGN KEY (`carpeta_id`) REFERENCES `Carpetes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_carpetes_items_items` FOREIGN KEY (`item_id`) REFERENCES `Items` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Compartits` (
@@ -112,7 +112,7 @@ CREATE TABLE `Compartits` (
   `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_compartits` (`tipus_entitat`, `entitat_uuid`),
-  CONSTRAINT `fk_compartits_usuaris` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`)
+  CONSTRAINT `fk_compartits_usuaris` FOREIGN KEY (`usuari_id`) REFERENCES `Usuaris` (`id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Config` (
@@ -121,5 +121,5 @@ CREATE TABLE `Config` (
   `sucursal_id` BIGINT NOT NULL,
   `permetre_tots_dominis` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_config_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`)
+  CONSTRAINT `fk_config_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
 );
