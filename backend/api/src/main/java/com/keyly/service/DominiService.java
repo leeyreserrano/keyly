@@ -84,15 +84,10 @@ public class DominiService {
         if (repo.existsByDomini(request.domini()))
             throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
 
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Domini domini = getDominiEntityByUuid(uuid);
 
-        if (s != null)
-            domini.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            domini.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateDominiFromDto(request, domini);
 
@@ -140,11 +135,11 @@ public class DominiService {
         if (repo.existsByDomini(request.domini()))
             throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
 
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Domini domini = getDominiEntityById(id);
 
-        domini.setSucursal(s);
+        if (request.sucursalUuid() != null) {
+            domini.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
+        }
 
         mapper.updateDominiFromDto(request, domini);
 

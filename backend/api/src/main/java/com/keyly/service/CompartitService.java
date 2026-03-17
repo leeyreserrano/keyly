@@ -70,12 +70,16 @@ public class CompartitService {
     public CompartitResponse update(UUID uuid, CompartitRequest request) {
         Compartit compartitGuardat = getEntityByUuid(uuid);
 
-        Usuari u = usuariService.getUsuariEntityByUuid(request.usuariUuid());
+        if (request.usuariUuid() != null) 
+            compartitGuardat.setUsuari(usuariService.getUsuariEntityByUuid(request.usuariUuid()));
 
-        compartitGuardat.setUsuari(u);
-        compartitGuardat.setTipusEntitat(request.tipusEntitat());
-        compartitGuardat.setPermisos(request.permisos());
-        if (request.tipusEntitat() == TipusEntitat.CARPETA) {
+        if (request.tipusEntitat() != null)
+            compartitGuardat.setTipusEntitat(request.tipusEntitat());
+
+        if (request.permisos() != null)
+            compartitGuardat.setPermisos(request.permisos());
+        
+        if (compartitGuardat.getTipusEntitat() == TipusEntitat.CARPETA) {
             Carpeta carpeta = carpetaService
                     .getCarpetaEntityByUuid(request.entitatUuid());
             compartitGuardat.setEntitatUuid(request.entitatUuid());
@@ -122,12 +126,16 @@ public class CompartitService {
     public CompartitResponse update(Long id, CompartitRequest request) {
         Compartit compartitGuardat = getEntityById(id);
 
-        Usuari u = usuariService.getUsuariEntityByUuid(request.usuariUuid());
+        if (request.usuariUuid() != null) 
+            compartitGuardat.setUsuari(usuariService.getUsuariEntityByUuid(request.usuariUuid()));
 
-        compartitGuardat.setUsuari(u);
-        compartitGuardat.setTipusEntitat(request.tipusEntitat());
-        compartitGuardat.setPermisos(request.permisos());
-        if (request.tipusEntitat() == TipusEntitat.CARPETA) {
+        if (request.tipusEntitat() != null)
+            compartitGuardat.setTipusEntitat(request.tipusEntitat());
+
+        if (request.permisos() != null)
+            compartitGuardat.setPermisos(request.permisos());
+
+        if (compartitGuardat.getTipusEntitat() == TipusEntitat.CARPETA) {
             Carpeta carpeta = carpetaService
                     .getCarpetaEntityById(carpetaService.getCarpetaEntityByUuid(request.entitatUuid()).getId());
             compartitGuardat.setId(carpeta.getId());

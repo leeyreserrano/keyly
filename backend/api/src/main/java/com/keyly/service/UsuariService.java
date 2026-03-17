@@ -84,25 +84,14 @@ public class UsuariService {
     }
 
     public UsuariResponse update(UUID uuid, UsuariRequest request) {
-        Sucursal s = null;
-        Departament d = null;
-        Rol r = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-        if (request.departamentUuid() != null)
-            d = departamentService.getDepartamentEntityByUuid(request.departamentUuid());
-        if (request.rolUuid() != null)
-            r = rolService.getRolEntityByUuid(request.rolUuid());
-
         Usuari usuari = getUsuariEntityByUuid(uuid);
 
-        if (s != null)
-            usuari.setSucursal(s);
-        if (d != null)
-            usuari.setDepartament(d);
-        if (r != null)
-            usuari.setRol(r);
+        if (request.sucursalUuid() != null)
+            usuari.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
+        if (request.departamentUuid() != null)
+            usuari.setDepartament(departamentService.getDepartamentEntityByUuid(request.departamentUuid()));
+        if (request.rolUuid() != null)
+            usuari.setRol(rolService.getRolEntityByUuid(request.rolUuid()));
 
         mapper.updateUsuariFromDto(request, usuari);
 
@@ -172,31 +161,21 @@ public class UsuariService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id)));
     }
 
+    @Deprecated
     public Usuari getUsuariEntityById(Long id) {
         return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id));
     }
 
     @Deprecated
     public UsuariResponse update(Long id, UsuariRequest request) {
-        Sucursal s = null;
-        Departament d = null;
-        Rol r = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-        if (request.departamentUuid() != null)
-            d = departamentService.getDepartamentEntityByUuid(request.departamentUuid());
-        if (request.rolUuid() != null)
-            r = rolService.getRolEntityByUuid(request.rolUuid());
-
         Usuari usuari = getUsuariEntityById(id);
 
-        if (s != null)
-            usuari.setSucursal(s);
-        if (d != null)
-            usuari.setDepartament(d);
-        if (r != null)
-            usuari.setRol(r);
+        if (request.sucursalUuid() != null)
+            usuari.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
+        if (request.departamentUuid() != null)
+            usuari.setDepartament(departamentService.getDepartamentEntityByUuid(request.departamentUuid()));
+        if (request.rolUuid() != null)
+            usuari.setRol(rolService.getRolEntityByUuid(request.rolUuid()));
 
         mapper.updateUsuariFromDto(request, usuari);
 

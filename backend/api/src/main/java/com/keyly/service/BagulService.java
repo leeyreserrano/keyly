@@ -56,7 +56,8 @@ public class BagulService {
     public BagulResponse update(UUID uuid, BagulRequest request) {
         Bagul bagul = getBagulEntityByUuid(uuid);
 
-        bagul.setPropietari(usuariService.getUsuariEntityByUuid(request.propietariUuid()));
+        if (request.propietariUuid() != null)
+            bagul.setPropietari(usuariService.getUsuariEntityByUuid(request.propietariUuid()));
 
         mapper.updateBagulFromDto(request, bagul);
 
@@ -92,7 +93,8 @@ public class BagulService {
     public BagulResponse update(Long id, BagulRequest request) {
         Bagul bagul = getBagulEntityById(id);
 
-        bagul.setPropietari(usuariService.getUsuariEntityByUuid(request.propietariUuid()));
+        if (request.propietariUuid() != null)
+            bagul.setPropietari(usuariService.getUsuariEntityByUuid(request.propietariUuid()));
 
         mapper.updateBagulFromDto(request, bagul);
 

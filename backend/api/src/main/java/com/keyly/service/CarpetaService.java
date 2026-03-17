@@ -81,11 +81,10 @@ public class CarpetaService {
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
-        Bagul b = bagulService.getBagulEntityByUuid(request.bagulUuid());
-
         Carpeta carpeta = getCarpetaEntityByUuid(uuid);
-
-        carpeta.setBagul(b);
+        
+        if (request.bagulUuid() != null)
+            carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateCarpetaFromDto(request, carpeta);
 
@@ -138,11 +137,10 @@ public class CarpetaService {
 
     @Deprecated
     public CarpetaResponse update(Long id, CarpetaRequest request) {
-        Bagul bagul = bagulService.getBagulEntityByUuid(request.bagulUuid());
-
         Carpeta carpeta = getCarpetaEntityById(id);
-
-        carpeta.setBagul(bagul);
+        
+        if (request.bagulUuid() != null)
+            carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateCarpetaFromDto(request, carpeta);
 
