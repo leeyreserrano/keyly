@@ -62,21 +62,6 @@ public class DepartamentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(departament);
     }
 
-    @Operation(summary = "Crea un llistat de departaments")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Departaments creats"),
-        @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades")
-    })
-    @PostMapping("departaments")
-    public ResponseEntity<List<DepartamentResponse>> addDepartaments(@RequestBody List<DepartamentRequest> ds) {
-        List<DepartamentResponse> responses = new ArrayList<>();
-        for (DepartamentRequest d : ds) {
-            responses.add(service.save(d));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Actualitza un departament per UUID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Departament actualitzat"),
@@ -102,6 +87,22 @@ public class DepartamentController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de departaments")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Departaments creats"),
+        @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades")
+    })
+    @Deprecated
+    @PostMapping("departaments")
+    public ResponseEntity<List<DepartamentResponse>> addDepartaments(@RequestBody List<DepartamentRequest> ds) {
+        List<DepartamentResponse> responses = new ArrayList<>();
+        for (DepartamentRequest d : ds) {
+            responses.add(service.save(d));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté un departament per ID", deprecated = true)
     @ApiResponses({

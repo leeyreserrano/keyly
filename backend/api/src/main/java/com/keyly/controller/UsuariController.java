@@ -61,21 +61,6 @@ public class UsuariController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuari);
     }
 
-    @Operation(summary = "Crea un llistat de usuaris")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Usuaris creats"),
-        @ApiResponse(responseCode = "404", description = "Un dels departaments, sucursals o rols no trobats")
-    })
-    @PostMapping("usuaris")
-    public ResponseEntity<List<UsuariResponse>> addUsuaris(@RequestBody List<UsuariRequest> us) {
-        List<UsuariResponse> responses = new ArrayList<>();
-        for (UsuariRequest u : us) {
-            responses.add(service.save(u));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Actualitza un usuari per UUID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
@@ -118,6 +103,22 @@ public class UsuariController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de usuaris")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Usuaris creats"),
+        @ApiResponse(responseCode = "404", description = "Un dels departaments, sucursals o rols no trobats")
+    })
+    @Deprecated
+    @PostMapping("usuaris")
+    public ResponseEntity<List<UsuariResponse>> addUsuaris(@RequestBody List<UsuariRequest> us) {
+        List<UsuariResponse> responses = new ArrayList<>();
+        for (UsuariRequest u : us) {
+            responses.add(service.save(u));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté un usuari per ID", deprecated = true)
     @ApiResponses({

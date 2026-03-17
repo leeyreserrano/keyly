@@ -60,21 +60,6 @@ public class RolController {
         return ResponseEntity.status(HttpStatus.CREATED).body(rol);
     }
 
-    @Operation(summary = "Crea un llistat de rols")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Rols creats"),
-        @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades")
-    })
-    @PostMapping("rols")
-    public ResponseEntity<List<RolResponse>> addRols(@RequestBody List<RolRequest> rs) {
-        List<RolResponse> responses = rs
-                .stream()
-                .map(rol -> service.save(rol))
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Actualitza un rol per UUID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Rol actualitzat"),
@@ -100,6 +85,22 @@ public class RolController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de rols")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Rols creats"),
+        @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades")
+    })
+    @Deprecated
+    @PostMapping("rols")
+    public ResponseEntity<List<RolResponse>> addRols(@RequestBody List<RolRequest> rs) {
+        List<RolResponse> responses = rs
+                .stream()
+                .map(rol -> service.save(rol))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté un rol per ID", deprecated = true)
     @ApiResponses({

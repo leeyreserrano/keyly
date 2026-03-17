@@ -61,21 +61,6 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(item);
     }
 
-    @Operation(summary = "Crea un llistat de items")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Items creats"),
-        @ApiResponse(responseCode = "404", description = "Un dels baguls no trobats")
-    })
-    @PostMapping("items")
-    public ResponseEntity<List<ItemResponse>> addItems(@RequestBody List<ItemRequest> is) {
-        List<ItemResponse> responses = is
-                .stream()
-                .map(item -> service.save(item))
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Actualitza un item per UUID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Item actualitzat"),
@@ -101,6 +86,22 @@ public class ItemController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de items")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Items creats"),
+        @ApiResponse(responseCode = "404", description = "Un dels baguls no trobats")
+    })
+    @Deprecated
+    @PostMapping("items")
+    public ResponseEntity<List<ItemResponse>> addItems(@RequestBody List<ItemRequest> is) {
+        List<ItemResponse> responses = is
+                .stream()
+                .map(item -> service.save(item))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté un item per ID", deprecated = true)
     @ApiResponses({

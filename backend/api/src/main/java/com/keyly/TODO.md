@@ -2,8 +2,6 @@
 
 - Darle una vuelta a la tabla compartits en el atributo entitat_uuid, quizás habría que poner la id en vez de la uuid
 
-- Los endpoints de creación múltiple, tratar que pasa si alguno falla en la creación
-
 - Manejar las imagenes de los usuarios (preguntar opinión al PROFESOR)
 
 - Plantear la opción de que el administrador pueda elegir cuanto tiempo pasa antes de dar el aviso de que la contraseña debería de cambiarse
