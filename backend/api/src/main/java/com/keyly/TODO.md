@@ -1,8 +1,10 @@
-- Añadir el fix para las updates, no es necesario que pasen las uuid de lo que dependan si no se va a cambiar
-
 - Cambiar put's por patch's
 
+- Arreglar la redundancia en los responses
+
 - Comprovación de que un telefono sea un telefono en sucursals
+
+- Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento
 
 - Darle una vuelta a la relación entre usuarios y baules, quizás deba de ser 1..1
 
@@ -11,6 +13,8 @@
 - Los endpoints de creación múltiple, tratar que pasa si alguno falla en la creación
 
 - Manejar las imagenes de los usuarios
+
+- Plantear la opción de que el administrador pueda elegir cuanto tiempo pasa antes de dar el aviso de que la contraseña debería de cambiarse
 
 - Gestionar las contraseñas seguras (Una vez el jwt esté hecho)
 
