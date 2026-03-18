@@ -66,6 +66,11 @@ public class UsuariService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid));
     }
 
+    public Usuari getUsuariEntityByMail(String mail) {
+        return repo.findByCorreu(mail)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el correu: " + mail));
+    }
+
     public UsuariResponse save(UsuariRequest u) {
         Sucursal s = sucursalService.getSucursalEntityByUuid(u.sucursalUuid());
         Departament d = departamentService.getDepartamentEntityByUuid(u.departamentUuid());
@@ -107,15 +112,6 @@ public class UsuariService {
         repo.deleteByUuid(uuid);
 
         return usuari;
-    }
-
-    public boolean login(UUID uuid, String contrasenya) {
-        Usuari u = repo.findByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + uuid));
-
-        String contrasenyaBD = u.getContrasenya();
-
-        return passwordEncoder.matches(contrasenya, contrasenyaBD);
     }
 
     /**
@@ -192,16 +188,6 @@ public class UsuariService {
         repo.deleteById(id);
 
         return usuari;
-    }
-
-    @Deprecated
-    public boolean login(Long id, String contrasenya) {
-        Usuari u = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id));
-
-        String contrasenyaBD = u.getContrasenya();
-
-        return passwordEncoder.matches(contrasenya, contrasenyaBD);
     }
 
 }

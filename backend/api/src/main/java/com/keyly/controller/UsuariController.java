@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @Tag(name = "Usuari Controller", description = "Operacions sobre usuaris")
@@ -83,23 +82,6 @@ public class UsuariController {
         return ResponseEntity.ok(service.deleteByUuid(uuid));
     }
 
-    // [x] Login provisional para ir probando
-    @Operation(summary = "Login per UUID")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Login permés"),
-        @ApiResponse(responseCode = "404", description = "Login no permés")
-    })
-    @GetMapping("login/{uuid}")
-    public ResponseEntity<Boolean> loginProvisional(@PathVariable UUID uuid, @RequestParam String contrasenya) {
-        boolean faLogin = service.login(uuid, contrasenya);
-
-        if (faLogin) {
-            return ResponseEntity.ok(true);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
     /*
      * Métodos que desaparecerán en futuras versiones
      */
@@ -154,24 +136,6 @@ public class UsuariController {
     @DeleteMapping("usuari/id/{id}")
     public ResponseEntity<UsuariResponse> deleteUsuari(@PathVariable Long id) {
         return ResponseEntity.ok(service.deleteById(id));
-    }
-
-    // [x] Login provisional para ir probando
-    @Operation(summary = "Login per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Login permés"),
-        @ApiResponse(responseCode = "404", description = "Login no permés")
-    })
-    @Deprecated
-    @GetMapping("login/id/{id}")
-    public ResponseEntity<Boolean> loginProvisional(@PathVariable Long id, @RequestParam String contrasenya) {
-        boolean faLogin = service.login(id, contrasenya);
-
-        if (faLogin) {
-            return ResponseEntity.ok(true);
-        }
-
-        return ResponseEntity.notFound().build();
     }
 
 }
