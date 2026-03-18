@@ -74,21 +74,6 @@ public class CarpetaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(carpeta);
     }
 
-    @Operation(summary = "Crea un llistat de carpetes")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Carpetes creades"),
-        @ApiResponse(responseCode = "404", description = "Un dels baguls no trobats")
-    })
-    @PostMapping("carpetes")
-    public ResponseEntity<List<CarpetaResponse>> addCarpetes(@RequestBody List<CarpetaRequest> cs) {
-        List<CarpetaResponse> responses = cs
-                .stream()
-                .map(carpeta -> service.save(carpeta))
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Afegeix un item existent en una carpeta")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Item afegit"),
@@ -141,6 +126,22 @@ public class CarpetaController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de carpetes")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Carpetes creades"),
+        @ApiResponse(responseCode = "404", description = "Un dels baguls no trobats")
+    })
+    @Deprecated
+    @PostMapping("carpetes")
+    public ResponseEntity<List<CarpetaResponse>> addCarpetes(@RequestBody List<CarpetaRequest> cs) {
+        List<CarpetaResponse> responses = cs
+                .stream()
+                .map(carpeta -> service.save(carpeta))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté una carpeta per ID", deprecated = true)
     @ApiResponses({

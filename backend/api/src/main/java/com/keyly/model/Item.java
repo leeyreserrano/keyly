@@ -41,7 +41,7 @@ public class Item {
     private Long id;
 
     @UuidGenerator
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID uuid;
 
     @ManyToMany(mappedBy = "items")

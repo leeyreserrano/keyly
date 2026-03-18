@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.keyly.model.Item;
+import com.keyly.model.response.basics.BagulResponseBasic;
 
 public record ItemResponse(
         UUID uuid,
-        BagulResponse bagul,
         String titol,
         String nomUsuari,
         String contrasenya,
@@ -16,12 +16,13 @@ public record ItemResponse(
         boolean favorit,
         LocalDateTime dataCreacio,
         LocalDateTime dataEditat,
-        LocalDateTime ultimAccess) {
+        LocalDateTime ultimAccess,
+        boolean dinsDeCarpeta,
+        BagulResponseBasic bagul) {
 
-    public ItemResponse(Item i) {
+    public ItemResponse(Item i, boolean dinsDeCarpeta) {
         this(
                 i.getUuid(),
-                new BagulResponse(i.getBagul()),
                 i.getTitol(),
                 i.getNomUsuari(),
                 i.getContrasenya(),
@@ -30,7 +31,9 @@ public record ItemResponse(
                 i.getFavorit(),
                 i.getDataCreacio(),
                 i.getDataEditat(),
-                i.getDataUltimAcces());
+                i.getDataUltimAcces(),
+                dinsDeCarpeta,
+                new BagulResponseBasic(i.getBagul(), i.getBagul().getPropietari()));
     }
 
 }

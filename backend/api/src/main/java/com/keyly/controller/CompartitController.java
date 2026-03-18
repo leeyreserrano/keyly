@@ -62,21 +62,6 @@ public class CompartitController {
         return ResponseEntity.status(HttpStatus.CREATED).body(compartit);
     }
 
-    @Operation(summary = "Crea un llistat de entitats compartides")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Entitats compartides creades"),
-        @ApiResponse(responseCode = "404", description = "Un dels usuaris no trobats")
-    })
-    @PostMapping("compartits")
-    public ResponseEntity<List<CompartitResponse>> addCompartits(@RequestBody List<CompartitRequest> cs) {
-        List<CompartitResponse> responses = cs
-                .stream()
-                .map(compartit -> service.save(compartit))
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Actualitza una entitat compartida per UUID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Entitat compartida actualitzada"),
@@ -103,6 +88,22 @@ public class CompartitController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de entitats compartides")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Entitats compartides creades"),
+        @ApiResponse(responseCode = "404", description = "Un dels usuaris no trobats")
+    })
+    @Deprecated
+    @PostMapping("compartits")
+    public ResponseEntity<List<CompartitResponse>> addCompartits(@RequestBody List<CompartitRequest> cs) {
+        List<CompartitResponse> responses = cs
+                .stream()
+                .map(compartit -> service.save(compartit))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté una entitat compartida per ID", deprecated = true)
     @ApiResponses({

@@ -12,7 +12,6 @@ import com.keyly.model.response.ConfigResponse;
 import com.keyly.service.ConfigService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @Tag(name = "Config Controller", description = "Operacions sobre la Configuracio d'una sucursal")
@@ -64,7 +64,7 @@ public class ConfigController {
         return ResponseEntity.ok(service.updateConfig(uuid, c));
     }
 
-    @Operation(summary = "Obté una config per la UUID d'una sucursal")
+    @Operation(summary = "Actualitza una config per la UUID d'una sucursal")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Config trobada"),
         @ApiResponse(responseCode = "404", description = "Config o sucursal no trobada")

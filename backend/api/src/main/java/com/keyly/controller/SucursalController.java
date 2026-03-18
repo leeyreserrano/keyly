@@ -59,21 +59,6 @@ public class SucursalController {
         return ResponseEntity.status(HttpStatus.CREATED).body(novaSucursal);
     }
 
-    @Operation(summary = "Crea un llistat de sucursals")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Sucursals creades")
-    })
-    @PostMapping("sucursals")
-    public ResponseEntity<List<SucursalResponse>> addSucursals(@RequestBody List<SucursalRequest> sucursalsRequests) {
-        List<SucursalResponse> sucursalResponses = new ArrayList<>();
-
-        for (SucursalRequest s : sucursalsRequests) {
-            sucursalResponses.add(service.save(s));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(sucursalResponses);
-    }
-
     @Operation(summary = "Actualitza una sucursal")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Sucursal actualitzada"),
@@ -100,6 +85,22 @@ public class SucursalController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de sucursals")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Sucursals creades")
+    })
+    @Deprecated
+    @PostMapping("sucursals")
+    public ResponseEntity<List<SucursalResponse>> addSucursals(@RequestBody List<SucursalRequest> sucursalsRequests) {
+        List<SucursalResponse> sucursalResponses = new ArrayList<>();
+
+        for (SucursalRequest s : sucursalsRequests) {
+            sucursalResponses.add(service.save(s));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(sucursalResponses);
+    }
 
     @Operation(summary = "Obté una sucursal", deprecated = true)
     @ApiResponses({

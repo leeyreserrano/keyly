@@ -63,22 +63,6 @@ public class DominiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(domini);
     }
 
-    @Operation(summary = "Crea un llistat de dominis")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dominis creats"),
-            @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades"),
-            @ApiResponse(responseCode = "409", description = "Un dels dominis no és válid o ja existeix")
-    })
-    @PostMapping("dominis")
-    public ResponseEntity<List<DominiResponse>> addDominis(@RequestBody List<DominiRequest> ds) {
-        List<DominiResponse> responses = new ArrayList<>();
-        for (DominiRequest d : ds) {
-            responses.add(service.save(d));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
     @Operation(summary = "Actualitza un domini per UUID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Domini creat"),
@@ -104,6 +88,23 @@ public class DominiController {
     /*
      * Métodos que desaparecerán en futuras versiones
      */
+
+    @Operation(summary = "Crea un llistat de dominis")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Dominis creats"),
+            @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades"),
+            @ApiResponse(responseCode = "409", description = "Un dels dominis no és válid o ja existeix")
+    })
+    @Deprecated
+    @PostMapping("dominis")
+    public ResponseEntity<List<DominiResponse>> addDominis(@RequestBody List<DominiRequest> ds) {
+        List<DominiResponse> responses = new ArrayList<>();
+        for (DominiRequest d : ds) {
+            responses.add(service.save(d));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
 
     @Operation(summary = "Obté un domini per ID", deprecated = true)
     @ApiResponses({

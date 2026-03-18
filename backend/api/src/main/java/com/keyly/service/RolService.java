@@ -55,11 +55,10 @@ public class RolService {
     }
 
     public RolResponse update(UUID uuid, RolRequest request) {
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Rol rol = getRolEntityByUuid(uuid);
 
-        rol.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            rol.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateRolFromDto(request, rol);
 
@@ -93,15 +92,10 @@ public class RolService {
 
     @Deprecated
     public RolResponse update(Long id, RolRequest request) {
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Rol rol = getRolEntityById(id);
 
-        if (s != null)
-            rol.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            rol.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateRolFromDto(request, rol);
 

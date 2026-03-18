@@ -38,7 +38,9 @@ public class ItemService {
     public List<ItemResponse> getAllItems() {
         return repo.findAll()
                 .stream()
-                .map(item -> new ItemResponse(item))
+                .map(item -> new ItemResponse(
+                        item,
+                        carpetaService.hasItemInAnyCarpeta(item.getUuid())))
                 .toList();
     }
 
@@ -46,7 +48,7 @@ public class ItemService {
         Item item = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
 
-        return new ItemResponse(item);
+        return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
     }
 
     public Item getItemEntityByUuid(UUID uuid) {
@@ -77,17 +79,22 @@ public class ItemService {
             }
         }
 
-        return new ItemResponse(repo.save(item));
+        Item itemGuardat = repo.save(item);
+
+        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     public ItemResponse update(UUID uuid, ItemRequest request) {
         Item item = getItemEntityByUuid(uuid);
 
-        item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
+        if (request.bagulUuid() != null)
+            item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateItemFromDto(request, item);
 
-        return new ItemResponse(repo.save(item));
+        Item itemGuardat = repo.save(item);
+
+        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     public ItemResponse deleteByUuid(UUID uuid) {
@@ -104,8 +111,10 @@ public class ItemService {
 
     @Deprecated
     public ItemResponse getById(Long id) {
-        return new ItemResponse(
-                repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el id: " + id)));
+        Item item = repo.findById(id)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el id: " + id));
+
+        return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
     }
 
     @Deprecated
@@ -117,11 +126,14 @@ public class ItemService {
     public ItemResponse update(Long id, ItemRequest request) {
         Item item = getEntityById(id);
 
-        item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
+        if (request.bagulUuid() != null)
+            item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateItemFromDto(request, item);
 
-        return new ItemResponse(repo.save(item));
+        Item itemGuardat = repo.save(item);
+
+        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     @Deprecated

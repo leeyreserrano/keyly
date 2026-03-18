@@ -60,21 +60,16 @@ public class DepartamentService {
         Departament departament = new Departament();
 
         departament.setSucursal(s);
-        departament.setDomini(request.nom());
+        departament.setDepartament(request.nom());
 
         return new DepartamentResponse(repo.save(departament));
     }
 
     public DepartamentResponse update(UUID uuid, DepartamentRequest request) {
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Departament d = getDepartamentEntityByUuid(uuid);
 
-        if (s != null)
-            d.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            d.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateDepartamentFromDto(request, d);
 
@@ -103,12 +98,10 @@ public class DepartamentService {
 
     @Deprecated
     public DepartamentResponse update(Long id, DepartamentRequest request) {
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Departament d = getDepartamentEntityById(id);
 
-        if (s != null)
-            d.setSucursal(s);
+        if (request.sucursalUuid() != null) 
+            d.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateDepartamentFromDto(request, d);
 

@@ -31,24 +31,24 @@ public class Departament {
     private Long id;
 
     @UuidGenerator
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID uuid;
 
     @ManyToOne
     @JoinColumn(name = "sucursal_id", nullable = false)
     private Sucursal sucursal;
 
-    @Column(name = "domini")
-    private String domini;
+    @Column(name = "departament")
+    private String departament;
 
     public Departament(Sucursal sucursal, String nom) {
         this.sucursal = sucursal;
-        this.domini = nom;
+        this.departament = nom;
     }
 
     public Departament(Sucursal sucursal, DepartamentResponse response) {
         this.sucursal = sucursal;
-        this.domini = response.nom();
+        this.departament = response.nom();
     }
 
 }

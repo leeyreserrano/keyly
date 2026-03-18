@@ -45,10 +45,19 @@ public class CarpetaService {
         return new CarpetaResponse(carpeta);
     }
 
+    /**
+     * Llistat dels items dins d'una carpeta per UUID.
+     * 
+     * @param uuid Identificador de la carpeta
+     * @return Tots els items associats a la carpeta
+     */
     public List<ItemResponse> getCarpetaItem(UUID uuid) {
-        CarpetaResponse carpeta = getByUuid(uuid);
+        Carpeta carpeta = getCarpetaEntityByUuid(uuid);
 
-        return carpeta.items();
+        return carpeta.getItems()
+                .stream()
+                .map(item -> new ItemResponse(item, true))
+                .toList();
     }
 
     public Carpeta getCarpetaEntityByUuid(UUID uuid) {
@@ -75,11 +84,10 @@ public class CarpetaService {
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
-        Bagul b = bagulService.getBagulEntityByUuid(request.bagulUuid());
-
         Carpeta carpeta = getCarpetaEntityByUuid(uuid);
 
-        carpeta.setBagul(b);
+        if (request.bagulUuid() != null)
+            carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateCarpetaFromDto(request, carpeta);
 
@@ -103,6 +111,10 @@ public class CarpetaService {
         repo.save(carpeta);
     }
 
+    public boolean hasItemInAnyCarpeta(UUID itemUuid) {
+        return (repo.existItemInCarpetes(itemUuid) > 0) ? true : false;
+    }
+
     /*
      * Métodos que desaparecerán en futuras versiones
      */
@@ -115,9 +127,12 @@ public class CarpetaService {
 
     @Deprecated
     public List<ItemResponse> getCarpetaItem(Long id) {
-        CarpetaResponse carpeta = getById(id);
+        Carpeta carpeta = getCarpetaEntityById(id);
 
-        return carpeta.items();
+        return carpeta.getItems()
+                .stream()
+                .map(item -> new ItemResponse(item, true))
+                .toList();
     }
 
     @Deprecated
@@ -128,11 +143,10 @@ public class CarpetaService {
 
     @Deprecated
     public CarpetaResponse update(Long id, CarpetaRequest request) {
-        Bagul bagul = bagulService.getBagulEntityByUuid(request.bagulUuid());
-
         Carpeta carpeta = getCarpetaEntityById(id);
 
-        carpeta.setBagul(bagul);
+        if (request.bagulUuid() != null)
+            carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
 
         mapper.updateCarpetaFromDto(request, carpeta);
 

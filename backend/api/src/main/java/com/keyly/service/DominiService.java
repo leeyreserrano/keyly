@@ -47,6 +47,18 @@ public class DominiService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el uuid: " + uuid));
     }
 
+    /**
+     * Entrega tots els dominis que estiguin relacionats amb la sucursal indicada
+     * 
+     * @param uuid Identificador de la sucursal
+     * @return Dominis de la sucursal
+     */
+    public List<DominiResponse> getDominisBySucursalUuid(UUID uuid) {
+        List<Domini> dominis = repo.findBySucursalUuid(uuid).orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el uuid: " + uuid));
+
+        return dominis.stream().map(domini -> new DominiResponse(domini)).toList();
+    }
+
     public DominiResponse save(DominiRequest d) {
         if (!esDominiValid(d.domini()))
             throw new DominiInvalidException("El domini " + d.domini() + " no és un domini válid.");
@@ -72,15 +84,10 @@ public class DominiService {
         if (repo.existsByDomini(request.domini()))
             throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
 
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Domini domini = getDominiEntityByUuid(uuid);
 
-        if (s != null)
-            domini.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            domini.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateDominiFromDto(request, domini);
 
@@ -128,11 +135,11 @@ public class DominiService {
         if (repo.existsByDomini(request.domini()))
             throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
 
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Domini domini = getDominiEntityById(id);
 
-        domini.setSucursal(s);
+        if (request.sucursalUuid() != null) {
+            domini.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
+        }
 
         mapper.updateDominiFromDto(request, domini);
 

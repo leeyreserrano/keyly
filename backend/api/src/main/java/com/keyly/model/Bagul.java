@@ -6,15 +6,13 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.keyly.model.response.BagulResponse;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,11 +31,11 @@ public class Bagul {
     private Long id;
 
     @UuidGenerator
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID uuid;
 
-    @ManyToOne
-    @JoinColumn(name = "propietari_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "propietari_id", nullable = false, unique = true)
     private Usuari propietari;
 
     @CreationTimestamp
@@ -46,17 +44,6 @@ public class Bagul {
 
     public Bagul(Usuari propietari) {
         this.propietari = propietari;
-    }
-
-    public Bagul(BagulResponse response) {
-        Sucursal s = new Sucursal(response.usuari().sucursal());
-
-        this.propietari = new Usuari(
-            new Sucursal(response.usuari().sucursal()),
-            new Departament(s ,response.usuari().departament()),
-            new Rol(s, response.usuari().rol()),
-            response.usuari()
-        );
     }
 
 }
