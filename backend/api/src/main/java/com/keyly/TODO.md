@@ -1,4 +1,4 @@
-- Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento
+- Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento (NO LO VEO CLARO)
 
 - Manejar las imagenes de los usuarios (preguntar opinión al PROFESOR)
 
