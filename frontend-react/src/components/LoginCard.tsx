@@ -1,50 +1,38 @@
 import React from 'react';
-import MuiCard from '@mui/material/Card';
+import { useNavigate } from 'react-router';
+import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ForgotPassword from './ForgotPassword';
-import { SiteKeyly } from './CustomIcons';
-
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignSelf: 'center',
-  width: '100%',
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  boxShadow:
-    'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
-  [theme.breakpoints.up('sm')]: {
-    width: '450px',
-  },
-}));
 
 export default function LoginCard() {
+  const navigate = useNavigate();
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (emailError || passwordError) return;
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    if (!validateInputs()) return;
+    navigate('/home');
   };
 
   const validateInputs = () => {
@@ -74,41 +62,27 @@ export default function LoginCard() {
   };
 
   return (
-    <Card variant="outlined">
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          mb: 2,
-          width: '100%',
-        }}
-      >
-        <SiteKeyly style={{ width: 250, height: 250 }} />
-      </Box>
-
-      <Typography
-        component="h1"
-        variant="h4"
-        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', textAlign: 'center' }}
-      >
-        Sign in
+    <Stack sx={{ width: '100%', maxWidth: '420px', gap: 3 }}>
+      <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+        Login
       </Typography>
 
       <Box
         component="form"
         onSubmit={handleSubmit}
         noValidate
-        sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
       >
         <FormControl>
-          <FormLabel htmlFor="email">Email</FormLabel>
+          <FormLabel htmlFor="email" sx={{ fontWeight: 600, mb: 0.5 }}>
+            Email
+          </FormLabel>
           <TextField
             error={emailError}
             helperText={emailErrorMessage}
             id="email"
             type="email"
             name="email"
-            placeholder="your@email.com"
             autoComplete="email"
             autoFocus
             required
@@ -119,43 +93,66 @@ export default function LoginCard() {
         </FormControl>
 
         <FormControl>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <Link
-              component="button"
-              type="button"
-              onClick={handleClickOpen}
-              variant="body2"
-            >
-              Forgot your password?
-            </Link>
-          </Box>
+          <FormLabel htmlFor="password" sx={{ fontWeight: 600, mb: 0.5 }}>
+            Password
+          </FormLabel>
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
             name="password"
-            placeholder="••••••"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="current-password"
             required
             fullWidth
             variant="outlined"
             color={passwordError ? 'error' : 'primary'}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleTogglePassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
         </FormControl>
 
-        <FormControlLabel
-          control={<Checkbox value="remember" color="primary" />}
-          label="Remember me"
-        />
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <FormControlLabel
+            control={<Checkbox value="remember" color="primary" />}
+            label="Remember me"
+          />
+          <Link
+            component="button"
+            type="button"
+            onClick={handleClickOpen}
+            variant="body2"
+            color="primary"
+          >
+            Forgot Password?
+          </Link>
+        </Stack>
 
         <ForgotPassword open={open} handleClose={handleClose} />
 
-        <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
-          Sign in
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          sx={{ py: 1.5, borderRadius: '8px' }}
+        >
+          Login
         </Button>
       </Box>
-    </Card>
+    </Stack>
   );
 }
