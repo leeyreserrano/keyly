@@ -11,16 +11,20 @@ interface CredentialCardProps {
   nomUsuari: string;
   dataEditat: string;
   dinsCarpeta?: boolean;
+  onClick?: () => void;
 }
 
 export default function CredentialCard({
+  
   titol,
   nomUsuari: email,
   dataEditat: modified,
   dinsCarpeta: hasFolder = false,
+  onClick, 
 }: CredentialCardProps) {
   return (
     <Paper
+      onClick={onClick}  
       variant="outlined"
       sx={{
         p: 2,
@@ -32,7 +36,7 @@ export default function CredentialCard({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        '&:hover': { boxShadow: 1 },
+        '&:hover': { boxShadow: 1, cursor: 'pointer' }, // cursor pointer para indicar clicable
         transition: 'box-shadow 150ms ease',
       }}
     >

@@ -29,29 +29,11 @@ const tabs: { value: TabValue; label: string }[] = [
   { value: 'favorites', label: 'Favoritos' },
 ];
 
-const mockCredentials = [
-  { id: 1, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
-  { id: 2, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
-  { id: 3, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
-  { id: 4, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
-  { id: 5, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
-  { id: 6, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
-  { id: 7, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
-  { id: 8, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: false },
-  { id: 9, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
-  { id: 10, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
-  { id: 11, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: false },
-  { id: 12, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
-  { id: 13, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
-  { id: 14, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: false },
-  { id: 15, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
-];
-
 export default function Home() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabValue>('latest');
+  const [activeTab] = useState<TabValue>('latest');
   const [page, setPage] = useState(1);
   useEffect(() => {
     const loadItems = async () => {
@@ -131,42 +113,53 @@ export default function Home() {
               alignItems: 'center',
             }}
           >
-            <Stack direction="row" sx={{ gap: 1 }}>
-              {tabs.map((tab) => {
-                const isActive = activeTab === tab.value;
-                return (
-                  <Button
-                    key={tab.value}
-                    onClick={() => setActiveTab(tab.value)}
-                    startIcon={isActive ? <CheckIcon sx={{ fontSize: '16px !important' }} /> : undefined}
-                    sx={{
-                      borderRadius: '100px',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      px: 2.5,
-                      py: 1,
-                      fontSize: '0.875rem',
-                      ...(isActive
-                        ? {
-                          bgcolor: brand[400],
-                          color: 'white',
-                          '&:hover': { bgcolor: brand[500] },
-                        }
-                        : {
-                          bgcolor: LAVENDER,
-                          color: 'text.primary',
-                          '&:hover': { bgcolor: '#E0D0FF' },
-                        }),
-                    }}
-                  >
-                    {tab.label}
-                  </Button>
-                );
-              })}
+            <Stack
+              direction="row"
+              sx={{
+                px: 4,
+                pt: 3,
+                pb: 2,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Stack direction="row" sx={{ gap: 1 }}>
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.value;
+                  return (
+                    <Button
+                      key={tab.value}
+                      onClick={() => navigate('/AddItem')}
+                      startIcon={isActive ? <CheckIcon sx={{ fontSize: '16px !important' }} /> : undefined}
+                      sx={{
+                        borderRadius: '100px',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        px: 2.5,
+                        py: 1,
+                        fontSize: '0.875rem',
+                        ...(isActive
+                          ? {
+                            bgcolor: brand[400],
+                            color: 'white',
+                            '&:hover': { bgcolor: brand[500] },
+                          }
+                          : {
+                            bgcolor: LAVENDER,
+                            color: 'text.primary',
+                            '&:hover': { bgcolor: '#E0D0FF' },
+                          }),
+                      }}
+                    >
+                      {tab.label}
+                    </Button>
+                  );
+                })}
+              </Stack>
             </Stack>
-
             <Button
               variant="contained"
+              onClick={() => navigate('/ChooseType')}
               sx={{
                 borderRadius: '8px',
                 textTransform: 'none',
@@ -192,6 +185,7 @@ export default function Home() {
                         nomUsuari={item.nomUsuari}
                         dataEditat={item.dataEditat}
                         dinsCarpeta={item.dinsCarpeta}
+                        onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
                       />
                     </Grid>
                   ))}
