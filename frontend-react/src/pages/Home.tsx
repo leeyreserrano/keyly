@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
@@ -8,6 +8,8 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
+import type { Item } from '../api/itemsapi';
+import { itemsApi } from '../api/itemsapi';
 import Pagination from '@mui/material/Pagination';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -28,28 +30,43 @@ const tabs: { value: TabValue; label: string }[] = [
 ];
 
 const mockCredentials = [
-  { id: 1,  name: 'Gmail Account', email: 'john.doe@gmail.com',  modified: '2 days ago',   hasFolder: false },
-  { id: 2,  name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: true  },
-  { id: 3,  name: 'Amazon',        email: 'john.doe@email.com',  modified: '2 weeks ago',   hasFolder: false },
-  { id: 4,  name: 'Gmail Account', email: 'john.doe@gmail.com',  modified: '2 days ago',    hasFolder: false },
-  { id: 5,  name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: true  },
-  { id: 6,  name: 'Amazon',        email: 'john.doe@email.com',  modified: '2 weeks ago',   hasFolder: false },
-  { id: 7,  name: 'Gmail Account', email: 'john.doe@gmail.com',  modified: '2 days ago',    hasFolder: false },
-  { id: 8,  name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: false },
-  { id: 9,  name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: true  },
-  { id: 10, name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: true  },
-  { id: 11, name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: false },
-  { id: 12, name: 'Amazon',        email: 'john.doe@email.com',  modified: '2 weeks ago',   hasFolder: false },
-  { id: 13, name: 'Gmail Account', email: 'john.doe@gmail.com',  modified: '2 days ago',    hasFolder: false },
-  { id: 14, name: 'Netflix',       email: 'john.doe@email.com',  modified: '1 week ago',    hasFolder: false },
-  { id: 15, name: 'Amazon',        email: 'john.doe@email.com',  modified: '2 weeks ago',   hasFolder: false },
+  { id: 1, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
+  { id: 2, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
+  { id: 3, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
+  { id: 4, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
+  { id: 5, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
+  { id: 6, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
+  { id: 7, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
+  { id: 8, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: false },
+  { id: 9, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
+  { id: 10, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: true },
+  { id: 11, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: false },
+  { id: 12, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
+  { id: 13, titol: 'Gmail Account', nomUsuari: 'john.doe@gmail.com', dataEditat: '2 days ago', dinsCarpeta: false },
+  { id: 14, titol: 'Netflix', nomUsuari: 'john.doe@email.com', dataEditat: '1 week ago', dinsCarpeta: false },
+  { id: 15, titol: 'Amazon', nomUsuari: 'john.doe@email.com', dataEditat: '2 weeks ago', dinsCarpeta: false },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabValue>('latest');
   const [page, setPage] = useState(1);
+  useEffect(() => {
+    const loadItems = async () => {
+      try {
+        const data = await itemsApi.fetchItems();
+        setItems(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    loadItems();
+  }, []);
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
@@ -131,15 +148,15 @@ export default function Home() {
                       fontSize: '0.875rem',
                       ...(isActive
                         ? {
-                            bgcolor: brand[400],
-                            color: 'white',
-                            '&:hover': { bgcolor: brand[500] },
-                          }
+                          bgcolor: brand[400],
+                          color: 'white',
+                          '&:hover': { bgcolor: brand[500] },
+                        }
                         : {
-                            bgcolor: LAVENDER,
-                            color: 'text.primary',
-                            '&:hover': { bgcolor: '#E0D0FF' },
-                          }),
+                          bgcolor: LAVENDER,
+                          color: 'text.primary',
+                          '&:hover': { bgcolor: '#E0D0FF' },
+                        }),
                     }}
                   >
                     {tab.label}
@@ -160,22 +177,28 @@ export default function Home() {
               + Add New
             </Button>
           </Stack>
-
-          {/* Credential Grid */}
-          <Box sx={{ px: 4, pb: 3, flex: 1 }}>
-            <Grid container spacing={2}>
-              {mockCredentials.map((cred) => (
-                <Grid size={4} key={cred.id}>
-                  <CredentialCard
-                    name={cred.name}
-                    email={cred.email}
-                    modified={cred.modified}
-                    hasFolder={cred.hasFolder}
-                  />
+          {/* Loading */}
+          {loading ? (
+            <Typography sx={{ p: 4 }}>Cargando...</Typography>
+          ) : (
+            <>
+              {/* Credential Grid */}
+              <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+                <Grid container spacing={2}>
+                  {items.map((item) => (
+                    <Grid size={4} key={item.uuid}>
+                      <CredentialCard
+                        titol={item.titol}
+                        nomUsuari={item.nomUsuari}
+                        dataEditat={item.dataEditat}
+                        dinsCarpeta={item.dinsCarpeta}
+                      />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-          </Box>
+              </Box>
+            </>
+          )}
 
           {/* Pagination */}
           <Stack sx={{ px: 4, pb: 4, alignItems: 'flex-end' }}>

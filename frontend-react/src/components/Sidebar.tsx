@@ -10,6 +10,7 @@ import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import type { SvgIconComponent } from '@mui/icons-material';
 import { KeylyLogo } from './CustomIcons';
 import { brand } from '../theme/themePrimitives';
+import { useState } from 'react';
 
 const SIDEBAR_BG = '#EEE5FF';
 const ACTIVE_BG = 'rgba(255,255,255,0.55)';
@@ -32,19 +33,24 @@ const navItems: NavItem[] = [
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   return (
     <Stack
       sx={{
-        width: 260,
+        width: open ? 260 : 80,
         minHeight: '100vh',
         bgcolor: SIDEBAR_BG,
         flexShrink: 0,
+        transition: 'width 0.3s ease',
       }}
     >
       {/* Logo */}
-      <Stack sx={{ alignItems: 'center', py: 3, px: 2 }}>
-        <KeylyLogo sx={{ width: 130, height: 130 }} />
+      <Stack
+        sx={{ alignItems: 'center', py: 3, px: 2, cursor: 'pointer' }}
+        onClick={() => setOpen(!open)}
+      >
+        <KeylyLogo sx={{ width: open ? 130 : 50, height: open ? 130 : 50 }} />
       </Stack>
 
       <Divider sx={{ borderColor: DIVIDER_COLOR }} />
@@ -63,27 +69,36 @@ export default function Sidebar() {
                 sx={{
                   px: 3,
                   py: 2,
-                  gap: 2,
+                  gap: open ? 2 : 0,
+                  justifyContent: open ? 'flex-start' : 'center',
                   alignItems: 'center',
                   cursor: 'pointer',
                   bgcolor: isActive ? ACTIVE_BG : 'transparent',
                   borderLeft: isActive
                     ? `4px solid ${brand[400]}`
                     : '4px solid transparent',
-                  transition: 'background-color 150ms ease',
+                  transition: 'all 150ms ease',
                   '&:hover': {
                     bgcolor: 'rgba(255,255,255,0.35)',
                   },
                 }}
               >
                 <Icon sx={{ color: brand[900], fontSize: 22 }} />
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 700, color: brand[900], lineHeight: 1 }}
-                >
-                  {item.label}
-                </Typography>
+
+                {open && (
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 700,
+                      color: brand[900],
+                      lineHeight: 1,
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                )}
               </Stack>
+
               {index < navItems.length - 1 && (
                 <Divider sx={{ borderColor: DIVIDER_COLOR }} />
               )}

@@ -7,17 +7,17 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 
 interface CredentialCardProps {
-  name: string;
-  email: string;
-  modified: string;
-  hasFolder?: boolean;
+  titol: string;
+  nomUsuari: string;
+  dataEditat: string;
+  dinsCarpeta?: boolean;
 }
 
 export default function CredentialCard({
-  name,
-  email,
-  modified,
-  hasFolder = false,
+  titol,
+  nomUsuari: email,
+  dataEditat: modified,
+  dinsCarpeta: hasFolder = false,
 }: CredentialCardProps) {
   return (
     <Paper
@@ -51,7 +51,7 @@ export default function CredentialCard({
             variant="body1"
             sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.9rem' }}
           >
-            {name}
+            {titol}
           </Typography>
         </Stack>
         <Stack direction="row" sx={{ gap: 0.25, ml: 1 }}>

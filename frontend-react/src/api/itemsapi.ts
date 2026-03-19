@@ -3,10 +3,10 @@ function sleep(ms: number) {
 }
 
 export class itemsApi {
-  static async fetchItems(limit: number): Promise<Item[]> {
+  static async fetchItems(): Promise<Item[]> {
     await sleep(1500);
     const response = await fetch(
-      "https://jsonplaceholder.typicode.com/items?_limit=2" + limit,
+      "https://10.147.17.250:8081/api/items",
     );
 
     if (!response.ok) {
@@ -22,4 +22,9 @@ export type Item = {
   titol: string;
   nomUsuari: string;
   contrasenya: string;
+  url: string;
+  dataCreacio: string;
+  dataEditat: string;
+  ultimAcces: string;
+  dinsCarpeta: boolean;
 };
