@@ -6,11 +6,14 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.keyly.model.enums.RolIntern;
 import com.keyly.model.request.UsuariRequest;
 import com.keyly.model.response.UsuariResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,6 +52,10 @@ public class Usuari {
     @ManyToOne
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol_intern")
+    private RolIntern rolIntern;
     
     @Column(name = "nom")
     private String nom;

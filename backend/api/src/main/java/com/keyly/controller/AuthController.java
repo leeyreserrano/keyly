@@ -26,7 +26,7 @@ public class AuthController {
         if (faLogin)
             return ResponseEntity.ok(new LoginResponse(service.generateToken(request.correu())));
 
-        return null;
+        return ResponseEntity.status(401).build();
     }
 
 }

@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class UsuariController {
     private UsuariService service;
 
     @Operation(summary = "Obté tots els usuaris")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("usuaris")
     public ResponseEntity<List<UsuariResponse>> getAllUsuaris() {
         return ResponseEntity.ok(service.getAllUsuaris());
