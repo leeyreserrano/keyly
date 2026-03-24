@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.request.ConfigRequest;
@@ -14,63 +15,70 @@ import com.keyly.service.ConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@Tag(name = "Config Controller", description = "Operacions sobre la Configuracio d'una sucursal")
+@Tag(name = "Config Controller", description = "Operacions sobre la configuració d'una sucursal")
 public class ConfigController {
 
     @Autowired
     private ConfigService service;
 
-    @Operation(summary = "Obté totes les Config")
+    @Operation(summary = "Obté totes les Config", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("config")
     public ResponseEntity<List<ConfigResponse>> getAllConfigs() {
         return ResponseEntity.ok(service.getConfigs());
     }
 
-    @Operation(summary = "Obté una config per UUID")
+    @Operation(summary = "Obté una config per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Config trobada"),
-        @ApiResponse(responseCode = "404", description = "Config no trobada")
+            @ApiResponse(responseCode = "200", description = "Config trobada"),
+            @ApiResponse(responseCode = "404", description = "Config no trobada")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("config/{uuid}")
     public ResponseEntity<ConfigResponse> getConfig(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.getConfig(uuid));
     }
 
-    @Operation(summary = "Obté una config per la UUID d'una sucursal")
+    @Operation(summary = "Obté una config per la UUID d'una sucursal", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Config trobada"),
-        @ApiResponse(responseCode = "404", description = "Config o sucursal no trobada")
+            @ApiResponse(responseCode = "200", description = "Config trobada"),
+            @ApiResponse(responseCode = "404", description = "Config o sucursal no trobada")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("config/sucursal/{uuid}")
     public ResponseEntity<ConfigResponse> getConfigBySucursalUuid(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.getConfigBySucursalUuid(uuid));
     }
 
-    @Operation(summary = "Actualitza una config per UUID")
+    @Operation(summary = "Actualitza una config per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Config actualitzada"),
-        @ApiResponse(responseCode = "404", description = "Config no actualitzada")
+            @ApiResponse(responseCode = "200", description = "Config actualitzada"),
+            @ApiResponse(responseCode = "404", description = "Config no actualitzada")
     })
-    @PatchMapping("config/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("config/{uuid}")
     public ResponseEntity<ConfigResponse> updateConfig(@PathVariable UUID uuid, @RequestBody ConfigRequest c) {
         return ResponseEntity.ok(service.updateConfig(uuid, c));
     }
 
-    @Operation(summary = "Actualitza una config per la UUID d'una sucursal")
+    @Operation(summary = "Actualitza una config per la UUID d'una sucursal", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Config trobada"),
-        @ApiResponse(responseCode = "404", description = "Config o sucursal no trobada")
+            @ApiResponse(responseCode = "200", description = "Config trobada"),
+            @ApiResponse(responseCode = "404", description = "Config o sucursal no trobada")
     })
-    @PatchMapping("config/sucursal/{uuid}")
-    public ResponseEntity<ConfigResponse> updateConfigBySucursalUuid(@PathVariable UUID uuid, @RequestBody ConfigRequest c) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("config/sucursal/{uuid}")
+    public ResponseEntity<ConfigResponse> updateConfigBySucursalUuid(@PathVariable UUID uuid,
+            @RequestBody ConfigRequest c) {
         return ResponseEntity.ok(service.updateConfigBySucursalUuid(uuid, c));
     }
 

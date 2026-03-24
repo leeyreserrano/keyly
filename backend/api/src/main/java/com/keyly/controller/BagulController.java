@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.request.BagulRequest;
@@ -14,11 +15,12 @@ import com.keyly.service.BagulService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -28,17 +30,19 @@ public class BagulController {
     @Autowired
     private BagulService service;
 
-    @Operation(summary = "Obté tots els baguls")
+    @Operation(summary = "Obté tots els baguls", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("baguls")
     public ResponseEntity<List<BagulResponse>> getAllBaguls() {
         return ResponseEntity.ok(service.getAllBaguls());
     }
 
-    @Operation(summary = "Obté un bagul per UUID")
+    @Operation(summary = "Obté un bagul per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Bagul trobat"),
         @ApiResponse(responseCode = "404", description = "Bagul no trobat")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("bagul/{uuid}")
     public ResponseEntity<BagulResponse> getBagul(@PathVariable UUID uuid) {
         BagulResponse bagul = service.getByUuid(uuid);
@@ -46,12 +50,13 @@ public class BagulController {
         return ResponseEntity.ok(bagul);
     }
 
-    @Operation(summary = "Actualitza un bagul per UUID")
+    @Operation(summary = "Actualitza un bagul per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Bagul actualitzat"),
         @ApiResponse(responseCode = "404", description = "Bagul o usuari no trobats")
     })
-    @PatchMapping("bagul/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("bagul/{uuid}")
     public ResponseEntity<BagulResponse> updateBagul(@PathVariable UUID uuid, @RequestBody BagulRequest request) {
         BagulResponse response = service.update(uuid, request);
 

@@ -16,6 +16,8 @@ public interface UsuariRepo extends JpaRepository<Usuari, Long> {
 
     Optional<Usuari> findByUuid(UUID uuid);
 
+    Optional<Usuari> findByCorreu(String correu);
+
     @Modifying
     @Transactional
     void deleteByUuid(UUID uuid);

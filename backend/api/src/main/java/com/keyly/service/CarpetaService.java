@@ -11,6 +11,7 @@ import com.keyly.mapper.CarpetaMapper;
 import com.keyly.model.Bagul;
 import com.keyly.model.Carpeta;
 import com.keyly.model.Item;
+import com.keyly.model.Usuari;
 import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.ItemResponse;
@@ -38,9 +39,23 @@ public class CarpetaService {
                 .toList();
     }
 
+    public List<CarpetaResponse> getAllCarpetesByUsuariUuid(UUID uuid) {
+        return repo.findAllByUsuariUuid(uuid)
+                .stream()
+                .map(carpeta -> new CarpetaResponse(carpeta))
+                .toList();
+    }
+
     public CarpetaResponse getByUuid(UUID uuid) {
         Carpeta carpeta = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid: " + uuid));
+
+        return new CarpetaResponse(carpeta);
+    }
+
+    public CarpetaResponse getUserCarpeta(Usuari usuari, UUID uuid) {
+        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
 
         return new CarpetaResponse(carpeta);
     }
@@ -53,6 +68,16 @@ public class CarpetaService {
      */
     public List<ItemResponse> getCarpetaItem(UUID uuid) {
         Carpeta carpeta = getCarpetaEntityByUuid(uuid);
+
+        return carpeta.getItems()
+                .stream()
+                .map(item -> new ItemResponse(item, true))
+                .toList();
+    }
+
+    public List<ItemResponse> getUserCarpetaItem(Usuari usuari, UUID uuid) {
+        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
 
         return carpeta.getItems()
                 .stream()
@@ -73,6 +98,18 @@ public class CarpetaService {
         return new CarpetaResponse(repo.save(carpeta));
     }
 
+    public CarpetaResponse save(Usuari u, CarpetaRequest c) {
+        Bagul b = bagulService.getBagulEntityByUuid(c.bagulUuid());
+
+        if (!b.getPropietari().equals(u)) {
+            throw new EntitatNoTrobadaException("No autoritzat per crear carpeta en aquest bagul");
+        }
+
+        Carpeta carpeta = new Carpeta(b, c);
+
+        return new CarpetaResponse(repo.save(carpeta));
+    }
+
     public CarpetaResponse saveItemToCarpeta(UUID carpetaUuid, UUID itemUuid) {
         Carpeta carpeta = getCarpetaEntityByUuid(carpetaUuid);
         Item itemRecuperat = itemService.getItemEntityByUuid(itemUuid);
@@ -83,11 +120,41 @@ public class CarpetaService {
         return getById(carpeta.getId());
     }
 
+    public CarpetaResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, UUID itemUuid) {
+        Carpeta carpeta = repo.findUserCarpetaByUuid(u, carpetaUuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
+        Item itemRecuperat = itemService.getUserItemEntity(u, itemUuid);
+
+        carpeta.addItem(itemRecuperat);
+        repo.save(carpeta);
+
+        return new CarpetaResponse(carpeta);
+    }
+
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
         Carpeta carpeta = getCarpetaEntityByUuid(uuid);
 
         if (request.bagulUuid() != null)
             carpeta.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
+
+        mapper.updateCarpetaFromDto(request, carpeta);
+
+        Carpeta carpetaGuardada = repo.save(carpeta);
+
+        return new CarpetaResponse(carpetaGuardada);
+    }
+
+    public CarpetaResponse update(Usuari usuari, UUID uuid, CarpetaRequest request) {
+        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
+
+        if (request.bagulUuid() != null) {
+            Bagul b = bagulService.getBagulEntityByUuid(request.bagulUuid());
+            if (!b.getPropietari().equals(usuari)) {
+                throw new EntitatNoTrobadaException("No autoritzat per canviar a aquest bagul");
+            }
+            carpeta.setBagul(b);
+        }
 
         mapper.updateCarpetaFromDto(request, carpeta);
 
@@ -104,9 +171,24 @@ public class CarpetaService {
         return carpeta;
     }
 
+    public void deleteUserCarpeta(Usuari usuari, UUID uuid) {
+        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
+
+        repo.delete(carpeta);
+    }
+
     public void deleteItemInCarpeta(UUID carpetaUuid, UUID itemUuid) {
         Carpeta carpeta = getCarpetaEntityByUuid(carpetaUuid);
         Item itemRecuperat = itemService.getItemEntityByUuid(itemUuid);
+        carpeta.removeItem(itemRecuperat);
+        repo.save(carpeta);
+    }
+
+    public void deleteItemInUserCarpeta(Usuari u, UUID carpetaUuid, UUID itemUuid) {
+        Carpeta carpeta = repo.findUserCarpetaByUuid(u, carpetaUuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
+        Item itemRecuperat = itemService.getUserItemEntity(u, itemUuid);
         carpeta.removeItem(itemRecuperat);
         repo.save(carpeta);
     }

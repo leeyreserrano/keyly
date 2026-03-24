@@ -25,15 +25,15 @@ INSERT INTO Rols (uuid, sucursal_id, nom) VALUES
 (UUID_TO_BIN(UUID()), 1, 'Usuario');
 
 
-INSERT INTO Usuaris (uuid, sucursal_id, departament_id, rol_id, nom, correu, 
+INSERT INTO Usuaris (uuid, sucursal_id, departament_id, rol_id, rol_intern, nom, correu, 
 contrasenya_master, data_creacio,pot_administrar) VALUES
-(UUID_TO_BIN(UUID()), 2, 1, 1, 'Geri', 'user@domain.com', 
+(UUID_TO_BIN(UUID()), 2, 1, 1, 'ADMIN','Geri', 'user@domain.com', 
 '$2a$12$gC/zYDtNNNJrejFER9FpLe6adKCXuWUJ2cjRe7QOXz8dz1OOf0nVi', NOW(), true),
-(UUID_TO_BIN(UUID()), 2, 2, 2, 'Yami', 'yami@gmail.com',
+(UUID_TO_BIN(UUID()), 2, 2, 2, 'ADMIN', 'Yami', 'yami@gmail.com',
 '$2a$12$WV7KWjmusFGOKrYQB9Kj5OeqCIqoui3XEOmcV4.MtWKkzHPT9auH2', NOW(), false),
-(UUID_TO_BIN(UUID()), 2, 2, 1, 'Ley', 'ley@insgabrielamistral.cat',
+(UUID_TO_BIN(UUID()), 2, 2, 1, 'CAP','Ley', 'ley@insgabrielamistral.cat',
 '$2a$12$moNVzQp13kG/cFVets45s.wtLNnekKndjFiSgPAz8QNsCR6UAf/wy', NOW(), true),
-(UUID_TO_BIN(UUID()), 1, 2, 1, 'Pau', 'p@gmail.com',
+(UUID_TO_BIN(UUID()), 1, 2, 1, 'USUARI','Pau', 'p@gmail.com',
 '$2a$12$uQT50ira624UjVe3Two7ieM21fvJeGK.20.OU8g1U9up8ltJCXmVe', NOW(), false);
 
 INSERT INTO Carpetes (uuid, bagul_id, nom, data_creacio) VALUES

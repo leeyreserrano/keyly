@@ -44,6 +44,10 @@ public class BagulService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Bagul no trobat amb el uuid: " + uuid));
     }
 
+    public Bagul getBagulEntityByUsuariUuid(UUID uuid) {
+        return repo.findByUsuariUuid(uuid).orElseThrow(() -> new EntitatNoTrobadaException("Bagul no trobat per l'usuari uuid"));
+    }
+
     public BagulResponse update(UUID uuid, BagulRequest request) {
         Bagul bagul = getBagulEntityByUuid(uuid);
 
