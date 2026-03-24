@@ -1,6 +1,7 @@
 package com.keyly.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,9 @@ public class ItemService {
         Item item = repo.findUserItemByUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
 
+        item.setDataUltimAcces(LocalDateTime.now());
+        repo.save(item);
+
         return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
     }
 
@@ -124,6 +128,8 @@ public class ItemService {
                         "Item amb uuid " + uuid + " no trobat per l'usuari amb el uuid " + usuari.uuid()));
 
         mapper.updateItemFromDto(request, item);
+
+        item.setDataEditat(LocalDateTime.now());
 
         Item itemGuardat = repo.save(item);
         

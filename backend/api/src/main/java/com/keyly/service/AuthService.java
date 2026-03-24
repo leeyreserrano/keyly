@@ -22,7 +22,14 @@ public class AuthService {
 
     public boolean login(AuthRequest request) {
         Usuari usuari = usuariService.getUsuariEntityByMail(request.correu());
-        return passwordEncoder.matches(request.contrasenya(), usuari.getContrasenya());
+
+        if (passwordEncoder.matches(request.contrasenya(), usuari.getContrasenya())) {
+            usuariService.actualitzarUltimLogin(usuari);
+
+            return true;
+        }
+
+        return false;
     }
 
     public String generateToken(String correu) {

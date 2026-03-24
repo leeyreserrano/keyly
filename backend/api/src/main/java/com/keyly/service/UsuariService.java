@@ -1,5 +1,6 @@
 package com.keyly.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -181,6 +182,12 @@ public class UsuariService {
         repo.deleteByUuid(uuid);
 
         return usuari;
+    }
+
+    public void actualitzarUltimLogin(Usuari u) {
+        u.setDataUltimLogin(LocalDateTime.now());
+
+        repo.save(u);
     }
 
     /**

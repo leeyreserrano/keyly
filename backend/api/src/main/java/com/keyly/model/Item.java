@@ -77,11 +77,9 @@ public class Item {
     @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
 
-    @CreationTimestamp
     @Column(name = "data_editat", updatable = true)
     private LocalDateTime dataEditat;
 
-    @CreationTimestamp
     @Column(name = "ultim_access", updatable = true)
     private LocalDateTime dataUltimAcces;
 

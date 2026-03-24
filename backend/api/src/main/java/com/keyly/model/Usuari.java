@@ -74,7 +74,6 @@ public class Usuari {
     @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
 
-    @CreationTimestamp
     @Column(name = "data_ultim_login", updatable = true)
     private LocalDateTime dataUltimLogin;
 
