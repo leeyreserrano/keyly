@@ -2,7 +2,7 @@
 
 - Manejar las imagenes de los usuarios (preguntar opinión al PROFESOR)
 
-- JWT
+- Diseño de endpoints para producción
 
 - Gestionar las contraseñas seguras (Una vez el jwt esté hecho)
 

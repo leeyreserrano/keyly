@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.request.DepartamentRequest;
@@ -16,6 +17,7 @@ import com.keyly.service.DepartamentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,17 +34,27 @@ public class DepartamentController {
     @Autowired
     private DepartamentService service;
 
-    @Operation(summary = "Obté tots els departaments")
+    @Operation(
+        summary = "Obté tots els departaments",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("departaments")
     public ResponseEntity<List<DepartamentResponse>> getAllDepartaments() {
         return ResponseEntity.ok(service.getAllDepartaments());
     }
 
-    @Operation(summary = "Obté un departament per UUID")
+    @Operation(
+        summary = "Obté un departament per UUID",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Departament trobat"),
         @ApiResponse(responseCode = "404", description = "Departament no trobat")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("departament/{uuid}")
     public ResponseEntity<DepartamentResponse> getDepartament(@PathVariable UUID uuid) {
         DepartamentResponse departament = service.getByUuid(uuid);
@@ -50,11 +62,16 @@ public class DepartamentController {
         return ResponseEntity.ok(departament);
     }
 
-    @Operation(summary = "Crea un departament")
+    @Operation(
+        summary = "Crea un departament",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Departament creat"),
         @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("departament")
     public ResponseEntity<DepartamentResponse> addDepartament(@RequestBody DepartamentRequest d) {
         DepartamentResponse departament = service.save(d);
@@ -62,11 +79,16 @@ public class DepartamentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(departament);
     }
 
-    @Operation(summary = "Actualitza un departament per UUID")
+    @Operation(
+        summary = "Actualitza un departament per UUID",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Departament actualitzat"),
         @ApiResponse(responseCode = "404", description = "Departament o sucursal no trobats")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("departament/{uuid}")
     public ResponseEntity<DepartamentResponse> updateDepartament(@PathVariable UUID uuid, @RequestBody DepartamentRequest request) {
         DepartamentResponse response = service.update(uuid, request);
@@ -74,11 +96,16 @@ public class DepartamentController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Elimina un departament per UUID")
+    @Operation(
+        summary = "Elimina un departament per UUID",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Departament eliminat"),
         @ApiResponse(responseCode = "404", description = "Departament no trobat")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("departament/{uuid}")
     public ResponseEntity<DepartamentResponse> deleteDepartament(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.deleteByUuid(uuid));

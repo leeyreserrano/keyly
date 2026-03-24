@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.keyly.model.Usuari;
+import com.keyly.model.enums.RolIntern;
 import com.keyly.model.response.basics.DepartamentResponseBasic;
 import com.keyly.model.response.basics.RolResponseBasic;
 import com.keyly.model.response.basics.SucursalResponseBasic;
@@ -16,6 +17,7 @@ public record UsuariResponse(
         LocalDateTime dataCreacio,
         LocalDateTime ultimLogin,
         boolean potAdministrar,
+        RolIntern rolIntern,
         SucursalResponseBasic sucursal,
         DepartamentResponseBasic departament,
         RolResponseBasic rol) {
@@ -29,6 +31,7 @@ public record UsuariResponse(
                 u.getDataCreacio(),
                 u.getDataUltimLogin(),
                 u.getPotAdministrar(),
+                u.getRolIntern(),
                 new SucursalResponseBasic(u.getSucursal()),
                 new DepartamentResponseBasic(u.getDepartament()),
                 new RolResponseBasic(u.getRol()));

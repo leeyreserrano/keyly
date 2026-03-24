@@ -45,6 +45,7 @@ CREATE TABLE `Usuaris` (
   `sucursal_id` BIGINT NOT NULL,
   `departament_id` BIGINT NOT NULL,
   `rol_id` BIGINT NOT NULL,
+  `rol_intern` ENUM ('ADMIN', 'CAP', 'USUARI') NOT NULL DEFAULT 'USUARI',
   `nom` VARCHAR(255) NOT NULL,
   `correu` VARCHAR(255) NOT NULL UNIQUE,
   `imatge` VARCHAR(255),
