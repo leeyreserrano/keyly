@@ -8,8 +8,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import type { Item } from '../api/itemsapi';
-import { itemsApi } from '../api/itemsapi';
 import Pagination from '@mui/material/Pagination';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -18,6 +16,9 @@ import AppTheme from '../theme/AppTheme';
 import Sidebar from '../components/Sidebar';
 import CredentialCard from '../components/CredentialCard';
 import { brand } from '../theme/themePrimitives';
+import { itemsApi } from '../api/itemsapi';
+import { carpetasApi, type Carpeta } from '../api/carpetasapi';
+import type { Item } from '../api/itemsapi';
 
 const LAVENDER = '#EEE5FF';
 
@@ -32,14 +33,20 @@ const tabs: { value: TabValue; label: string }[] = [
 export default function Home() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
+  const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab] = useState<TabValue>('latest');
   const [page, setPage] = useState(1);
+
   useEffect(() => {
-    const loadItems = async () => {
+    const loadData = async () => {
       try {
-        const data = await itemsApi.fetchItems();
-        setItems(data);
+        const [itemsData, carpetasData] = await Promise.all([
+          itemsApi.fetchItems(),
+          carpetasApi.fetchItems(),
+        ]);
+        setItems(itemsData);
+        setCarpetas(carpetasData);
       } catch (error) {
         console.error(error);
       } finally {
@@ -47,18 +54,16 @@ export default function Home() {
       }
     };
 
-    loadItems();
+    loadData();
   }, []);
+
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
         <Sidebar />
 
-        {/* Main Content */}
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-
-          {/* Header */}
           <Stack
             direction="row"
             sx={{
@@ -102,7 +107,6 @@ export default function Home() {
             </Stack>
           </Stack>
 
-          {/* Tabs + Add New */}
           <Stack
             direction="row"
             sx={{
@@ -113,50 +117,39 @@ export default function Home() {
               alignItems: 'center',
             }}
           >
-            <Stack
-              direction="row"
-              sx={{
-                px: 4,
-                pt: 3,
-                pb: 2,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Stack direction="row" sx={{ gap: 1 }}>
-                {tabs.map((tab) => {
-                  const isActive = activeTab === tab.value;
-                  return (
-                    <Button
-                      key={tab.value}
-                      onClick={() => navigate('/AddItem')}
-                      startIcon={isActive ? <CheckIcon sx={{ fontSize: '16px !important' }} /> : undefined}
-                      sx={{
-                        borderRadius: '100px',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        px: 2.5,
-                        py: 1,
-                        fontSize: '0.875rem',
-                        ...(isActive
-                          ? {
-                            bgcolor: brand[400],
-                            color: 'white',
-                            '&:hover': { bgcolor: brand[500] },
-                          }
-                          : {
-                            bgcolor: LAVENDER,
-                            color: 'text.primary',
-                            '&:hover': { bgcolor: '#E0D0FF' },
-                          }),
-                      }}
-                    >
-                      {tab.label}
-                    </Button>
-                  );
-                })}
-              </Stack>
+            <Stack direction="row" sx={{ gap: 1 }}>
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.value;
+                return (
+                  <Button
+                    key={tab.value}
+                    startIcon={isActive ? <CheckIcon sx={{ fontSize: '16px !important' }} /> : undefined}
+                    sx={{
+                      borderRadius: '100px',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      px: 2.5,
+                      py: 1,
+                      fontSize: '0.875rem',
+                      ...(isActive
+                        ? {
+                          bgcolor: brand[400],
+                          color: 'white',
+                          '&:hover': { bgcolor: brand[500] },
+                        }
+                        : {
+                          bgcolor: LAVENDER,
+                          color: 'text.primary',
+                          '&:hover': { bgcolor: '#E0D0FF' },
+                        }),
+                    }}
+                  >
+                    {tab.label}
+                  </Button>
+                );
+              })}
             </Stack>
+
             <Button
               variant="contained"
               onClick={() => navigate('/ChooseType')}
@@ -170,31 +163,50 @@ export default function Home() {
               + Add New
             </Button>
           </Stack>
-          {/* Loading */}
+
           {loading ? (
             <Typography sx={{ p: 4 }}>Cargando...</Typography>
           ) : (
-            <>
-              {/* Credential Grid */}
-              <Box sx={{ px: 4, pb: 3, flex: 1 }}>
-                <Grid container spacing={2}>
-                  {items.map((item) => (
+            <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+
+              <Grid container spacing={2}>
+                {carpetas.map((carpeta) => (
+                  <Grid size={4} key={carpeta.uuid}>
+                    <CredentialCard
+                      titol={carpeta.nom}
+                      nomUsuari=""
+                      dataEditat={carpeta.dataCreacio}
+                      esCarpeta
+                      onEdit={() => navigate('/editcarpeta', { state: { uuid: carpeta.uuid } })}
+                      onDelete={() => console.log('Eliminar carpeta', carpeta.uuid)}
+                    />
+                  </Grid>
+                ))}
+
+                {items.map((item) => {
+                  const estaEnCarpeta = carpetas.some((carpeta) =>
+                    carpeta.items.some((i) => i.uuid === item.uuid)
+                  );
+
+                  return (
                     <Grid size={4} key={item.uuid}>
                       <CredentialCard
+                        uuid={item.uuid}
                         titol={item.titol}
                         nomUsuari={item.nomUsuari}
                         dataEditat={item.dataEditat}
-                        dinsCarpeta={item.dinsCarpeta}
+                        dinsCarpeta={estaEnCarpeta}
                         onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
+                        onEdit={() => navigate('/edititem', { state: { uuid: item.uuid } })}
+                        onDelete={() => console.log('Eliminar item', item.uuid)}
                       />
                     </Grid>
-                  ))}
+                  );
+                })}
                 </Grid>
-              </Box>
-            </>
+            </Box>
           )}
 
-          {/* Pagination */}
           <Stack sx={{ px: 4, pb: 4, alignItems: 'flex-end' }}>
             <Pagination
               count={68}

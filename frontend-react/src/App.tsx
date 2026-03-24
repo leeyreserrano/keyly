@@ -5,6 +5,7 @@ import Item from './pages/Item';
 import AddItem from './pages/AddItem';
 import ChooseType from './pages/ChooseType';
 import Items from './pages/Items';
+import EditItem from './pages/EditItem';
 
 import './App.css';
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/AddItem" element={<AddItem />} />
         <Route path="/ChooseType" element={<ChooseType />} />
         <Route path="/Items" element={<Items />} />
+        <Route path="/EditItem" element={<EditItem />} />
       </Routes>
     </BrowserRouter>
   );

@@ -38,7 +38,7 @@ export default function ChooseType() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: 3,
-                minWidth: 200,
+                minWidth: 240,
                 cursor: 'pointer',
                 '&:hover': { boxShadow: 4 },
               }}
@@ -68,7 +68,7 @@ export default function ChooseType() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: 3,
-                minWidth: 200,
+                minWidth: 240,
                 cursor: 'pointer',
                 '&:hover': { boxShadow: 4 },
               }}

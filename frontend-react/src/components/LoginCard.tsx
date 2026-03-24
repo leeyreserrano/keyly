@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ForgotPassword from './ForgotPassword';
+import { loginUser } from '../api/loginapi';
 
 export default function LoginCard() {
   const navigate = useNavigate();
@@ -24,23 +25,18 @@ export default function LoginCard() {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState(true); // Nuevo estado para "Remember Me"
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!validateInputs()) return;
-    navigate('/home');
-  };
-
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
@@ -49,9 +45,9 @@ export default function LoginCard() {
       setEmailErrorMessage('');
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password || password.length < 1) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Password is required.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -59,6 +55,23 @@ export default function LoginCard() {
     }
 
     return isValid;
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!validateInputs()) return;
+
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+
+    try {
+      const { user } = await loginUser(email, password, rememberMe);
+      console.log('Usuario logueado:', user);
+      navigate('/home');
+    } catch (err: any) {
+      setPasswordError(true);
+      setPasswordErrorMessage(err.message || 'Error al iniciar sesión');
+    }
   };
 
   return (
@@ -107,27 +120,31 @@ export default function LoginCard() {
             fullWidth
             variant="outlined"
             color={passwordError ? 'error' : 'primary'}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleTogglePassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleTogglePassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
         </FormControl>
 
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
+            control={
+              <Checkbox
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                color="primary"
+              />
+            }
             label="Remember me"
           />
           <Link

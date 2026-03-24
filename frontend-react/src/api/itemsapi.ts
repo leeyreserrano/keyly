@@ -15,7 +15,14 @@ export class itemsApi {
 
     return response.json();
   }
+  static async deleteItem(uuid: string): Promise<void> {
+    const response = await fetch(`https://10.147.17.250:8081/api/item/${uuid}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Error eliminando el item");
+  }
 }
+
 
 export type Item = {
   uuid: string;

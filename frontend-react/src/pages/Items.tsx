@@ -13,10 +13,11 @@ import MenuItem from '@mui/material/MenuItem';
 import type { Item } from '../api/itemsapi';
 import { itemsApi } from '../api/itemsapi';
 import Pagination from '@mui/material/Pagination';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import AppTheme from '../theme/AppTheme';
 import Sidebar from '../components/Sidebar';
+import { carpetasApi, type Carpeta } from '../api/carpetasapi';
 import CredentialCard from '../components/CredentialCard';
 
 const LAVENDER = '#EEE5FF';
@@ -36,19 +37,25 @@ export default function Items() {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<FilterValue>('latest');
     const [page, setPage] = useState(1);
+    const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
 
     useEffect(() => {
-        const loadItems = async () => {
+        const loadData = async () => {
             try {
-                const data = await itemsApi.fetchItems();
-                setItems(data);
+                const [itemsData, carpetasData] = await Promise.all([
+                    itemsApi.fetchItems(),
+                    carpetasApi.fetchItems(),
+                ]);
+                setItems(itemsData);
+                setCarpetas(carpetasData);
             } catch (error) {
                 console.error(error);
             } finally {
                 setLoading(false);
             }
         };
-        loadItems();
+
+        loadData();
     }, []);
 
     // Filtrar y buscar
@@ -60,7 +67,7 @@ export default function Items() {
         .sort((a, b) => {
             if (filter === 'latest') return new Date(b.dataEditat).getTime() - new Date(a.dataEditat).getTime();
             if (filter === 'most_used') return (b.ultimAcces?.length || 0) - (a.ultimAcces?.length || 0);
-            return 0; // favoritos no implementado, solo ejemplo
+            return 0;
         });
 
     return (
@@ -83,9 +90,9 @@ export default function Items() {
                         }}
                     >
                         <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center' }}>
-                            <HomeRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />
+                            <KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />
                             <Typography variant="h3" sx={{ fontWeight: 800 }}>
-                                Home
+                                Items
                             </Typography>
                         </Stack>
                         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
@@ -108,7 +115,7 @@ export default function Items() {
                         sx={{
                             px: 4,
                             py: 3,
-                            justifyContent: 'flex-start', 
+                            justifyContent: 'flex-start',
                             alignItems: 'center',
                             gap: 1,
                         }}
@@ -119,7 +126,7 @@ export default function Items() {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             size="small"
-                            sx={{ width: { xs: '100%', sm: 1090 } }} 
+                            sx={{ width: { xs: '100%', sm: 1090 } }}
                         />
 
                         {/* Selector de filtro */}
@@ -153,17 +160,26 @@ export default function Items() {
                     ) : (
                         <Box sx={{ px: 4, pb: 3, flex: 1 }}>
                             <Grid container spacing={2}>
-                                {filteredItems.map((item) => (
-                                    <Grid size={4} key={item.uuid}>
-                                        <CredentialCard
-                                            titol={item.titol}
-                                            nomUsuari={item.nomUsuari}
-                                            dataEditat={item.dataEditat}
-                                            dinsCarpeta={item.dinsCarpeta}
-                                            onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
-                                        />
-                                    </Grid>
-                                ))}
+                                {filteredItems.map((item) => {
+                                    const estaEnCarpeta = carpetas.some((carpeta) =>
+                                        carpeta.items.some((i) => i.uuid === item.uuid)
+                                    );
+
+                                    return (
+                                        <Grid size={4} key={item.uuid}>
+                                            <CredentialCard
+                                                uuid={item.uuid}
+                                                titol={item.titol}
+                                                nomUsuari={item.nomUsuari}
+                                                dataEditat={item.dataEditat}
+                                                dinsCarpeta={estaEnCarpeta}
+                                                onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
+                                                onEdit={() => navigate('/edititem', { state: { uuid: item.uuid } })}
+                                                onDelete={() => console.log('Eliminar item', item.uuid)}
+                                            />
+                                        </Grid>
+                                    );
+                                })}
                             </Grid>
                         </Box>
                     )}

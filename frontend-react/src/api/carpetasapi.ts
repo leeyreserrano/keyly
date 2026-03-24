@@ -18,5 +18,12 @@ export class carpetasApi {
 }
 
 export type Carpeta = {
- uuid: string;
+  uuid: string;
+  nom: string;
+  dataCreacio: string;
+  items: {
+    uuid: string;
+    titol: string;
+    dinsDeCarpeta: boolean;
+  }[];
 };
