@@ -10,15 +10,23 @@ import com.keyly.model.request.AuthRequest;
 import com.keyly.model.response.LoginResponse;
 import com.keyly.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Autorització", description = "Servei per fer login i register")
+@Tag(name = "Autorització", description = "Servei per fer login i registre")
 public class AuthController {
 
     @Autowired
     private AuthService service;
 
+    @Operation(summary = "Permet fer login")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sucessfull"),
+        @ApiResponse(responseCode = "401", description = "Dades incorrectes")
+    })
     @PostMapping("login")
     public ResponseEntity<LoginResponse> login(@RequestBody AuthRequest request) {
         boolean faLogin = service.login(request);

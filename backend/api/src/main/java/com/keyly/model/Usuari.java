@@ -55,7 +55,7 @@ public class Usuari {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol_intern")
-    private RolIntern rolIntern;
+    private RolIntern rolIntern = RolIntern.USUARI;
     
     @Column(name = "nom")
     private String nom;

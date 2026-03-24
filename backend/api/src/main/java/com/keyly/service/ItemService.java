@@ -15,8 +15,10 @@ import com.keyly.mapper.ItemMapper;
 import com.keyly.model.Bagul;
 import com.keyly.model.Carpeta;
 import com.keyly.model.Item;
+import com.keyly.model.Usuari;
 import com.keyly.model.request.ItemRequest;
 import com.keyly.model.response.ItemResponse;
+import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.ItemRepo;
 
 @Service
@@ -27,6 +29,9 @@ public class ItemService {
 
     @Autowired
     private BagulService bagulService;
+
+    @Autowired
+    private UsuariService usuariService;
 
     @Autowired
     private ItemMapper mapper;
@@ -44,6 +49,13 @@ public class ItemService {
                 .toList();
     }
 
+    public List<ItemResponse> getAllItemsByUsuariUuid(UUID usuariUuid) {
+        return repo.findAllByUsuariUuid(usuariUuid)
+                .stream()
+                .map(item -> new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())))
+                .toList();
+    }
+
     public ItemResponse getByUuid(UUID uuid) {
         Item item = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
@@ -56,8 +68,20 @@ public class ItemService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
     }
 
-    public ItemResponse save(ItemRequest i) {
-        Bagul b = bagulService.getBagulEntityByUuid(i.bagulUuid());
+    public ItemResponse getUserItem(Usuari usuari, UUID uuid) {
+        Item item = repo.findUserItemByUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
+
+        return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
+    }
+
+    public Item getUserItemEntity(Usuari usuari, UUID uuid) {
+        return repo.findUserItemByUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
+    }
+
+    public ItemResponse save(UsuariResponse u, ItemRequest i) {
+        Bagul b = bagulService.getBagulEntityByUsuariUuid(u.uuid());
 
         Item item = new Item(b, i);
 
@@ -87,13 +111,22 @@ public class ItemService {
     public ItemResponse update(UUID uuid, ItemRequest request) {
         Item item = getItemEntityByUuid(uuid);
 
-        if (request.bagulUuid() != null)
-            item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
-
         mapper.updateItemFromDto(request, item);
 
         Item itemGuardat = repo.save(item);
 
+        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
+    }
+
+    public ItemResponse update(UsuariResponse usuari, UUID uuid, ItemRequest request) {
+        Item item = repo.findUserItemByUuid(usuariService.getUsuariEntityByUuid(usuari.uuid()), uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException(
+                        "Item amb uuid " + uuid + " no trobat per l'usuari amb el uuid " + usuari.uuid()));
+
+        mapper.updateItemFromDto(request, item);
+
+        Item itemGuardat = repo.save(item);
+        
         return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
@@ -103,6 +136,14 @@ public class ItemService {
         repo.deleteByUuid(uuid);
 
         return item;
+    }
+
+    public ItemResponse deleteByUuid(Usuari usuari, UUID uuid) {
+        Item item = repo.findUserItemByUuid(usuari, uuid).orElseThrow(() -> new EntitatNoTrobadaException("Item amb el uuid: " + uuid + " no trobat."));
+
+        repo.deleteByUuid(item.getUuid());
+
+        return new ItemResponse(item, false);
     }
 
     /*
@@ -120,20 +161,6 @@ public class ItemService {
     @Deprecated
     public Item getEntityById(Long id) {
         return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el id: " + id));
-    }
-
-    @Deprecated
-    public ItemResponse update(Long id, ItemRequest request) {
-        Item item = getEntityById(id);
-
-        if (request.bagulUuid() != null)
-            item.setBagul(bagulService.getBagulEntityByUuid(request.bagulUuid()));
-
-        mapper.updateItemFromDto(request, item);
-
-        Item itemGuardat = repo.save(item);
-
-        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     @Deprecated

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.request.DominiRequest;
@@ -16,6 +17,7 @@ import com.keyly.service.DominiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,17 +34,27 @@ public class DominiController {
     @Autowired
     private DominiService service;
 
-    @Operation(summary = "Obté tots els domini")
+    @Operation(
+        summary = "Obté tots els domini",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("dominis")
     public ResponseEntity<List<DominiResponse>> getAllDominis() {
         return ResponseEntity.ok(service.getAllDominis());
     }
 
-    @Operation(summary = "Obté un domini per UUID")
+    @Operation(
+        summary = "Obté un domini per UUID",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Domini trobat"),
             @ApiResponse(responseCode = "404", description = "Domini no trobat")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("domini/{uuid}")
     public ResponseEntity<DominiResponse> getDomini(@PathVariable UUID uuid) {
         DominiResponse domini = service.getByUuid(uuid);
@@ -50,12 +62,17 @@ public class DominiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(domini);
     }
 
-    @Operation(summary = "Crea un domini")
+    @Operation(
+        summary = "Crea un domini",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Domini creat"),
             @ApiResponse(responseCode = "404", description = "Sucursal no trobada"),
             @ApiResponse(responseCode = "409", description = "El domini no es válid o ja existeix")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("domini")
     public ResponseEntity<DominiResponse> addDomini(@RequestBody DominiRequest d) {
         DominiResponse domini = service.save(d);
@@ -63,11 +80,16 @@ public class DominiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(domini);
     }
 
-    @Operation(summary = "Actualitza un domini per UUID")
+    @Operation(
+        summary = "Actualitza un domini per UUID",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Domini creat"),
             @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("domini/{uuid}")
     public ResponseEntity<DominiResponse> updateDomini(@PathVariable UUID uuid, @RequestBody DominiRequest request) {
         DominiResponse response = service.update(uuid, request);
@@ -75,11 +97,16 @@ public class DominiController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Elimina un domini per UUID")
+    @Operation(
+        summary = "Elimina un domini per UUID",
+        description = "ADMIN",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Domini eliminat"),
             @ApiResponse(responseCode = "404", description = "Domini no trobat")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("domini/{uuid}")
     public ResponseEntity<DominiResponse> deleteDomini(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.deleteByUuid(uuid));

@@ -40,4 +40,11 @@ public class GestorGlobalExcepcions {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
     }
 
+    @ExceptionHandler(UsuariException.class)
+    public ResponseEntity<ErrorResponse> usuariError(UsuariException e) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
 }

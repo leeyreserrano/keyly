@@ -16,9 +16,12 @@ import com.keyly.service.UsuariService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,55 +36,105 @@ public class UsuariController {
     @Autowired
     private UsuariService service;
 
-    @Operation(summary = "Obté tots els usuaris")
+    @Operation(summary = "Obté tots els usuaris", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("usuaris")
     public ResponseEntity<List<UsuariResponse>> getAllUsuaris() {
         return ResponseEntity.ok(service.getAllUsuaris());
     }
 
-    @Operation(summary = "Obté un usuari per UUID")
+    @Operation(summary = "Crea un usuari", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuari trobat"),
-        @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+            @ApiResponse(responseCode = "201", description = "Usuari creat"),
+            @ApiResponse(responseCode = "404", description = "Departament, sucursal o rol no trobats")
     })
-    @GetMapping("usuari/{uuid}")
-    public ResponseEntity<UsuariResponse> getUsuari(@PathVariable UUID uuid) {
-        return ResponseEntity.ok(service.getByUuid(uuid));
-    }
-
-    @Operation(summary = "Crea un usuari")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Usuari creat"),
-        @ApiResponse(responseCode = "404", description = "Departament, sucursal o rol no trobats")
-    })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP')")
     @PostMapping("usuari")
     public ResponseEntity<UsuariResponse> addUsuari(@RequestBody UsuariRequest u) {
-        UsuariResponse usuari = service.save(u);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuari);
+        boolean esAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean esCap = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_CAP"));
+
+        if (esAdmin) {
+            UsuariResponse usuari = service.save(u);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuari);
+        } else if (esCap) {
+            UsuariResponse usuari = service
+                    .save(service.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), u);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuari);
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @Operation(summary = "Actualitza un usuari per UUID")
+    @Operation(summary = "Actualitza un usuari per UUID", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
-        @ApiResponse(responseCode = "404", description = "Usuari, departament, rol o sucursal no trobats")
+            @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
+            @ApiResponse(responseCode = "404", description = "Usuari, departament, rol o sucursal no trobats")
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP')")
     @PutMapping("usuari/{uuid}")
     public ResponseEntity<UsuariResponse> updateUsuari(@PathVariable UUID uuid, @RequestBody UsuariRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean esCap = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_CAP"));
+
+        if (esAdmin) {
+            UsuariResponse response = service.update(uuid, request);
+
+            return ResponseEntity.ok(response);
+        } else if (esCap) {
+            UsuariResponse response = service
+                    .update(service.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid, request);
+
+            return ResponseEntity.ok(response);
+        }
+
         UsuariResponse response = service.update(uuid, request);
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Elimina un usuari per UUID")
+    @Operation(summary = "Elimina un usuari per UUID", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuari eliminat"),
-        @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+            @ApiResponse(responseCode = "200", description = "Usuari eliminat"),
+            @ApiResponse(responseCode = "404", description = "Usuari no trobat"),
+            @ApiResponse(responseCode = "409", description = "Falta de permissos")
     })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP')")
     @DeleteMapping("usuari/{uuid}")
     public ResponseEntity<UsuariResponse> deleteUsuari(@PathVariable UUID uuid) {
-        return ResponseEntity.ok(service.deleteByUuid(uuid));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean esAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean esCap = authentication.getAuthorities()
+                .stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_CAP"));
+
+        if (esAdmin)
+            return ResponseEntity.ok(service.deleteByUuid(uuid));
+        else if (esCap)
+            return ResponseEntity.ok(service
+                    .deleteByUuid(service.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid));
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
     }
 
     /*
@@ -90,8 +143,8 @@ public class UsuariController {
 
     @Operation(summary = "Crea un llistat de usuaris")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Usuaris creats"),
-        @ApiResponse(responseCode = "404", description = "Un dels departaments, sucursals o rols no trobats")
+            @ApiResponse(responseCode = "201", description = "Usuaris creats"),
+            @ApiResponse(responseCode = "404", description = "Un dels departaments, sucursals o rols no trobats")
     })
     @Deprecated
     @PostMapping("usuaris")
@@ -106,8 +159,8 @@ public class UsuariController {
 
     @Operation(summary = "Obté un usuari per ID", deprecated = true)
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuari trobat"),
-        @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+            @ApiResponse(responseCode = "200", description = "Usuari trobat"),
+            @ApiResponse(responseCode = "404", description = "Usuari no trobat")
     })
     @Deprecated
     @GetMapping("usuari/id/{id}")
@@ -115,10 +168,21 @@ public class UsuariController {
         return ResponseEntity.ok(service.getById(id));
     }
 
+    @Operation(summary = "Obté un usuari per UUID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuari trobat"),
+            @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+    })
+    @Deprecated
+    @GetMapping("usuari/{uuid}")
+    public ResponseEntity<UsuariResponse> getUsuariAdmin(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.getByUuid(uuid));
+    }
+
     @Operation(summary = "Actualitza un usuari per ID", deprecated = true)
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
-        @ApiResponse(responseCode = "404", description = "Usuari, departament, rol o sucursal no trobats")
+            @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
+            @ApiResponse(responseCode = "404", description = "Usuari, departament, rol o sucursal no trobats")
     })
     @Deprecated
     @PutMapping("usuari/id/{id}")
@@ -131,8 +195,8 @@ public class UsuariController {
 
     @Operation(summary = "Elimina un usuari per ID", deprecated = true)
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Usuari eliminat"),
-        @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+            @ApiResponse(responseCode = "200", description = "Usuari eliminat"),
+            @ApiResponse(responseCode = "404", description = "Usuari no trobat")
     })
     @Deprecated
     @DeleteMapping("usuari/id/{id}")

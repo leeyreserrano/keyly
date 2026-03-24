@@ -44,7 +44,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(usuari.getCorreu())
+                .subject(usuari.getUuid().toString())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
