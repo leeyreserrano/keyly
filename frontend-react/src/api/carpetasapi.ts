@@ -4,17 +4,15 @@ function sleep(ms: number) {
 
 export class carpetasApi {
   static async fetchItems(): Promise<Carpeta[]> {
-    await sleep(1500);
-    const response = await fetch(
-      "https://10.147.17.250:8081/api/carpetes",
-    );
+  await sleep(1500);
+  const token = localStorage.getItem("jwtToken");
+  const response = await fetch("https://10.147.17.250:8081/api/carpetes", {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error("Error en la petición");
+  return response.json();
+}
 
-    if (!response.ok) {
-      throw new Error("Error en la petición");
-    }
-
-    return response.json();
-  }
 }
 
 export type Carpeta = {

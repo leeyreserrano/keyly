@@ -25,11 +25,11 @@ export default function LoginCard() {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-  const [rememberMe, setRememberMe] = React.useState(true); // Nuevo estado para "Remember Me"
+  const [rememberMe, setRememberMe] = React.useState(true);
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handleTogglePassword = () => setShowPassword((prev) => !prev);
+  const handleTogglePassword = () => setShowPassword(prev => !prev);
 
   const validateInputs = () => {
     const email = (document.getElementById('email') as HTMLInputElement).value;
@@ -58,21 +58,21 @@ export default function LoginCard() {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!validateInputs()) return;
+  event.preventDefault();
+  if (!validateInputs()) return;
 
-    const email = (document.getElementById('email') as HTMLInputElement).value;
-    const password = (document.getElementById('password') as HTMLInputElement).value;
+  const correu = (document.getElementById('email') as HTMLInputElement).value;
+  const contrasenya = (document.getElementById('password') as HTMLInputElement).value;
 
-    try {
-      const { user } = await loginUser(email, password, rememberMe);
-      console.log('Usuario logueado:', user);
-      navigate('/home');
-    } catch (err: any) {
-      setPasswordError(true);
-      setPasswordErrorMessage(err.message || 'Error al iniciar sesión');
-    }
-  };
+  try {
+    const { token } = await loginUser(correu, contrasenya);
+    localStorage.setItem("jwtToken", token); // ✅ guardar token
+    navigate("/home");
+  } catch (err: any) {
+    setPasswordError(true);
+    setPasswordErrorMessage(err.message || "Error al iniciar sesión");
+  }
+};
 
   return (
     <Stack sx={{ width: '100%', maxWidth: '420px', gap: 3 }}>
@@ -80,22 +80,14 @@ export default function LoginCard() {
         Login
       </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        noValidate
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
-      >
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
         <FormControl>
-          <FormLabel htmlFor="email" sx={{ fontWeight: 600, mb: 0.5 }}>
-            Email
-          </FormLabel>
+          <FormLabel htmlFor="email" sx={{ fontWeight: 600, mb: 0.5 }}>Email</FormLabel>
           <TextField
             error={emailError}
             helperText={emailErrorMessage}
             id="email"
             type="email"
-            name="email"
             autoComplete="email"
             autoFocus
             required
@@ -106,15 +98,12 @@ export default function LoginCard() {
         </FormControl>
 
         <FormControl>
-          <FormLabel htmlFor="password" sx={{ fontWeight: 600, mb: 0.5 }}>
-            Password
-          </FormLabel>
+          <FormLabel htmlFor="password" sx={{ fontWeight: 600, mb: 0.5 }}>Password</FormLabel>
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
-            name="password"
-            type={showPassword ? 'text' : 'password'}
             id="password"
+            type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
             required
             fullWidth
@@ -123,52 +112,26 @@ export default function LoginCard() {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleTogglePassword}
-                    edge="end"
-                  >
+                  <IconButton onClick={handleTogglePassword} edge="end">
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
-              ),
+              )
             }}
           />
         </FormControl>
 
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <FormControlLabel
-            control={
-              <Checkbox
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                color="primary"
-              />
-            }
+            control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} color="primary" />}
             label="Remember me"
           />
-          <Link
-            component="button"
-            type="button"
-            onClick={handleClickOpen}
-            variant="body2"
-            color="primary"
-          >
-            Forgot Password?
-          </Link>
+          <Link component="button" onClick={handleClickOpen} variant="body2" color="primary">Forgot Password?</Link>
         </Stack>
 
         <ForgotPassword open={open} handleClose={handleClose} />
 
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          size="large"
-          sx={{ py: 1.5, borderRadius: '8px' }}
-        >
-          Login
-        </Button>
+        <Button type="submit" fullWidth variant="contained" size="large" sx={{ py: 1.5, borderRadius: '8px' }}>Login</Button>
       </Box>
     </Stack>
   );
