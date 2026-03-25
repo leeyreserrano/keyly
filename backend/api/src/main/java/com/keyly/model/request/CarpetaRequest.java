@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record CarpetaRequest(
         UUID bagulUuid,
-        String nom) {
+        String nom,
+        Boolean favorit) {
 
 }

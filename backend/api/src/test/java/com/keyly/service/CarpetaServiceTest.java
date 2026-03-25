@@ -55,7 +55,7 @@ class CarpetaServiceTest {
         usuari.setUuid(uuid);
         bagul = new Bagul(usuari);
         bagul.setUuid(uuid);
-        carpeta = new Carpeta(bagul, new CarpetaRequest(uuid, "Test Carpeta"));
+        carpeta = new Carpeta(bagul, new CarpetaRequest(uuid, "Test Carpeta", false));
         carpeta.setUuid(uuid);
         carpetaResponse = new CarpetaResponse(carpeta);
     }
@@ -140,7 +140,7 @@ class CarpetaServiceTest {
     @Test
     void save_shouldReturnCarpetaResponse() {
         // Given
-        CarpetaRequest request = new CarpetaRequest(uuid, "New Carpeta");
+        CarpetaRequest request = new CarpetaRequest(uuid, "New Carpeta", false);
         when(bagulService.getBagulEntityByUuid(uuid)).thenReturn(bagul);
         when(repo.save(any(Carpeta.class))).thenReturn(carpeta);
 
@@ -156,7 +156,7 @@ class CarpetaServiceTest {
     @Test
     void save_withUsuari_shouldReturnCarpetaResponse_whenAuthorized() {
         // Given
-        CarpetaRequest request = new CarpetaRequest(uuid, "New Carpeta");
+        CarpetaRequest request = new CarpetaRequest(uuid, "New Carpeta", false);
         when(bagulService.getBagulEntityByUuid(uuid)).thenReturn(bagul);
         when(repo.save(any(Carpeta.class))).thenReturn(carpeta);
 
@@ -174,7 +174,7 @@ class CarpetaServiceTest {
         // Given
         Usuari otherUsuari = new Usuari();
         otherUsuari.setUuid(UUID.randomUUID());
-        CarpetaRequest request = new CarpetaRequest(uuid, "New Carpeta");
+        CarpetaRequest request = new CarpetaRequest(uuid, "New Carpeta", false);
         when(bagulService.getBagulEntityByUuid(uuid)).thenReturn(bagul);
 
         // When & Then
@@ -185,7 +185,7 @@ class CarpetaServiceTest {
     @Test
     void update_shouldReturnCarpetaResponse() {
         // Given
-        CarpetaRequest request = new CarpetaRequest(uuid, "Updated Carpeta");
+        CarpetaRequest request = new CarpetaRequest(uuid, "Updated Carpeta", false);
         when(repo.findByUuid(uuid)).thenReturn(Optional.of(carpeta));
         when(bagulService.getBagulEntityByUuid(uuid)).thenReturn(bagul);
         when(repo.save(carpeta)).thenReturn(carpeta);
@@ -204,7 +204,7 @@ class CarpetaServiceTest {
     @Test
     void update_withUsuari_shouldReturnCarpetaResponse() {
         // Given
-        CarpetaRequest request = new CarpetaRequest(uuid, "Updated Carpeta");
+        CarpetaRequest request = new CarpetaRequest(uuid, "Updated Carpeta", false);
         when(repo.findUserCarpetaByUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
         when(bagulService.getBagulEntityByUuid(uuid)).thenReturn(bagul);
         when(repo.save(carpeta)).thenReturn(carpeta);
