@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@Tag(name = "Autorització", description = "Servei per fer login i registre")
+@Tag(name = "Autorització", description = "Servei per fer login")
 public class AuthController {
 
     @Autowired
