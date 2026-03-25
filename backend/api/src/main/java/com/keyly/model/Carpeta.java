@@ -61,6 +61,9 @@ public class Carpeta {
     @Column(name = "nom")
     private String nom;
 
+    @Column(name = "favorit")
+    private Boolean favorit;
+
     @CreationTimestamp
     @Column(name = "data_creacio")
     private LocalDateTime dataCreacio;

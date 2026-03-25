@@ -11,6 +11,7 @@ public record CarpetaResponse(
         UUID uuid,
         BagulResponse bagul,
         String nom,
+        Boolean favorit,
         LocalDateTime dataCreacio,
         List<ItemResponseBasic> items) {
 
@@ -19,6 +20,7 @@ public record CarpetaResponse(
                 c.getUuid(),
                 new BagulResponse(c.getBagul()),
                 c.getNom(),
+                c.getFavorit(),
                 c.getDataCreacio(),
                 c.getItems()
                         .stream()

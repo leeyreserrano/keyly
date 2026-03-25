@@ -99,11 +99,7 @@ public class CarpetaService {
     }
 
     public CarpetaResponse save(Usuari u, CarpetaRequest c) {
-        Bagul b = bagulService.getBagulEntityByUuid(c.bagulUuid());
-
-        if (!b.getPropietari().equals(u)) {
-            throw new EntitatNoTrobadaException("No autoritzat per crear carpeta en aquest bagul");
-        }
+        Bagul b = bagulService.getBagulEntityByUsuariUuid(u.getUuid());
 
         Carpeta carpeta = new Carpeta(b, c);
 

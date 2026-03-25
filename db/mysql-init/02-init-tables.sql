@@ -91,6 +91,7 @@ CREATE TABLE `Carpetes` (
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `bagul_id` BIGINT NOT NULL,
   `nom` VARCHAR(255) NULL,
+  `favorit` BOOLEAN NULL DEFAULT FALSE,
   `data_creacio` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_carpetes_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`) ON DELETE CASCADE
