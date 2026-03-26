@@ -13,8 +13,10 @@ import {
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import Sidebar from '../components/Sidebar';
-import AppTheme from '../theme/AppTheme';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import Sidebar from '../../components/Sidebar';
+import AppTheme from '../../theme/AppTheme';
+import { itemsApi } from '../../api/itemsapi';
 
 export default function AddItem() {
   const navigate = useNavigate();
@@ -23,10 +25,18 @@ export default function AddItem() {
   const [nomUsuari, setNomUsuari] = useState('');
   const [url, setUrl] = useState('');
   const [contrasenya, setContrasenya] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = () => {
-    console.log({ titol, nomUsuari, url, contrasenya });
-    navigate(-1);
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await itemsApi.addItem({ titol, nomUsuari, url, contrasenya });
+      navigate(-1);
+    } catch (error) {
+      console.error('Error creando item', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => navigate(-1);
@@ -58,11 +68,9 @@ export default function AddItem() {
             </Stack>
 
             <Stack direction="row" sx={{ gap: 2, alignItems: 'center' }}>
-              {/* Avatar */}
               <Avatar sx={{ bgcolor: 'grey.500', width: 36, height: 36, fontSize: 15, fontWeight: 700 }}>
                 U
               </Avatar>
-              {/* Logout */}
               <IconButton
                 onClick={() => navigate('/')}
                 size="small"
@@ -70,18 +78,12 @@ export default function AddItem() {
               >
                 <LogoutOutlinedIcon sx={{ fontSize: 22, color: 'text.secondary' }} />
               </IconButton>
-              {/* Cancel */}
               <Button
-                onClick={handleCancel}
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  bgcolor: 'grey.300',
-                  color: 'text.primary',
-                  '&:hover': { bgcolor: 'grey.400' },
-                }}
+                startIcon={<ArrowBackOutlinedIcon />}
+                onClick={() => navigate(-1)}
+                sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}
               >
-                Cancelar
+                Tornar
               </Button>
             </Stack>
           </Stack>
@@ -90,37 +92,52 @@ export default function AddItem() {
           <Box sx={{ px: 4, py: 4, display: 'flex', justifyContent: 'center' }}>
             <Paper
               variant="outlined"
-              sx={{ p: 4, borderRadius: 3, width: '100%', maxWidth: 500, display: 'flex', flexDirection: 'column', gap: 3 }}
+              sx={{
+                p: 4,
+                borderRadius: 3,
+                width: '100%',
+                maxWidth: 500,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+              }}
             >
-              <TextField
-                label="Título"
-                value={titol}
-                onChange={(e) => setTitol(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
-              <TextField
-                label="Usuario / Email"
-                value={nomUsuari}
-                onChange={(e) => setNomUsuari(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
-              <TextField
-                label="URL"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
-              <TextField
-                label="Contraseña"
-                type="password"
-                value={contrasenya}
-                onChange={(e) => setContrasenya(e.target.value)}
-                fullWidth
-                variant="outlined"
-              />
+              {/* Título */}
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                  Título
+                </Typography>
+                <TextField fullWidth value={titol} onChange={(e) => setTitol(e.target.value)} />
+              </Stack>
+
+              {/* Usuario */}
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                  Usuario / Email
+                </Typography>
+                <TextField fullWidth value={nomUsuari} onChange={(e) => setNomUsuari(e.target.value)} />
+              </Stack>
+
+              {/* URL */}
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                  URL
+                </Typography>
+                <TextField fullWidth value={url} onChange={(e) => setUrl(e.target.value)} />
+              </Stack>
+
+              {/* Contraseña */}
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                  Contraseña
+                </Typography>
+                <TextField
+                  type="password"
+                  fullWidth
+                  value={contrasenya}
+                  onChange={(e) => setContrasenya(e.target.value)}
+                />
+              </Stack>
 
               {/* Botones */}
               <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'flex-end' }}>
@@ -138,6 +155,7 @@ export default function AddItem() {
                 </Button>
                 <Button
                   onClick={handleSave}
+                  disabled={loading}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 600,
@@ -146,7 +164,7 @@ export default function AddItem() {
                     '&:hover': { bgcolor: 'primary.dark' },
                   }}
                 >
-                  Guardar
+                  {loading ? 'Guardando...' : 'Guardar'}
                 </Button>
               </Stack>
             </Paper>

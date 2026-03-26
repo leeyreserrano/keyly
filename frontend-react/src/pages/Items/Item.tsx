@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import {Stack, Typography, Paper, IconButton, Button, Divider, Box, CircularProgress, CssBaseline, Avatar} from '@mui/material';
+import { Stack, Typography, Paper, IconButton, Divider, Box, CircularProgress, CssBaseline, Avatar } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
-import Sidebar from '../components/Sidebar';
-import AppTheme from '../theme/AppTheme';
-import { itemsApi, type Item } from '../api/itemsapi';
-import { carpetasApi, type Carpeta } from '../api/carpetasapi';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
+import Sidebar from '../../components/Sidebar';
+import AppTheme from '../../theme/AppTheme';
+import { itemsApi, type Item } from '../../api/itemsapi';
+import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
+import toast from 'react-hot-toast';
+import Header from '../../components/Header';
+import ActionButtons from '../../components/ActionButtons';
 
 export default function Item() {
   const navigate = useNavigate();
@@ -48,7 +47,16 @@ export default function Item() {
     loadData();
   }, [uuid]);
 
-  const handleCopy = () => { if (item?.contrasenya) navigator.clipboard.writeText(item.contrasenya); };
+  const handleCopy = async () => {
+    if (item?.contrasenya) {
+      try {
+        await navigator.clipboard.writeText(item.contrasenya);
+        toast.success('Contrasenya copiada al portapapeles');
+      } catch (error) {
+        toast.error('Error al copiar');
+      }
+    }
+  };
   const toggleShowPassword = () => setShowPassword(!showPassword);
   const estaEnCarpeta = item
     ? carpetas.some((carpeta) =>
@@ -67,10 +75,23 @@ export default function Item() {
     if (!item) return;
     try {
       await itemsApi.deleteItem(item.uuid);
+      toast.success("Se ha eliminado el item");
       setOpenDeleteModal(false);
-      navigate('/home');
+      navigate(-1);
     } catch (error) {
-      console.error("Error eliminando el item:", error);
+      toast.error("Error eliminando el item");
+    }
+  };
+  const [isFavorit, setIsFavorit] = useState(item?.favorit || false);
+
+  const toggleFavorit = async () => {
+    if (!item) return;
+    try {
+      await itemsApi.updateItem(item.uuid, { favorit: !isFavorit });
+      setIsFavorit(!isFavorit);
+      toast.success(isFavorit ? 'Eliminado de favoritos' : 'Marcado como favorito');
+    } catch {
+      toast.error('Error al actualizar favorito');
     }
   };
 
@@ -82,38 +103,12 @@ export default function Item() {
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
           {/* HEADER */}
-          <Stack
-            direction="row"
-            sx={{
-              px: 4,
-              py: 2.5,
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center' }}>
-              <KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />
-              <Typography variant="h3" sx={{ fontWeight: 800 }}>
-                {item?.titol || 'Item'}
-              </Typography>
-            </Stack>
-
-            <Stack direction="row" sx={{ gap: 2, alignItems: 'center' }}>
-              <Avatar sx={{ bgcolor: 'grey.500', width: 36, height: 36, fontSize: 15, fontWeight: 700 }}>U</Avatar>
-              <IconButton onClick={() => navigate('/')} size="small" sx={{ border: 'none', bgcolor: 'transparent', '&:hover': { bgcolor: 'action.hover' } }}>
-                <LogoutOutlinedIcon sx={{ fontSize: 22, color: 'text.secondary' }} />
-              </IconButton>
-              <Button
-                startIcon={<ArrowBackOutlinedIcon />}
-                onClick={() => navigate(-1)}
-                sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}
-              >
-                Tornar
-              </Button>
-            </Stack>
-          </Stack>
+          <Header
+            title={item?.titol || 'Item'}
+            icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+            userInitial="U"
+            showBackButton={true}
+          />
 
           {/* CONTENIDO */}
           <Box sx={{ px: 4, py: 3 }}>
@@ -136,21 +131,17 @@ export default function Item() {
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>{item.titol}</Typography>
                   </Stack>
 
-                  <Stack direction="row" sx={{ gap: 0.5 }}>
-                    <IconButton
-                      onClick={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
-                      sx={{ border: '1px solid', borderColor: 'divider' }}
-                    >
-                      <EditOutlinedIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      onClick={handleDelete}
-                      sx={{ border: '1px solid', borderColor: 'divider', bgcolor: 'error.main', color: 'white', '&:hover': { bgcolor: 'error.dark' } }}
-                    >
-                      <DeleteOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </Stack>
+                  <ActionButtons
+                    isFavorit={isFavorit}
+                    onToggleFavorit={toggleFavorit}
+                    onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
+                    onDelete={handleDelete}
+                    size="card"          // aquí es donde le indicamos que sea grande
+                    gap={0.5}            // opcional, ajusta el espacio entre botones
+                    showFolderIcon={false} // si no quieres que aparezca icono de carpeta
+                  />
                 </Stack>
+                
 
                 <Divider />
 
