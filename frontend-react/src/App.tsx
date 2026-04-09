@@ -10,6 +10,7 @@ import EditItem from './pages/Items/EditItem';
 import Carpetas from './pages/Carpetes/Carpetes';
 import Carpeta from './pages/Carpetes/Carpeta';
 import AddCarpeta from './pages/Carpetes/AddFolder';
+import UserConfig from './pages/UserConfig';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/Carpetes" element={<Carpetas />} />
         <Route path="/Carpeta" element={<Carpeta />} />
         <Route path="/AddCarpeta" element={<AddCarpeta/>} />
+        <Route path="/Settings" element={<UserConfig />} />
       </Routes>
     </BrowserRouter></>
   );

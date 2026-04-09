@@ -33,9 +33,23 @@ export async function loginUser(correu: string, contrasenya: string, rememberMe:
 
 // Obtener usuario logueado
 export function getCurrentUser() {
-  const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+  const token =
+    localStorage.getItem('jwtToken') ||
+    sessionStorage.getItem('jwtToken');
+
   if (!token) return null;
-  return { token };
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    return {
+      token,
+      user: payload
+    };
+  } catch (error) {
+    console.error('Error decoding token', error);
+    return null;
+  }
 }
 
 // Logout
