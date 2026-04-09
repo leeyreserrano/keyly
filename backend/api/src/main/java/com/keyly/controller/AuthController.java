@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.request.AuthRequest;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@RequestMapping("/auth")
 @Tag(name = "Autorització", description = "Servei per fer login")
 public class AuthController {
 
@@ -32,7 +34,7 @@ public class AuthController {
         boolean faLogin = service.login(request);
 
         if (faLogin)
-            return ResponseEntity.ok(new LoginResponse(service.generateToken(request.correu())));
+            return ResponseEntity.ok(new LoginResponse(service.generateToken(request.correu()), service.getUsuari(request.correu())));
 
         return ResponseEntity.status(401).build();
     }

@@ -73,42 +73,4 @@ public class RolService {
         return rol;
     }
 
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public RolResponse getById(Long id) {
-        return new RolResponse(
-                repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el id: " + id)));
-    }
-
-    @Deprecated
-    public Rol getRolEntityById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el id: " + id));
-
-    }
-
-    @Deprecated
-    public RolResponse update(Long id, RolRequest request) {
-        Rol rol = getRolEntityById(id);
-
-        if (request.sucursalUuid() != null)
-            rol.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
-
-        mapper.updateRolFromDto(request, rol);
-
-        return new RolResponse(repo.save(rol));
-    }
-
-    @Deprecated
-    public RolResponse deleteById(Long id) {
-        RolResponse rol = getById(id);
-
-        repo.deleteById(id);
-
-        return rol;
-    }
-
 }

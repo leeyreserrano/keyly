@@ -1,6 +1,5 @@
 package com.keyly.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,9 +24,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@RequestMapping("/domini")
 @Tag(name = "Domini Controller", description = "Operacions sobre dominis")
 public class DominiController {
 
@@ -40,7 +41,7 @@ public class DominiController {
         security = @SecurityRequirement(name = "bearerAuth")
     )
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("dominis")
+    @GetMapping("all/admin")
     public ResponseEntity<List<DominiResponse>> getAllDominis() {
         return ResponseEntity.ok(service.getAllDominis());
     }
@@ -55,7 +56,7 @@ public class DominiController {
             @ApiResponse(responseCode = "404", description = "Domini no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("domini/{uuid}")
+    @GetMapping("get/admin/{uuid}")
     public ResponseEntity<DominiResponse> getDomini(@PathVariable UUID uuid) {
         DominiResponse domini = service.getByUuid(uuid);
 
@@ -73,7 +74,7 @@ public class DominiController {
             @ApiResponse(responseCode = "409", description = "El domini no es válid o ja existeix")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("domini")
+    @PostMapping("add/admin")
     public ResponseEntity<DominiResponse> addDomini(@RequestBody DominiRequest d) {
         DominiResponse domini = service.save(d);
 
@@ -90,7 +91,7 @@ public class DominiController {
             @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("domini/{uuid}")
+    @PutMapping("update/admin/{uuid}")
     public ResponseEntity<DominiResponse> updateDomini(@PathVariable UUID uuid, @RequestBody DominiRequest request) {
         DominiResponse response = service.update(uuid, request);
 
@@ -107,66 +108,9 @@ public class DominiController {
             @ApiResponse(responseCode = "404", description = "Domini no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("domini/{uuid}")
+    @DeleteMapping("delete/admin/{uuid}")
     public ResponseEntity<DominiResponse> deleteDomini(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.deleteByUuid(uuid));
-    }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Operation(summary = "Crea un llistat de dominis")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dominis creats"),
-            @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades"),
-            @ApiResponse(responseCode = "409", description = "Un dels dominis no és válid o ja existeix")
-    })
-    @Deprecated
-    @PostMapping("dominis")
-    public ResponseEntity<List<DominiResponse>> addDominis(@RequestBody List<DominiRequest> ds) {
-        List<DominiResponse> responses = new ArrayList<>();
-        for (DominiRequest d : ds) {
-            responses.add(service.save(d));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
-    @Operation(summary = "Obté un domini per ID", deprecated = true)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Domini trobat"),
-            @ApiResponse(responseCode = "404", description = "Domini no trobat")
-    })
-    @Deprecated
-    @GetMapping("domini/id/{id}")
-    public ResponseEntity<DominiResponse> getDomini(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
-    }
-
-    @Operation(summary = "Actualitza un domini per ID", deprecated = true)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Domini actualitzat"),
-            @ApiResponse(responseCode = "404", description = "Domini no trobat")
-    })
-    @Deprecated
-    @PutMapping("domini/id/{id}")
-    public ResponseEntity<DominiResponse> updateDomini(@PathVariable Long id,
-            @RequestBody DominiRequest dominiActualitzat) {
-        DominiResponse domini = service.update(id, dominiActualitzat);
-
-        return ResponseEntity.ok(domini);
-    }
-
-    @Operation(summary = "Elimina un domini per ID", deprecated = true)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Domini eliminat"),
-            @ApiResponse(responseCode = "404", description = "Domini no trobat")
-    })
-    @Deprecated
-    @DeleteMapping("domini/id/{id}")
-    public ResponseEntity<DominiResponse> deleteDomini(@PathVariable Long id) {
-        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

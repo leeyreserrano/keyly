@@ -1,7 +1,7 @@
 services:
   backend:
     build: ./backend/api
-    container_name: springboot
+    container_name: keyly-springboot
     # ports:
     #   - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
     networks:
@@ -11,7 +11,7 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: mysql-container
+    container_name: keyly-mysql
     env_file:
       - .env
     environment:
@@ -30,21 +30,9 @@ services:
     command: 
       --character-set-server=utf8mb4
 
-  swagger-ui:
-    image: swaggerapi/swagger-ui:v5.32.0
-    container_name: swagger
-    # ports:
-    #   - "${SWAGGER_PORT_LOCAL}:${SWAGGER_PORT_DOCKER}"
-    volumes:
-      - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
-    environment:
-      SWAGGER_JSON_URL: /swagger/openapi.json
-    networks:
-      - network
-
   nginx:
     image: nginx:alpine
-    container_name: nginx
+    container_name: keyly-nginx
     ports:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:

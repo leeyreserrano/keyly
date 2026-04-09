@@ -24,144 +24,70 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
 @RestController
+@RequestMapping("/rol")
 @Tag(name = "Rol Controller", description = "Operacions sobre rols")
 public class RolController {
 
     @Autowired
     private RolService service;
 
-    @Operation(
-        summary = "Obté tots els rols",
-        description = "ADMIN",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
+    @Operation(summary = "Obté tots els rols", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("rols")
+    @GetMapping("all/admin")
     public ResponseEntity<List<RolResponse>> getAllRols() {
         return ResponseEntity.ok(service.getAllRols());
     }
 
-    @Operation(
-        summary = "Obté un rol per UUID",
-        description = "ADMIN",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
+    @Operation(summary = "Obté un rol per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Rol trobat"),
-        @ApiResponse(responseCode = "404", description = "Rol no trobat")
+            @ApiResponse(responseCode = "200", description = "Rol trobat"),
+            @ApiResponse(responseCode = "404", description = "Rol no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("rol/{uuid}")
+    @GetMapping("get/admin/{uuid}")
     public ResponseEntity<RolResponse> getRol(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.getByUuid(uuid));
     }
-    
-    @Operation(
-        summary = "Crea un rol",
-        description = "ADMIN",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
+
+    @Operation(summary = "Crea un rol", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Rol creat"),
-        @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
+            @ApiResponse(responseCode = "201", description = "Rol creat"),
+            @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("rol")
+    @PostMapping("add/admin")
     public ResponseEntity<RolResponse> addRol(@RequestBody RolRequest r) {
         RolResponse rol = service.save(r);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(rol);
     }
 
-    @Operation(
-        summary = "Actualitza un rol per UUID",
-        description = "ADMIN",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
+    @Operation(summary = "Actualitza un rol per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Rol actualitzat"),
-        @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
+            @ApiResponse(responseCode = "200", description = "Rol actualitzat"),
+            @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("rol/{uuid}")
+    @PutMapping("update/admin/{uuid}")
     public ResponseEntity<RolResponse> updateRol(@PathVariable UUID uuid, @RequestBody RolRequest request) {
         RolResponse response = service.update(uuid, request);
 
         return ResponseEntity.ok(response);
     }
 
-    @Operation(
-        summary = "Elimina un rol per UUID",
-        description = "ADMIN",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
+    @Operation(summary = "Elimina un rol per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Rol eliminat"),
-        @ApiResponse(responseCode = "404", description = "Rol no trobat")
+            @ApiResponse(responseCode = "200", description = "Rol eliminat"),
+            @ApiResponse(responseCode = "404", description = "Rol no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("rol/{uuid}")
+    @DeleteMapping("delete/admin/{uuid}")
     public ResponseEntity<RolResponse> deleteRol(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.deleteByUuid(uuid));
     }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Operation(summary = "Crea un llistat de rols")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Rols creats"),
-        @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades")
-    })
-    @Deprecated
-    @PostMapping("rols")
-    public ResponseEntity<List<RolResponse>> addRols(@RequestBody List<RolRequest> rs) {
-        List<RolResponse> responses = rs
-                .stream()
-                .map(rol -> service.save(rol))
-                .toList();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
-    @Operation(summary = "Obté un rol per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Rol trobat"),
-        @ApiResponse(responseCode = "404", description = "Rol no trobat")
-    })
-    @Deprecated
-    @GetMapping("rol/id/{id}")
-    public ResponseEntity<RolResponse> getRol(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
-    }
-
-    @Operation(summary = "Actualitza un rol per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Rol actualitzat"),
-        @ApiResponse(responseCode = "404", description = "Rol no trobat")
-    })
-    @Deprecated
-    @PutMapping("rol/id/{id}")
-    public ResponseEntity<RolResponse> updateRol(@PathVariable Long id, @RequestBody RolRequest rolActualitzat) {
-        RolResponse response = service.update(id, rolActualitzat);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Elimina un rol per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Rol eliminat"),
-        @ApiResponse(responseCode = "404", description = "Rol no trobat")
-    })
-    @Deprecated
-    @DeleteMapping("rol/id/{id}")
-    public ResponseEntity<RolResponse> deleteRol(@PathVariable Long id) {
-        return ResponseEntity.ok(service.deleteById(id));
-    }
-
+    
 }

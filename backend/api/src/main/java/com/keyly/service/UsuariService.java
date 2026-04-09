@@ -220,47 +220,4 @@ public class UsuariService {
         return false;
     }
 
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public UsuariResponse getById(Long id) {
-        return new UsuariResponse(repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id)));
-    }
-
-    @Deprecated
-    public Usuari getUsuariEntityById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id));
-    }
-
-    @Deprecated
-    public UsuariResponse update(Long id, UsuariRequest request) {
-        Usuari usuari = getUsuariEntityById(id);
-
-        if (request.sucursalUuid() != null)
-            usuari.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
-        if (request.departamentUuid() != null)
-            usuari.setDepartament(departamentService.getDepartamentEntityByUuid(request.departamentUuid()));
-        if (request.rolUuid() != null)
-            usuari.setRol(rolService.getRolEntityByUuid(request.rolUuid()));
-
-        mapper.updateUsuariFromDto(request, usuari);
-
-        if (!correuValid(usuari))
-            throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
-
-        return new UsuariResponse(repo.save(usuari));
-    }
-
-    @Deprecated
-    public UsuariResponse deleteById(Long id) {
-        UsuariResponse usuari = getById(id);
-
-        repo.deleteById(id);
-
-        return usuari;
-    }
-
 }

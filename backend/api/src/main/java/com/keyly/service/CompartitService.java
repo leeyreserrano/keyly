@@ -155,31 +155,4 @@ public class CompartitService {
         repo.delete(compartit);
     }
 
-    @Deprecated
-    public CompartitResponse getById(Long id) {
-        Compartit c = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el id: " + id));
-
-        if (c.getTipusEntitat() == TipusEntitat.CARPETA) {
-            Carpeta carpeta = carpetaService.getCarpetaEntityById(c.getId());
-
-            return new CompartitResponse(c, new CarpetaResponse(carpeta));
-        }
-
-        Item item = itemService.getEntityById(c.getId());
-
-        return new CompartitResponse(c, new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())));
-    }
-
-    @Deprecated
-    public Compartit getEntityById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el id: " + id));
-    }
-
-    @Deprecated
-    public void deleteById(Long id) {
-        repo.deleteById(id);
-    }
-
 }

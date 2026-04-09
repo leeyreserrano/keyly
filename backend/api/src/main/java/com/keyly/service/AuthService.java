@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.keyly.model.Usuari;
 import com.keyly.model.request.AuthRequest;
+import com.keyly.model.response.UsuariResponse;
 import com.keyly.security.JwtUtils;
 
 @Service
@@ -30,6 +31,12 @@ public class AuthService {
         }
 
         return false;
+    }
+
+    public UsuariResponse getUsuari(String correu) {
+        Usuari usuari = usuariService.getUsuariEntityByMail(correu);
+
+        return new UsuariResponse(usuari);
     }
 
     public String generateToken(String correu) {

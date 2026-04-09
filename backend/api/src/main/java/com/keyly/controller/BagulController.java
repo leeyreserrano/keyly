@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
+@RequestMapping("/bagul")
 @Tag(name = "Bagul Controller", description = "Operacions sobre baguls")
 public class BagulController {
 
@@ -32,7 +34,7 @@ public class BagulController {
 
     @Operation(summary = "Obté tots els baguls", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("baguls")
+    @GetMapping("all/admin")
     public ResponseEntity<List<BagulResponse>> getAllBaguls() {
         return ResponseEntity.ok(service.getAllBaguls());
     }
@@ -43,7 +45,7 @@ public class BagulController {
         @ApiResponse(responseCode = "404", description = "Bagul no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("bagul/{uuid}")
+    @GetMapping("get/admin/{uuid}")
     public ResponseEntity<BagulResponse> getBagul(@PathVariable UUID uuid) {
         BagulResponse bagul = service.getByUuid(uuid);
 
@@ -56,7 +58,7 @@ public class BagulController {
         @ApiResponse(responseCode = "404", description = "Bagul o usuari no trobats")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("bagul/{uuid}")
+    @PutMapping("update/admin/{uuid}")
     public ResponseEntity<BagulResponse> updateBagul(@PathVariable UUID uuid, @RequestBody BagulRequest request) {
         BagulResponse response = service.update(uuid, request);
 

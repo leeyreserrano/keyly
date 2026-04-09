@@ -67,44 +67,4 @@ public class SucursalService {
         return sucursal;
     }
 
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public SucursalResponse getById(Long id) {
-        Sucursal sucursal = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el id: " + id));
-
-        return new SucursalResponse(sucursal);
-    }
-
-    @Deprecated
-    public Sucursal getEntityById(Long id) {
-        Sucursal sucursal = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el id: " + id));
-
-        return sucursal;
-    }
-
-    @Deprecated
-    public SucursalResponse update(Long id, SucursalRequest sucursalRequest) {
-        Sucursal sucursalGuardada = getEntityById(id);
-
-        mapper.updateSucursalFromDto(sucursalRequest, sucursalGuardada);
-
-        Sucursal sucursalGuardat = repo.save(sucursalGuardada);
-
-        return new SucursalResponse(sucursalGuardat);
-    }
-
-    @Deprecated
-    public SucursalResponse deleteById(Long id) {
-        SucursalResponse sucursal = getById(id);
-
-        repo.deleteById(id);
-
-        return sucursal;
-    }
-
 }

@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@RequestMapping("/item")
 @Tag(name = "Item Controller", description = "Operacions sobre items")
 public class ItemController {
 
@@ -41,14 +43,14 @@ public class ItemController {
 
     @Operation(summary = "Obté tots els items", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("items/all")
+    @GetMapping("all/admin")
     public ResponseEntity<List<ItemResponse>> getAllItem() {
         return ResponseEntity.ok(service.getAllItems());
     }
 
     @Operation(summary = "Obté tots els items de l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @GetMapping("items")
+    @GetMapping("get/all")
     public ResponseEntity<List<ItemResponse>> getAllItemOfUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -61,7 +63,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "Item no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("item/admin/{uuid}")
+    @GetMapping("get/admin/{uuid}")
     public ResponseEntity<ItemResponse> getItem(@PathVariable UUID uuid) {
         ItemResponse item = service.getByUuid(uuid);
 
@@ -74,7 +76,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "Item no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @GetMapping("item/{uuid}")
+    @GetMapping("get/{uuid}")
     public ResponseEntity<ItemResponse> getUserItem(@PathVariable UUID uuid) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -90,7 +92,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "Bagul no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @PostMapping("item")
+    @PostMapping("add")
     public ResponseEntity<ItemResponse> addItem(@RequestBody ItemRequest i) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -105,7 +107,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "Bagul no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("item/admin/{uuid}")
+    @PutMapping("update/admin/{uuid}")
     public ResponseEntity<ItemResponse> updateItem(@PathVariable UUID uuid, @RequestBody ItemRequest request) {
         ItemResponse response = service.update(uuid, request);
 
@@ -118,7 +120,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "Bagul no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @PutMapping("item/{uuid}")
+    @PutMapping("update/{uuid}")
     public ResponseEntity<ItemResponse> updateUsuariItem(@PathVariable UUID uuid, @RequestBody ItemRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -134,7 +136,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "Item no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("item/admin/{uuid}")
+    @DeleteMapping("delete/admin/{uuid}")
     public ResponseEntity<ItemResponse> deleteAnyItem(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.deleteByUuid(uuid));
     }
@@ -146,40 +148,12 @@ public class ItemController {
             @ApiResponse(responseCode = "409", description = "Falta de permissos")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @DeleteMapping("item/{uuid}")
+    @DeleteMapping("delete/{uuid}")
     public ResponseEntity<ItemResponse> deleteItem(@PathVariable UUID uuid) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         return ResponseEntity.ok(service.deleteByUuid(
                 usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid));
     }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Operation(summary = "Obté un item per ID", deprecated = true)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Item trobat"),
-            @ApiResponse(responseCode = "404", description = "Item no trobat")
-    })
-    @Deprecated
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("item/id/{id}")
-    public ResponseEntity<ItemResponse> getItem(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
-    }
-
-    @Operation(summary = "Elimina un item per ID", deprecated = true)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Item eliminat"),
-            @ApiResponse(responseCode = "404", description = "Item no trobat")
-    })
-    @Deprecated
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("item/id/{id}")
-    public ResponseEntity<ItemResponse> deleteItem(@PathVariable Long id) {
-        return ResponseEntity.ok(service.deleteById(id));
-    }
-
+    
 }

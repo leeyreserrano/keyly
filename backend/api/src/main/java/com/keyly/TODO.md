@@ -6,10 +6,6 @@
 
 - Al cambiar la master contrasenya, se deberá de volver a encriptar todas las contraseñas del usuario en la bd con la nueva contraseña (JWT hecho)
 
-- Generación aleatoria de contraseñas con selección
-
 - Comprovación de que una contraseña no esté filtrada
-
-- Endpoint para carpetas, para crear un item directamente dentro de una carpeta
 
 - Hacer que en items pille el favicon de la url que ponga y si no que ponga un logo por defecto (quizás null)

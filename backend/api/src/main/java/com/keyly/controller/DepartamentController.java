@@ -1,6 +1,5 @@
 package com.keyly.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,9 +24,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@RequestMapping("/departament")
 @Tag(name = "Departament Controller", description = "Operacions sobre departaments")
 public class DepartamentController {
 
@@ -40,7 +41,7 @@ public class DepartamentController {
         security = @SecurityRequirement(name = "bearerAuth")
     )
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("departaments")
+    @GetMapping("all/admin")
     public ResponseEntity<List<DepartamentResponse>> getAllDepartaments() {
         return ResponseEntity.ok(service.getAllDepartaments());
     }
@@ -55,7 +56,7 @@ public class DepartamentController {
         @ApiResponse(responseCode = "404", description = "Departament no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("departament/{uuid}")
+    @GetMapping("get/admin/{uuid}")
     public ResponseEntity<DepartamentResponse> getDepartament(@PathVariable UUID uuid) {
         DepartamentResponse departament = service.getByUuid(uuid);
 
@@ -72,7 +73,7 @@ public class DepartamentController {
         @ApiResponse(responseCode = "404", description = "Sucursal no trobada")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("departament")
+    @PostMapping("add/admin")
     public ResponseEntity<DepartamentResponse> addDepartament(@RequestBody DepartamentRequest d) {
         DepartamentResponse departament = service.save(d);
 
@@ -89,7 +90,7 @@ public class DepartamentController {
         @ApiResponse(responseCode = "404", description = "Departament o sucursal no trobats")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("departament/{uuid}")
+    @PutMapping("update/admin/{uuid}")
     public ResponseEntity<DepartamentResponse> updateDepartament(@PathVariable UUID uuid, @RequestBody DepartamentRequest request) {
         DepartamentResponse response = service.update(uuid, request);
 
@@ -106,67 +107,9 @@ public class DepartamentController {
         @ApiResponse(responseCode = "404", description = "Departament no trobat")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("departament/{uuid}")
+    @DeleteMapping("delete/admin/{uuid}")
     public ResponseEntity<DepartamentResponse> deleteDepartament(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.deleteByUuid(uuid));
-    }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Operation(summary = "Crea un llistat de departaments")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Departaments creats"),
-        @ApiResponse(responseCode = "404", description = "Una de les sucursals no trobades")
-    })
-    @Deprecated
-    @PostMapping("departaments")
-    public ResponseEntity<List<DepartamentResponse>> addDepartaments(@RequestBody List<DepartamentRequest> ds) {
-        List<DepartamentResponse> responses = new ArrayList<>();
-        for (DepartamentRequest d : ds) {
-            responses.add(service.save(d));
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
-    }
-
-    @Operation(summary = "Obté un departament per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Departament trobat"),
-        @ApiResponse(responseCode = "404", description = "Departament no trobat")
-    })
-    @Deprecated
-    @GetMapping("departament/id/{id}")
-    public ResponseEntity<DepartamentResponse> getDepartament(@PathVariable Long id) {
-        DepartamentResponse departament = service.getById(id);
-
-        return ResponseEntity.ok(departament);
-    }
-
-    @Operation(summary = "Actualitza un departament per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Departament actualitzat"),
-        @ApiResponse(responseCode = "404", description = "Departament o sucursal no trobats")
-    })
-    @Deprecated
-    @PutMapping("departament/id/{id}")
-    public ResponseEntity<DepartamentResponse> updateDepartament(@PathVariable Long id,
-            @RequestBody DepartamentRequest departamentActualitzat) {
-        DepartamentResponse response = service.update(id, departamentActualitzat);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "Elimina un departament per ID", deprecated = true)
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Departament eliminat"),
-        @ApiResponse(responseCode = "404", description = "Departament no trobat")
-    })
-    @Deprecated
-    @DeleteMapping("departament/id/{id}")
-    public ResponseEntity<DepartamentResponse> deleteDepartament(@PathVariable Long id) {
-        return ResponseEntity.ok(service.deleteById(id));
     }
 
 }

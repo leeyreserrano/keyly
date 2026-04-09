@@ -151,31 +151,5 @@ public class ItemService {
 
         return new ItemResponse(item, false);
     }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public ItemResponse getById(Long id) {
-        Item item = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el id: " + id));
-
-        return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
-    }
-
-    @Deprecated
-    public Item getEntityById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el id: " + id));
-    }
-
-    @Deprecated
-    public ItemResponse deleteById(Long id) {
-        ItemResponse item = getById(id);
-
-        repo.deleteById(id);
-
-        return item;
-    }
-
+    
 }

@@ -84,37 +84,4 @@ public class DepartamentService {
         return departament;
     }
 
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public DepartamentResponse getById(Long id) {
-        Departament departament = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Departament no trobat amb el id: " + id));
-
-        return new DepartamentResponse(departament);
-    }
-
-    @Deprecated
-    public DepartamentResponse update(Long id, DepartamentRequest request) {
-        Departament d = getDepartamentEntityById(id);
-
-        if (request.sucursalUuid() != null) 
-            d.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
-
-        mapper.updateDepartamentFromDto(request, d);
-
-        return new DepartamentResponse(repo.save(d));
-    }
-
-    @Deprecated
-    public DepartamentResponse deleteById(Long id) {
-        DepartamentResponse departament = getById(id);
-
-        repo.deleteById(id);
-
-        return departament;
-    }
-
 }
