@@ -1,8 +1,6 @@
 - Que cuando un departamento se cree, se cree una carpeta automaticamente para ese departamento (NO LO VEO CLARO)
 
-- Intentar quitar las consultas SQL personalizadas
-
-- Hacer que en items pille el favicon de la url que ponga y si no que ponga un logo por defecto (quizás null)
+- Hacer que en items pille el favicon de la url que ponga y si no que ponga un logo por defecto (quizás null) Esto debería de ocuparse el frontend
 
 - Gestionar las contraseñas seguras (Una vez el jwt esté hecho)
 

@@ -84,14 +84,14 @@ class CompartitServiceTest {
         when(carpetaResponse.uuid()).thenReturn(uuid);
         when(carpetaResponse.nom()).thenReturn("Test Carpeta");
         
-        when(repo.findAllByUsuariUuid(uuid)).thenReturn(List.of(compartit));
+        when(repo.findByUsuariUuid(uuid)).thenReturn(List.of(compartit));
         when(carpetaService.getByUuid(any())).thenReturn(carpetaResponse);
         
         List<CompartitResponse> result = service.getAllCompartitsByUsuariUuid(uuid);
         
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(repo).findAllByUsuariUuid(uuid);
+        verify(repo).findByUsuariUuid(uuid);
     }
 
     @Test
@@ -121,21 +121,21 @@ class CompartitServiceTest {
         carpeta.setUuid(uuid);
         carpeta.setBagul(bagul);
         
-        when(repo.findUserCompartitByUuid(usuari, uuid)).thenReturn(Optional.of(compartit));
+        when(repo.findByUsuariAndUuid(usuari, uuid)).thenReturn(Optional.of(compartit));
         when(carpetaService.getCarpetaEntityByUuid(uuid)).thenReturn(carpeta);
 
         CompartitResponse result = service.getUserCompartit(usuari, uuid);
 
         assertNotNull(result);
-        verify(repo).findUserCompartitByUuid(usuari, uuid);
+        verify(repo).findByUsuariAndUuid(usuari, uuid);
     }
 
     @Test
     void getUserCompartit_shouldThrowException_whenNotExists() {
-        when(repo.findUserCompartitByUuid(usuari, uuid)).thenReturn(Optional.empty());
+        when(repo.findByUsuariAndUuid(usuari, uuid)).thenReturn(Optional.empty());
 
         assertThrows(EntitatNoTrobadaException.class, () -> service.getUserCompartit(usuari, uuid));
-        verify(repo).findUserCompartitByUuid(usuari, uuid);
+        verify(repo).findByUsuariAndUuid(usuari, uuid);
     }
 
     @Test
@@ -194,11 +194,11 @@ class CompartitServiceTest {
 
     @Test
     void deleteUserCompartit_shouldCallRepoDelete() {
-        when(repo.findUserCompartitByUuid(usuari, uuid)).thenReturn(Optional.of(compartit));
+        when(repo.findByUsuariAndUuid(usuari, uuid)).thenReturn(Optional.of(compartit));
 
         service.deleteUserCompartit(usuari, uuid);
 
-        verify(repo).findUserCompartitByUuid(usuari, uuid);
+        verify(repo).findByUsuariAndUuid(usuari, uuid);
         verify(repo).delete(compartit);
     }
 }

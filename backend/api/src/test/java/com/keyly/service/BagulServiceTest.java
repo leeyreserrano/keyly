@@ -100,21 +100,21 @@ class BagulServiceTest {
 
     @Test
     void getBagulEntityByUsuariUuid_shouldReturnBagul_whenExists() {
-        when(repo.findByUsuariUuid(uuid)).thenReturn(Optional.of(bagul));
+        when(repo.findByPropietariUuid(uuid)).thenReturn(Optional.of(bagul));
 
         Bagul result = service.getBagulEntityByUsuariUuid(uuid);
 
         assertNotNull(result);
         assertEquals(uuid, result.getUuid());
-        verify(repo).findByUsuariUuid(uuid);
+        verify(repo).findByPropietariUuid(uuid);
     }
 
     @Test
     void getBagulEntityByUsuariUuid_shouldThrowException_whenNotExists() {
-        when(repo.findByUsuariUuid(uuid)).thenReturn(Optional.empty());
+        when(repo.findByPropietariUuid(uuid)).thenReturn(Optional.empty());
 
         assertThrows(EntitatNoTrobadaException.class, () -> service.getBagulEntityByUsuariUuid(uuid));
-        verify(repo).findByUsuariUuid(uuid);
+        verify(repo).findByPropietariUuid(uuid);
     }
 
     @Test

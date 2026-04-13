@@ -75,14 +75,14 @@ class ItemServiceTest {
 
     @Test
     void getAllItemsByUsuariUuid_shouldReturnListOfItemResponse() {
-        when(repo.findAllByUsuariUuid(uuid)).thenReturn(List.of(item));
+        when(repo.findByBagulPropietariUuid(uuid)).thenReturn(List.of(item));
         when(carpetaService.hasItemInAnyCarpeta(uuid)).thenReturn(false);
 
         List<ItemResponse> result = service.getAllItemsByUsuariUuid(uuid);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(repo).findAllByUsuariUuid(uuid);
+        verify(repo).findByBagulPropietariUuid(uuid);
     }
 
     @Test
@@ -106,21 +106,21 @@ class ItemServiceTest {
 
     @Test
     void getUserItem_shouldReturnItemResponse_whenExists() {
-        when(repo.findUserItemByUuid(usuari, uuid)).thenReturn(Optional.of(item));
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.of(item));
         when(carpetaService.hasItemInAnyCarpeta(uuid)).thenReturn(false);
 
         ItemResponse result = service.getUserItem(usuari, uuid);
 
         assertNotNull(result);
-        verify(repo).findUserItemByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
     }
 
     @Test
     void getUserItem_shouldThrowException_whenNotExists() {
-        when(repo.findUserItemByUuid(usuari, uuid)).thenReturn(Optional.empty());
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.empty());
 
         assertThrows(EntitatNoTrobadaException.class, () -> service.getUserItem(usuari, uuid));
-        verify(repo).findUserItemByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
     }
 
     @Test
@@ -152,12 +152,12 @@ class ItemServiceTest {
 
     @Test
     void deleteByUuid_withUsuari_shouldReturnItemResponse() {
-        when(repo.findUserItemByUuid(usuari, uuid)).thenReturn(Optional.of(item));
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.of(item));
 
         ItemResponse result = service.deleteByUuid(usuari, uuid);
 
         assertNotNull(result);
-        verify(repo).findUserItemByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
         verify(repo).deleteByUuid(uuid);
     }
 }

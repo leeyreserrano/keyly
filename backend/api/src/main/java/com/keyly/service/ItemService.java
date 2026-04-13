@@ -51,7 +51,7 @@ public class ItemService {
     }
 
     public List<ItemResponse> getAllItemsByUsuariUuid(UUID usuariUuid) {
-        return repo.findAllByUsuariUuid(usuariUuid)
+        return repo.findByBagulPropietariUuid(usuariUuid)
                 .stream()
                 .map(item -> new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())))
                 .toList();
@@ -70,7 +70,7 @@ public class ItemService {
     }
 
     public ItemResponse getUserItem(Usuari usuari, UUID uuid) {
-        Item item = repo.findUserItemByUuid(usuari, uuid)
+        Item item = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
 
         item.setDataUltimAcces(LocalDateTime.now());
@@ -80,7 +80,7 @@ public class ItemService {
     }
 
     public Item getUserItemEntity(Usuari usuari, UUID uuid) {
-        return repo.findUserItemByUuid(usuari, uuid)
+        return repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
     }
 
@@ -123,7 +123,7 @@ public class ItemService {
     }
 
     public ItemResponse update(UsuariResponse usuari, UUID uuid, ItemRequest request) {
-        Item item = repo.findUserItemByUuid(usuariService.getUsuariEntityByUuid(usuari.uuid()), uuid)
+        Item item = repo.findByBagulPropietariAndUuid(usuariService.getUsuariEntityByUuid(usuari.uuid()), uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException(
                         "Item amb uuid " + uuid + " no trobat per l'usuari amb el uuid " + usuari.uuid()));
 
@@ -145,7 +145,7 @@ public class ItemService {
     }
 
     public ItemResponse deleteByUuid(Usuari usuari, UUID uuid) {
-        Item item = repo.findUserItemByUuid(usuari, uuid).orElseThrow(() -> new EntitatNoTrobadaException("Item amb el uuid: " + uuid + " no trobat."));
+        Item item = repo.findByBagulPropietariAndUuid(usuari, uuid).orElseThrow(() -> new EntitatNoTrobadaException("Item amb el uuid: " + uuid + " no trobat."));
 
         repo.deleteByUuid(item.getUuid());
 

@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -18,13 +17,7 @@ public interface BagulRepo extends JpaRepository<Bagul, Long> {
 
     Optional<Bagul> findByUuid(UUID uuid);
 
-    @Query("""
-                SELECT b
-                FROM Bagul b
-                JOIN b.propietari u
-                WHERE u.uuid = :uuid
-            """)
-    Optional<Bagul> findByUsuariUuid(@Param("uuid") UUID uuid);
+    Optional<Bagul> findByPropietariUuid(@Param("uuid") UUID uuid);
 
     @Modifying
     @Transactional
