@@ -16,6 +16,15 @@
         android:theme="@style/Theme.Keyly_Projecte_Intermodular"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ItemFolderSelectorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CarpetesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ItemsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ItemActivity"
             android:exported="false" />
         <activity

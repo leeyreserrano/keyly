@@ -22,7 +22,7 @@
     </FrameLayout>
 
     <EditText
-        android:id="@+id/editTextTextEmailAddress"
+        android:id="@+id/txtUsuari"
         android:layout_width="352dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -33,7 +33,7 @@
         android:inputType="textEmailAddress" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/txtContrasenya"
         android:layout_width="352dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

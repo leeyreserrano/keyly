@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/alertDialogFiltres"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filtrar per:"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/airbnb_cereal_w_bd"/>
+
+    <CheckBox
+        android:id="@+id/cbTots"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Tots"
+        android:checked="true"
+        android:buttonTint="@color/purple_button"/>
+
+    <CheckBox
+        android:id="@+id/cbUltimsUsats"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Últims utitilzats"
+        android:checked="true"
+        android:buttonTint="@color/purple_button"/>
+
+    <CheckBox
+        android:id="@+id/cbMesUsats"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Més utilitzats"
+        android:checked="true"
+        android:buttonTint="@color/purple_button"/>
+
+    <CheckBox
+        android:id="@+id/cbFavorits"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Favorits"
+        android:checked="true"
+        android:buttonTint="@color/purple_button"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnFiltrar"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center"
+            android:text="Filtrar"
+            android:background="@drawable/background_buttons"/>
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Cancelar"
+            android:background="@drawable/background_buttons"/>
+
+    </LinearLayout>
+
+</LinearLayout>

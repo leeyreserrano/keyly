@@ -1,4 +1,4 @@
-package com.example.keyly_projecte_intermodular.DAO;
+package com.example.keyly_projecte_intermodular.dao;
 
 import java.util.UUID;
 
@@ -7,7 +7,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class User {
+public class Usuari {
+
     private UUID uuid; // Solo usar uuid (es random), para identificar el item
     private Sucursal sucursal;
     private Departament departament;
@@ -18,4 +19,5 @@ public class User {
     private String dataCreacio;
     private String ultimLogin;
     private boolean potAdministrar;
+
 }

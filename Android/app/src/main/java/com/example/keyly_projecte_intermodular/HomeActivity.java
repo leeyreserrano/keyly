@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,27 +14,39 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.keyly_projecte_intermodular.resources.ContentJSONProva;
-import com.example.keyly_projecte_intermodular.resources.Item;
-import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
+import com.example.keyly_projecte_intermodular.dao.Item;
+import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.google.gson.Gson;
+import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
+    private BottomNavigationView menu;
     private String json;
     private ArrayList<Item> items = new ArrayList<>();
     private JSONArray jsonArray;
+
+    /*interface RequestItem {
+        // Obtenir tots els items
+        @GET("/api/items")
+        Call<ArrayList<Item>> getAllItems();
+
+        // Obtenir un item en concret
+        //@GET("/api/items/{uuid}")
+        //Call<ItemData> getItem(@Path("uuid") String uuid);
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,34 +64,80 @@ public class HomeActivity extends AppCompatActivity {
 
         layoutError = findViewById(R.id.layoutError);
 
+        /*OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .hostnameVerifier((hostname, session) -> true)
+                .build();
 
-        // Carregar el JSON
-        Thread t = new Thread(() -> {
-            json = ContentJSONProva.carregarJSON(this, R.raw.prueba);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://10.147.17.250:8081")
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();*/
 
-            if (json == null || json.equals("[]")) {
-                // Mostrar Toast en el hilo principal
-                runOnUiThread(() -> {
-                    layoutError.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                });
-            } else {
-                // Parsear JSON
-                Gson gson = new Gson();
-                Item[] itemsArray = gson.fromJson(json, Item[].class);
-                ArrayList<Item> itemsList = new ArrayList<>(Arrays.asList(itemsArray));
+        itemAdapter = new ItemAdapter(items, item -> {
+            Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("title", item.getTitol());
+            intent.putExtra("url", item.getUrl());
+            intent.putExtra("propietari", item.getNomUsuari());
+            intent.putExtra("password", item.getContrasenya());
+            intent.putExtra("notes", item.getNotes());
+            intent.putExtra("fav", item.isFavorit());
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(itemAdapter);
 
-                // Actualizar UI en hilo principal
-                runOnUiThread(() -> {
+        ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
+
+        // Obtenir un item en concret
+        //requestItem.getItem("1").enqueue(new Callback<ItemData>() {
+        requestItem.getAllItems().enqueue(new Callback<ArrayList<Item>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("RESPONSE", response.toString());
                     items.clear();
-                    items.addAll(itemsList);
+                    items.addAll(response.body());
                     itemAdapter.notifyDataSetChanged();
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
-                });
+                    layoutError.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
+                layoutError.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             }
         });
 
-        t.start();
+
+        // Carregar el JSON
+//        Thread t = new Thread(() -> {
+//            json = ItemDTO.carregarJSONItem(this, R.raw.prueba);
+//
+//            if (json == null || json.equals("[]")) {
+//                // Mostrar Toast en el hilo principal
+//                runOnUiThread(() -> {
+//                    layoutError.setVisibility(View.VISIBLE);
+//                    recyclerView.setVisibility(View.GONE);
+//                });
+//            } else {
+//                // Parsear JSON
+//                Gson gson = new Gson();
+//                Item[] itemsArray = gson.fromJson(json, Item[].class);
+//                ArrayList<Item> itemsList = new ArrayList<>(Arrays.asList(itemsArray));
+//
+//                // Actualizar UI en hilo principal
+//                runOnUiThread(() -> {
+//                    items.clear();
+//                    items.addAll(itemsList);
+//                    itemAdapter.notifyDataSetChanged();
+//                    recyclerView.setVisibility(RecyclerView.VISIBLE);
+//                });
+//            }
+//        });
+//
+//        t.start();
 
         /*try {
             t.join();
@@ -88,13 +145,23 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }*/
 
-        itemAdapter = new ItemAdapter(items, item -> {
-            Intent intent = new Intent(this, ItemActivity.class);
-            intent.putExtra("title", item.getTitle());
-            startActivity(intent);
+        menu = findViewById(R.id.menu_app);
+        menu.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                Intent intent = new Intent(this, HomeActivity.class);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_items_folders) {
+                Intent intent = new Intent(this, ItemFolderSelectorActivity.class);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.nav_shared) {
+                return true;
+            } else if (id == R.id.nav_profile) {
+                return true;
+            }
+            return false;
         });
-        recyclerView.setAdapter(itemAdapter);
-
-
     }
 }

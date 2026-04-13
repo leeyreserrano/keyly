@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Departament {
-    private UUID uuid; // Solo usar uuid (es random), para identificar el item
-    private Sucursal sucursal;
-    private String nom;
+public class Bagul {
+    private UUID uuid;
+    private Usuari usuari;
+
 }

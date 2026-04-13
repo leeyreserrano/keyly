@@ -1,9 +1,9 @@
-package com.example.keyly_projecte_intermodular.DTO;
+package com.example.keyly_projecte_intermodular.dto;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.example.keyly_projecte_intermodular.DAO.Item;
+import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -13,14 +13,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class UserDTO {
+public class UsuariDTO {
 
-    public static String carregarJSONUser (Context context, int nomArxiu) {
+    public static String carregarJSONUsuari (Context context, int nomArxiu) {
 
         String json = "[]";
 
         try {
-            URL url = new URL("http://10.147.17.250:8081/api/user");
+            URL url = new URL("https://10.147.17.250:8081/api/login/id/1");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
@@ -46,9 +46,9 @@ public class UserDTO {
 
     }
 
-    public static Item[] getUsers(String json) {
+    public static Usuari[] getUsuaris(String json) {
         Gson gson = new Gson();
-        Item[] itemList = gson.fromJson(json, Item[].class);
-        return itemList;
+        Usuari[] usuarisLlista = gson.fromJson(json, Usuari[].class);
+        return usuarisLlista;
     }
 }

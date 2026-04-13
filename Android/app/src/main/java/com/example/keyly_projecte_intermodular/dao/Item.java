@@ -1,6 +1,4 @@
-package com.example.keyly_projecte_intermodular.resources;
-
-import com.bumptech.glide.Glide;
+package com.example.keyly_projecte_intermodular.dao;
 
 import java.util.UUID;
 
@@ -10,18 +8,15 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Item {
-
-    private UUID uuid; // Solo usar uuid (es random), para identificar el item
-    //private UUID bagul_uuid;
+    private UUID uuid;
+    private Bagul bagul;
     private String titol;
-    private String nom_usuari;
+    private String nomUsuari;
     private String contrasenya;
     private String url;
     private String notes;
     private boolean favorit;
-    private String data_creacio;
-    private String data_editat;
-    private String ultim_access;
-    //private byte[] favicon;
-
+    private String dataCreacio;
+    private String dataEditat;
+    private String ultimAccess;
 }

@@ -44,35 +44,54 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="30dp"
             android:src="@drawable/icon_notification"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_margin="20dp">
+        android:elevation="8dp"
+        android:background="@drawable/background_layout_settings">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/txtNomItem"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nom Item"
-                    android:fontFamily="@font/airbnb_cereal_w_bd"
-                    android:textSize="20dp"
-                    android:textColor="@color/black"/>
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/txtNomItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nom Item"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:textSize="20dp"
+                        android:textColor="@color/black"/>
+
+                    <ImageButton
+                        android:id="@+id/imgBtnStar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/star"
+                        android:backgroundTint="@color/transparent"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/txtLlocItem"
@@ -99,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/editar"
                 android:backgroundTint="@color/white"
-                android:layout_gravity="right|center"
+                android:layout_gravity="right|top"
                 android:scaleType="fitXY"/>
 
         </FrameLayout>
@@ -109,12 +128,16 @@
             android:layout_height="1dp"
             android:background="#f3f3f3"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp">
 
             <LinearLayout
                 android:layout_width="320dp"
@@ -158,17 +181,48 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/editar"
+                android:src="@drawable/generate_password"
                 android:backgroundTint="@color/transparent"
-                android:scaleType="fitXY"/>
+                android:scaleType="fitXY"
+                android:layout_gravity="center"/>
             
         </LinearLayout>
+
+        <EditText
+            android:id="@+id/txtNotes"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:text="Notes..."
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:background="@drawable/background_text_notes"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Guardar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:fontFamily="@font/airbnb_cereal_w_bd"
+            android:background="@drawable/background_buttons"/>
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:text="Enrere"
+            android:textAllCaps="false"
             android:textColor="@color/white"
             android:fontFamily="@font/airbnb_cereal_w_bd"
             android:background="@drawable/background_buttons"/>
