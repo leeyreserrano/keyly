@@ -41,7 +41,7 @@ public class CarpetaService {
     }
 
     public List<CarpetaResponse> getAllCarpetesByUsuariUuid(UUID uuid) {
-        return repo.findAllByUsuariUuid(uuid)
+        return repo.findByBagulPropietariUuid(uuid)
                 .stream()
                 .map(carpeta -> new CarpetaResponse(carpeta))
                 .toList();
@@ -55,7 +55,7 @@ public class CarpetaService {
     }
 
     public CarpetaResponse getUserCarpeta(Usuari usuari, UUID uuid) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
 
         return new CarpetaResponse(carpeta);
@@ -77,7 +77,7 @@ public class CarpetaService {
     }
 
     public List<ItemResponse> getUserCarpetaItem(Usuari usuari, UUID uuid) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
 
         return carpeta.getItems()
@@ -118,7 +118,7 @@ public class CarpetaService {
     }
 
     public CarpetaResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, UUID itemUuid) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(u, carpetaUuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(u, carpetaUuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
         Item itemRecuperat = itemService.getUserItemEntity(u, itemUuid);
 
@@ -129,7 +129,7 @@ public class CarpetaService {
     }
 
     public CarpetaResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, ItemRequest item) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(u, carpetaUuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(u, carpetaUuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
 
         carpeta.addItem(new Item(bagulService.getBagulEntityByUsuariUuid(u.getUuid()), item));
@@ -152,7 +152,7 @@ public class CarpetaService {
     }
 
     public CarpetaResponse update(Usuari usuari, UUID uuid, CarpetaRequest request) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
 
         if (request.bagulUuid() != null) {
@@ -179,7 +179,7 @@ public class CarpetaService {
     }
 
     public void deleteUserCarpeta(Usuari usuari, UUID uuid) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(usuari, uuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
 
         repo.delete(carpeta);
@@ -193,7 +193,7 @@ public class CarpetaService {
     }
 
     public void deleteItemInUserCarpeta(Usuari u, UUID carpetaUuid, UUID itemUuid) {
-        Carpeta carpeta = repo.findUserCarpetaByUuid(u, carpetaUuid)
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(u, carpetaUuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
         Item itemRecuperat = itemService.getUserItemEntity(u, itemUuid);
         carpeta.removeItem(itemRecuperat);

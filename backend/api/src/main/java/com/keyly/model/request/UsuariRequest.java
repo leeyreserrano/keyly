@@ -11,9 +11,7 @@ public record UsuariRequest(
         UUID rolUuid,
         String nom,
         String correu,
-        String imatge,
         String contrasenya,
-        @JsonSetter(nulls = Nulls.AS_EMPTY)
-        Boolean potAdministrar) {
+        @JsonSetter(nulls = Nulls.AS_EMPTY) Boolean potAdministrar) {
 
 }

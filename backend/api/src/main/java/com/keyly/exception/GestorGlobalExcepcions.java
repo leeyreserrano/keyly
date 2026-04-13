@@ -35,13 +35,21 @@ public class GestorGlobalExcepcions {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(ConstraintViolationException ex) {
-        ErrorResponse e = new ErrorResponse(400, "Correu no válid");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
+    public ResponseEntity<ErrorResponse> handleValidationException(ConstraintViolationException e) {
+        ErrorResponse error = new ErrorResponse(400, "Correu no válid");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(UsuariException.class)
     public ResponseEntity<ErrorResponse> usuariError(UsuariException e) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(ImageException.class)
+    public ResponseEntity<ErrorResponse> imageException(ImageException e) {
         ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

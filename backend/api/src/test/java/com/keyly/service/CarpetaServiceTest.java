@@ -78,7 +78,7 @@ class CarpetaServiceTest {
     @Test
     void getAllCarpetesByUsuariUuid_shouldReturnListOfCarpetaResponse() {
         // Given
-        when(repo.findAllByUsuariUuid(uuid)).thenReturn(List.of(carpeta));
+        when(repo.findByBagulPropietariUuid(uuid)).thenReturn(List.of(carpeta));
 
         // When
         List<CarpetaResponse> result = service.getAllCarpetesByUsuariUuid(uuid);
@@ -86,7 +86,7 @@ class CarpetaServiceTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(repo).findAllByUsuariUuid(uuid);
+        verify(repo).findByBagulPropietariUuid(uuid);
     }
 
     @Test
@@ -116,7 +116,7 @@ class CarpetaServiceTest {
     @Test
     void getUserCarpeta_shouldReturnCarpetaResponse_whenExists() {
         // Given
-        when(repo.findUserCarpetaByUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
 
         // When
         CarpetaResponse result = service.getUserCarpeta(usuari, uuid);
@@ -124,17 +124,17 @@ class CarpetaServiceTest {
         // Then
         assertNotNull(result);
         assertEquals(carpetaResponse.nom(), result.nom());
-        verify(repo).findUserCarpetaByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
     }
 
     @Test
     void getUserCarpeta_shouldThrowException_whenNotExists() {
         // Given
-        when(repo.findUserCarpetaByUuid(usuari, uuid)).thenReturn(Optional.empty());
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(EntitatNoTrobadaException.class, () -> service.getUserCarpeta(usuari, uuid));
-        verify(repo).findUserCarpetaByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
     }
 
     @Test
@@ -205,7 +205,7 @@ class CarpetaServiceTest {
     void update_withUsuari_shouldReturnCarpetaResponse() {
         // Given
         CarpetaRequest request = new CarpetaRequest(uuid, "Updated Carpeta", false);
-        when(repo.findUserCarpetaByUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
         when(bagulService.getBagulEntityByUuid(uuid)).thenReturn(bagul);
         when(repo.save(carpeta)).thenReturn(carpeta);
 
@@ -214,7 +214,7 @@ class CarpetaServiceTest {
 
         // Then
         assertNotNull(result);
-        verify(repo).findUserCarpetaByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
         verify(bagulService).getBagulEntityByUuid(uuid);
         verify(mapper).updateCarpetaFromDto(request, carpeta);
         verify(repo).save(carpeta);
@@ -237,13 +237,13 @@ class CarpetaServiceTest {
     @Test
     void deleteUserCarpeta_shouldCallRepoDelete() {
         // Given
-        when(repo.findUserCarpetaByUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
+        when(repo.findByBagulPropietariAndUuid(usuari, uuid)).thenReturn(Optional.of(carpeta));
 
         // When
         service.deleteUserCarpeta(usuari, uuid);
 
         // Then
-        verify(repo).findUserCarpetaByUuid(usuari, uuid);
+        verify(repo).findByBagulPropietariAndUuid(usuari, uuid);
         verify(repo).delete(carpeta);
     }
 }

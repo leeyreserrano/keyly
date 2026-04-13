@@ -26,7 +26,7 @@ public class UtilsController {
 
     @Operation(summary = "Genera una contrasenya personalitzada", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @PostMapping("contrasenya/personalitzada")
+    @PostMapping("custom/password")
     public ResponseEntity<GeneracioContrasenyaResponse> generacioContrasenyaPersonalitzada(
             @RequestBody GeneracioContrasenyaRequest request) {
         return ResponseEntity.ok(service.generacioContrasenyaPersonalitzada(request));

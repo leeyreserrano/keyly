@@ -47,7 +47,7 @@ public class CompartitService {
     }
 
     public List<CompartitResponse> getAllCompartitsByUsuariUuid(UUID uuid) {
-        return repo.findAllByUsuariUuid(uuid)
+        return repo.findByUsuariUuid(uuid)
                 .stream()
                 .map(item -> {
                     if (item.getTipusEntitat() == TipusEntitat.CARPETA)
@@ -79,7 +79,7 @@ public class CompartitService {
     }
 
     public CompartitResponse getUserCompartit(Usuari usuari, UUID uuid) {
-        Compartit compartit = repo.findUserCompartitByUuid(usuari, uuid)
+        Compartit compartit = repo.findByUsuariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid: " + uuid));
 
         if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
@@ -125,7 +125,7 @@ public class CompartitService {
     }
 
     public CompartitResponse update(Usuari usuari, UUID uuid, CompartitRequest request) {
-        Compartit compartit = repo.findUserCompartitByUuid(usuari, uuid)
+        Compartit compartit = repo.findByUsuariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid " + uuid));
 
         mapper.updateCompartitFromDto(request, compartit);
@@ -149,7 +149,7 @@ public class CompartitService {
     }
 
     public void deleteUserCompartit(Usuari usuari, UUID uuid) {
-        Compartit compartit = repo.findUserCompartitByUuid(usuari, uuid)
+        Compartit compartit = repo.findByUsuariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb el uuid " + uuid));
 
         repo.delete(compartit);

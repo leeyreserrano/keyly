@@ -31,22 +31,9 @@ public interface CarpetaRepo extends JpaRepository<Carpeta, Long> {
             """, nativeQuery = true)
     Long existItemInCarpetes(UUID uuid);
 
-    @Query("""
-                SELECT c
-                FROM Carpeta c
-                JOIN c.bagul b
-                WHERE b.propietari.uuid = :uuid
-            """)
-    List<Carpeta> findAllByUsuariUuid(@Param("uuid") UUID uuid);
+    List<Carpeta> findByBagulPropietariUuid(@Param("uuid") UUID uuid);
 
-    @Query("""
-                SELECT c
-                FROM Carpeta c
-                JOIN c.bagul b
-                WHERE b.propietari = :usuari
-                  AND c.uuid = :uuid
-            """)
-    Optional<Carpeta> findUserCarpetaByUuid(@Param("usuari") Usuari usuari, @Param("uuid") UUID uuid);
+    Optional<Carpeta> findByBagulPropietariAndUuid(@Param("usuari") Usuari usuari, @Param("uuid") UUID uuid);
 
     @Modifying
     @Transactional
