@@ -6,8 +6,8 @@ services:
       - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
     networks:
       - network
-    # depends_on:
-    #   - db
+    volumes:
+      - uploads:/app/uploads
 
   db:
     image: mysql:8.0
@@ -39,10 +39,11 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       # - ./frontend/build:/usr/share/nginx/html/frontend # cuando tengas frontend
     networks:
-      - network
+      - network 
 
 volumes:
   mysql-data:
+  uploads:
 
 networks:
   network:
