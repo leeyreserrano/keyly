@@ -70,6 +70,7 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
+    @Deprecated
     @Operation(summary = "Obté un item per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Item trobat"),

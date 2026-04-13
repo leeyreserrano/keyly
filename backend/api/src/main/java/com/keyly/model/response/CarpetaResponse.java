@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.keyly.model.Carpeta;
-import com.keyly.model.response.basics.ItemResponseBasic;
 
 public record CarpetaResponse(
         UUID uuid,
@@ -13,7 +12,7 @@ public record CarpetaResponse(
         String nom,
         Boolean favorit,
         LocalDateTime dataCreacio,
-        List<ItemResponseBasic> items) {
+        List<ItemResponse> items) {
 
     public CarpetaResponse(Carpeta c) {
         this(
@@ -24,7 +23,7 @@ public record CarpetaResponse(
                 c.getDataCreacio(),
                 c.getItems()
                         .stream()
-                        .map(item -> new ItemResponseBasic(item, true))
+                        .map(item -> new ItemResponse(item, true))
                         .toList());
     }
 

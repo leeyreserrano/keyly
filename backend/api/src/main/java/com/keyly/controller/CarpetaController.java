@@ -72,6 +72,7 @@ public class CarpetaController {
         return ResponseEntity.ok(carpeta);
     }
 
+    @Deprecated
     @Operation(summary = "Obté una carpeta de l'usuari per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Carpeta trobada"),

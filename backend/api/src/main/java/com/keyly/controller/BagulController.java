@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Deprecated
 @RestController
 @RequestMapping("/bagul")
 @Tag(name = "Bagul Controller", description = "Operacions sobre baguls")
