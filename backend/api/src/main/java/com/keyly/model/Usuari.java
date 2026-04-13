@@ -86,7 +86,6 @@ public class Usuari {
         this.rol = rol;
         this.nom = request.nom();
         this.correu = request.correu();
-        this.imatge = request.imatge();
         this.potAdministrar = request.potAdministrar();
     }
 
