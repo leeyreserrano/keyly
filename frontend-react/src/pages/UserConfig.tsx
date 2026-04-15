@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   Stack,
   Typography,
@@ -6,7 +5,6 @@ import {
   Box,
   CircularProgress,
   CssBaseline,
-  Avatar,
   Divider
 } from '@mui/material';
 
@@ -14,17 +12,12 @@ import Sidebar from '../components/Sidebar';
 import AppTheme from '../theme/AppTheme';
 import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
-import { getUserImage } from '../api/userimageapi';
+import UserAvatar from '../components/UserAvatar';
 
 export default function UserConfig() {
   const { usuari } = useAuth();
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  const imageUrl = getUserImage(usuari?.imatge);
+  const loading = false;
   const initial = usuari?.nom?.charAt(0).toUpperCase() ?? 'U';
 
   return (
@@ -34,24 +27,12 @@ export default function UserConfig() {
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
         <Sidebar />
 
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
+        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto' }}>
 
+          {/* HEADER */}
           <Header
             title="Perfil"
-            icon={
-              <Avatar
-                src={imageUrl}
-                sx={{
-                  bgcolor: 'primary.main',
-                  width: 36,
-                  height: 36,
-                  fontWeight: 700,
-                  cursor: 'default',
-                }}
-              >
-                {!imageUrl && initial}
-              </Avatar>
-            }
+            icon={<UserAvatar />}
             showBackButton={false}
           />
 
@@ -70,7 +51,6 @@ export default function UserConfig() {
                 sx={{
                   p: 3,
                   borderRadius: '12px',
-                  border: '1px solid',
                   borderColor: 'divider',
                   display: 'flex',
                   flexDirection: 'column',
@@ -78,36 +58,26 @@ export default function UserConfig() {
                 }}
               >
 
+                {/* USER INFO HEADER */}
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-                  <Avatar
-                    src={imageUrl}
-                    sx={{
-                      bgcolor: 'primary.main',
-                      width: 36,
-                      height: 36,
-                      fontWeight: 700,
-                      cursor: 'default',
-                    }}
-                  >
-                    {!imageUrl && initial}
-                  </Avatar>
+                  <UserAvatar />
 
                   <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {usuari?.nom || 'Usuari'}
+                    {usuari.nom}
                   </Typography>
                 </Stack>
 
                 <Divider />
 
                 <Typography>
-                  <strong>Nom:</strong> {usuari?.nom}
+                  <strong>Nom:</strong> {usuari.nom}
                 </Typography>
 
                 <Typography>
-                  <strong>Email:</strong> {usuari?.correu}
+                  <strong>Email:</strong> {usuari.correu}
                 </Typography>
 
-                {usuari?.uuid && (
+                {usuari.uuid && (
                   <Typography>
                     <strong>ID:</strong> {usuari.uuid}
                   </Typography>

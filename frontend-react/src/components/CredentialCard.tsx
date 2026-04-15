@@ -2,24 +2,28 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { itemsApi } from '../api/itemsapi';
+import ActionButtons from './ActionButtons';
 import toast from 'react-hot-toast';
 import { carpetasApi } from '../api/carpetasapi';
-import ActionButtons from './ActionButtons';
+import { itemsApi } from '../api/itemsapi';
+import { useState } from 'react';
+import { useTimeRefresh } from './UseTimeRefresh';
+import { getTimeAgo } from '../utils/timeUtils';
 
 interface CredentialCardProps {
   uuid: string;
   titol: string;
   nomUsuari: string;
   dataEditat: string;
+  dataCreacio?: string;
   esCarpeta?: boolean;
   dinsCarpeta?: boolean;
   favorit?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onToggleFavorit?: () => void;
 }
 
 export default function CredentialCard({
@@ -27,6 +31,7 @@ export default function CredentialCard({
   titol,
   nomUsuari,
   dataEditat,
+  dataCreacio,
   esCarpeta = false,
   dinsCarpeta = false,
   favorit = false,
@@ -36,37 +41,26 @@ export default function CredentialCard({
 }: CredentialCardProps) {
   const navigate = useNavigate();
   const [isFavorit, setIsFavorit] = useState(favorit);
+  const now = useTimeRefresh(10000);
 
-  const toggleFavorit = async (e: React.MouseEvent) => {
+  const handleToggleFavorit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-
+    const newValue = !isFavorit;
+    setIsFavorit(newValue);
     try {
       if (esCarpeta) {
-        const updated = await carpetasApi.updateCarpeta(uuid, {
-          favorit: !isFavorit,
-        });
-
-        if (updated) {
-          setIsFavorit(!!updated.favorit);
-        }
+        await carpetasApi.updateCarpeta(uuid, { favorit: newValue });
       } else {
-        const updated = await itemsApi.updateItem(uuid, {
-          favorit: !isFavorit,
-        });
-
-        if (updated) {
-          setIsFavorit(!!updated.favorit);
-        }
+        await itemsApi.updateItem(uuid, { favorit: newValue });
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('Error al cambiar favorito');
+    } catch {
+      setIsFavorit(!newValue);
+      toast.error('Error al canviar favorit');
     }
   };
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-
     if (esCarpeta) {
       navigate('/editCarpeta', { state: { uuid } });
     } else {
@@ -102,7 +96,6 @@ export default function CredentialCard({
           {esCarpeta && (
             <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary' }} />
           )}
-
           <Typography sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
             {titol}
           </Typography>
@@ -110,7 +103,7 @@ export default function CredentialCard({
 
         <ActionButtons
           isFavorit={isFavorit}
-          onToggleFavorit={toggleFavorit}
+          onToggleFavorit={handleToggleFavorit}
           onEdit={handleEdit}
           onDelete={handleDelete}
           showFolderIcon={dinsCarpeta}
@@ -118,13 +111,22 @@ export default function CredentialCard({
         />
       </Stack>
 
-      <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>
-        {nomUsuari}
-      </Typography>
+      {!esCarpeta && (
+        <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>
+          {nomUsuari}
+        </Typography>
+      )}
 
-      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-        Last modified: {dataEditat}
-      </Typography>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', mt: 0.5 }}>
+        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+          Modificat: {getTimeAgo(dataEditat, now)}
+        </Typography>
+        {dataCreacio && (
+          <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+            Creat: {getTimeAgo(dataCreacio, now)}
+          </Typography>
+        )}
+      </Stack>
     </Paper>
   );
 }

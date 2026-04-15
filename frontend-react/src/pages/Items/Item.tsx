@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { Stack, Typography, Paper, IconButton, Divider, Box, CircularProgress, CssBaseline, Avatar } from '@mui/material';
+import { Stack, Typography, Paper, IconButton, Divider, Box, CircularProgress, CssBaseline } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
@@ -14,6 +14,8 @@ import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
 import Header from '../../components/Header';
 import ActionButtons from '../../components/ActionButtons';
+import { useTimeRefresh } from '../../components/UseTimeRefresh';
+import { getTimeAgo, formatDate } from '../../utils/timeUtils';
 
 export default function Item() {
   const navigate = useNavigate();
@@ -25,9 +27,13 @@ export default function Item() {
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [isFavorit, setIsFavorit] = useState(false);
+
+  const now = useTimeRefresh(60000); 
 
   useEffect(() => {
     if (!uuid) return;
+
     const loadData = async () => {
       try {
         const [allItems, allCarpetas] = await Promise.all([
@@ -35,8 +41,9 @@ export default function Item() {
           carpetasApi.fetchItems(),
         ]);
 
-        const found = allItems?.find((i) => i.uuid === uuid);
-        setItem(found || null);
+        const found = allItems?.find((i) => i.uuid === uuid) ?? null;
+        setItem(found);
+        setIsFavorit(found?.favorit ?? false); 
         setCarpetas(allCarpetas);
       } catch (error) {
         console.error('Error al cargar el item', error);
@@ -44,56 +51,51 @@ export default function Item() {
         setLoading(false);
       }
     };
+
     loadData();
   }, [uuid]);
 
-  const handleCopy = async () => {
-    if (item?.contrasenya) {
-      try {
-        await navigator.clipboard.writeText(item.contrasenya);
-        toast.success('Contrasenya copiada al portapapeles');
-      } catch (error) {
-        toast.error('Error al copiar');
-      }
+  const toggleFavorit = async () => {
+    if (!item) return;
+    const newValue = !isFavorit;
+    try {
+      await itemsApi.updateItem(item.uuid, { favorit: newValue });
+      setIsFavorit(newValue);
+      toast.success(newValue ? 'Marcat com a favorit' : 'Eliminat de favorits');
+    } catch {
+      toast.error('Error al actualitzar favorit');
     }
   };
-  const toggleShowPassword = () => setShowPassword(!showPassword);
+
+  const handleCopy = async () => {
+    if (!item?.contrasenya) return;
+    try {
+      await navigator.clipboard.writeText(item.contrasenya);
+      toast.success('Contrasenya copiada al portapapers');
+    } catch {
+      toast.error('Error al copiar');
+    }
+  };
+
+  const toggleShowPassword = () => setShowPassword((prev) => !prev);
+
   const estaEnCarpeta = item
-    ? carpetas.some((carpeta) =>
-      carpeta.items.some((i) => i.uuid === item.uuid)
-    )
+    ? carpetas.some((carpeta) => carpeta.items.some((i) => i.uuid === item.uuid))
     : false;
 
-  // Solo abre el modal
   const handleDelete = () => {
     if (!item) return;
     setOpenDeleteModal(true);
   };
 
-  // Función que elimina el item
   const confirmDelete = async () => {
-  if (!item) return;
-
-  const uuid = item.uuid;
-
-  try {
-    await itemsApi.deleteItem(uuid);
-    toast.success("Item eliminado");
-    navigate(-1);
-  } catch {
-    toast.error("Error eliminando item");
-  }
-};
-  const [isFavorit, setIsFavorit] = useState(item?.favorit || false);
-
-  const toggleFavorit = async () => {
     if (!item) return;
     try {
-      await itemsApi.updateItem(item.uuid, { favorit: !isFavorit });
-      setIsFavorit(!isFavorit);
-      toast.success(isFavorit ? 'Eliminado de favoritos' : 'Marcado como favorito');
+      await itemsApi.deleteItem(item.uuid);
+      toast.success('Item eliminat');
+      navigate(-1);
     } catch {
-      toast.error('Error al actualizar favorito');
+      toast.error('Error eliminant item');
     }
   };
 
@@ -104,14 +106,12 @@ export default function Item() {
         <Sidebar />
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          {/* HEADER */}
           <Header
             title={item?.titol || 'Item'}
             icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
             showBackButton={true}
           />
 
-          {/* CONTENIDO */}
           <Box sx={{ px: 4, py: 3 }}>
             {loading ? (
               <Stack sx={{ alignItems: 'center', mt: 10 }}>
@@ -137,12 +137,11 @@ export default function Item() {
                     onToggleFavorit={toggleFavorit}
                     onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
                     onDelete={handleDelete}
-                    size="card"          // aquí es donde le indicamos que sea grande
-                    gap={0.5}            // opcional, ajusta el espacio entre botones
-                    showFolderIcon={false} // si no quieres que aparezca icono de carpeta
+                    size="card"
+                    gap={0.5}
+                    showFolderIcon={false}
                   />
                 </Stack>
-                
 
                 <Divider />
 
@@ -151,7 +150,12 @@ export default function Item() {
 
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
                   <Typography>
-                    <strong>Contrasenya:</strong> {showPassword ? item.contrasenya : item.contrasenya ? '********' : 'No disponible'}
+                    <strong>Contrasenya:</strong>{' '}
+                    {showPassword
+                      ? item.contrasenya
+                      : item.contrasenya
+                      ? '••••••••'
+                      : 'No disponible'}
                   </Typography>
 
                   <Stack direction="row" spacing={1}>
@@ -164,12 +168,19 @@ export default function Item() {
                   </Stack>
                 </Stack>
 
-                <Typography><strong>Data creació:</strong> {item.dataCreacio}</Typography>
-                <Typography><strong>Última modificació:</strong> {item.dataEditat}</Typography>
-                <Typography><strong>Últim accés:</strong> {item.ultimAcces}</Typography>
+                <Typography>
+                  <strong>Data creació:</strong> {formatDate(item.dataCreacio)}
+                </Typography>
+                <Typography>
+                  <strong>Última modificació:</strong> {getTimeAgo(item.dataEditat, now)}
+                </Typography>
+                <Typography>
+                  <strong>Últim accés:</strong> {getTimeAgo(item.ultimAcces, now)}
+                </Typography>
               </Paper>
             )}
           </Box>
+
           <DeleteConfirmationModal
             open={openDeleteModal}
             onClose={() => setOpenDeleteModal(false)}

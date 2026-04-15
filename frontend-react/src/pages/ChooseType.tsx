@@ -5,15 +5,12 @@ import {
   Paper,
   Button,
   CssBaseline,
-  Avatar,
-  IconButton,
 } from '@mui/material';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import AppTheme from '../theme/AppTheme';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 export default function ChooseType() {
   const navigate = useNavigate();
@@ -26,49 +23,11 @@ export default function ChooseType() {
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
           {/* HEADER */}
-          <Stack
-            direction="row"
-            sx={{
-              px: 4,
-              py: 2.5,
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center' }}>
-              <Typography variant="h3" sx={{ fontWeight: 800 }}>
-                Crear nuevo elemento
-              </Typography>
-            </Stack>
-
-            <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-              <Avatar sx={{ bgcolor: 'grey.500', width: 36, height: 36, fontSize: 15, fontWeight: 700 }}>
-                U
-              </Avatar>
-              <IconButton
-                onClick={() => navigate(-1)}
-                size="small"
-                sx={{ border: 'none', bgcolor: 'transparent', '&:hover': { bgcolor: 'action.hover' } }}
-              >
-                <LogoutOutlinedIcon sx={{ fontSize: 22, color: 'text.secondary' }} />
-              </IconButton>
-              <Button
-                startIcon={<ArrowBackOutlinedIcon />}
-                onClick={() => navigate(-1)}
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  '&:hover': { bgcolor: 'primary.dark' },
-                }}
-              >
-                Tornar
-              </Button>
-            </Stack>
-          </Stack>
+          <Header
+            title="Crear nuevo elemento" 
+            icon={undefined}
+            showBackButton={true}          
+            />
 
           {/* CONTINGUT PRINCIPAL */}
           <Stack sx={{ px: 4, py: 6, alignItems: 'center' }}>

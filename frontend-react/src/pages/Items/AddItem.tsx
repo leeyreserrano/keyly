@@ -9,6 +9,7 @@ import {
   CssBaseline,
   IconButton,
   Box,
+  Divider,
   InputAdornment,
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
@@ -29,8 +30,6 @@ export default function AddItem() {
   const [contrasenya, setContrasenya] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // Validació
   const [errors, setErrors] = useState<{ titol?: string; contrasenya?: string }>({});
 
   const validate = (): boolean => {
@@ -43,14 +42,13 @@ export default function AddItem() {
 
   const handleSave = async () => {
     if (!validate()) return;
-
     setLoading(true);
     try {
       await itemsApi.addItem({ titol, nomUsuari, url, contrasenya });
       toast.success('Item creat correctament');
       navigate('/Items');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error creant l\'item';
+      const message = err instanceof Error ? err.message : "Error creant l'item";
       toast.error(message);
     } finally {
       setLoading(false);
@@ -70,19 +68,25 @@ export default function AddItem() {
             showBackButton
           />
 
-          <Box sx={{ px: 4, py: 4, display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ px: 4, py: 3, display: 'flex', justifyContent: 'center' }}>
             <Paper
               variant="outlined"
               sx={{
-                p: 4,
-                borderRadius: 3,
-                width: '100%',
-                maxWidth: 500,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 3,
+               p: 4,
+                  borderRadius: 3,
+                  width: '70%',
+                  maxWidth: 500,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 3,
               }}
             >
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                Nou Item
+              </Typography>
+
+              <Divider />
+
               <Stack spacing={0.5}>
                 <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
                   Títol *
@@ -137,7 +141,7 @@ export default function AddItem() {
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword((p) => !p)}
-                          sx={{ borderRadius: 2 }}
+                          sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}
                         >
                           {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                         </IconButton>
@@ -147,7 +151,9 @@ export default function AddItem() {
                 />
               </Stack>
 
-              <Stack direction="row" spacing={2} sx={{ mt: 1, justifyContent: 'flex-end' }}>
+              <Divider />
+
+              <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
                 <Button
                   onClick={() => navigate(-1)}
                   variant="outlined"

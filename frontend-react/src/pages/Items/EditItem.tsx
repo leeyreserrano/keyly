@@ -11,6 +11,7 @@ import {
   CssBaseline,
   TextField,
   Alert,
+  Divider,
   InputAdornment,
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
@@ -42,13 +43,17 @@ export default function EditItem() {
 
   useEffect(() => {
     if (!uuid) {
-      setLoadError('No s\'ha especificat cap item.');
+      setLoadError("No s'ha especificat cap item.");
       setLoading(false);
       return;
     }
     const loadData = async () => {
       try {
         const allItems = await itemsApi.fetchItems();
+        if (!allItems) {
+          setLoadError('Error carregant items.');
+          return;
+        }
         const found = allItems.find((i) => i.uuid === uuid);
         if (found) {
           setItem(found);
@@ -60,7 +65,7 @@ export default function EditItem() {
           setLoadError('Item no trobat.');
         }
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Error carregant l\'item';
+        const message = err instanceof Error ? err.message : "Error carregant l'item";
         setLoadError(message);
       } finally {
         setLoading(false);
@@ -85,7 +90,7 @@ export default function EditItem() {
       toast.success('Item actualitzat correctament');
       navigate(-1);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error guardant l\'item';
+      const message = err instanceof Error ? err.message : "Error guardant l'item";
       toast.error(message);
     } finally {
       setSaving(false);
@@ -109,12 +114,12 @@ export default function EditItem() {
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
           <Header
-            title="Editar Item"
+            title={item?.titol || 'Editar Item'}
             icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
             showBackButton
           />
 
-          <Box sx={{ px: 4, py: 3 }}>
+          <Box sx={{ px: 4, py: 4, display: 'flex', justifyContent: 'center' }}>
             {loading ? (
               <Stack sx={{ alignItems: 'center', mt: 10 }}>
                 <CircularProgress />
@@ -125,16 +130,21 @@ export default function EditItem() {
               <Paper
                 variant="outlined"
                 sx={{
-                  p: 3,
-                  borderRadius: '12px',
-                  border: '1px solid',
-                  borderColor: 'divider',
+                  p: 4,
+                  borderRadius: 3,
+                  width: '70%',
+                  maxWidth: 500,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 2,
-                  maxWidth: 500,
+                  gap: 3,
                 }}
               >
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                  {item?.titol}
+                </Typography>
+
+                <Divider />
+
                 <Stack spacing={0.5}>
                   <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
                     Títol *
@@ -184,10 +194,16 @@ export default function EditItem() {
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton onClick={() => setShowPassword((p) => !p)} sx={{ borderRadius: 2 }}>
+                          <IconButton
+                            onClick={() => setShowPassword((p) => !p)}
+                            sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}
+                          >
                             {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                           </IconButton>
-                          <IconButton onClick={handleCopy} sx={{ borderRadius: 2, color: 'primary.main' }}>
+                          <IconButton
+                            onClick={handleCopy}
+                            sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'primary.main' }}
+                          >
                             <ContentCopyOutlinedIcon fontSize="small" />
                           </IconButton>
                         </InputAdornment>
@@ -196,7 +212,9 @@ export default function EditItem() {
                   />
                 </Stack>
 
-                <Stack direction="row" sx={{ mt: 1, gap: 1, justifyContent: 'flex-end' }}>
+                <Divider />
+
+                <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
                   <Button
                     onClick={() => navigate(-1)}
                     variant="outlined"

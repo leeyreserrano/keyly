@@ -41,4 +41,20 @@ export async function apiRequest<T>(
   return text ? JSON.parse(text) : null;
 }
 
+export async function apiImageRequest(path: string): Promise<string> {
+  const token = getToken();
+
+  const res = await fetch(`${API_BASE}/usuari/get/image/${path}`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Error loading image');
+  }
+
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
 export { API_BASE };

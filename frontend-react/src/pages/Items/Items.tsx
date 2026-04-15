@@ -9,6 +9,7 @@ import Alert from '@mui/material/Alert';
 import Skeleton from '@mui/material/Skeleton';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import VpnKeyOffOutlinedIcon from '@mui/icons-material/VpnKeyOffOutlined';
+
 import AppTheme from '../../theme/AppTheme';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
@@ -16,6 +17,7 @@ import ItemsToolbar from '../../components/ItemsToolbar';
 import CustomPagination from '../../components/CustomPagination';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import CredentialCard from '../../components/CredentialCard';
+
 import { itemsApi, type Item } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
@@ -50,7 +52,8 @@ export default function Items() {
         setItems(itemsData ?? []);
         setCarpetas(carpetasData ?? []);
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Error carregant les dades';
+        const message =
+          err instanceof Error ? err.message : 'Error carregant les dades';
         setError(message);
       } finally {
         setLoading(false);
@@ -58,6 +61,11 @@ export default function Items() {
     };
     loadData();
   }, []);
+
+  // Reset página cuando cambia filtro o búsqueda
+  useEffect(() => {
+    setPage(1);
+  }, [search, filter]);
 
   // Filtrado y ordenación
   const filteredItems = items
@@ -69,11 +77,19 @@ export default function Items() {
     )
     .sort((a, b) => {
       if (filter === 'latest')
-        return new Date(b.dataEditat).getTime() - new Date(a.dataEditat).getTime();
+        return (
+          new Date(b.dataEditat).getTime() -
+          new Date(a.dataEditat).getTime()
+        );
       if (filter === 'most_used')
-        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
+        return (
+          new Date(b.ultimAcces).getTime() -
+          new Date(a.ultimAcces).getTime()
+        );
       return 0;
     });
+
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
 
   const paginatedItems = filteredItems.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -94,7 +110,7 @@ export default function Items() {
       setOpenDeleteModal(false);
       setDeleteTarget(null);
     } catch {
-      toast.error('Error eliminant l\'item');
+      toast.error("Error eliminant l'item");
     }
   };
 
@@ -104,7 +120,11 @@ export default function Items() {
         <Grid container spacing={2}>
           {Array.from({ length: 6 }).map((_, i) => (
             <Grid size={4} key={i}>
-              <Skeleton variant="rounded" height={110} sx={{ borderRadius: '10px' }} />
+              <Skeleton
+                variant="rounded"
+                height={110}
+                sx={{ borderRadius: '10px' }}
+              />
             </Grid>
           ))}
         </Grid>
@@ -121,11 +141,23 @@ export default function Items() {
 
     if (filteredItems.length === 0) {
       return (
-        <Stack sx={{ alignItems: 'center', py: 10, gap: 2, color: 'text.disabled' }}>
+        <Stack
+          sx={{
+            alignItems: 'center',
+            py: 10,
+            gap: 2,
+            color: 'text.disabled',
+          }}
+        >
           <VpnKeyOffOutlinedIcon sx={{ fontSize: 64 }} />
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
-            {search ? 'Cap resultat per a la cerca' : filter === 'favorites' ? 'No tens cap favorit' : 'No tens cap contrasenya guardada'}
+            {search
+              ? 'Cap resultat per a la cerca'
+              : filter === 'favorites'
+              ? 'No tens cap favorit'
+              : 'No tens cap contrasenya guardada'}
           </Typography>
+
           {!search && filter !== 'favorites' && (
             <Typography variant="body2" color="text.secondary">
               Afegeix la primera des del botó "+ Add New"
@@ -138,7 +170,10 @@ export default function Items() {
     return (
       <Grid container spacing={2}>
         {paginatedItems.map((item) => {
-          const estaEnCarpeta = carpetas.some((c) => c.items.some((i) => i.uuid === item.uuid));
+          const estaEnCarpeta = carpetas.some((c) =>
+            c.items.some((i) => i.uuid === item.uuid)
+          );
+
           return (
             <Grid size={4} key={item.uuid}>
               <CredentialCard
@@ -148,8 +183,12 @@ export default function Items() {
                 dataEditat={item.dataEditat}
                 dinsCarpeta={estaEnCarpeta}
                 favorit={item.favorit}
-                onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
-                onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
+                onClick={() =>
+                  navigate('/Item', { state: { uuid: item.uuid } })
+                }
+                onEdit={() =>
+                  navigate('/EditItem', { state: { uuid: item.uuid } })
+                }
                 onDelete={() => handleDelete(item)}
               />
             </Grid>
@@ -162,10 +201,18 @@ export default function Items() {
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
+
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
         <Sidebar />
 
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
+        <Stack
+          sx={{
+            flex: 1,
+            bgcolor: 'background.default',
+            overflow: 'auto',
+            minWidth: 0,
+          }}
+        >
           <Header
             title="Items"
             icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
@@ -183,11 +230,11 @@ export default function Items() {
             {renderContent()}
           </Box>
 
-          {!loading && !error && filteredItems.length > ITEMS_PER_PAGE && (
+          {!loading && !error && filteredItems.length > 0 && (
             <CustomPagination
-              count={Math.ceil(filteredItems.length / ITEMS_PER_PAGE)}
+              count={totalPages}
               page={page}
-              onChange={(val) => { setPage(val); window.scrollTo(0, 0); }}
+              onChange={setPage}
             />
           )}
         </Stack>

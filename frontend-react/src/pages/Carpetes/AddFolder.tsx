@@ -1,148 +1,121 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
-    Stack,
-    Typography,
-    Paper,
-    Button,
-    TextField,
-    CssBaseline,
-    Avatar,
-    IconButton,
-    Box,
+  Stack,
+  Typography,
+  Paper,
+  Button,
+  TextField,
+  CssBaseline,
+  Box,
+  Divider,
 } from '@mui/material';
-import KeyRoundedIcon from '@mui/icons-material/FolderOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import Sidebar from '../../components/Sidebar';
 import AppTheme from '../../theme/AppTheme';
+import Header from '../../components/Header';
 import { carpetasApi } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
 
 export default function AddCarpeta() {
-    const navigate = useNavigate();
-    const [nombre, setNombre] = useState('');
-    const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [nom, setNom] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
-    const handleSave = async () => {
-        if (!nombre.trim()) return toast.error("El nombre de la carpeta es obligatorio");
-        setLoading(true);
+  const validate = (): boolean => {
+    if (!nom.trim()) {
+      setError('El nom de la carpeta és obligatori');
+      return false;
+    }
+    setError(undefined);
+    return true;
+  };
 
-        try {
-            await carpetasApi.addCarpeta({ nom: nombre });
-            toast.success("Carpeta creada correctamente");
-            navigate(-1);
-        } catch (error: any) {
-            console.error("Error creando carpeta", error);
-            toast.error(error.message || "Error creando carpeta");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleSave = async () => {
+    if (!validate()) return;
+    setLoading(true);
+    try {
+      await carpetasApi.addCarpeta({ nom });
+      toast.success('Carpeta creada correctament');
+      navigate(-1);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error creant la carpeta';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleCancel = () => navigate(-1);
+  return (
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
+        <Sidebar />
 
-    return (
-        <AppTheme>
-            <CssBaseline enableColorScheme />
-            <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
-                <Sidebar />
+        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
+          <Header
+            title="Afegir Carpeta"
+            icon={<FolderOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+            showBackButton
+          />
 
-                <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-                    {/* Header */}
-                    <Stack
-                        direction="row"
-                        sx={{
-                            px: 4,
-                            py: 2.5,
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            borderBottom: '1px solid',
-                            borderColor: 'divider',
-                        }}
-                    >
-                        <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center' }}>
-                            <KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />
-                            <Typography variant="h3" sx={{ fontWeight: 800 }}>
-                                Añadir Carpeta
-                            </Typography>
-                        </Stack>
+          <Box sx={{ px: 4, py: 3, display: 'flex', justifyContent: 'center' }}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 4,
+                  borderRadius: 3,
+                  width: '70%',
+                  maxWidth: 500,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 3,
+              }}
+            >
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                Nova Carpeta
+              </Typography>
 
-                        <Stack direction="row" sx={{ gap: 2, alignItems: 'center' }}>
-                            <Avatar sx={{ bgcolor: 'grey.500', width: 36, height: 36, fontSize: 15, fontWeight: 700 }}>
-                                U
-                            </Avatar>
-                            <IconButton
-                                onClick={() => navigate('/')}
-                                size="small"
-                                sx={{ border: 'none', bgcolor: 'transparent', '&:hover': { bgcolor: 'action.hover' } }}
-                            >
-                                <LogoutOutlinedIcon sx={{ fontSize: 22, color: 'text.secondary' }} />
-                            </IconButton>
-                            <Button
-                                startIcon={<ArrowBackOutlinedIcon />}
-                                onClick={() => navigate(-1)}
-                                sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}
-                            >
-                                Tornar
-                            </Button>
-                        </Stack>
-                    </Stack>
+              <Divider />
 
-                    {/* Formulario */}
-                    <Box sx={{ px: 4, py: 4, display: 'flex', justifyContent: 'center' }}>
-                        <Paper
-                            variant="outlined"
-                            sx={{
-                                p: 4,
-                                borderRadius: 3,
-                                width: '100%',
-                                maxWidth: 500,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 3,
-                            }}
-                        >
-                            {/* Nombre Carpeta */}
-                            <Stack spacing={0.5}>
-                                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                                    Nombre de la carpeta
-                                </Typography>
-                                <TextField fullWidth value={nombre} onChange={(e) => setNombre(e.target.value)} />
-                            </Stack>
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                  Nom *
+                </Typography>
+                <TextField
+                  fullWidth
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                  error={!!error}
+                  helperText={error}
+                  placeholder="Ex: Xarxes socials"
+                />
+              </Stack>
 
-                            {/* Botones */}
-                            <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'flex-end' }}>
-                                <Button
-                                    onClick={handleCancel}
-                                    sx={{
-                                        textTransform: 'none',
-                                        fontWeight: 600,
-                                        bgcolor: 'grey.300',
-                                        color: 'text.primary',
-                                        '&:hover': { bgcolor: 'grey.400' },
-                                    }}
-                                >
-                                    Cancelar
-                                </Button>
-                                <Button
-                                    onClick={handleSave}
-                                    disabled={loading}
-                                    sx={{
-                                        textTransform: 'none',
-                                        fontWeight: 600,
-                                        bgcolor: 'primary.main',
-                                        color: 'white',
-                                        '&:hover': { bgcolor: 'primary.dark' },
-                                    }}
-                                >
-                                    {loading ? 'Guardando...' : 'Guardar'}
-                                </Button>
-                            </Stack>
-                        </Paper>
-                    </Box>
-                </Stack>
-            </Stack>
-        </AppTheme>
-    );
+              <Divider />
+
+              <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
+                <Button
+                  onClick={() => navigate(-1)}
+                  variant="outlined"
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  Cancel·lar
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  variant="contained"
+                  disabled={loading}
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  {loading ? 'Guardant...' : 'Guardar'}
+                </Button>
+              </Stack>
+            </Paper>
+          </Box>
+        </Stack>
+      </Stack>
+    </AppTheme>
+  );
 }

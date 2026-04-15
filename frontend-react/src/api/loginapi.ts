@@ -16,7 +16,10 @@ export async function loginUser(correu: string, contrasenya: string) {
 
   return {
     token: data.token,
-    usuari: data.usuari,
+    usuari: {
+      ...data.usuari,
+      imatge: data.usuari?.imatge ?? null,
+    },
   };
 }
 

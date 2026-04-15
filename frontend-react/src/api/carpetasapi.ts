@@ -42,6 +42,7 @@ export type Carpeta = {
   uuid: string;
   nom: string;
   dataCreacio: string;
+  dataEditat: string;
   favorit: boolean;
   items: {
     uuid: string;

@@ -32,6 +32,16 @@ const tabs: { value: TabValue; label: string }[] = [
   { value: 'favorites', label: 'Favorits' },
 ];
 
+type HomeElement =
+  | (Item & { esCarpeta: false })
+  | (Carpeta & {
+    esCarpeta: true;
+    titol: string;
+    nomUsuari: string;
+    dataEditat: string;
+    ultimAcces: string;
+  });
+
 export default function Home() {
   const navigate = useNavigate();
 
@@ -65,28 +75,65 @@ export default function Home() {
     loadData();
   }, []);
 
-  // Calcular qué items están en carpeta (memoizado para evitar O(n×m) en cada render)
   const itemsEnCarpetaSet = useMemo(() => {
     const set = new Set<string>();
     carpetas.forEach((c) => c.items.forEach((i) => set.add(i.uuid)));
     return set;
   }, [carpetas]);
 
-  // Filtrado y orden según tab activo
-  const filteredItems = useMemo(() => {
-    const base = activeTab === 'favorites' ? items.filter((i) => i.favorit) : items;
+
+  const filteredData = useMemo<HomeElement[]>(() => {
+    const allData: HomeElement[] = [
+      ...items.map(i => ({
+        ...i,
+        esCarpeta: false as const,
+      })),
+
+      ...carpetas.map(c => ({
+        ...c,
+        esCarpeta: true as const,
+        titol: c.nom,
+        nomUsuari: '',
+        dataEditat: c.dataCreacio,
+        ultimAcces: c.dataCreacio,
+      })),
+    ];
+
+    const base =
+      activeTab === 'favorites'
+        ? allData.filter((i) => i.favorit)
+        : allData;
+
     return [...base].sort((a, b) => {
-      if (activeTab === 'latest')
-        return new Date(b.dataEditat).getTime() - new Date(a.dataEditat).getTime();
-      if (activeTab === 'most_used')
-        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
+      if (activeTab === 'latest') {
+        return (
+          new Date(b.dataEditat).getTime() -
+          new Date(a.dataEditat).getTime()
+        );
+      }
+
+      if (activeTab === 'most_used') {
+        return (
+          new Date(b.ultimAcces).getTime() -
+          new Date(a.ultimAcces).getTime()
+        );
+      }
+
       return 0;
     });
-  }, [items, activeTab]);
+  }, [items, carpetas, activeTab]);
 
-  const displayedCarpetas = carpetas.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-  const displayedItems = filteredItems.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
-  const totalCount = filteredItems.length + carpetas.length;
+  const paginatedData = useMemo(() => {
+    return filteredData.slice(
+      (page - 1) * ITEMS_PER_PAGE,
+      page * ITEMS_PER_PAGE
+    );
+  }, [filteredData, page]);
+
+  const displayedCarpetas = paginatedData.filter(i => i.esCarpeta);
+  const displayedItems = paginatedData.filter(i => !i.esCarpeta);
+
+  const totalCount = filteredData.length;
 
   const handleDeleteClick = (uuid: string, esCarpeta: boolean) => {
     setDeleteTarget({ uuid, esCarpeta });
@@ -94,44 +141,44 @@ export default function Home() {
   };
 
   const confirmDelete = async () => {
-  if (!deleteTarget) return;
+    if (!deleteTarget) return;
 
-  const { uuid, esCarpeta } = deleteTarget;
+    const { uuid, esCarpeta } = deleteTarget;
 
-  if (esCarpeta) {
-    setCarpetas((prev) => prev.filter((c) => c.uuid !== uuid));
-  } else {
-    setItems((prev) => prev.filter((i) => i.uuid !== uuid));
-  }
-
-  setOpenDeleteModal(false);
-  setDeleteTarget(null);
-
-  try {
     if (esCarpeta) {
-      await carpetasApi.deleteCarpeta(uuid);
+      setCarpetas((prev) => prev.filter((c) => c.uuid !== uuid));
     } else {
-      await itemsApi.deleteItem(uuid);
+      setItems((prev) => prev.filter((i) => i.uuid !== uuid));
     }
 
-    toast.success('Eliminado correctamente');
-  } catch (error) {
-    toast.error('Error al eliminar');
+    setOpenDeleteModal(false);
+    setDeleteTarget(null);
 
-    const reload = async () => {
-      try {
-        const [itemsData, carpetasData] = await Promise.all([
-          itemsApi.fetchItems(),
-          carpetasApi.fetchItems(),
-        ]);
-        setItems(itemsData ?? []);
-        setCarpetas(carpetasData ?? []);
-      } catch {}
-    };
+    try {
+      if (esCarpeta) {
+        await carpetasApi.deleteCarpeta(uuid);
+      } else {
+        await itemsApi.deleteItem(uuid);
+      }
 
-    reload();
-  }
-};
+      toast.success('Eliminado correctamente');
+    } catch (error) {
+      toast.error('Error al eliminar');
+
+      const reload = async () => {
+        try {
+          const [itemsData, carpetasData] = await Promise.all([
+            itemsApi.fetchItems(),
+            carpetasApi.fetchItems(),
+          ]);
+          setItems(itemsData ?? []);
+          setCarpetas(carpetasData ?? []);
+        } catch { }
+      };
+
+      reload();
+    }
+  };
 
   const renderGrid = () => {
     if (loading) {
@@ -178,10 +225,10 @@ export default function Home() {
               uuid={carpeta.uuid}
               titol={carpeta.nom}
               nomUsuari=""
+              dataEditat={carpeta.dataEditat}
               favorit={carpeta.favorit}
-              dataEditat={carpeta.dataCreacio}
               esCarpeta
-              onClick={() => navigate('/Carpeta', { state: { uuid: carpeta.uuid, nombreCarpeta: carpeta.nom } })}
+              onClick={() => navigate('/Carpeta', { state: { uuid: carpeta.uuid } })}
               onEdit={() => navigate('/editCarpeta', { state: { uuid: carpeta.uuid } })}
               onDelete={() => handleDeleteClick(carpeta.uuid, true)}
             />
@@ -196,6 +243,7 @@ export default function Home() {
               dataEditat={item.dataEditat}
               dinsCarpeta={itemsEnCarpetaSet.has(item.uuid)}
               favorit={item.favorit}
+              esCarpeta={false}
               onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
               onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
               onDelete={() => handleDeleteClick(item.uuid, false)}
