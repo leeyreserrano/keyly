@@ -13,53 +13,54 @@ import {
 import Sidebar from '../components/Sidebar';
 import AppTheme from '../theme/AppTheme';
 import Header from '../components/Header';
-import { getCurrentUser } from '../api/loginapi';
+import { useAuth } from '../context/AuthContext';
+import { getUserImage } from '../api/userimageapi';
 
 export default function UserConfig() {
-  const [user, setUser] = useState<any>(null);
+  const { usuari } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const current = getCurrentUser();
-      setUser(current?.user || null);
-    } catch (error) {
-      console.error('Error obteniendo usuario', error);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   }, []);
+
+  const imageUrl = getUserImage(usuari?.imatge);
+  const initial = usuari?.nom?.charAt(0).toUpperCase() ?? 'U';
 
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
 
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
-        {/* SIDEBAR */}
         <Sidebar />
 
-        {/* CONTENIDO PRINCIPAL */}
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
 
-          {/* HEADER*/}
           <Header
             title="Perfil"
             icon={
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {user?.name?.charAt(0) || 'U'}
+              <Avatar
+                src={imageUrl}
+                sx={{
+                  bgcolor: 'primary.main',
+                  width: 36,
+                  height: 36,
+                  fontWeight: 700,
+                  cursor: 'default',
+                }}
+              >
+                {!imageUrl && initial}
               </Avatar>
             }
-            userInitial={user?.name?.charAt(0) || 'U'}
             showBackButton={false}
           />
 
-          {/* CONTENIDO */}
           <Box sx={{ px: 4, py: 3 }}>
             {loading ? (
               <Stack sx={{ alignItems: 'center', mt: 10 }}>
                 <CircularProgress />
               </Stack>
-            ) : !user ? (
+            ) : !usuari ? (
               <Typography color="error" sx={{ mt: 4 }}>
                 No s'ha pogut obtenir l'usuari.
               </Typography>
@@ -77,31 +78,38 @@ export default function UserConfig() {
                 }}
               >
 
-                {/* TITULO */}
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-                  <Avatar sx={{ width: 40, height: 40 }}>
-                    {user?.name?.charAt(0) || 'U'}
+                  <Avatar
+                    src={imageUrl}
+                    sx={{
+                      bgcolor: 'primary.main',
+                      width: 36,
+                      height: 36,
+                      fontWeight: 700,
+                      cursor: 'default',
+                    }}
+                  >
+                    {!imageUrl && initial}
                   </Avatar>
 
                   <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {user?.name || 'Usuari'}
+                    {usuari?.nom || 'Usuari'}
                   </Typography>
                 </Stack>
 
                 <Divider />
 
-                {/* INFO */}
                 <Typography>
-                  <strong>Nom:</strong> {user?.name}
+                  <strong>Nom:</strong> {usuari?.nom}
                 </Typography>
 
                 <Typography>
-                  <strong>Email:</strong> {user?.email}
+                  <strong>Email:</strong> {usuari?.correu}
                 </Typography>
 
-                {user?.id && (
+                {usuari?.uuid && (
                   <Typography>
-                    <strong>ID:</strong> {user.id}
+                    <strong>ID:</strong> {usuari.uuid}
                   </Typography>
                 )}
               </Paper>

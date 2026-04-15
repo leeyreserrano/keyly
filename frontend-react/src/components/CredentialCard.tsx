@@ -4,8 +4,8 @@ import Paper from '@mui/material/Paper';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { itemsApi, type Item } from '../api/itemsapi';
-import { toast } from 'react-hot-toast/headless';
+import { itemsApi } from '../api/itemsapi';
+import toast from 'react-hot-toast';
 import { carpetasApi } from '../api/carpetasapi';
 import ActionButtons from './ActionButtons';
 
@@ -39,39 +39,45 @@ export default function CredentialCard({
 
   const toggleFavorit = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
     try {
       if (esCarpeta) {
-        const updatedCarpeta = await carpetasApi.updateCarpeta(uuid, { favorit: !isFavorit });
-        setIsFavorit(updatedCarpeta.favorit ?? false);
-        toast.success(
-          updatedCarpeta.favorit ? "Carpeta añadida a favoritos" : "Carpeta quitada de favoritos"
-        );
+        const updated = await carpetasApi.updateCarpeta(uuid, {
+          favorit: !isFavorit,
+        });
+
+        if (updated) {
+          setIsFavorit(!!updated.favorit);
+        }
       } else {
-        const updatedItem: Item = await itemsApi.updateItem(uuid, { favorit: !isFavorit });
-        setIsFavorit(updatedItem.favorit ?? false);
-        toast.success(
-          updatedItem.favorit ? "Item añadido a favoritos" : "Item quitado de favoritos"
-        );
+        const updated = await itemsApi.updateItem(uuid, {
+          favorit: !isFavorit,
+        });
+
+        if (updated) {
+          setIsFavorit(!!updated.favorit);
+        }
       }
     } catch (error) {
-      console.error("Error actualizando favorito", error);
-      toast.error(`Error cambiando favorito ${esCarpeta ? "de carpeta" : "de item"}`);
+      console.error(error);
+      toast.error('Error al cambiar favorito');
     }
   };
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (esCarpeta) {
       navigate('/editCarpeta', { state: { uuid } });
     } else {
-      onEdit && onEdit();
+      onEdit?.();
     }
   };
 
-  function handleDelete(event: React.MouseEvent<HTMLButtonElement>): void {
-    event.stopPropagation();
-    onDelete && onDelete();
-  }
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onDelete?.();
+  };
 
   return (
     <Paper
@@ -91,10 +97,13 @@ export default function CredentialCard({
         transition: 'box-shadow 150ms ease',
       }}
     >
-      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
         <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center' }}>
-          {esCarpeta && <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary' }} />}
-          <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.9rem' }}>
+          {esCarpeta && (
+            <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary' }} />
+          )}
+
+          <Typography sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
             {titol}
           </Typography>
         </Stack>
@@ -104,19 +113,18 @@ export default function CredentialCard({
           onToggleFavorit={toggleFavorit}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          highlightDelete={false}
           showFolderIcon={dinsCarpeta}
           size="small"
         />
       </Stack>
 
-        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.82rem' }}>
-          {nomUsuari}
-        </Typography>
+      <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>
+        {nomUsuari}
+      </Typography>
 
-        <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.75, display: 'block' }}>
-          Last modified: {dataEditat}
-        </Typography>
+      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+        Last modified: {dataEditat}
+      </Typography>
     </Paper>
   );
 }

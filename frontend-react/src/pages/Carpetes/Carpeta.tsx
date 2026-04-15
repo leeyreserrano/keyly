@@ -93,7 +93,6 @@ export default function Carpeta() {
                     <Header
                         title={nombreCarpeta || 'Carpeta'}
                         icon={<FolderOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
-                        userInitial="U"
                         showBackButton={true}
                     />
                     {/* Buscador + Filtro + Add New */}

@@ -35,7 +35,7 @@ export default function Item() {
           carpetasApi.fetchItems(),
         ]);
 
-        const found = allItems.find((i) => i.uuid === uuid);
+        const found = allItems?.find((i) => i.uuid === uuid);
         setItem(found || null);
         setCarpetas(allCarpetas);
       } catch (error) {
@@ -72,16 +72,18 @@ export default function Item() {
 
   // Función que elimina el item
   const confirmDelete = async () => {
-    if (!item) return;
-    try {
-      await itemsApi.deleteItem(item.uuid);
-      toast.success("Se ha eliminado el item");
-      setOpenDeleteModal(false);
-      navigate(-1);
-    } catch (error) {
-      toast.error("Error eliminando el item");
-    }
-  };
+  if (!item) return;
+
+  const uuid = item.uuid;
+
+  try {
+    await itemsApi.deleteItem(uuid);
+    toast.success("Item eliminado");
+    navigate(-1);
+  } catch {
+    toast.error("Error eliminando item");
+  }
+};
   const [isFavorit, setIsFavorit] = useState(item?.favorit || false);
 
   const toggleFavorit = async () => {
@@ -106,7 +108,6 @@ export default function Item() {
           <Header
             title={item?.titol || 'Item'}
             icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
-            userInitial="U"
             showBackButton={true}
           />
 

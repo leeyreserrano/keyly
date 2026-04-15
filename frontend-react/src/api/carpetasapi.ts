@@ -1,63 +1,40 @@
-import type { Item } from "./itemsapi";
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { apiRequest } from './client';
+import type { Item } from './itemsapi';
 
 export class carpetasApi {
-  static async fetchItems(): Promise<Carpeta[]> {
-    const token = localStorage.getItem("jwtToken");
-    const response = await fetch("https://10.147.17.250:8081/api/carpetes", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Error en la petición");
-    return response.json();
+  static fetchItems(): Promise<Carpeta[]> {
+    return apiRequest<Carpeta[]>('/carpeta/get/all').then(result => result ?? []);
   }
 
-  static async deleteCarpeta(uuid: string): Promise<void> {
-    const token = localStorage.getItem("jwtToken");
-    const response = await fetch(`https://10.147.17.250:8081/api/carpeta/${uuid}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Error eliminando la carpeta");
-  }
-
-  static async fetchItemsFromCarpeta(uuid: string): Promise<Item[]> {
-    const token = localStorage.getItem("jwtToken");
-    const response = await fetch(`https://10.147.17.250:8081/api/carpeta/${uuid}/item`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error("Error fetching items de la carpeta");
-    return response.json();
-  }
-
-  static async addCarpeta(data: Partial<Carpeta>): Promise<Carpeta> {
-    const token = localStorage.getItem('jwtToken');
-    const res = await fetch('https://10.147.17.250:8081/api/carpeta', {
+  static addCarpeta(data: Partial<Carpeta>): Promise<Carpeta> {
+    return apiRequest<Carpeta>('/carpeta/add', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(data),
+    }).then(result => {
+      if (!result) throw new Error('Failed to add carpeta');
+      return result;
     });
-    if (!res.ok) throw new Error('Error creating folder');
-    return res.json();
   }
 
-  static async updateCarpeta(uuid: string, data: Partial<Carpeta>): Promise<Carpeta> {
-    const token = localStorage.getItem('jwtToken');
-    const res = await fetch(`https://10.147.17.250:8081/api/carpeta/${uuid}`, {
+  static updateCarpeta(uuid: string, data: Partial<Carpeta>): Promise<Carpeta> {
+    return apiRequest<Carpeta>(`/carpeta/update/${uuid}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
       body: JSON.stringify(data),
+    }).then(result => {
+      if (!result) throw new Error('Failed to update carpeta');
+      return result;
     });
-    if (!res.ok) throw new Error('Error updating folder');
-    return res.json();
+  }
+
+  static deleteCarpeta(uuid: string): Promise<void> {
+  return apiRequest<void>(`/carpeta/delete/${uuid}`, {
+    method: 'DELETE',
+  }).then(() => {
+  });
+}
+
+  static fetchItemsFromCarpeta(uuid: string): Promise<Item[]> {
+    return apiRequest<Item[]>(`/carpeta/get/${uuid}/item`).then(result => result ?? []);
   }
 }
 

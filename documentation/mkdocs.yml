@@ -1,0 +1,38 @@
+site_name: Keyly Documentation
+site_description: Documentación del proyecto Keyly
+site_author: Equipo Keyly
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+    - scheme: slate
+  logo: assets/images/logo_keyly.png
+  favicon: assets/images/logo_keyly.png
+
+nav:
+  - Inicio: index.md
+  - 👤 Guía de Usuario:
+      - Inicio: usuario/inicio.md
+      - Cómo usar la app: usuario/como-usar.md
+      - Funcionalidades: usuario/funcionalidades.md
+      - FAQ: usuario/faq.md
+
+  - 🎓 Documentación Técnica:
+      - Introducción: profesor/introduccion.md
+      - Arquitectura: profesor/arquitectura.md
+      - Base de datos: profesor/base-datos.md
+      - API: profesor/api.md
+      - Decisiones técnicas: profesor/decisiones-tecnicas.md
+
+  - 🛠️ Desarrollo:
+      - Roadmap: desarrollo/roadmap.md
+      - Issues: desarrollo/issues.md
+      - Cambios: desarrollo/cambios.md
+
+extra_css:
+  - styles/extra.css
+
+plugins:
+  - search

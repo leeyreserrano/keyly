@@ -1,13 +1,14 @@
-import { Stack, Typography, Avatar, IconButton, Button } from '@mui/material';
+import { Stack, Typography, Avatar, IconButton, Button, Tooltip } from '@mui/material';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import { useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { getUserImage } from '../api/userimageapi';
 
 type HeaderProps = {
   title: string;
   icon: ReactNode;
-  userInitial?: string;
   showBackButton?: boolean;
   onBack?: () => void;
 };
@@ -15,11 +16,21 @@ type HeaderProps = {
 export default function Header({
   title,
   icon,
-  userInitial,
   showBackButton = false,
   onBack,
 }: HeaderProps) {
   const navigate = useNavigate();
+  const { usuari, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const initial = usuari?.nom?.charAt(0).toUpperCase() ?? '?';
+  const tooltipText = usuari ? `${usuari.nom} · ${usuari.rolIntern}` : '';
+
+  const imageUrl = getUserImage(usuari?.imatge);
 
   return (
     <Stack
@@ -43,29 +54,33 @@ export default function Header({
 
       {/* Derecha */}
       <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-        <Avatar
-          sx={{
-            bgcolor: 'grey.500',
-            width: 36,
-            height: 36,
-            fontSize: 15,
-            fontWeight: 700,
-          }}
-        >
-          {userInitial}
-        </Avatar>
+        <Tooltip title={tooltipText} arrow>
+          <Avatar
+            src={imageUrl}
+            sx={{
+              bgcolor: 'primary.main',
+              width: 36,
+              height: 36,
+              fontWeight: 700,
+              cursor: 'default',
+            }}
+          >
+            {!imageUrl && initial}
+          </Avatar>
+        </Tooltip>
 
-        <IconButton
-          onClick={() => navigate('/')}
-          size="small"
-          sx={{
-            border: 'none',
-            bgcolor: 'transparent',
-            '&:hover': { bgcolor: 'action.hover' },
-          }}
-        >
-          <LogoutOutlinedIcon sx={{ fontSize: 22, color: 'text.secondary' }} />
-        </IconButton>
+        <Tooltip title="Tancar sessió" arrow>
+          <IconButton
+            onClick={handleLogout}
+            size="small"
+            sx={{
+              bgcolor: 'transparent',
+              '&:hover': { bgcolor: 'action.hover' },
+            }}
+          >
+            <LogoutOutlinedIcon sx={{ fontSize: 22, color: 'text.secondary' }} />
+          </IconButton>
+        </Tooltip>
 
         {showBackButton && (
           <Button

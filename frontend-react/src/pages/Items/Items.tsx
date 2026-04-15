@@ -5,7 +5,10 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
+import Skeleton from '@mui/material/Skeleton';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
+import VpnKeyOffOutlinedIcon from '@mui/icons-material/VpnKeyOffOutlined';
 import AppTheme from '../../theme/AppTheme';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
@@ -13,20 +16,21 @@ import ItemsToolbar from '../../components/ItemsToolbar';
 import CustomPagination from '../../components/CustomPagination';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import CredentialCard from '../../components/CredentialCard';
-
 import { itemsApi, type Item } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
 
 export type FilterValue = 'latest' | 'most_used' | 'favorites';
 
+const ITEMS_PER_PAGE = 12;
+
 export default function Items() {
-  const itemsPerPage = 12;
   const navigate = useNavigate();
 
   const [items, setItems] = useState<Item[]>([]);
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterValue>('latest');
@@ -37,15 +41,17 @@ export default function Items() {
 
   useEffect(() => {
     const loadData = async () => {
+      setError(null);
       try {
         const [itemsData, carpetasData] = await Promise.all([
           itemsApi.fetchItems(),
           carpetasApi.fetchItems(),
         ]);
-        setItems(itemsData);
-        setCarpetas(carpetasData);
-      } catch (error) {
-        console.error(error);
+        setItems(itemsData ?? []);
+        setCarpetas(carpetasData ?? []);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Error carregant les dades';
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -53,18 +59,26 @@ export default function Items() {
     loadData();
   }, []);
 
-  // Filtrado y orden
+  // Filtrado y ordenación
   const filteredItems = items
     .filter((item) =>
-      item.titol.toLowerCase().includes(search.toLowerCase()) ||
-      item.nomUsuari.toLowerCase().includes(search.toLowerCase())
+      filter === 'favorites'
+        ? item.favorit
+        : item.titol.toLowerCase().includes(search.toLowerCase()) ||
+          item.nomUsuari.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
-      if (filter === 'latest') return new Date(b.dataEditat).getTime() - new Date(a.dataEditat).getTime();
-      if (filter === 'most_used') return (b.ultimAcces?.length || 0) - (a.ultimAcces?.length || 0);
-      if (filter === 'favorites') return (b.favorit ? 1 : 0) - (a.favorit ? 1 : 0);
+      if (filter === 'latest')
+        return new Date(b.dataEditat).getTime() - new Date(a.dataEditat).getTime();
+      if (filter === 'most_used')
+        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
       return 0;
     });
+
+  const paginatedItems = filteredItems.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
 
   const handleDelete = (item: Item) => {
     setDeleteTarget(item);
@@ -76,13 +90,73 @@ export default function Items() {
     try {
       await itemsApi.deleteItem(deleteTarget.uuid);
       setItems((prev) => prev.filter((i) => i.uuid !== deleteTarget.uuid));
-      toast.success('Se ha eliminado el item');
+      toast.success('Item eliminat correctament');
       setOpenDeleteModal(false);
       setDeleteTarget(null);
-      navigate('/items');
-    } catch (error) {
-      toast.error('Error eliminando el item');
+    } catch {
+      toast.error('Error eliminant l\'item');
     }
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <Grid container spacing={2}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Grid size={4} key={i}>
+              <Skeleton variant="rounded" height={110} sx={{ borderRadius: '10px' }} />
+            </Grid>
+          ))}
+        </Grid>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      );
+    }
+
+    if (filteredItems.length === 0) {
+      return (
+        <Stack sx={{ alignItems: 'center', py: 10, gap: 2, color: 'text.disabled' }}>
+          <VpnKeyOffOutlinedIcon sx={{ fontSize: 64 }} />
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            {search ? 'Cap resultat per a la cerca' : filter === 'favorites' ? 'No tens cap favorit' : 'No tens cap contrasenya guardada'}
+          </Typography>
+          {!search && filter !== 'favorites' && (
+            <Typography variant="body2" color="text.secondary">
+              Afegeix la primera des del botó "+ Add New"
+            </Typography>
+          )}
+        </Stack>
+      );
+    }
+
+    return (
+      <Grid container spacing={2}>
+        {paginatedItems.map((item) => {
+          const estaEnCarpeta = carpetas.some((c) => c.items.some((i) => i.uuid === item.uuid));
+          return (
+            <Grid size={4} key={item.uuid}>
+              <CredentialCard
+                uuid={item.uuid}
+                titol={item.titol}
+                nomUsuari={item.nomUsuari}
+                dataEditat={item.dataEditat}
+                dinsCarpeta={estaEnCarpeta}
+                favorit={item.favorit}
+                onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
+                onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
+                onDelete={() => handleDelete(item)}
+              />
+            </Grid>
+          );
+        })}
+      </Grid>
+    );
   };
 
   return (
@@ -92,13 +166,11 @@ export default function Items() {
         <Sidebar />
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          {/* Header */}
           <Header
             title="Items"
             icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
           />
 
-          {/* Buscador + Filtro + Add New */}
           <ItemsToolbar
             search={search}
             setSearch={setSearch}
@@ -107,33 +179,17 @@ export default function Items() {
             onAdd={() => navigate('/AddItem')}
           />
 
-          {/* Grid de Items */}
-          {loading ?
-            (<Typography sx={{ p: 4 }}>Cargando...</Typography>
-            ) : (
-              <Box sx={{ px: 4, pb: 3, flex: 1 }}>
-                <Grid container spacing={2}>
-                  {filteredItems.map((item) => {
-                    const estaEnCarpeta = carpetas.some((carpeta) => carpeta.items.some((i) => i.uuid === item.uuid));
-                    return (<Grid size={4} key={item.uuid}>
-                      <CredentialCard
-                        uuid={item.uuid}
-                        titol={item.titol}
-                        nomUsuari={item.nomUsuari}
-                        dataEditat={item.dataEditat}
-                        dinsCarpeta={estaEnCarpeta}
-                        favorit={item.favorit}
-                        onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
-                        onEdit={() => navigate('/edititem', { state: { uuid: item.uuid } })}
-                        onDelete={() => handleDelete(item)} />
-                    </Grid>);
-                  })} </Grid> </Box>)}
-          {/* Pagination */}
-          <CustomPagination
-            count={Math.ceil(filteredItems.length / itemsPerPage)}
-            page={page}
-            onChange={setPage}
-          />
+          <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+            {renderContent()}
+          </Box>
+
+          {!loading && !error && filteredItems.length > ITEMS_PER_PAGE && (
+            <CustomPagination
+              count={Math.ceil(filteredItems.length / ITEMS_PER_PAGE)}
+              page={page}
+              onChange={(val) => { setPage(val); window.scrollTo(0, 0); }}
+            />
+          )}
         </Stack>
 
         <DeleteConfirmationModal

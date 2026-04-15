@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+
 import AppTheme from '../../theme/AppTheme';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
@@ -18,6 +19,7 @@ import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
 
 export type FilterValue = 'latest' | 'most_used' | 'favorites';
+
 const itemsPerPage = 12;
 
 export default function Carpetas() {
@@ -33,32 +35,45 @@ export default function Carpetas() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Carpeta | null>(null);
 
+  const loadCarpetas = async () => {
+    try {
+      setLoading(true);
+      const data = await carpetasApi.fetchItems();
+      setCarpetas(data);
+    } catch (error) {
+      console.error(error);
+      toast.error('Error cargando carpetas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const carpetasData = await carpetasApi.fetchItems();
-        setCarpetas(carpetasData);
-      } catch (error) {
-        console.error(error);
-        toast.error('Error cargando carpetas');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
+    loadCarpetas();
   }, []);
 
-  // Filtrado y orden
   const filteredCarpetas = carpetas
     .filter((c) => c.nom.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
-      if (filter === 'latest') return new Date(b.dataCreacio).getTime() - new Date(a.dataCreacio).getTime();
-      if (filter === 'most_used') return (b.items?.length || 0) - (a.items?.length || 0);
-      if (filter === 'favorites') return (b.favorit ? 1 : 0) - (a.favorit ? 1 : 0);
+      if (filter === 'latest')
+        return (
+          new Date(b.dataCreacio).getTime() -
+          new Date(a.dataCreacio).getTime()
+        );
+
+      if (filter === 'most_used')
+        return (b.items?.length || 0) - (a.items?.length || 0);
+
+      if (filter === 'favorites')
+        return (b.favorit ? 1 : 0) - (a.favorit ? 1 : 0);
+
       return 0;
     });
 
-  const displayedCarpetas = filteredCarpetas.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const displayedCarpetas = filteredCarpetas.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
   const handleDelete = (carpeta: Carpeta) => {
     setDeleteTarget(carpeta);
@@ -66,32 +81,40 @@ export default function Carpetas() {
   };
 
   const confirmDelete = async () => {
-    if (!deleteTarget) return;
+  if (!deleteTarget) return;
+
+  const uuid = deleteTarget.uuid;
+
+  setCarpetas((prev) => prev.filter((c) => c.uuid !== uuid));
+  setOpenDeleteModal(false);
+  setDeleteTarget(null);
+
+  try {
+    await carpetasApi.deleteCarpeta(uuid);
+    toast.success('Carpeta eliminada correctamente');
+  } catch {
+    toast.error('Error eliminando carpeta');
+
     try {
-      await carpetasApi.deleteCarpeta(deleteTarget.uuid);
-      setCarpetas((prev) => prev.filter((c) => c.uuid !== deleteTarget.uuid));
-      toast.success('Carpeta eliminada correctamente');
-      setOpenDeleteModal(false);
-      setDeleteTarget(null);
-    } catch (error) {
-      toast.error('Error eliminando carpeta');
-    }
-  };
+      const data = await carpetasApi.fetchItems();
+      setCarpetas(data);
+    } catch {}
+  }
+};
 
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
+
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
         <Sidebar />
 
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          {/* Header */}
+        <Stack sx={{ flex: 1, bgcolor: 'background.default' }}>
           <Header
             title="Carpetas"
-            icon={<FolderOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+            icon={<FolderOutlinedIcon sx={{ fontSize: 30 }} />}
           />
 
-          {/* Toolbar */}
           <ItemsToolbar
             search={search}
             setSearch={setSearch}
@@ -100,23 +123,33 @@ export default function Carpetas() {
             onAdd={() => navigate('/AddCarpeta')}
           />
 
-          {/* Grid de Carpetas */}
           {loading ? (
             <Typography sx={{ p: 4 }}>Cargando...</Typography>
           ) : (
-            <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+            <Box sx={{ px: 4, pb: 3 }}>
               <Grid container spacing={2}>
                 {displayedCarpetas.map((carpeta) => (
                   <Grid size={4} key={carpeta.uuid}>
                     <CredentialCard
                       uuid={carpeta.uuid}
                       titol={carpeta.nom}
-                      favorit={carpeta.favorit}
                       nomUsuari=""
                       dataEditat={carpeta.dataCreacio}
                       esCarpeta
-                      onClick={() => navigate('/carpeta', { state: { uuid: carpeta.uuid, nombreCarpeta: carpeta.nom } })}
-                      onEdit={() => navigate('/editcarpeta', { state: { uuid: carpeta.uuid } })}
+                      favorit={carpeta.favorit}
+                      onClick={() =>
+                        navigate('/carpeta', {
+                          state: {
+                            uuid: carpeta.uuid,
+                            nombreCarpeta: carpeta.nom,
+                          },
+                        })
+                      }
+                      onEdit={() =>
+                        navigate('/editcarpeta', {
+                          state: { uuid: carpeta.uuid },
+                        })
+                      }
                       onDelete={() => handleDelete(carpeta)}
                     />
                   </Grid>
@@ -125,7 +158,6 @@ export default function Carpetas() {
             </Box>
           )}
 
-          {/* Pagination */}
           <CustomPagination
             count={Math.ceil(filteredCarpetas.length / itemsPerPage)}
             page={page}

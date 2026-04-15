@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider} from './context/AuthContext';
+import ProtectedRoute from './routes/ProtectedRoute';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Item from './pages/Items/Item';
@@ -11,25 +13,30 @@ import Carpetas from './pages/Carpetes/Carpetes';
 import Carpeta from './pages/Carpetes/Carpeta';
 import AddCarpeta from './pages/Carpetes/AddFolder';
 import UserConfig from './pages/UserConfig';
+
 import './App.css';
 
 function App() {
   return (
-    <><Toaster position="top-center" /><BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/Item" element={<Item />} />
-        <Route path="/AddItem" element={<AddItem />} />
-        <Route path="/ChooseType" element={<ChooseType />} />
-        <Route path="/Items" element={<Items />} />
-        <Route path="/EditItem" element={<EditItem />} />
-        <Route path="/Carpetes" element={<Carpetas />} />
-        <Route path="/Carpeta" element={<Carpeta />} />
-        <Route path="/AddCarpeta" element={<AddCarpeta/>} />
-        <Route path="/Settings" element={<UserConfig />} />
-      </Routes>
-    </BrowserRouter></>
+    <AuthProvider>
+      <Toaster position="top-center" />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/home"      element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/Item"      element={<ProtectedRoute><Item /></ProtectedRoute>} />
+          <Route path="/AddItem"   element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
+          <Route path="/ChooseType" element={<ProtectedRoute><ChooseType /></ProtectedRoute>} />
+          <Route path="/Items"     element={<ProtectedRoute><Items /></ProtectedRoute>} />
+          <Route path="/EditItem"  element={<ProtectedRoute><EditItem /></ProtectedRoute>} />
+          <Route path="/Carpetes"  element={<ProtectedRoute><Carpetas /></ProtectedRoute>} />
+          <Route path="/Carpeta"   element={<ProtectedRoute><Carpeta /></ProtectedRoute>} />
+          <Route path="/AddCarpeta" element={<ProtectedRoute><AddCarpeta /></ProtectedRoute>} />
+          <Route path="/Settings"  element={<ProtectedRoute><UserConfig /></ProtectedRoute>} />
+          <Route path="*"          element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
