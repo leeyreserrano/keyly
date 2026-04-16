@@ -1,13 +1,13 @@
-// src/components/ItemsToolbar.tsx
 import { Stack, TextField, MenuItem, Button } from '@mui/material';
 import type { FilterValue } from '../pages/Items/Items';
 
 type Props = {
   search: string;
+  sx?: Record<string, unknown>;
   setSearch: (v: string) => void;
-  filter: FilterValue;
-  setFilter: (v: FilterValue) => void;
-  onAdd: () => void;
+  filter?: FilterValue;
+  setFilter?: (v: FilterValue) => void;
+  onAdd?: () => void;
 };
 
 const filters: { value: FilterValue; label: string }[] = [
@@ -27,30 +27,34 @@ export default function ItemsToolbar({ search, setSearch, filter, setFilter, onA
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         size="small"
-        sx={{ width: { xs: '100%', sm: 1090 } }}
+        sx={{ width: { xs: '100%', sm: setFilter ? 1070 : '100%' } }}
       />
 
-      <TextField
-        select
-        value={filter}
-        onChange={(e) => setFilter(e.target.value as FilterValue)}
-        size="small"
-        sx={{ width: { xs: '100%', sm: 180 } }}
-      >
-        {filters.map((f) => (
-          <MenuItem key={f.value} value={f.value}>
-            {f.label}
-          </MenuItem>
-        ))}
-      </TextField>
+      {filter !== undefined && setFilter && (
+        <TextField
+          select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value as FilterValue)}
+          size="small"
+          sx={{ width: { xs: '100%', sm: 180 } }}
+        >
+          {filters.map((f) => (
+            <MenuItem key={f.value} value={f.value}>
+              {f.label}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
 
-      <Button
-        variant="contained"
-        onClick={onAdd}
-        sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
-      >
-        + Add New
-      </Button>
+      {onAdd && (
+        <Button
+          variant="contained"
+          onClick={onAdd}
+          sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+        >
+          + Add New
+        </Button>
+      )}
     </Stack>
   );
 }

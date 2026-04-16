@@ -53,7 +53,7 @@ export default function AddCarpeta() {
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
         <Sidebar />
 
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
+        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0}}>
           <Header
             title="Afegir Carpeta"
             icon={<FolderOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
