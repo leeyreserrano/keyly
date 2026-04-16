@@ -1,0 +1,15 @@
+/* =========================
+   MODO CLARO
+========================= */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #AB3DF0;
+  --md-accent-fg-color: #7C3AED;
+}
+
+/* =========================
+   MODO OSCURO
+========================= */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #6D28D9;
+  --md-accent-fg-color: #F5E7FD;
+}
