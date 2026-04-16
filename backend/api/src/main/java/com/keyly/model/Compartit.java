@@ -8,7 +8,6 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.keyly.model.enums.Permisos;
 import com.keyly.model.enums.TipusEntitat;
-import com.keyly.model.request.CompartitRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,6 +43,9 @@ public class Compartit {
     @JoinColumn(name = "usuari_id", nullable = false)
     private Usuari usuari;
 
+    @Column(name = "creador_uuid", columnDefinition = "BINARY(16)")
+    private UUID creadorUuid;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipus_entitat", nullable = false)
     private TipusEntitat tipusEntitat;
@@ -58,13 +60,5 @@ public class Compartit {
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
-
-    public Compartit(Usuari usuari, CompartitRequest request) {
-        this.usuari = usuari;
-        this.tipusEntitat = request.tipusEntitat();
-        this.entitatUuid = request.entitatUuid();
-        this.permisos = request.permisos();
-    }
-
 
 }

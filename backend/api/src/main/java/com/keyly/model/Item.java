@@ -84,7 +84,7 @@ public class Item {
     private LocalDateTime dataUltimAcces;
 
     @Column(name = "comptador_access")
-    private Long comptadorAccess;
+    private Long comptadorAccess = 0L;
 
     public void addCarpeta(Carpeta carpeta) {
         carpetas.add(carpeta);
