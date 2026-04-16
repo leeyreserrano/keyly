@@ -9,7 +9,8 @@ import { carpetasApi } from '../api/carpetasapi';
 import { itemsApi } from '../api/itemsapi';
 import { useState } from 'react';
 import { useTimeRefresh } from './UseTimeRefresh';
-import { getTimeAgo } from '../utils/timeUtils';
+import { getTimeAgo, formatDate } from '../utils/timeUtils';
+import { useAuth } from '../context/AuthContext';
 
 interface CredentialCardProps {
   uuid: string;
@@ -23,13 +24,12 @@ interface CredentialCardProps {
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
-  onToggleFavorit?: () => void;
 }
 
 export default function CredentialCard({
   uuid,
   titol,
-  nomUsuari,
+  nomUsuari: _nomUsuari,
   dataEditat,
   dataCreacio,
   esCarpeta = false,
@@ -40,6 +40,7 @@ export default function CredentialCard({
   onDelete,
 }: CredentialCardProps) {
   const navigate = useNavigate();
+  const { usuari } = useAuth();
   const [isFavorit, setIsFavorit] = useState(favorit);
   const now = useTimeRefresh(10000);
 
@@ -62,7 +63,7 @@ export default function CredentialCard({
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (esCarpeta) {
-      navigate('/editCarpeta', { state: { uuid } });
+      navigate('/EditCarpeta', { state: { uuid } });
     } else {
       onEdit?.();
     }
@@ -83,7 +84,7 @@ export default function CredentialCard({
         bgcolor: 'background.default',
         border: '1px solid',
         borderColor: 'divider',
-        minHeight: 110,
+        height: 110,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -91,12 +92,20 @@ export default function CredentialCard({
         transition: 'box-shadow 150ms ease',
       }}
     >
-      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-        <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center' }}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center', minWidth: 0 }}>
           {esCarpeta && (
-            <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary' }} />
+            <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary', flexShrink: 0 }} />
           )}
-          <Typography sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
+          <Typography
+            sx={{
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {titol}
           </Typography>
         </Stack>
@@ -111,21 +120,17 @@ export default function CredentialCard({
         />
       </Stack>
 
-      {!esCarpeta && (
-        <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>
-          {nomUsuari}
-        </Typography>
-      )}
+      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+        Propietari: {usuari?.nom ?? ''}
+      </Typography>
 
-      <Stack direction="row" sx={{ justifyContent: 'space-between', mt: 0.5 }}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
           Modificat: {getTimeAgo(dataEditat, now)}
         </Typography>
-        {dataCreacio && (
-          <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-            Creat: {getTimeAgo(dataCreacio, now)}
-          </Typography>
-        )}
+        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+          {dataCreacio ? `Creat: ${formatDate(dataCreacio)}` : ''}
+        </Typography>
       </Stack>
     </Paper>
   );

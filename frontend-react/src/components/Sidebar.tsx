@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   { label: 'Home', icon: HomeRoundedIcon, path: '/home' },
   { label: 'Items', icon: VpnKeyRoundedIcon, path: '/items' },
   { label: 'Tus carpetas', icon: FolderOutlinedIcon, path: '/carpetes' },
-  { label: 'Compartido', icon: PeopleAltOutlinedIcon, path: '/shared' },
+  { label: 'Compartido', icon: PeopleAltOutlinedIcon, path: '/compartits' },
   { label: 'Configuración', icon: EditNoteOutlinedIcon, path: '/settings' },
 ];
 

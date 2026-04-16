@@ -14,6 +14,7 @@ import Carpeta from './pages/Carpetes/Carpeta';
 import AddCarpeta from './pages/Carpetes/AddFolder';
 import UserConfig from './pages/UserConfig';
 import EditCarpeta from './pages/Carpetes/EditFolder';
+import Compartits from './pages/Compartit/Compartits';
 
 import './App.css';
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/AddCarpeta" element={<ProtectedRoute><AddCarpeta /></ProtectedRoute>} />
           <Route path="/Settings"  element={<ProtectedRoute><UserConfig /></ProtectedRoute>} />
           <Route path="/EditCarpeta" element={<ProtectedRoute><EditCarpeta /></ProtectedRoute>} />
+          <Route path="/Compartits" element={<ProtectedRoute><Compartits /></ProtectedRoute>} />
           <Route path="*"          element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

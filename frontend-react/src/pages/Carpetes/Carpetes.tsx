@@ -53,22 +53,21 @@ export default function Carpetas() {
   }, []);
 
   const filteredCarpetas = carpetas
-    .filter((c) => c.nom.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => {
-      if (filter === 'latest')
-        return (
-          new Date(b.dataCreacio).getTime() -
-          new Date(a.dataCreacio).getTime()
-        );
-
-      if (filter === 'most_used')
-        return (b.items?.length || 0) - (a.items?.length || 0);
-
-      if (filter === 'favorites')
-        return (b.favorit ? 1 : 0) - (a.favorit ? 1 : 0);
-
-      return 0;
-    });
+  .filter((c) =>
+    filter === 'favorites'
+      ? c.favorit
+      : c.nom.toLowerCase().includes(search.toLowerCase())
+  )
+  .sort((a, b) => {
+    if (filter === 'latest')
+      return (
+        new Date(b.dataEditat).getTime() -
+        new Date(a.dataEditat).getTime()
+      );
+    if (filter === 'most_used')
+      return (b.items?.length || 0) - (a.items?.length || 0);
+    return 0;
+  });
 
   const displayedCarpetas = filteredCarpetas.slice(
     (page - 1) * itemsPerPage,
@@ -135,10 +134,11 @@ export default function Carpetas() {
                       titol={carpeta.nom}
                       nomUsuari=""
                       dataEditat={carpeta.dataCreacio}
+                      dataCreacio={carpeta.dataCreacio}
                       esCarpeta
                       favorit={carpeta.favorit}
                       onClick={() =>
-                        navigate('/carpeta', {
+                        navigate('/Carpeta', {
                           state: {
                             uuid: carpeta.uuid,
                             nombreCarpeta: carpeta.nom,

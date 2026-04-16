@@ -226,9 +226,10 @@ export default function Home() {
               titol={carpeta.nom}
               nomUsuari=""
               dataEditat={carpeta.dataEditat}
+              dataCreacio={carpeta.dataCreacio}
               favorit={carpeta.favorit}
               esCarpeta
-              onClick={() => navigate('/Carpeta', { state: { uuid: carpeta.uuid } })}
+              onClick={() => navigate('/Carpeta', { state: { uuid: carpeta.uuid, nombreCarpeta: carpeta.nom } })}
               onEdit={() => navigate('/editCarpeta', { state: { uuid: carpeta.uuid } })}
               onDelete={() => handleDeleteClick(carpeta.uuid, true)}
             />
@@ -239,8 +240,9 @@ export default function Home() {
             <CredentialCard
               uuid={item.uuid}
               titol={item.titol}
-              nomUsuari={item.nomUsuari}
+              nomUsuari=''
               dataEditat={item.dataEditat}
+              dataCreacio={item.dataCreacio}
               dinsCarpeta={itemsEnCarpetaSet.has(item.uuid)}
               favorit={item.favorit}
               esCarpeta={false}

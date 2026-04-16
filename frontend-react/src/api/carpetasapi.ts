@@ -27,14 +27,25 @@ export class carpetasApi {
   }
 
   static deleteCarpeta(uuid: string): Promise<void> {
-  return apiRequest<void>(`/carpeta/delete/${uuid}`, {
-    method: 'DELETE',
-  }).then(() => {
-  });
-}
+    return apiRequest<void>(`/carpeta/delete/${uuid}`, {
+      method: 'DELETE',
+    }).then(() => {});
+  }
 
   static fetchItemsFromCarpeta(uuid: string): Promise<Item[]> {
     return apiRequest<Item[]>(`/carpeta/get/${uuid}/item`).then(result => result ?? []);
+  }
+
+  static addExistingItem(carpetaUuid: string, itemUuid: string): Promise<void> {
+    return apiRequest<void>(`/carpeta/add/${carpetaUuid}/item/existing/${itemUuid}`, {
+      method: 'POST',
+    }).then(() => {});
+  }
+
+  static removeItem(carpetaUuid: string, itemUuid: string): Promise<void> {
+    return apiRequest<void>(`/carpeta/delete/${carpetaUuid}/item/${itemUuid}`, {
+      method: 'DELETE',
+    }).then(() => {});
   }
 }
 

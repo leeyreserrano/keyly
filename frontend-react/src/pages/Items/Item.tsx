@@ -16,6 +16,7 @@ import Header from '../../components/Header';
 import ActionButtons from '../../components/ActionButtons';
 import { useTimeRefresh } from '../../components/UseTimeRefresh';
 import { getTimeAgo, formatDate } from '../../utils/timeUtils';
+import ShareModal from '../../components/ShareModal';
 
 export default function Item() {
   const navigate = useNavigate();
@@ -27,9 +28,10 @@ export default function Item() {
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openShareModal, setOpenShareModal] = useState(false);
   const [isFavorit, setIsFavorit] = useState(false);
 
-  const now = useTimeRefresh(60000); 
+  const now = useTimeRefresh(60000);
 
   useEffect(() => {
     if (!uuid) return;
@@ -43,7 +45,7 @@ export default function Item() {
 
         const found = allItems?.find((i) => i.uuid === uuid) ?? null;
         setItem(found);
-        setIsFavorit(found?.favorit ?? false); 
+        setIsFavorit(found?.favorit ?? false);
         setCarpetas(allCarpetas);
       } catch (error) {
         console.error('Error al cargar el item', error);
@@ -129,7 +131,9 @@ export default function Item() {
                 <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                   <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
                     {estaEnCarpeta && <FolderOutlinedIcon />}
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>{item.titol}</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                      {item.titol}
+                    </Typography>
                   </Stack>
 
                   <ActionButtons
@@ -137,6 +141,7 @@ export default function Item() {
                     onToggleFavorit={toggleFavorit}
                     onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
                     onDelete={handleDelete}
+                    onShare={(e) => { e.stopPropagation(); setOpenShareModal(true); }}
                     size="card"
                     gap={0.5}
                     showFolderIcon={false}
@@ -154,7 +159,7 @@ export default function Item() {
                     {showPassword
                       ? item.contrasenya
                       : item.contrasenya
-                      ? '••••••••'
+                      ? '********'
                       : 'No disponible'}
                   </Typography>
 
@@ -186,6 +191,16 @@ export default function Item() {
             onClose={() => setOpenDeleteModal(false)}
             onConfirm={confirmDelete}
           />
+
+          {item && (
+            <ShareModal
+              open={openShareModal}
+              onClose={() => setOpenShareModal(false)}
+              tipusEntitat="ITEM"
+              entitatUuid={item.uuid}
+              entitatNom={item.titol}
+            />
+          )}
         </Stack>
       </Stack>
     </AppTheme>

@@ -13,6 +13,9 @@ import {
   Alert,
   Divider,
   InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
@@ -23,6 +26,10 @@ import Sidebar from '../../components/Sidebar';
 import AppTheme from '../../theme/AppTheme';
 import Header from '../../components/Header';
 import { itemsApi, type Item } from '../../api/itemsapi';
+import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
+
+const NOVA_CARPETA_VALUE = '__nova__';
+const SENSE_CARPETA_VALUE = '__cap__';
 
 export default function EditItem() {
   const navigate = useNavigate();
@@ -41,6 +48,12 @@ export default function EditItem() {
   const [contrasenya, setContrasenya] = useState('');
   const [errors, setErrors] = useState<{ titol?: string; contrasenya?: string }>({});
 
+  const [carpetes, setCarpetes] = useState<Carpeta[]>([]);
+  const [carpetaOriginal, setCarpetaOriginal] = useState<string>(SENSE_CARPETA_VALUE);
+  const [carpetaSeleccionada, setCarpetaSeleccionada] = useState<string>(SENSE_CARPETA_VALUE);
+  const [novaCarpetaNom, setNovaCarpetaNom] = useState('');
+  const [novaCarpetaError, setNovaCarpetaError] = useState<string | undefined>();
+
   useEffect(() => {
     if (!uuid) {
       setLoadError("No s'ha especificat cap item.");
@@ -49,21 +62,35 @@ export default function EditItem() {
     }
     const loadData = async () => {
       try {
-        const allItems = await itemsApi.fetchItems();
+        const [allItems, allCarpetes] = await Promise.all([
+          itemsApi.fetchItems(),
+          carpetasApi.fetchItems(),
+        ]);
+
         if (!allItems) {
           setLoadError('Error carregant items.');
           return;
         }
+
         const found = allItems.find((i) => i.uuid === uuid);
-        if (found) {
-          setItem(found);
-          setTitol(found.titol);
-          setNomUsuari(found.nomUsuari);
-          setUrl(found.url);
-          setContrasenya(found.contrasenya);
-        } else {
+        if (!found) {
           setLoadError('Item no trobat.');
+          return;
         }
+
+        setItem(found);
+        setTitol(found.titol);
+        setNomUsuari(found.nomUsuari);
+        setUrl(found.url);
+        setContrasenya(found.contrasenya);
+        setCarpetes(allCarpetes);
+
+        const carpetaActual = allCarpetes.find((c) =>
+          c.items.some((i) => i.uuid === uuid)
+        );
+        const carpetaUuid = carpetaActual?.uuid ?? SENSE_CARPETA_VALUE;
+        setCarpetaOriginal(carpetaUuid);
+        setCarpetaSeleccionada(carpetaUuid);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Error carregant l'item";
         setLoadError(message);
@@ -79,6 +106,13 @@ export default function EditItem() {
     if (!titol.trim()) newErrors.titol = 'El títol és obligatori';
     if (!contrasenya.trim()) newErrors.contrasenya = 'La contrasenya és obligatòria';
     setErrors(newErrors);
+
+    if (carpetaSeleccionada === NOVA_CARPETA_VALUE && !novaCarpetaNom.trim()) {
+      setNovaCarpetaError('El nom de la carpeta és obligatori');
+      return false;
+    }
+    setNovaCarpetaError(undefined);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -87,6 +121,22 @@ export default function EditItem() {
     setSaving(true);
     try {
       await itemsApi.updateItem(item.uuid, { titol, nomUsuari, url, contrasenya });
+
+      const carpetaCanviada = carpetaSeleccionada !== carpetaOriginal;
+
+      if (carpetaCanviada) {
+        if (carpetaOriginal !== SENSE_CARPETA_VALUE) {
+          await carpetasApi.removeItem(carpetaOriginal, item.uuid);
+        }
+
+        if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
+          const novaCarpeta = await carpetasApi.addCarpeta({ nom: novaCarpetaNom });
+          await carpetasApi.addExistingItem(novaCarpeta.uuid, item.uuid);
+        } else if (carpetaSeleccionada !== SENSE_CARPETA_VALUE) {
+          await carpetasApi.addExistingItem(carpetaSeleccionada, item.uuid);
+        }
+      }
+
       toast.success('Item actualitzat correctament');
       navigate(-1);
     } catch (err: unknown) {
@@ -211,6 +261,40 @@ export default function EditItem() {
                     }}
                   />
                 </Stack>
+
+                <Stack spacing={0.5}>
+                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                    Carpeta
+                  </Typography>
+                  <FormControl fullWidth>
+                    <Select
+                      value={carpetaSeleccionada}
+                      onChange={(e) => setCarpetaSeleccionada(e.target.value)}
+                    >
+                      <MenuItem value={SENSE_CARPETA_VALUE}>Sense carpeta</MenuItem>
+                      {carpetes.map((c) => (
+                        <MenuItem key={c.uuid} value={c.uuid}>{c.nom}</MenuItem>
+                      ))}
+                      <MenuItem value={NOVA_CARPETA_VALUE}>+ Nova carpeta</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Stack>
+
+                {carpetaSeleccionada === NOVA_CARPETA_VALUE && (
+                  <Stack spacing={0.5}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                      Nom de la nova carpeta *
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      value={novaCarpetaNom}
+                      onChange={(e) => setNovaCarpetaNom(e.target.value)}
+                      error={!!novaCarpetaError}
+                      helperText={novaCarpetaError}
+                      placeholder="Ex: Xarxes socials"
+                    />
+                  </Stack>
+                )}
 
                 <Divider />
 
