@@ -50,6 +50,7 @@ CREATE TABLE `Usuaris` (
   `correu` VARCHAR(255) NOT NULL UNIQUE,
   `imatge` VARCHAR(255),
   `contrasenya_master` VARCHAR(60) NOT NULL,
+  `kdf_salt` VARBINARY(32),
   `data_creacio` TIMESTAMP NOT NULL,
   `data_ultim_login` TIMESTAMP,
   `pot_administrar` BOOLEAN NOT NULL DEFAULT FALSE,
@@ -75,13 +76,14 @@ CREATE TABLE `Items` (
   `titol` VARCHAR(255) NOT NULL,
   `nom_usuari` VARCHAR(255) NOT NULL,
   `contrasenya` VARCHAR(255) NOT NULL,
-  `iv` VARBINARY(12) NOT NULL,
+  `iv` VARBINARY(12),
   `url` VARCHAR(255) NULL,
   `notes` TEXT NULL,
   `favorit` BOOLEAN NULL DEFAULT FALSE,
   `data_creacio` TIMESTAMP NOT NULL,
   `data_editat` TIMESTAMP NULL,
   `ultim_access` TIMESTAMP NULL,
+  `comptador_access` BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_items_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`) ON DELETE CASCADE
 );
@@ -93,6 +95,9 @@ CREATE TABLE `Carpetes` (
   `nom` VARCHAR(255) NULL,
   `favorit` BOOLEAN NULL DEFAULT FALSE,
   `data_creacio` TIMESTAMP NOT NULL,
+  `data_editat` TIMESTAMP,
+  `ultim_access` TIMESTAMP,
+  `comptador_access` BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_carpetes_baguls` FOREIGN KEY (`bagul_id`) REFERENCES `Baguls` (`id`) ON DELETE CASCADE
 );

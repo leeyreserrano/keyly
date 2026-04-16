@@ -17,6 +17,7 @@ public record ItemResponse(
         LocalDateTime dataCreacio,
         LocalDateTime dataEditat,
         LocalDateTime ultimAccess,
+        Long comptadorAccess,
         boolean dinsDeCarpeta,
         BagulResponseBasic bagul) {
 
@@ -32,6 +33,7 @@ public record ItemResponse(
                 i.getDataCreacio(),
                 i.getDataEditat(),
                 i.getDataUltimAcces(),
+                i.getComptadorAccess(),
                 dinsDeCarpeta,
                 new BagulResponseBasic(i.getBagul(), i.getBagul().getPropietari()));
     }

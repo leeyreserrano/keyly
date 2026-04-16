@@ -1,6 +1,5 @@
 package com.keyly.service;
 
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -89,10 +88,6 @@ public class ItemService {
 
         Item item = new Item(b, i);
 
-        byte[] iv = new byte[12];
-        new SecureRandom().nextBytes(iv);
-        item.setIv(iv);
-
         if (item.getCarpetas() != null && !item.getCarpetas().isEmpty()) {
             Set<Carpeta> managed = new HashSet<>();
 
@@ -116,6 +111,8 @@ public class ItemService {
         Item item = getItemEntityByUuid(uuid);
 
         mapper.updateItemFromDto(request, item);
+
+        item.setDataEditat(LocalDateTime.now());
 
         Item itemGuardat = repo.save(item);
 
@@ -150,6 +147,18 @@ public class ItemService {
         repo.deleteByUuid(item.getUuid());
 
         return new ItemResponse(item, false);
+    }
+
+    public void registerAccess(UUID userUuid, UUID itemUuid) {
+        Usuari usuari = usuariService.getUsuariEntityByUuid(userUuid);
+
+        Item item = getUserItemEntity(usuari, itemUuid);
+
+        item.setDataUltimAcces(LocalDateTime.now());
+
+        item.setComptadorAccess(item.getComptadorAccess() + 1);
+
+        repo.save(item);
     }
     
 }

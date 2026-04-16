@@ -117,6 +117,15 @@ public class CarpetaController {
         return ResponseEntity.ok(items);
     }
 
+    @Operation(summary = "Registra un accéss al recurs", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @PostMapping("access/{uuid}")
+    public void access(@PathVariable UUID uuid) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        service.registerAccess(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid);
+    }
+
     @Operation(summary = "Crea una carpeta", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Carpeta creada"),

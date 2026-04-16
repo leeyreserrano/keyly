@@ -65,8 +65,17 @@ public class Carpeta {
     private Boolean favorit;
 
     @CreationTimestamp
-    @Column(name = "data_creacio")
+    @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
+
+    @Column(name = "data_editat", updatable = true)
+    private LocalDateTime dataEditat;
+
+    @Column(name = "ultim_access", updatable = true)
+    private LocalDateTime ultimAccess;
+
+    @Column(name = "comptador_access")
+    private Long comptadorAccess;
 
     public void addItem(Item item) {
         items.add(item);

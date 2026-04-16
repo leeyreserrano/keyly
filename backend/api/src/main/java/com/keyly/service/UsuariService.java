@@ -4,11 +4,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,7 +61,9 @@ public class UsuariService {
     @Autowired
     private UsuariMapper mapper;
 
-    private final Path root = Paths.get("/app/uploads/profile-pictures");
+    private final String IMAGES_PATH = "/app/uploads/profile-pictures/";
+
+    private final Path root = Paths.get(IMAGES_PATH);
 
     public List<UsuariResponse> getAllUsuaris() {
         return repo.findAll()
@@ -96,7 +103,9 @@ public class UsuariService {
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
         usuari.setContrasenya(contrasenyaEncriptada);
 
-        usuari.setImatge("/uploads/profile-pictures/" + u.nom().toUpperCase().charAt(0) + ".svg");
+        usuari.setKdfSalt(generateSalt());
+
+        usuari.setImatge(IMAGES_PATH + u.nom().toUpperCase().charAt(0) + ".svg");
 
         return new UsuariResponse(repo.save(usuari));
     }
@@ -121,27 +130,35 @@ public class UsuariService {
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
         usuari.setContrasenya(contrasenyaEncriptada);
 
-        usuari.setImatge("/uploads/profile-pictures/" + nouUsuari.nom().toUpperCase().charAt(0) + ".svg");
+        usuari.setKdfSalt(generateSalt());
+
+        usuari.setImatge(IMAGES_PATH + nouUsuari.nom().toUpperCase().charAt(0) + ".svg");
 
         return new UsuariResponse(repo.save(usuari));
+    }
+
+    private static byte[] generateSalt() {
+        byte[] salt = new byte[32];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        return salt;
     }
 
     public void saveImage(UUID uuid, MultipartFile file) {
         try {
             Files.createDirectories(root);
 
-            String fileName = file.getOriginalFilename();
+            String fileName = IMAGES_PATH + file.getOriginalFilename();
             Path destinationFile = root.resolve(fileName);
 
             Files.copy(file.getInputStream(), destinationFile);
 
-            String ruta = "/uploads/profile-pictures/" + fileName;
-
-            uploadImage(uuid, ruta);
+            uploadImage(uuid, fileName);
         } catch (IOException e) {
             throw new ImageException("La imatge no s'ha pogut guardar.");
         }
     }
+    
     public UsuariResponse update(UUID uuid, UsuariRequest request) {
         Usuari usuari = getUsuariEntityByUuid(uuid);
 
@@ -153,6 +170,8 @@ public class UsuariService {
             usuari.setRol(rolService.getRolEntityByUuid(request.rolUuid()));
 
         mapper.updateUsuariFromDto(request, usuari);
+
+        if (request.contrasenya() != null) usuari.setKdfSalt(generateSalt());
 
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
@@ -181,10 +200,36 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
+        if (request.contrasenya() != null) usuari.setKdfSalt(generateSalt());
+
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
 
         return new UsuariResponse(repo.save(usuari));
+    }
+
+    public ResponseEntity<Resource> getImatge(UUID userUuid) {
+            try {
+            Path imagePath = Paths.get(root.toString())
+                    .resolve(getByUuid(userUuid).imatge());
+
+            if (!Files.exists(imagePath)) {
+                throw new ImageException("Imatge no trobada");
+            }
+
+            Resource resource = new FileSystemResource(imagePath);
+
+            String contentType = Files.probeContentType(imagePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+        } catch (IOException e) {
+            throw new ImageException("Imatge no trobada");
+        }
     }
 
     private void uploadImage(UUID requesterUuid, String urlImage) {
