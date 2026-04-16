@@ -101,6 +101,8 @@ public class CarpetaService {
 
         Carpeta carpeta = new Carpeta(b, c);
 
+        carpeta.setDataEditat(LocalDateTime.now());
+
         return new CarpetaResponse(repo.save(carpeta));
     }
 
@@ -108,6 +110,8 @@ public class CarpetaService {
         Bagul b = bagulService.getBagulEntityByUsuariUuid(u.getUuid());
 
         Carpeta carpeta = new Carpeta(b, c);
+
+        carpeta.setDataEditat(LocalDateTime.now());
 
         return new CarpetaResponse(repo.save(carpeta));
     }
