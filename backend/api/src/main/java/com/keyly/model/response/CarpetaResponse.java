@@ -12,6 +12,9 @@ public record CarpetaResponse(
         String nom,
         Boolean favorit,
         LocalDateTime dataCreacio,
+        LocalDateTime dataEditat,
+        LocalDateTime ultimAccess,
+        Long comptadorAccess,
         List<ItemResponse> items) {
 
     public CarpetaResponse(Carpeta c) {
@@ -21,6 +24,9 @@ public record CarpetaResponse(
                 c.getNom(),
                 c.getFavorit(),
                 c.getDataCreacio(),
+                c.getDataEditat(),
+                c.getUltimAccess(),
+                c.getComptadorAccess(),
                 c.getItems()
                         .stream()
                         .map(item -> new ItemResponse(item, true))

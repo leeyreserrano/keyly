@@ -70,7 +70,6 @@ public class ItemController {
         return ResponseEntity.ok(item);
     }
 
-    @Deprecated
     @Operation(summary = "Obté un item per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Item trobat"),
@@ -85,6 +84,15 @@ public class ItemController {
                 .getUserItem(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Registra un accéss al recurs", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @PostMapping("access/{uuid}")
+    public void access(@PathVariable UUID uuid) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        service.registerAccess(UUID.fromString(authentication.getName()), uuid);
     }
 
     @Operation(summary = "Crea un item a l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))

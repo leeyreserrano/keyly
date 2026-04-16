@@ -70,6 +70,9 @@ public class Usuari {
     @Column(name = "contrasenya_master")
     private String contrasenya;
 
+    @Column(name = "kdf_salt")
+    private byte[] kdfSalt;
+
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;

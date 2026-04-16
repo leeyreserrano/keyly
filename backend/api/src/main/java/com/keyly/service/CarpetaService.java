@@ -1,5 +1,6 @@
 package com.keyly.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,10 +56,14 @@ public class CarpetaService {
     }
 
     public CarpetaResponse getUserCarpeta(Usuari usuari, UUID uuid) {
-        Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
+        return new CarpetaResponse(getUserEntityCarpeta(usuari, uuid));
+    }
 
-        return new CarpetaResponse(carpeta);
+    public Carpeta getUserEntityCarpeta(Usuari usuari, UUID carpetaUuid) {
+        Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, carpetaUuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
+
+        return carpeta;
     }
 
     /**
@@ -146,6 +151,8 @@ public class CarpetaService {
 
         mapper.updateCarpetaFromDto(request, carpeta);
 
+        carpeta.setDataEditat(LocalDateTime.now());
+
         Carpeta carpetaGuardada = repo.save(carpeta);
 
         return new CarpetaResponse(carpetaGuardada);
@@ -164,6 +171,8 @@ public class CarpetaService {
         }
 
         mapper.updateCarpetaFromDto(request, carpeta);
+
+        carpeta.setDataEditat(LocalDateTime.now());
 
         Carpeta carpetaGuardada = repo.save(carpeta);
 
@@ -202,6 +211,15 @@ public class CarpetaService {
 
     public boolean hasItemInAnyCarpeta(UUID itemUuid) {
         return (repo.existItemInCarpetes(itemUuid) > 0) ? true : false;
+    }
+
+    public void registerAccess(Usuari usuari, UUID carpetaUuid) {
+        Carpeta carpeta = getUserEntityCarpeta(usuari, carpetaUuid);
+
+        carpeta.setUltimAccess(LocalDateTime.now());
+        carpeta.setComptadorAccess(carpeta.getComptadorAccess() + 1);
+
+        repo.save(carpeta);
     }
 
 }

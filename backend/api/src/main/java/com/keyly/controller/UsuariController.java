@@ -1,17 +1,11 @@
 package com.keyly.controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,7 +53,7 @@ public class UsuariController {
             @ApiResponse(responseCode = "404", description = "Departament, sucursal o rol no trobats")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP')")
-    @PostMapping("add/admin/cap")
+    @PostMapping("add/admin")
     public ResponseEntity<UsuariResponse> addUsuari(@RequestBody UsuariRequest u) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -124,8 +118,8 @@ public class UsuariController {
 
     @Operation(summary = "Puja una imatge de perfil a l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "202", description = "Imatge pujada"),
-        @ApiResponse(responseCode = "400", description = "La imatge té una extensió no soportada")
+            @ApiResponse(responseCode = "202", description = "Imatge pujada"),
+            @ApiResponse(responseCode = "400", description = "La imatge té una extensió no soportada")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @PostMapping("upload/image")
@@ -143,41 +137,29 @@ public class UsuariController {
 
         return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
-
-    @Operation(summary = "Retorna l'imatge de perfil de l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    
+    @Operation(summary = "Retorna l'imatge del usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Imatge tornada"),
-        @ApiResponse(responseCode = "400", description = "Ha ocorregut un error"),
         @ApiResponse(responseCode = "404", description = "Imatge no trobada")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @GetMapping("get/image/{path}")
-    public ResponseEntity<Resource> getImage(@PathVariable String path) {
-        try {
-            if (path.contains("..") || path.startsWith("/")) {
-                return ResponseEntity.badRequest().build();
-            }
-            
-            Path imagePath = Paths.get("/app/uploads/profile-pictures").resolve(path);
-            
-            if (!Files.exists(imagePath)) {
-                return ResponseEntity.notFound().build();
-            }
-            
-            Resource resource = new FileSystemResource(imagePath);
+    @GetMapping("get/image")
+    public ResponseEntity<Resource> getUserImatge() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            String contentType = Files.probeContentType(imagePath);
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
+        return service.getImatge(UUID.fromString(authentication.getName()));
+    }
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(resource);
-
-        } catch (IOException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @Operation(summary = "Retorna l'imatge d'un usuari especificat", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Imatge tornada"),
+        @ApiResponse(responseCode = "404", description = "Imatge no trobada")
+    })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @GetMapping("get/image/{uuid}")
+    public ResponseEntity<Resource> getUserImatgeByUuid(@PathVariable UUID uuid) {
+        return service.getImatge(uuid);
     }
 
     @Operation(summary = "Elimina un usuari per UUID", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))

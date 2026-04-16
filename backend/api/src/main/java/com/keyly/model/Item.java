@@ -83,6 +83,9 @@ public class Item {
     @Column(name = "ultim_access", updatable = true)
     private LocalDateTime dataUltimAcces;
 
+    @Column(name = "comptador_access")
+    private Long comptadorAccess;
+
     public void addCarpeta(Carpeta carpeta) {
         carpetas.add(carpeta);
         carpeta.getItems().add(this);
