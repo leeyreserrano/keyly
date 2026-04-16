@@ -37,9 +37,9 @@ services:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      # - ./frontend/build:/usr/share/nginx/html/frontend # cuando tengas frontend
+      - ./frontend-react/dist:/usr/share/nginx/html
     networks:
-      - network 
+      - network
 
 volumes:
   mysql-data:
