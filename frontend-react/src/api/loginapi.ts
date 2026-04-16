@@ -1,5 +1,4 @@
 import { API_BASE } from './client';
-import type { Usuari } from '../context/AuthContext';
 
 export async function loginUser(correu: string, contrasenya: string) {
   const res = await fetch(`${API_BASE}/auth/login`, {

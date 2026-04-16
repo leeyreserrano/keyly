@@ -133,7 +133,6 @@ export default function Compartits() {
     return (
       <Grid container spacing={2}>
         {paginatedCompartits.map((compartit) => {
-          const nom = getNom(compartit);
           return (
             <Grid size={4} key={compartit.uuid}>
               <SharedCard
