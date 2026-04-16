@@ -27,7 +27,7 @@ INSERT INTO Rols (uuid, sucursal_id, nom) VALUES
 
 INSERT INTO Usuaris (uuid, sucursal_id, departament_id, rol_id, rol_intern, nom, correu, imatge,
 contrasenya_master, data_creacio,pot_administrar) VALUES
-(UUID_TO_BIN(UUID()), 2, 1, 1, 'ADMIN','Geri', 'user@domain.com', '/app/uploads/profile-pictures/G.svg',
+(UUID_TO_BIN("6d5bb973-39a8-11f1-8e13-960a7d88f8c4"), 2, 1, 1, 'ADMIN','Geri', 'user@domain.com', '/app/uploads/profile-pictures/G.svg',
 '$2a$12$gC/zYDtNNNJrejFER9FpLe6adKCXuWUJ2cjRe7QOXz8dz1OOf0nVi', NOW(), true),
 (UUID_TO_BIN(UUID()), 2, 2, 2, 'ADMIN', 'Yami', 'yami@gmail.com', '/app/uploads/profile-pictures/Y.svg',
 '$2a$12$WV7KWjmusFGOKrYQB9Kj5OeqCIqoui3XEOmcV4.MtWKkzHPT9auH2', NOW(), false),
@@ -57,13 +57,13 @@ INSERT INTO Carpetes_Items VALUES
 (2, 3),
 (2, 1);
 
-INSERT INTO Compartits (uuid, usuari_id, tipus_entitat, entitat_uuid, permisos, data_creacio) VALUES
-(UUID_TO_BIN(UUID()), 1, 'CARPETA', 
+INSERT INTO Compartits (uuid, usuari_id, creador_uuid,tipus_entitat, entitat_uuid, permisos, data_creacio) VALUES
+(UUID_TO_BIN(UUID()), 1, UUID_TO_BIN("6d5bb973-39a8-11f1-8e13-960a7d88f8c4"),'CARPETA', 
 (SELECT uuid FROM Carpetes WHERE id = 1 LIMIT 1),
 'ADMINISTRADOR', NOW()),
-(UUID_TO_BIN(UUID()), 2, 'ITEM', 
+(UUID_TO_BIN(UUID()), 2, UUID_TO_BIN("6d5bb973-39a8-11f1-8e13-960a7d88f8c4"),'ITEM', 
 (SELECT uuid FROM Items WHERE id = 2 LIMIT 1),
 'LECTURA', NOW()),
-(UUID_TO_BIN(UUID()), 2, 'ITEM', 
+(UUID_TO_BIN(UUID()), 2, UUID_TO_BIN("6d5bb973-39a8-11f1-8e13-960a7d88f8c4"),'ITEM', 
 (SELECT uuid FROM Items WHERE id = 1 LIMIT 1),
 'ESCRIPTURA', NOW());
