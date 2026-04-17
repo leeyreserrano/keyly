@@ -20,6 +20,6 @@ public interface CompartitRepo extends JpaRepository<Compartit, Long> {
 
     Optional<Compartit> findByUsuariAndUuid(@Param("usuari") Usuari usuari, @Param("uuid") UUID uuid);
 
-    Optional<Compartit> deleteByUuid(UUID uuid);
+    void deleteByUuid(UUID uuid);
 
 }

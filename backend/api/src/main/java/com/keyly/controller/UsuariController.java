@@ -47,6 +47,21 @@ public class UsuariController {
         return ResponseEntity.ok(service.getAllUsuaris());
     }
 
+    @Operation(summary = "Obté tots els usuaris de la mateixa sucursal del que fa la petició", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuaris retornats"),
+        @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+    })
+    @GetMapping("all")
+    public ResponseEntity<List<UsuariResponse>> getUsuaris() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        List<UsuariResponse> usuaris = service.getAllUsuarisBySucursal(UUID.fromString(authentication.getName()));
+
+        return ResponseEntity.ok(usuaris);
+    }
+    
+
     @Operation(summary = "Crea un usuari", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Usuari creat"),

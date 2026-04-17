@@ -2,6 +2,7 @@ package com.keyly.model.response.basics;
 
 import java.util.UUID;
 
+import com.keyly.model.Carpeta;
 import com.keyly.model.response.CarpetaResponse;
 
 public record CarpetaResponseBasic(
@@ -11,5 +12,11 @@ public record CarpetaResponseBasic(
         this(
                 c.uuid(),
                 c.nom());
+    }
+
+    public CarpetaResponseBasic(Carpeta c) {
+        this(
+                c.getUuid(),
+                c.getNom());
     }
 }

@@ -72,6 +72,13 @@ public class UsuariService {
                 .toList();
     }
 
+    public List<UsuariResponse> getAllUsuarisBySucursal(UUID usuariUuid) {
+        return repo.findBySucursalId(getUsuariEntityByUuid(usuariUuid).getSucursal().getId())
+                .stream()
+                .map(usuari -> new UsuariResponse(usuari))
+                .toList();
+    }
+
     public UsuariResponse getByUuid(UUID uuid) {
         Usuari usuari = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid));
@@ -158,7 +165,7 @@ public class UsuariService {
             throw new ImageException("La imatge no s'ha pogut guardar.");
         }
     }
-    
+
     public UsuariResponse update(UUID uuid, UsuariRequest request) {
         Usuari usuari = getUsuariEntityByUuid(uuid);
 
@@ -171,7 +178,8 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
-        if (request.contrasenya() != null) usuari.setKdfSalt(generateSalt());
+        if (request.contrasenya() != null)
+            usuari.setKdfSalt(generateSalt());
 
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
@@ -200,7 +208,8 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
-        if (request.contrasenya() != null) usuari.setKdfSalt(generateSalt());
+        if (request.contrasenya() != null)
+            usuari.setKdfSalt(generateSalt());
 
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
@@ -209,7 +218,7 @@ public class UsuariService {
     }
 
     public ResponseEntity<Resource> getImatge(UUID userUuid) {
-            try {
+        try {
             Path imagePath = Paths.get(root.toString())
                     .resolve(getByUuid(userUuid).imatge());
 
