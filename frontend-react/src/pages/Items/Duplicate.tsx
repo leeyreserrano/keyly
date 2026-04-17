@@ -7,8 +7,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
 import Skeleton from '@mui/material/Skeleton';
-import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
-import VpnKeyOffOutlinedIcon from '@mui/icons-material/VpnKeyOffOutlined';
+import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
 
 import AppTheme from '../../theme/AppTheme';
 import Sidebar from '../../components/Sidebar';
@@ -22,11 +21,19 @@ import { itemsApi, type Item } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
 
-export type FilterValue = 'latest' | 'most_used' | 'favorites';
-
 const ITEMS_PER_PAGE = 12;
 
-export default function Items() {
+function getDuplicatedItems(items: Item[]): Item[] {
+  const frequency: Record<string, number> = {};
+  items.forEach((i) => {
+    if (i.contrasenya) {
+      frequency[i.contrasenya] = (frequency[i.contrasenya] || 0) + 1;
+    }
+  });
+  return items.filter((i) => i.contrasenya && frequency[i.contrasenya] > 1);
+}
+
+export default function Duplicats() {
   const navigate = useNavigate();
 
   const [items, setItems] = useState<Item[]>([]);
@@ -35,7 +42,6 @@ export default function Items() {
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<FilterValue>('latest');
   const [page, setPage] = useState(1);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -62,32 +68,17 @@ export default function Items() {
     loadData();
   }, []);
 
-  // Reset página cuando cambia filtro o búsqueda
   useEffect(() => {
     setPage(1);
-  }, [search, filter]);
+  }, [search]);
 
-  // Filtrado y ordenación
-  const filteredItems = items
-    .filter((item) =>
-      filter === 'favorites'
-        ? item.favorit
-        : item.titol.toLowerCase().includes(search.toLowerCase()) ||
-        item.nomUsuari.toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (filter === 'latest')
-        return (
-          new Date(b.dataEditat).getTime() -
-          new Date(a.dataEditat).getTime()
-        );
-      if (filter === 'most_used')
-        return (
-          new Date(b.ultimAcces).getTime() -
-          new Date(a.ultimAcces).getTime()
-        );
-      return 0;
-    });
+  const duplicats = getDuplicatedItems(items);
+
+  const filteredItems = duplicats.filter(
+    (item) =>
+      item.titol.toLowerCase().includes(search.toLowerCase()) ||
+      item.nomUsuari.toLowerCase().includes(search.toLowerCase())
+  );
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
 
@@ -149,18 +140,15 @@ export default function Items() {
             color: 'text.disabled',
           }}
         >
-          <VpnKeyOffOutlinedIcon sx={{ fontSize: 64 }} />
+          <RepeatRoundedIcon sx={{ fontSize: 64 }} />
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
             {search
               ? 'Cap resultat per a la cerca'
-              : filter === 'favorites'
-                ? 'No tens cap favorit'
-                : 'No tens cap contrasenya guardada'}
+              : 'No hi ha contrasenyes duplicades'}
           </Typography>
-
-          {!search && filter !== 'favorites' && (
+          {!search && (
             <Typography variant="body2" color="text.secondary">
-              Afegeix la primera des del botó "+ Add New"
+              Totes les teves contrasenyes són úniques.
             </Typography>
           )}
         </Stack>
@@ -214,19 +202,18 @@ export default function Items() {
           }}
         >
           <Header
-            title="Items"
-            icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+            title="Contrasenyes duplicades"
+            icon={<RepeatRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+            showBackButton={true}
           />
 
           <ItemsToolbar
             search={search}
             setSearch={setSearch}
-            filter={filter}
-            setFilter={setFilter}
-            onAdd={() => navigate('/AddItem')}
+            sx={{ width: '100%', maxWidth: 1280, mx: 'auto' }}
           />
 
-          <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+          <Box sx={{ px: 4, pb: 3, flex: 1, pt: 3 }}>
             {renderContent()}
           </Box>
 

@@ -1,5 +1,5 @@
 import { Avatar } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE } from '../api/client';
 
@@ -8,27 +8,27 @@ interface UserAvatarProps {
 }
 
 export default function UserAvatar({ size = 36 }: UserAvatarProps) {
-  const { usuari, token } = useAuth();
+  const { token } = useAuth();
   const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!usuari?.imatge || !token) return;
-
-    let objectUrl: string | null = null;
+    if (!token) return;
 
     const loadImage = async () => {
       try {
-        const res = await fetch(
-          `${API_BASE}/usuari/get/image/${usuari.imatge}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await fetch(`${API_BASE}/usuari/get/image`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (!res.ok) throw new Error('Error loading image');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const blob = await res.blob();
-        objectUrl = URL.createObjectURL(blob);
-        setImgUrl(objectUrl);
-      } catch {
+        if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = URL.createObjectURL(blob);
+        setImgUrl(objectUrlRef.current);
+      } catch (e) {
+        console.error('UserAvatar fetch error:', e);
         setImgUrl(null);
       }
     };
@@ -36,10 +36,14 @@ export default function UserAvatar({ size = 36 }: UserAvatarProps) {
     loadImage();
 
     return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
     };
-  }, [usuari?.imatge, token]);
+  }, [token]);
 
+  const { usuari } = useAuth();
   const initial = usuari?.nom?.charAt(0).toUpperCase() ?? '?';
 
   return (
