@@ -131,6 +131,22 @@ public class UsuariController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Actualitza el usuari que fa la petició", description = "USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
+        @ApiResponse(responseCode = "404", description = "Usuari/Departament/Rol/Sucursal no trobat"),
+        @ApiResponse(responseCode = "409", description = "Correu no válid")
+    })
+    @PreAuthorize("hasRole('USUARI')")
+    @PutMapping("update")
+    public ResponseEntity<UsuariResponse> updateUsuari(@RequestBody UsuariRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UsuariResponse response = service.update(UUID.fromString(authentication.getName()), request);
+
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Puja una imatge de perfil a l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Imatge pujada"),
