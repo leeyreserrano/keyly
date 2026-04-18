@@ -6,24 +6,10 @@ import java.util.UUID;
 import com.keyly.model.enums.Permisos;
 import com.keyly.model.enums.TipusEntitat;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 public record CompartitRequest(
-    List<UsuariPerCompartir> usuaris,
+    UUID entitatUuid,
     TipusEntitat tipusEntitat,
-    CarpetaRequest carpeta,
-    ItemRequest item
-
+    List<UUID> usuarisUuid,
+    Permisos permisos
 ) {
-
-}
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class UsuariPerCompartir {
-    UUID uuid;
-    Permisos permis;
 }
