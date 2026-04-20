@@ -87,7 +87,7 @@ public class ItemService {
         Bagul b = bagulService.getBagulEntityByUsuariUuid(u.uuid());
 
         Item item = new Item(b, i);
-
+        
         if (item.getCarpetas() != null && !item.getCarpetas().isEmpty()) {
             Set<Carpeta> managed = new HashSet<>();
 
