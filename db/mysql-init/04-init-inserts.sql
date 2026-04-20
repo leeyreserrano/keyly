@@ -26,11 +26,11 @@ INSERT INTO Rols (uuid, sucursal_id, nom) VALUES
 
 
 INSERT INTO Usuaris (uuid, sucursal_id, departament_id, rol_id, rol_intern, nom, correu, imatge,
-contrasenya_master, data_creacio,pot_administrar) VALUES
+contrasenya_master, kdf_salt,data_creacio,pot_administrar) VALUES
 (UUID_TO_BIN("6d5bb973-39a8-11f1-8e13-960a7d88f8c4"), 2, 1, 1, 'ADMIN','Geri', 'user@domain.com', '/app/uploads/profile-pictures/G.svg',
-'$2a$12$gC/zYDtNNNJrejFER9FpLe6adKCXuWUJ2cjRe7QOXz8dz1OOf0nVi', NOW(), true),
+'$2a$12$gC/zYDtNNNJrejFER9FpLe6adKCXuWUJ2cjRe7QOXz8dz1OOf0nVi', "­\óu S°G   !¥bÑ®gfø:E ×9  Ì:ó¬ @", NOW(), true),
 (UUID_TO_BIN(UUID()), 2, 2, 2, 'ADMIN', 'Yami', 'yami@gmail.com', '/app/uploads/profile-pictures/Y.svg',
-'$2a$12$WV7KWjmusFGOKrYQB9Kj5OeqCIqoui3XEOmcV4.MtWKkzHPT9auH2', NOW(), false),
+'$2a$12$WV7KWjmusFGOKrYQB9Kj5OeqCIqoui3XEOmcV4.MtWKkzHPT9auH2', "­\óu S°G   !¥bÑ®gfø:E ×9  Ì:ó¬ @",NOW(), false),
 (UUID_TO_BIN(UUID()), 2, 2, 1, 'CAP','Ley', 'ley@insgabrielamistral.cat', '/app/uploads/profile-pictures/L.svg',
 '$2a$12$moNVzQp13kG/cFVets45s.wtLNnekKndjFiSgPAz8QNsCR6UAf/wy', NOW(), true),
 (UUID_TO_BIN(UUID()), 1, 2, 1, 'USUARI','Pau', 'p@gmail.com', '/app/uploads/profile-pictures/P.svg',

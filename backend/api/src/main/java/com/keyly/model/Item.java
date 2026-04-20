@@ -1,5 +1,6 @@
 package com.keyly.model;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -101,6 +102,7 @@ public class Item {
         this.titol = request.titol();
         this.nomUsuari = request.nomUsuari();
         this.contrasenya = request.contrasenya();
+        this.iv = request.iv().getBytes(StandardCharsets.UTF_8);
         this.url = request.url();
         this.notes = request.notes();
         this.favorit = request.favorit();
