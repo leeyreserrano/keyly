@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -40,6 +41,7 @@ public class ItemsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
     private EditText etCercar;
+    private ImageButton btnAddItem;
     private ImageView btnFiltres;
     private BottomNavigationView menu;
     private boolean filtrat = false;
@@ -196,6 +198,37 @@ public class ItemsActivity extends AppCompatActivity {
             });
 
         });
+
+        btnAddItem = findViewById(R.id.add_item);
+        btnAddItem.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("add_edit", 1);
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
+        requestItem.getAllItems().enqueue(new Callback<ArrayList<Item>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    items.clear();
+                    items.addAll(response.body());
+                    itemAdapter.notifyDataSetChanged();
+                    actulitzarItems(items);
+                    recyclerView.setVisibility(RecyclerView.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
+                recyclerView.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void resultatsCerca(String titolItem) {
@@ -210,12 +243,14 @@ public class ItemsActivity extends AppCompatActivity {
 
         itemAdapter = new ItemAdapter(llistaFiltradaItems, item -> {
             Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("uuid", item.getUuid().toString());
             intent.putExtra("title", item.getTitol());
             intent.putExtra("url", item.getUrl());
-            intent.putExtra("propietari", item.getNomUsuari());
+            intent.putExtra("nom_usuari", item.getNomUsuari());
             intent.putExtra("password", item.getContrasenya());
             intent.putExtra("notes", item.getNotes());
             intent.putExtra("fav", item.isFavorit());
+            intent.putExtra("add_edit", 0);
             startActivity(intent);
         });
         recyclerView.setAdapter(itemAdapter);
@@ -254,12 +289,14 @@ public class ItemsActivity extends AppCompatActivity {
     private void actulitzarItems(ArrayList<Item> items) {
         itemAdapter = new ItemAdapter(items, item -> {
             Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("uuid", item.getUuid().toString());
             intent.putExtra("title", item.getTitol());
             intent.putExtra("url", item.getUrl());
-            intent.putExtra("propietari", item.getNomUsuari());
+            intent.putExtra("nom_usuari", item.getNomUsuari());
             intent.putExtra("password", item.getContrasenya());
             intent.putExtra("notes", item.getNotes());
             intent.putExtra("fav", item.isFavorit());
+            intent.putExtra("add_edit", 0);
             startActivity(intent);
         });
         recyclerView.setAdapter(itemAdapter);

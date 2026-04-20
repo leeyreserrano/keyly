@@ -1,5 +1,6 @@
 package com.example.keyly_projecte_intermodular.dao;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,12 +9,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Carpeta {
+public class Carpeta implements Serializable {
     private UUID uuid;
     private Bagul bagul;
     private String nom;
     private boolean favorit;
-    private String data_creacio;
+    private String dataCreacio;
     private List<Item> items;
 
 }

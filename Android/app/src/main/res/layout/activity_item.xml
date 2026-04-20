@@ -64,62 +64,124 @@
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp">
 
-            <LinearLayout
+            <ImageButton
+                android:id="@+id/imgBtnEditStar"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/editar"
+                android:backgroundTint="@color/transparent"
+                android:layout_gravity="right|top"
+                android:scaleType="fitXY"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/ll_nom_item"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="55dp"
                     android:orientation="horizontal"
                     android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/txtNomItem"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Nom Item"
-                        android:fontFamily="@font/airbnb_cereal_w_bd"
-                        android:textSize="20dp"
-                        android:textColor="@color/black"/>
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtTitleItem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nom Item"
+                            android:fontFamily="@font/airbnb_cereal_w_bd"
+                            android:textSize="20dp"
+                            android:textColor="@color/black"
+                            android:visibility="gone"/>
+
+                        <EditText
+                            android:id="@+id/etNomItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:paddingStart="12dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:hint="Nom Item"
+                            android:background="@drawable/background_text_notes"
+                            android:visibility="visible"/>
+
+                    </LinearLayout>
 
                     <ImageButton
                         android:id="@+id/imgBtnStar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/star"
-                        android:backgroundTint="@color/transparent"/>
+                        android:backgroundTint="@color/transparent"
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txtLlocItem"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Lloc:"
-                    android:fontFamily="@font/manrope_regular"
-                    android:textSize="15dp"
-                    android:textColor="@color/light_grey"/>
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/txtPropietariItem"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/txtLlocItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lloc:"
+                        android:fontFamily="@font/manrope_regular"
+                        android:textSize="15dp"
+                        android:textColor="@color/light_grey"
+                        android:visibility="gone"/>
+
+                    <EditText
+                        android:id="@+id/etLlocItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:paddingStart="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:hint="https://domain.com"
+                        android:background="@drawable/background_text_notes"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Propietari:"
-                    android:fontFamily="@font/manrope_regular"
-                    android:textSize="15dp"
-                    android:textColor="@color/light_grey"/>
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtNomUsuariItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nom d'usuari:"
+                        android:fontFamily="@font/manrope_regular"
+                        android:textSize="15dp"
+                        android:textColor="@color/light_grey"
+                        android:visibility="gone"/>
+
+                    <EditText
+                        android:id="@+id/etNomUsuariItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:paddingStart="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:hint="nom@mail.com"
+                        android:background="@drawable/background_text_notes"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
 
             </LinearLayout>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/editar"
-                android:backgroundTint="@color/white"
-                android:layout_gravity="right|top"
-                android:scaleType="fitXY"/>
 
         </FrameLayout>
 
@@ -140,27 +202,35 @@
             android:layout_marginEnd="20dp">
 
             <LinearLayout
-                android:layout_width="320dp"
+                android:id="@+id/ll_password"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
                 android:orientation="horizontal"
                 android:background="@drawable/backgroung_edit_text_password">
 
                 <EditText
-                    android:id="@+id/editTextTextPassword2"
-                    android:layout_width="220dp"
+                    android:id="@+id/et_password"
+                    android:layout_width="267dp"
                     android:layout_height="45dp"
                     android:paddingStart="15dp"
-                    android:text="····················"
+                    android:textColor="@color/not_enabled"
+                    android:hint="Contrasenya"
+                    android:enabled="false"
                     android:inputType="textPassword"
                     android:background="@color/transparent"/>
 
                 <LinearLayout
+                    android:id="@+id/ll_actions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_gravity="right|center">
+                    android:layout_gravity="right|center"
+                    android:visibility="visible">
 
                     <ImageButton
+                        android:id="@+id/imbBtnCopy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/copy"
@@ -168,6 +238,7 @@
                         android:scaleType="fitXY"/>
 
                     <ImageButton
+                        android:id="@+id/imgBtnEye"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/visibility"
@@ -179,16 +250,18 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/imgBtnGenerate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/generate_password"
                 android:backgroundTint="@color/transparent"
                 android:scaleType="fitXY"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:visibility="visible"/>
             
         </LinearLayout>
 
-        <EditText
+        <TextView
             android:id="@+id/txtNotes"
             android:layout_width="match_parent"
             android:layout_height="45dp"
@@ -197,12 +270,31 @@
             android:layout_marginEnd="20dp"
             android:paddingStart="20dp"
             android:paddingTop="10dp"
+            android:gravity="start|top"
             android:text="Notes..."
+            android:textSize="18dp"
+            android:background="@drawable/backgroung_edit_text_password"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/etNotes"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:hint="Notes..."
+            android:textColor="@color/not_enabled"
+            android:enabled="false"
             android:gravity="start|top"
             android:inputType="textMultiLine"
-            android:background="@drawable/background_text_notes"/>
+            android:background="@drawable/background_text_notes"
+            android:visibility="visible"/>
 
         <Button
+            android:id="@+id/btnGuardarItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"

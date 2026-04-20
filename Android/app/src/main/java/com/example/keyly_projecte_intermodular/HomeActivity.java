@@ -74,41 +74,7 @@ public class HomeActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();*/
 
-        itemAdapter = new ItemAdapter(items, item -> {
-            Intent intent = new Intent(this, ItemActivity.class);
-            intent.putExtra("title", item.getTitol());
-            intent.putExtra("url", item.getUrl());
-            intent.putExtra("propietari", item.getNomUsuari());
-            intent.putExtra("password", item.getContrasenya());
-            intent.putExtra("notes", item.getNotes());
-            intent.putExtra("fav", item.isFavorit());
-            startActivity(intent);
-        });
-        recyclerView.setAdapter(itemAdapter);
-
-        ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
-
-        // Obtenir un item en concret
-        //requestItem.getItem("1").enqueue(new Callback<ItemData>() {
-        requestItem.getAllItems().enqueue(new Callback<ArrayList<Item>>() {
-            @Override
-            public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d("RESPONSE", response.toString());
-                    items.clear();
-                    items.addAll(response.body());
-                    itemAdapter.notifyDataSetChanged();
-                    recyclerView.setVisibility(RecyclerView.VISIBLE);
-                    layoutError.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
-                layoutError.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-            }
-        });
+        actualizarInfo();
 
 
         // Carregar el JSON
@@ -162,6 +128,51 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
             return false;
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        actualizarInfo();
+    }
+
+    private void actualizarInfo() {
+        itemAdapter = new ItemAdapter(items, item -> {
+            Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("uuid", item.getUuid().toString());
+            intent.putExtra("title", item.getTitol());
+            intent.putExtra("url", item.getUrl());
+            intent.putExtra("nom_usuari", item.getNomUsuari());
+            intent.putExtra("password", item.getContrasenya());
+            intent.putExtra("notes", item.getNotes());
+            intent.putExtra("fav", item.isFavorit());
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(itemAdapter);
+
+        ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
+
+        // Obtenir un item en concret
+        //requestItem.getItem("1").enqueue(new Callback<ItemData>() {
+        requestItem.getAllItems().enqueue(new Callback<ArrayList<Item>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("RESPONSE", response.toString());
+                    items.clear();
+                    items.addAll(response.body());
+                    itemAdapter.notifyDataSetChanged();
+                    recyclerView.setVisibility(RecyclerView.VISIBLE);
+                    layoutError.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
+                layoutError.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            }
         });
     }
 }

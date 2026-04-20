@@ -19,6 +19,8 @@ import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.rest_api.APIUsuari;
 import com.example.keyly_projecte_intermodular.rest_api.ApiService;
 import com.example.keyly_projecte_intermodular.rest_api.TokenResponse;
+import com.example.keyly_projecte_intermodular.rest_api.UsuariResponse;
+import com.example.keyly_projecte_intermodular.utils.Encrypt;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -141,8 +143,17 @@ public class LoginActivity extends AppCompatActivity {
 
                         Gson gson = new Gson();
                         TokenResponse token = gson.fromJson(ResponseJSON, TokenResponse.class);
+                        UsuariResponse usuariResponse = gson.fromJson(ResponseJSON, UsuariResponse.class);
+
+                        Usuari usuari = usuariResponse.getUsuari();
+
+                        Log.d("USUARI", usuari.toString());
 
                         tokenNou = token.getToken();
+
+                        Encrypt.clauDerivada = Encrypt.clauDerivada(password, usuari.getKdfSalt());
+
+                        Log.d("CLAU_DERIVADA", Encrypt.clauDerivada.toString());
 
                         Toast.makeText(LoginActivity.this, "Login correcto", Toast.LENGTH_SHORT).show();
 

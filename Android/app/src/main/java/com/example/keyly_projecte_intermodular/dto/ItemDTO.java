@@ -15,13 +15,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.*;
 
@@ -33,6 +39,22 @@ public class ItemDTO {
         // Obtenir tots els items
         @GET("/api/item/get/all")
         Call<ArrayList<Item>> getAllItems();
+
+        // Afegir un item
+        @POST("/api/item/add")
+        Call<Item> addItem(@Body Item item);
+
+        // Incrementar accés a un item
+        @POST("/api/item/access/{uuid}")
+        Call<Item> accessItem(@Path("uuid") String uuid);
+
+        // Actualitzar un item per UUID
+        @PUT("/api/item/update/{uuid}")
+        Call<Item> updateItem(@Path("uuid") String uuid, @Body Item item);
+
+        // Eliminar un item per UUID
+        @DELETE("/api/item/delete/{uuid}")
+        Call<Item> deleteItem(@Path("uuid") String uuid);
     }
 
     public static Retrofit obtenirJSONItem() {

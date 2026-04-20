@@ -2,9 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="light_grey">#F8F8F8</color>
+    <color name="light_grey">#8F8F8F</color>
     <color name="grey">#E0E0E0</color>
     <color name="dark_grey">#ACACAC</color>
+    <color name="not_enabled">#676767</color>
     <color name="blue_selected">#3E92CC</color>
     <color name="purple_button">#AB3DF0</color>
     <color name="purple_light">#B17DDE</color>

@@ -46,44 +46,59 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/nomCarpeta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:text="Items"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="0dp"
+            android:text="Nom carpeta"
             android:textSize="25dp"
             android:textColor="@color/black"
             android:fontFamily="@font/airbnb_cereal_w_bd"/>
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:paddingTop="5dp"-->
-<!--            android:paddingBottom="5dp"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:background="@drawable/background_search">-->
+        <TextView
+            android:id="@+id/dataCreacio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="10dp"
+            android:text="Data creació:"
+            android:textSize="15dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/manrope_regular"/>
 
-<!--            <ImageButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/filtro_rayas"-->
-<!--                android:backgroundTint="@color/transparent"/>-->
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginStart="20dp"-->
+        <!--            android:paddingTop="5dp"-->
+        <!--            android:paddingBottom="5dp"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            android:background="@drawable/background_search">-->
 
-<!--            <EditText-->
-<!--                android:layout_width="250dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_marginStart="10dp"-->
-<!--                android:layout_marginEnd="20dp"-->
-<!--                android:text="Cercar..."-->
-<!--                android:backgroundTint="@color/transparent"/>-->
+        <!--            <ImageButton-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:src="@drawable/filtro_rayas"-->
+        <!--                android:backgroundTint="@color/transparent"/>-->
 
-<!--            <ImageButton-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/lupa"-->
-<!--                android:backgroundTint="@color/transparent"/>-->
+        <!--            <EditText-->
+        <!--                android:layout_width="250dp"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:layout_marginStart="10dp"-->
+        <!--                android:layout_marginEnd="20dp"-->
+        <!--                android:text="Cercar..."-->
+        <!--                android:backgroundTint="@color/transparent"/>-->
 
-<!--        </LinearLayout>-->
+        <!--            <ImageButton-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:src="@drawable/lupa"-->
+        <!--                android:backgroundTint="@color/transparent"/>-->
+
+        <!--        </LinearLayout>-->
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -154,7 +169,6 @@
         android:elevation="8dp"/>
 
     <ImageButton
-        android:id="@+id/add_item"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_gravity="bottom|right"

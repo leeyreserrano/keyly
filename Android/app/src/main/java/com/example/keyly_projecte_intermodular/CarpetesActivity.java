@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -127,9 +128,11 @@ public class CarpetesActivity extends AppCompatActivity {
 
         carpetesAdapter = new CarpetaAdapter(llistaFiltradaCarpetes, carpeta -> {
             Intent intent = new Intent(this, CarpetaActivity.class);
-            intent.putExtra("title", carpeta.getNom());
+            intent.putExtra("nom", carpeta.getNom());
             intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
-            intent.putExtra("data_creacio", carpeta.getData_creacio());
+            intent.putExtra("data_creacio", carpeta.getDataCreacio());
+            Log.d("DATA_CREACIO", carpeta.getDataCreacio());
+            startActivity(intent);
         });
         recyclerView.setAdapter(carpetesAdapter);
     }
@@ -137,9 +140,11 @@ public class CarpetesActivity extends AppCompatActivity {
     private void actulitzarCarpetes(ArrayList<Carpeta> carpetes) {
         carpetesAdapter = new CarpetaAdapter(carpetes, carpeta -> {
             Intent intent = new Intent(this, CarpetaActivity.class);
-            intent.putExtra("title", carpeta.getNom());
+            intent.putExtra("nom", carpeta.getNom());
             intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
-            intent.putExtra("data_creacio", carpeta.getData_creacio());
+            intent.putExtra("data_creacio", carpeta.getDataCreacio());
+            Log.d("DATA_CREACIO", carpeta.getDataCreacio());
+            startActivity(intent);
         });
         recyclerView.setAdapter(carpetesAdapter);
     }
