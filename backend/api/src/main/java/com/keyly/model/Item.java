@@ -1,7 +1,7 @@
 package com.keyly.model;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -102,7 +102,7 @@ public class Item {
         this.titol = request.titol();
         this.nomUsuari = request.nomUsuari();
         this.contrasenya = request.contrasenya();
-        this.iv = request.iv().getBytes(StandardCharsets.UTF_8);
+        this.iv = Base64.getDecoder().decode(request.iv());
         this.url = request.url();
         this.notes = request.notes();
         this.favorit = request.favorit();
