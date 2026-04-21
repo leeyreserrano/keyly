@@ -29,6 +29,21 @@ services:
       - network
     command: 
       --character-set-server=utf8mb4
+  
+  cassandra:
+    image: cassandra:5.0.8
+    container_name: keyly-cassandra
+    ports:
+      - "${CASSANDRA_PORT_LOCAL}:${CASSANDRA_PORT_DOCKER}"
+    environment:
+      - MAX_HEAP_SIZE=1G
+      - HEAP_NEWSIZE=256M
+      - CASSANDRA_USER=${CASSANDRA_USER}
+      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    networks:
+      - network
 
   nginx:
     image: nginx:alpine
@@ -43,6 +58,7 @@ services:
 
 volumes:
   mysql-data:
+  cassandra-data:
   uploads:
 
 networks:
