@@ -4,19 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.keyly.model.request.GeneracioContrasenyaRequest;
 import com.keyly.model.response.GeneracioContrasenyaResponse;
+import com.keyly.model.response.PawnedPasswordResponse;
+import com.keyly.repo.PwnedHashRepo;
 
 @Service
 public class UtilsService {
 
+    @Autowired
+    private PwnedHashRepo repo;
+
     public GeneracioContrasenyaResponse generacioContrasenyaPersonalitzada(GeneracioContrasenyaRequest request) {
         List<Character> passwordChars = new ArrayList<>();
 
-        if (request.quantitatMay() + request.quantitatNumeros() + request.quantitatCaractersEspecials() > request.longitud()) {
-            throw new IllegalArgumentException("La longitud total de los caracteres no puede ser mayor que la longitud de la contraseña.");
+        if (request.quantitatMay() + request.quantitatNumeros() + request.quantitatCaractersEspecials() > request
+                .longitud()) {
+            throw new IllegalArgumentException(
+                    "La longitud total de los caracteres no puede ser mayor que la longitud de la contraseña.");
         }
 
         if (request.may()) {
@@ -51,6 +59,14 @@ public class UtilsService {
         }
 
         return new GeneracioContrasenyaResponse(shuffledPassword.toString());
+    }
+
+    public List<PawnedPasswordResponse> pawnedPassword(String prefix, String suffix) {
+        return repo.findByKeyPrefix(prefix)
+                .stream()
+                .filter(sha1 -> sha1.getKey().getSha1().startsWith(suffix))
+                .map(PawnedPasswordResponse::new)
+                .toList();
     }
 
 }

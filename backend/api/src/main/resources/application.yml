@@ -2,3 +2,11 @@ springdoc:
   swagger-ui:
     operationsSorter: method
     tagsSorter: alpha
+
+spring:
+  cassandra:
+    contact-points: cassandra
+    port: 9042
+    keyspace-name: hibp
+    local-datacenter: datacenter1
+    schema-action: create-if-not-exists
