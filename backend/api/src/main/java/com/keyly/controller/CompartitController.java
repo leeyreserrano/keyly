@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.keyly.model.request.CompartitRequest;
+import com.keyly.model.request.combined.CombinedCarpetaRequestCompartitRequest;
+import com.keyly.model.request.combined.CombinedItemRequestCompartitRequest;
 import com.keyly.model.response.CompartitResponse;
 import com.keyly.service.CompartitService;
 
@@ -79,6 +81,41 @@ public class CompartitController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
+
+    @Operation(summary = "Crea un item i el comparteix a múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Item creat i compartit"),
+        @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+        @ApiResponse(responseCode = "404", description = "Usuari o item no trobat")
+    })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @PostMapping("add/item")
+    public ResponseEntity<HttpStatus> createCompartit(@RequestBody CombinedItemRequestCompartitRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID creadorUuid = UUID.fromString(authentication.getName());
+
+        service.createCompartit(creadorUuid, request.itemRequest(), request.compartitRequest());
+
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Crea una carpeta i la comparteix a múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Carpeta creada i compartida"),
+        @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+        @ApiResponse(responseCode = "404", description = "Usuari o carpeta no trobat")
+    })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @PostMapping("add/carpeta")
+    public ResponseEntity<HttpStatus> createCompartit(@RequestBody CombinedCarpetaRequestCompartitRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID creadorUuid = UUID.fromString(authentication.getName());
+
+        service.createCompartit(creadorUuid, request.carpetaRequest(), request.compartitRequest());
+
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+    
 
     @Operation(summary = "Elimina un compartit", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
