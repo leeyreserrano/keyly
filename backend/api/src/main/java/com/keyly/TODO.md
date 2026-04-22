@@ -1,1 +1,0 @@
-- Hacer que se pueda crear un compartido pasando directamente la entidad para que también se cree la entidad
