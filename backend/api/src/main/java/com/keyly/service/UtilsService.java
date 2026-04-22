@@ -7,10 +7,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.keyly.cassandra.repo.PwnedHashRepo;
 import com.keyly.model.request.GeneracioContrasenyaRequest;
 import com.keyly.model.response.GeneracioContrasenyaResponse;
 import com.keyly.model.response.PawnedPasswordResponse;
+import com.keyly.repo.PwnedHashRepo;
 
 @Service
 public class UtilsService {
@@ -61,10 +61,11 @@ public class UtilsService {
         return new GeneracioContrasenyaResponse(shuffledPassword.toString());
     }
 
-    public List<PawnedPasswordResponse> pawnedPassword(String hash) {
-        return repo.findByKeyPrefix(hash)
+    public List<PawnedPasswordResponse> pawnedPassword(String prefix, String suffix) {
+        return repo.findByKeyPrefix(prefix)
                 .stream()
-                .map(sha1 -> new PawnedPasswordResponse(sha1))
+                .filter(sha1 -> sha1.getKey().getSha1().startsWith(suffix))
+                .map(PawnedPasswordResponse::new)
                 .toList();
     }
 

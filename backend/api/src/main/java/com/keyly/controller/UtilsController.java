@@ -37,9 +37,9 @@ public class UtilsController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @PostMapping("pwned/password/{hash}")
-    public ResponseEntity<List<PawnedPasswordResponse>> pawnedPasswords(@PathVariable String hash) {
-        return ResponseEntity.ok(service.pawnedPassword(hash));
+    @PostMapping("pwned/password/{prefix}/{suffix}")
+    public ResponseEntity<List<PawnedPasswordResponse>> pawnedPasswords(@PathVariable String prefix, @PathVariable String suffix) {
+        return ResponseEntity.ok(service.pawnedPassword(prefix, suffix));
     }
 
 }
