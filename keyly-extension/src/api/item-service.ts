@@ -8,7 +8,23 @@ export class itemsApi {
     const response = await fetch(API_BASE + "/item/get/all", {
       headers: { Authorization: `Bearer ${token}` }
     })
-    if (!response.ok) throw new Error("Error en la petición")
+    if (!response.ok) throw new Error("Error en la petició")
+    return response.json()
+  }
+
+  static async updateItem(item: Item): Promise<void> {
+    const token = localStorage.getItem("jwtToken")
+
+    const response = await fetch(API_BASE + `/item/update/${item.uuid}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(item)
+    })
+
+    if (!response.ok) throw new Error("Error en la petició")
     return response.json()
   }
 

@@ -54,6 +54,41 @@ function Home() {
       compartit.carpeta?.nom?.toLowerCase().includes(search.toLowerCase())
   )
 
+  const handleFavoriteItemClick = async (item: Item) => {
+    const updatedItem = {
+      ...item,
+      favorit: !item.favorit
+    }
+
+    try {
+      setItems((prev) =>
+        prev.map((i) => (i.uuid === item.uuid ? updatedItem : i))
+      )
+
+      await itemsApi.updateItem(updatedItem)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleFavoriteCarpetaClick = async (carpeta: Carpeta) => {
+    const updatedCarpeta = {
+      ...carpeta,
+      favorit: !carpeta.favorit
+    }
+
+    try {
+      setCarpetas((prev) =>
+        prev.map((i) => (i.uuid === carpeta.uuid ? updatedCarpeta : i))
+      )
+
+      await carpetasApi.updateCarpeta(updatedCarpeta)
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
   return (
     <div className="p-5">
       {loading ? (
@@ -124,6 +159,10 @@ function Home() {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill={item.favorit ? "currentColor" : "none"}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFavoriteItemClick(item)
+                      }}
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke={item.favorit ? "#facc15" : "currentColor"}
