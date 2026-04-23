@@ -20,9 +20,7 @@ import com.keyly.model.request.ItemRequest;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.CompartitResponse;
 import com.keyly.model.response.ItemResponse;
-import com.keyly.model.response.basics.CarpetaResponseBasic;
-import com.keyly.model.response.basics.ItemResponseBasic;
-import com.keyly.model.response.basics.UsuariResponseBasic;
+import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.CompartitRepo;
 
 @Service
@@ -126,28 +124,28 @@ public class CompartitService {
 
     private CompartitResponse convertToResponse(Compartit compartit) {
         Usuari creador = usuariService.getUsuariEntityByUuid(compartit.getCreadorUuid());
-        UsuariResponseBasic creadorBasic = new UsuariResponseBasic(creador);
+        UsuariResponse creadorResponse = new UsuariResponse(creador);
 
-        CarpetaResponseBasic carpetaBasic = null;
-        ItemResponseBasic itemBasic = null;
+        CarpetaResponse carpetaResponse = null;
+        ItemResponse itemResponse = null;
 
         if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
             try {
                 Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(compartit.getEntitatUuid());
-                carpetaBasic = new CarpetaResponseBasic(carpeta);
+                carpetaResponse = new CarpetaResponse(carpeta);
             } catch (EntitatNoTrobadaException e) {
                 
             }
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             try {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());
-                itemBasic = new ItemResponseBasic(item, false);
+                itemResponse = new ItemResponse(item, false);
             } catch (EntitatNoTrobadaException e) {
                 
             }
         }
 
-        return new CompartitResponse(compartit, creadorBasic, carpetaBasic, itemBasic);
+        return new CompartitResponse(compartit, creadorResponse, carpetaResponse, itemResponse);
     }
 
 }
