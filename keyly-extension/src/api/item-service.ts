@@ -29,8 +29,12 @@ export class itemsApi {
   }
 
   static async deleteItem(uuid: string): Promise<void> {
-    const response = await fetch(API_BASE + `item/delete/${uuid}`, {
-      method: "DELETE"
+    const token = localStorage.getItem("jwtToken")
+    const response = await fetch(API_BASE + `/item/delete/${uuid}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     if (!response.ok) throw new Error("Error eliminando el item")
   }

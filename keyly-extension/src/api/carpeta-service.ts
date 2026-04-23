@@ -5,12 +5,9 @@ const API_BASE = "https://10.147.17.250:8081/api"
 export class carpetasApi {
   static async fetchItems(): Promise<Carpeta[]> {
     const token = localStorage.getItem("jwtToken")
-    const response = await fetch(
-      API_BASE + "/carpeta/get/all",
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    )
+    const response = await fetch(API_BASE + "/carpeta/get/all", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
     if (!response.ok) throw new Error("Error en la petición")
     return response.json()
   }
@@ -29,5 +26,16 @@ export class carpetasApi {
 
     if (!response.ok) throw new Error("Error en la petició")
     return response.json()
+  }
+
+  static async deleteCarpeta(uuid: string): Promise<void> {
+    const token = localStorage.getItem("jwtToken")
+    const response = await fetch(API_BASE + `/carpeta/delete/${uuid}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    if (!response.ok) throw new Error("Error eliminant la carpeta")
   }
 }

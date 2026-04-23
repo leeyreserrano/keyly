@@ -40,7 +40,7 @@ function Home() {
 
   const filteredItems = items.filter(
     (item) =>
-      item.nomUsuari.toLowerCase().includes(search.toLowerCase()) ||
+      item.titol.toLowerCase().includes(search.toLowerCase()) ||
       item.url.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -86,7 +86,58 @@ function Home() {
     } catch (error) {
       console.error(error)
     }
+  }
 
+  const handleFavoriteCompartitClick = async (compartit: Compartit) => {
+    const updatedCompartit = {
+      ...compartit,
+      item: compartit.item
+        ? { ...compartit.item, favorit: !compartit.item.favorit }
+        : null,
+      carpeta: compartit.carpeta
+        ? { ...compartit.carpeta, favorit: !compartit.carpeta.favorit }
+        : null
+    }
+
+    try {
+      setCompartits((prev) =>
+        prev.map((i) => (i.uuid === compartit.uuid ? updatedCompartit : i))
+      )
+
+      await compartitApi.updateCompartit(updatedCompartit)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleDeleteItemClick = async (item: Item) => {
+    try {
+      await itemsApi.deleteItem(item.uuid)
+
+      setItems((prev) => prev.filter((i) => i.uuid !== item.uuid))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleDeleteCarpetaClick = async (carpeta: Carpeta) => {
+    try {
+      await carpetasApi.deleteCarpeta(carpeta.uuid)
+
+      setCarpetas((prev) => prev.filter((i) => i.uuid !== carpeta.uuid))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleDeleteCompartitClick = async (compartit: Compartit) => {
+    try {
+      await compartitApi.deleteCompartit(compartit.uuid)
+
+      setCompartits((prev) => prev.filter((i) => i.uuid !== compartit.uuid))
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -198,6 +249,10 @@ function Home() {
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteItemClick(item)
+                      }}
                       className="size-6 hover:text-red-600">
                       <path
                         stroke-linecap="round"
@@ -250,6 +305,10 @@ function Home() {
                       fill={carpetes.favorit ? "currentColor" : "none"}
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFavoriteCarpetaClick(carpetes)
+                      }}
                       stroke={carpetes.favorit ? "#facc15" : "currentColor"}
                       className={`size-6 hover:cursor-pointer transition-colors ${
                         carpetes.favorit
@@ -283,6 +342,10 @@ function Home() {
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteCarpetaClick(carpetes)
+                      }}
                       className="size-6 hover:text-red-600">
                       <path
                         stroke-linecap="round"
@@ -371,6 +434,10 @@ function Home() {
                       }
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFavoriteCompartitClick(compartit)
+                      }}
                       stroke={
                         compartit.carpeta?.favorit || compartit.item?.favorit
                           ? "#facc15"
@@ -408,6 +475,10 @@ function Home() {
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteCompartitClick(compartit)
+                      }}
                       className="size-6 hover:text-red-600">
                       <path
                         stroke-linecap="round"
