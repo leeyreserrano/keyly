@@ -1,3 +1,4 @@
+import React from "react"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import Layout from "~components/Layout"
 import Home from "~pages/home/Home"

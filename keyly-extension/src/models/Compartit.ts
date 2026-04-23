@@ -13,17 +13,21 @@ export type Compartit = {
 type CompartitCarpeta = {
     uuid: string,
     nom: string
+    favorit: boolean
 };
 
 type CompartitItem = {
     uuid: string,
     titol: string,
+    nomUsuari: string,
+    url: string,
+    favorit: boolean
     dinsDeCarpeta: boolean
 };
 
-enum TipusEntitat {
-    CARPETA,
-    ITEM
+export enum TipusEntitat {
+    CARPETA = "CARPETA",
+    ITEM = "ITEM"
 };
 
 enum Permisos {

@@ -1,10 +1,11 @@
+import React from "react"
 import { useNavigate } from "react-router-dom"
 
 function Navbar() {
   const navigate = useNavigate()
 
   return (
-    <nav className="bg-purple-200 flex items-center justify-center gap-5 h-10">
+    <nav className="bg-purple-200 flex items-center justify-center gap-5 h-10 sticky bottom-0 z-50">
       <svg
         className="size-8 cursor-pointer hover:scale-110 transition-transform"
         focusable="false"
