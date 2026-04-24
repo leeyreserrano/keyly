@@ -1,22 +1,18 @@
 import React, { useState } from "react"
 
-import CarpetCard from "~components/CarpetCard"
 import CompartitCard from "~components/CompartitCard"
-import ItemCard from "~components/ItemCard"
 import Searcher from "~components/Searcher"
 
-function Home() {
+function Compartit() {
   const [search, setSearch] = useState("")
 
   return (
     <div className="p-5">
       <Searcher search={search} setSearch={setSearch} />
 
-      <ItemCard search={search} />
-      <CarpetCard search={search} />
       <CompartitCard search={search} />
     </div>
   )
 }
 
-export default Home
+export default Compartit

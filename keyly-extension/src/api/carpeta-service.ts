@@ -3,7 +3,7 @@ import type { Carpeta } from "~models/Carpeta"
 const API_BASE = "https://10.147.17.250:8081/api"
 
 export class carpetasApi {
-  static async fetchItems(): Promise<Carpeta[]> {
+  static async fetchCarpetas(): Promise<Carpeta[]> {
     const token = localStorage.getItem("jwtToken")
     const response = await fetch(API_BASE + "/carpeta/get/all", {
       headers: { Authorization: `Bearer ${token}` }
