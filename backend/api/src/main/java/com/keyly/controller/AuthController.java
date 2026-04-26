@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Autorització", description = "Servei per fer login")
+@Tag(name = "Auth Controller", description = "Servei per fer login")
 public class AuthController {
 
     @Autowired

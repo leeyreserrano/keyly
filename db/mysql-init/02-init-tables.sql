@@ -113,6 +113,7 @@ CREATE TABLE `Compartits` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `usuari_id` BIGINT NOT NULL,
+  `creador_uuid` BINARY(16) NOT NULL,
   `tipus_entitat` ENUM('CARPETA','ITEM') NOT NULL,
   `entitat_uuid` BINARY(16) NOT NULL,
   `permisos` ENUM('LECTURA','ESCRIPTURA','ADMINISTRADOR') NOT NULL,

@@ -1,6 +1,7 @@
 package com.keyly.model;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -84,7 +85,7 @@ public class Item {
     private LocalDateTime dataUltimAcces;
 
     @Column(name = "comptador_access")
-    private Long comptadorAccess;
+    private Long comptadorAccess = 0L;
 
     public void addCarpeta(Carpeta carpeta) {
         carpetas.add(carpeta);
@@ -101,6 +102,7 @@ public class Item {
         this.titol = request.titol();
         this.nomUsuari = request.nomUsuari();
         this.contrasenya = request.contrasenya();
+        this.iv = Base64.getDecoder().decode(request.iv());
         this.url = request.url();
         this.notes = request.notes();
         this.favorit = request.favorit();

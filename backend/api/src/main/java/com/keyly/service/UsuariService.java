@@ -72,6 +72,13 @@ public class UsuariService {
                 .toList();
     }
 
+    public List<UsuariResponse> getAllUsuarisBySucursal(UUID usuariUuid) {
+        return repo.findBySucursalId(getUsuariEntityByUuid(usuariUuid).getSucursal().getId())
+                .stream()
+                .map(usuari -> new UsuariResponse(usuari))
+                .toList();
+    }
+
     public UsuariResponse getByUuid(UUID uuid) {
         Usuari usuari = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid));

@@ -1,7 +1,7 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import AppTheme from '../theme/AppTheme';
-import SignInCard from '../components/LoginCard';
+import LoginCard from '../components/LoginCard';
 import Content from '../components/Content';
 
 function Login(props: { disableCustomTheme?: boolean }) {
@@ -36,7 +36,7 @@ function Login(props: { disableCustomTheme?: boolean }) {
             p: { xs: 4, sm: 8 },
           }}
         >
-          <SignInCard />
+          <LoginCard />
         </Stack>
       </Stack>
     </AppTheme>

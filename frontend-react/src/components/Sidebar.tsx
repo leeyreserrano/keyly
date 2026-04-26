@@ -7,6 +7,7 @@ import VpnKeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
 import type { SvgIconComponent } from '@mui/icons-material';
 import { KeylyLogo } from './CustomIcons';
 import { brand } from '../theme/themePrimitives';
@@ -24,9 +25,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', icon: HomeRoundedIcon, path: '/home' },
+  { label: 'Estadistiques', icon: BarChartRoundedIcon, path: '/stadistics' },
   { label: 'Items', icon: VpnKeyRoundedIcon, path: '/items' },
-  { label: 'Tus carpetas', icon: FolderOutlinedIcon, path: '/folders' },
-  { label: 'Compartido', icon: PeopleAltOutlinedIcon, path: '/shared' },
+  { label: 'Carpetes', icon: FolderOutlinedIcon, path: '/carpetes' },
+  { label: 'Compartit', icon: PeopleAltOutlinedIcon, path: '/compartits' },
   { label: 'Configuración', icon: EditNoteOutlinedIcon, path: '/settings' },
 ];
 
@@ -39,10 +41,12 @@ export default function Sidebar() {
     <Stack
       sx={{
         width: open ? 260 : 80,
-        minHeight: '100vh',
-        bgcolor: SIDEBAR_BG,
+        height: '100vh',
         flexShrink: 0,
+        bgcolor: SIDEBAR_BG,
         transition: 'width 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {/* Logo */}

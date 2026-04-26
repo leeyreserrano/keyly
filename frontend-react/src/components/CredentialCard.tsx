@@ -1,33 +1,79 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
+import { useNavigate } from 'react-router';
+import ActionButtons from './ActionButtons';
+import toast from 'react-hot-toast';
+import { carpetasApi } from '../api/carpetasapi';
+import { itemsApi } from '../api/itemsapi';
+import { useState } from 'react';
+import { useTimeRefresh } from './UseTimeRefresh';
+import { getTimeAgo, formatDate } from '../utils/timeUtils';
+import { useAuth } from '../context/AuthContext';
 
 interface CredentialCardProps {
   uuid: string;
   titol: string;
   nomUsuari: string;
   dataEditat: string;
+  dataCreacio?: string;
   esCarpeta?: boolean;
   dinsCarpeta?: boolean;
+  favorit?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
 export default function CredentialCard({
+  uuid,
   titol,
-  nomUsuari,
+  nomUsuari: _nomUsuari,
   dataEditat,
+  dataCreacio,
   esCarpeta = false,
   dinsCarpeta = false,
+  favorit = false,
   onClick,
   onEdit,
   onDelete,
 }: CredentialCardProps) {
+  const navigate = useNavigate();
+  const { usuari } = useAuth();
+  const [isFavorit, setIsFavorit] = useState(favorit);
+  const now = useTimeRefresh(10000);
+
+  const handleToggleFavorit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    const newValue = !isFavorit;
+    setIsFavorit(newValue);
+    try {
+      if (esCarpeta) {
+        await carpetasApi.updateCarpeta(uuid, { favorit: newValue });
+      } else {
+        await itemsApi.updateItem(uuid, { favorit: newValue });
+      }
+    } catch {
+      setIsFavorit(!newValue);
+      toast.error('Error al canviar favorit');
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (esCarpeta) {
+      navigate('/EditCarpeta', { state: { uuid } });
+    } else {
+      onEdit?.();
+    }
+  };
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onDelete?.();
+  };
+
   return (
     <Paper
       onClick={onClick}
@@ -38,7 +84,7 @@ export default function CredentialCard({
         bgcolor: 'background.default',
         border: '1px solid',
         borderColor: 'divider',
-        minHeight: 110,
+        height: 110,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -47,43 +93,45 @@ export default function CredentialCard({
       }}
     >
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center' }}>
-          {esCarpeta && <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.secondary' }} />}
-          <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.9rem' }}>
+        <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center', minWidth: 0 }}>
+          {esCarpeta && (
+            <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary', flexShrink: 0 }} />
+          )}
+          <Typography
+            sx={{
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {titol}
           </Typography>
         </Stack>
 
-        <Stack direction="row" sx={{ gap: 0.25, ml: 1, alignItems: 'center' }}>
-          {dinsCarpeta && <FolderOutlinedIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 0.5 }} />}
-          {onEdit && (
-            <IconButton
-              size="small"
-              sx={{ width: 28, height: 28, border: '1px solid', borderColor: 'divider', bgcolor: 'transparent', p: 0 }}
-              onClick={(e) => { e.stopPropagation(); onEdit(); }}
-            >
-              <EditOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-            </IconButton>
-          )}
-          {onDelete && (
-            <IconButton
-              size="small"
-              sx={{ width: 28, height: 28, border: '1px solid', borderColor: 'divider', bgcolor: 'error.main', color: 'white', p: 0, '&:hover': { bgcolor: 'error.dark' } }}
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            >
-              <DeleteOutlinedIcon sx={{ fontSize: 14 }} />
-            </IconButton>
-          )}
-        </Stack>
+        <ActionButtons
+          isFavorit={isFavorit}
+          onToggleFavorit={handleToggleFavorit}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          showFolderIcon={dinsCarpeta}
+          size="small"
+        />
       </Stack>
 
-      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.82rem' }}>
-        {nomUsuari}
+      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+        Propietari: {usuari?.nom ?? ''}
       </Typography>
 
-      <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.75, display: 'block' }}>
-        Last modified: {dataEditat}
-      </Typography>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+          Modificat: {getTimeAgo(dataEditat, now)}
+        </Typography>
+        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+          {dataCreacio ? `Creat: ${formatDate(dataCreacio)}` : ''}
+        </Typography>
+      </Stack>
     </Paper>
   );
 }

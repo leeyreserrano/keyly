@@ -9,26 +9,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.keyly.model.request.CompartitRequest;
-import com.keyly.model.response.CompartitResponse;
-import com.keyly.service.CompartitService;
-import com.keyly.service.UsuariService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.keyly.model.request.CompartitRequest;
+import com.keyly.model.request.combined.CombinedCarpetaRequestCompartitRequest;
+import com.keyly.model.request.combined.CombinedItemRequestCompartitRequest;
+import com.keyly.model.response.CompartitResponse;
+import com.keyly.service.CompartitService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/compartit")
@@ -38,125 +37,96 @@ public class CompartitController {
     @Autowired
     private CompartitService service;
 
-    @Autowired
-    private UsuariService usuariService;
-
-    @Operation(summary = "Obté totes les entitats compartides", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Obté tots els compartits", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("all/admin")
     public ResponseEntity<List<CompartitResponse>> getAllCompartits() {
         return ResponseEntity.ok(service.getAllCompartits());
     }
 
-    @Operation(summary = "Obté totes les entitats compartides de l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Obté tots els compartits de l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @GetMapping("get/all")
-    public ResponseEntity<List<CompartitResponse>> getCompartits() {
+    public ResponseEntity<List<CompartitResponse>> getAllCompartitsOfUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID usuariUuid = UUID.fromString(authentication.getName());
 
-        return ResponseEntity.ok(service.getAllCompartitsByUsuariUuid(UUID.fromString(authentication.getName())));
+        return ResponseEntity.ok(service.getAllCompartitsOfUser(usuariUuid));
     }
 
-    @Operation(summary = "Obté una entitat compartida per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Obté un compartit per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Entitat compartida trobada"),
-            @ApiResponse(responseCode = "404", description = "Entitat compartida no trobada")
-    })
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("get/admin/{uuid}")
-    public ResponseEntity<CompartitResponse> getCompartit(@PathVariable UUID uuid) {
-        CompartitResponse compartit = service.getByUuid(uuid);
-
-        return ResponseEntity.ok(compartit);
-    }
-
-    @Operation(summary = "Obté una entitat de l'usuari per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Entitat compartida trobada"),
-            @ApiResponse(responseCode = "404", description = "Entitat compartida no trobada")
+            @ApiResponse(responseCode = "200", description = "Compartit trobat"),
+            @ApiResponse(responseCode = "404", description = "Compartit no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @GetMapping("get/{uuid}")
-    public ResponseEntity<CompartitResponse> getUserCompartit(@PathVariable UUID uuid) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        CompartitResponse response = service
-                .getUserCompartit(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<CompartitResponse> getCompartit(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(service.getCompartitByUuid(uuid));
     }
 
-    @Operation(summary = "Crea una entitat compartida a l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Crea compartits amb múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Entitat compartida creada"),
-            @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+            @ApiResponse(responseCode = "201", description = "Compartits creats"),
+            @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+            @ApiResponse(responseCode = "404", description = "Entitat no trobada")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @PostMapping("add")
-    public ResponseEntity<CompartitResponse> addCompartit(@RequestBody CompartitRequest c) {
+    public ResponseEntity<List<CompartitResponse>> createCompartit(@RequestBody CompartitRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID creadorUuid = UUID.fromString(authentication.getName());
 
-        CompartitResponse compartit = service
-                .save(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), c);
+        List<CompartitResponse> responses = service.createCompartit(creadorUuid, request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(compartit);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
-    @Operation(summary = "Actualitza una entitat compartida per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Crea un item i el comparteix a múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Entitat compartida actualitzada"),
-            @ApiResponse(responseCode = "404", description = "Entitat compartida no trobada")
-    })
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("update/admin/{uuid}")
-    public ResponseEntity<CompartitResponse> updateCompartit(@PathVariable UUID uuid,
-            @RequestBody CompartitRequest compartitActualitzat) {
-        return ResponseEntity.ok(service.update(uuid, compartitActualitzat));
-    }
-
-    @Operation(summary = "Actualitza una entitat compartida de l'usuari per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Entitat compartida actualitzada"),
-            @ApiResponse(responseCode = "404", description = "Entitat compartida no trobada")
+        @ApiResponse(responseCode = "201", description = "Item creat i compartit"),
+        @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+        @ApiResponse(responseCode = "404", description = "Usuari o item no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @PutMapping("update/{uuid}")
-    public ResponseEntity<CompartitResponse> updateUsuariCompartit(@PathVariable UUID uuid,
-            @RequestBody CompartitRequest compartitActualitzat) {
+    @PostMapping("add/item")
+    public ResponseEntity<HttpStatus> createCompartit(@RequestBody CombinedItemRequestCompartitRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID creadorUuid = UUID.fromString(authentication.getName());
 
-        CompartitResponse compartit = service.update(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())),
-                uuid, compartitActualitzat);
+        service.createCompartit(creadorUuid, request.itemRequest(), request.compartitRequest());
 
-        return ResponseEntity.ok(compartit);
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Elimina una entitat compartida per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Crea una carpeta i la comparteix a múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Entitat compartida eliminada"),
-            @ApiResponse(responseCode = "404", description = "Entitat compartida no trobada")
+        @ApiResponse(responseCode = "201", description = "Carpeta creada i compartida"),
+        @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+        @ApiResponse(responseCode = "404", description = "Usuari o carpeta no trobat")
     })
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("delete/admin/{uuid}")
-    public ResponseEntity<Void> deleteCompartit(@PathVariable UUID uuid) {
-        service.deleteByUuid(uuid);
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @PostMapping("add/carpeta")
+    public ResponseEntity<HttpStatus> createCompartit(@RequestBody CombinedCarpetaRequestCompartitRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID creadorUuid = UUID.fromString(authentication.getName());
 
-        return ResponseEntity.ok().build();
+        service.createCompartit(creadorUuid, request.carpetaRequest(), request.compartitRequest());
+
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
+    
 
-    @Operation(summary = "Elimina una entitat compartida de l'usuari per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Elimina un compartit", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Entitat compartida eliminada"),
-            @ApiResponse(responseCode = "404", description = "Entitat compartida no trobada")
+            @ApiResponse(responseCode = "204", description = "Compartit eliminat"),
+            @ApiResponse(responseCode = "404", description = "Compartit no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @DeleteMapping("delete/{uuid}")
-    public ResponseEntity<Void> deleteUserCompartit(@PathVariable UUID uuid) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        service.deleteUserCompartit(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid);
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deleteCompartit(@PathVariable UUID uuid) {
+        service.deleteCompartit(uuid);
+        return ResponseEntity.noContent().build();
     }
 
 }

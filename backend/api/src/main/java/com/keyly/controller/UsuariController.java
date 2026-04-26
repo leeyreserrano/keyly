@@ -47,6 +47,21 @@ public class UsuariController {
         return ResponseEntity.ok(service.getAllUsuaris());
     }
 
+    @Operation(summary = "Obté tots els usuaris de la mateixa sucursal del que fa la petició", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuaris retornats"),
+        @ApiResponse(responseCode = "404", description = "Usuari no trobat")
+    })
+    @GetMapping("all")
+    public ResponseEntity<List<UsuariResponse>> getUsuaris() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        List<UsuariResponse> usuaris = service.getAllUsuarisBySucursal(UUID.fromString(authentication.getName()));
+
+        return ResponseEntity.ok(usuaris);
+    }
+    
+
     @Operation(summary = "Crea un usuari", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Usuari creat"),
@@ -112,6 +127,22 @@ public class UsuariController {
         }
 
         UsuariResponse response = service.update(uuid, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Actualitza el usuari que fa la petició", description = "USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
+        @ApiResponse(responseCode = "404", description = "Usuari/Departament/Rol/Sucursal no trobat"),
+        @ApiResponse(responseCode = "409", description = "Correu no válid")
+    })
+    @PreAuthorize("hasRole('USUARI')")
+    @PutMapping("update")
+    public ResponseEntity<UsuariResponse> updateUsuari(@RequestBody UsuariRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UsuariResponse response = service.update(UUID.fromString(authentication.getName()), request);
 
         return ResponseEntity.ok(response);
     }

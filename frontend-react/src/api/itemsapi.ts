@@ -1,25 +1,32 @@
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { apiRequest } from './client';
 
 export class itemsApi {
-  static async fetchItems(): Promise<Item[]> {
-    await sleep(1500);
-    const token = localStorage.getItem("jwtToken");
-    const response = await fetch("https://10.147.17.250:8081/api/items", {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    if (!response.ok) throw new Error("Error en la petición");
-    return response.json();
+  static fetchItems(): Promise<Item[] | null> {
+    return apiRequest<Item[]>('/item/get/all');
   }
-  static async deleteItem(uuid: string): Promise<void> {
-    const response = await fetch(`https://10.147.17.250:8081/api/item/${uuid}`, {
-      method: "DELETE",
+
+  static addItem(data: Partial<Item>): Promise<Item | null> {
+    return apiRequest<Item>('/item/add', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Error eliminando el item");
+  }
+
+  static updateItem(uuid: string, data: Partial<Item>): Promise<Item | null> {
+    return apiRequest<Item>(`/item/update/${uuid}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  static deleteItem(uuid: string): Promise<void | null> {
+    return apiRequest<void>(`/item/delete/${uuid}`, { method: 'DELETE' });
+  }
+
+  static getItem(uuid: string): Promise<Item | null> {
+    return apiRequest<Item>(`/item/get/${uuid}`);
   }
 }
-
 
 export type Item = {
   uuid: string;
@@ -27,8 +34,10 @@ export type Item = {
   nomUsuari: string;
   contrasenya: string;
   url: string;
+  notes?: string;
   dataCreacio: string;
   dataEditat: string;
   ultimAcces: string;
   dinsCarpeta: boolean;
+  favorit: boolean;
 };

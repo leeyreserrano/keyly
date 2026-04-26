@@ -15,10 +15,14 @@ import Typography from '@mui/material/Typography';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ForgotPassword from './ForgotPassword';
+
 import { loginUser } from '../api/loginapi';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginCard() {
   const navigate = useNavigate();
+  const { login } = useAuth(); 
+
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -26,6 +30,7 @@ export default function LoginCard() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -34,20 +39,21 @@ export default function LoginCard() {
   const validateInputs = () => {
     const email = (document.getElementById('email') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
+
     let isValid = true;
 
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+      setEmailErrorMessage('Email no válido');
       isValid = false;
     } else {
       setEmailError(false);
       setEmailErrorMessage('');
     }
 
-    if (!password || password.length < 1) {
+    if (!password) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password is required.');
+      setPasswordErrorMessage('La contraseña es obligatoria');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -58,21 +64,27 @@ export default function LoginCard() {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
-  if (!validateInputs()) return;
+    event.preventDefault();
+    if (!validateInputs()) return;
 
-  const correu = (document.getElementById('email') as HTMLInputElement).value;
-  const contrasenya = (document.getElementById('password') as HTMLInputElement).value;
+    const correu = (document.getElementById('email') as HTMLInputElement).value;
+    const contrasenya = (document.getElementById('password') as HTMLInputElement).value;
 
-  try {
-    const { token } = await loginUser(correu, contrasenya);
-    localStorage.setItem("jwtToken", token); // ✅ guardar token
-    navigate("/home");
-  } catch (err: any) {
-    setPasswordError(true);
-    setPasswordErrorMessage(err.message || "Error al iniciar sesión");
-  }
-};
+    try {
+      setLoading(true);
+
+      const { token, usuari } = await loginUser(correu, contrasenya);
+
+      login(usuari, token, rememberMe);
+
+      navigate('/home');
+    } catch (err: any) {
+      setPasswordError(true);
+      setPasswordErrorMessage(err.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Stack sx={{ width: '100%', maxWidth: '420px', gap: 3 }}>
@@ -80,39 +92,37 @@ export default function LoginCard() {
         Login
       </Typography>
 
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        noValidate
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
+      >
         <FormControl>
-          <FormLabel htmlFor="email" sx={{ fontWeight: 600, mb: 0.5 }}>Email</FormLabel>
+          <FormLabel>Email</FormLabel>
           <TextField
             error={emailError}
             helperText={emailErrorMessage}
             id="email"
             type="email"
-            autoComplete="email"
-            autoFocus
             required
             fullWidth
-            variant="outlined"
-            color={emailError ? 'error' : 'primary'}
           />
         </FormControl>
 
         <FormControl>
-          <FormLabel htmlFor="password" sx={{ fontWeight: 600, mb: 0.5 }}>Password</FormLabel>
+          <FormLabel>Password</FormLabel>
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
             id="password"
             type={showPassword ? 'text' : 'password'}
-            autoComplete="current-password"
             required
             fullWidth
-            variant="outlined"
-            color={passwordError ? 'error' : 'primary'}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={handleTogglePassword} edge="end">
+                  <IconButton onClick={handleTogglePassword}>
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
@@ -123,15 +133,31 @@ export default function LoginCard() {
 
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <FormControlLabel
-            control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} color="primary" />}
+            control={
+              <Checkbox
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+              />
+            }
             label="Remember me"
           />
-          <Link component="button" onClick={handleClickOpen} variant="body2" color="primary">Forgot Password?</Link>
+          <Link component="button" onClick={handleClickOpen}>
+            Forgot Password?
+          </Link>
         </Stack>
 
         <ForgotPassword open={open} handleClose={handleClose} />
 
-        <Button type="submit" fullWidth variant="contained" size="large" sx={{ py: 1.5, borderRadius: '8px' }}>Login</Button>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          disabled={loading}
+          sx={{ py: 1.5, borderRadius: '8px' }}
+        >
+          {loading ? 'Entrando...' : 'Login'}
+        </Button>
       </Box>
     </Stack>
   );
