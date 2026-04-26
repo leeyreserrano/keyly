@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom"
 import { carpetasApi } from "~api/carpeta-service"
 import type { Carpeta } from "~models/Carpeta"
 
-import Searcher from "./Searcher"
-
 function CarpetCard({ search }: { search: string }) {
   const [carpetas, setCarpetas] = useState<Carpeta[]>([])
   const navigate = useNavigate()

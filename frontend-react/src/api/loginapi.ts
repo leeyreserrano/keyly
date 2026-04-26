@@ -3,7 +3,7 @@ const API_BASE = 'https://10.147.17.250:8081/api';
 // Login de usuario
 export async function loginUser(correu: string, contrasenya: string, rememberMe: boolean = true) {
   try {
-    const res = await fetch(`${API_BASE}/login`, {
+    const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

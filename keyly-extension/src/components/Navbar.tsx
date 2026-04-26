@@ -10,7 +10,7 @@ function Navbar() {
   const itemClass =
     "flex items-center justify-center h-full px-3 cursor-pointer transition-colors"
 
-  const activeClass = "bg-purple-300 border-b-2 border-purple-700"
+  const activeClass = "bg-purple-300 border-b-2 border-purple-500"
 
   const inactiveClass = "text-gray-500 hover:text-black transition-colors"
 

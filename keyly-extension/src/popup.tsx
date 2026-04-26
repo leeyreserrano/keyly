@@ -10,6 +10,8 @@ import CompartitPage from "~pages/home/Compartit"
 import Login from "~pages/login/Login"
 
 import "~style.css"
+import NewItem from "~pages/create_item/NewItem"
+import NewFolder from "~pages/create_folder/NewFolder"
 
 function IndexPopup() {
   return (
@@ -22,6 +24,8 @@ function IndexPopup() {
             <Route path="/item" element={<ItemPage />} />
             <Route path="/carpeta" element={<CarpetaPage />} />
             <Route path="/compartit" element={<CompartitPage />} />
+            <Route path="/create/item" element={<NewItem />} />
+            <Route path="/create/folder" element={<NewFolder />} />
             <Route path="/item/:id" element={<Item />} />
           </Route>
         </Routes>
