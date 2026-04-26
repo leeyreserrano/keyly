@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.keyly.model.Usuari;
 import com.keyly.model.request.AuthRequest;
+import com.keyly.model.response.LoginResponse;
 import com.keyly.model.response.UsuariResponse;
 import com.keyly.security.JwtUtils;
 
@@ -21,16 +22,14 @@ public class AuthService {
     @Autowired
     private JwtUtils jwtUtils;
 
-    public boolean login(AuthRequest request) {
+    public LoginResponse login(AuthRequest request) {
         Usuari usuari = usuariService.getUsuariEntityByMail(request.correu());
 
         if (passwordEncoder.matches(request.contrasenya(), usuari.getContrasenya())) {
             usuariService.actualitzarUltimLogin(usuari);
-
-            return true;
         }
 
-        return false;
+        return new LoginResponse(generateToken(usuari.getCorreu()), new UsuariResponse(usuari), usuari.getKdfSalt());
     }
 
     public UsuariResponse getUsuari(String correu) {

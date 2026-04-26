@@ -146,9 +146,10 @@ public class UsuariService {
 
     public void saveImage(UUID uuid, MultipartFile file) {
         try {
-            Files.createDirectories(root);
+            String originalName = file.getOriginalFilename();
+            String uniqueName = UUID.randomUUID() + "_" + originalName;
 
-            String fileName = IMAGES_PATH + file.getOriginalFilename();
+            String fileName = IMAGES_PATH + uniqueName;
             Path destinationFile = root.resolve(fileName);
 
             Files.copy(file.getInputStream(), destinationFile);
@@ -158,7 +159,7 @@ public class UsuariService {
             throw new ImageException("La imatge no s'ha pogut guardar.");
         }
     }
-    
+
     public UsuariResponse update(UUID uuid, UsuariRequest request) {
         Usuari usuari = getUsuariEntityByUuid(uuid);
 
@@ -171,7 +172,8 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
-        if (request.contrasenya() != null) usuari.setKdfSalt(generateSalt());
+        if (request.contrasenya() != null)
+            usuari.setKdfSalt(generateSalt());
 
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
@@ -200,7 +202,8 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
-        if (request.contrasenya() != null) usuari.setKdfSalt(generateSalt());
+        if (request.contrasenya() != null)
+            usuari.setKdfSalt(generateSalt());
 
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
@@ -209,7 +212,7 @@ public class UsuariService {
     }
 
     public ResponseEntity<Resource> getImatge(UUID userUuid) {
-            try {
+        try {
             Path imagePath = Paths.get(root.toString())
                     .resolve(getByUuid(userUuid).imatge());
 

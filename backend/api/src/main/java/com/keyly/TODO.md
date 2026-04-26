@@ -1,1 +1,1 @@
-- Comprovación de que una contraseña no esté filtrada
+- Guardar contraseña master encriptada
