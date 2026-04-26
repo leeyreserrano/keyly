@@ -1,3 +1,4 @@
+import React from "react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AuthService from "src/api/auth-service"
@@ -17,8 +18,8 @@ function Login() {
     setLoading(true)
 
     try {
-      //const result = await AuthService(correu, contrasenya, true)
-      const result = await AuthService("user@domain.com", "1234", true)
+      //const result = await AuthService(correu, contrasenya)
+      const result = await AuthService("user@domain.com", "1234")
       navigate("/home")
     } catch (err) {
       setError(err.message)

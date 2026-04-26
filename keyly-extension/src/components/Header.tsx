@@ -1,3 +1,5 @@
+import React from "react"
+
 function Header() {
   return (
     <header className="bg-purple-200 flex items-center">
