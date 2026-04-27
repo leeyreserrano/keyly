@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { getStoredKey } from "~api/auth-service"
 import { carpetasApi } from "~api/carpeta-service"
+import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { utilsService } from "~api/utils-service"
 import type { Carpeta } from "~models/Carpeta"
 import type { CustomPassword } from "~models/CustomPassword"
+import type { Item } from "~models/Item"
 import type { User } from "~models/User"
+
+function bytesToBase64(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)))
+}
 
 function NewItem() {
   const [showPassword, setShowPassword] = useState(false)
@@ -14,11 +21,15 @@ function NewItem() {
   const [open, setOpen] = useState(false)
   const [carpetas, setCarpetas] = useState<Carpeta[]>([])
   const [users, setUsers] = useState<User[]>([])
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [value, setValue] = useState("")
-  const [password, setPassword] = useState("")
   const menuRef = useRef(null)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [titol, setTitol] = useState("")
+  const [nomUsuari, setNomUsuari] = useState("")
+  const [url, setUrl] = useState("")
+  const [contrasenya, setContrasenya] = useState("")
+  const [notes, setNotes] = useState("")
+  const [carpeta, setCarpeta] = useState("")
+  const [compartir, setCompartir] = useState([])
 
   useEffect(() => {
     const loadCarpeta = async () => {
@@ -44,6 +55,43 @@ function NewItem() {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const iv = crypto.getRandomValues(new Uint8Array(12))
+
+    const data = new TextEncoder().encode(contrasenya)
+
+    const key = await getStoredKey()
+
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      data
+    )
+    const item: Item = {
+      uuid: null,
+      titol: titol,
+      nomUsuari: nomUsuari,
+      contrasenya: bytesToBase64(encrypted),
+      iv: bytesToBase64(iv),
+      url: url,
+      notes: notes,
+      favorit: false,
+      dataCreacio: null,
+      dataEditat: null,
+      ultimAcces: null,
+      dinsCarpeta: carpeta.length > 0
+    }
+
+    if (carpeta.length > 0) {
+      const result = await carpetasApi.createNewItemInCarpeta(carpeta, item)
+    } else {
+      const result = await itemsApi.saveItem(item)
+    }
+
+    navigate("/home")
+  }
 
   const customPasswordLow = async () => {
     const passwordConfig: CustomPassword = {
@@ -90,7 +138,7 @@ function NewItem() {
   const customPassword = async (passwordConfig: CustomPassword) => {
     try {
       const result = await utilsService.customPassword(passwordConfig)
-      setPassword(result)
+      setContrasenya(result)
     } catch (error) {
       console.error(error)
     }
@@ -98,10 +146,16 @@ function NewItem() {
 
   return (
     <div className="relative flex flex-col flex-1 h-full w-full overflow-hidden">
-      <div className="flex flex-col items-center gap-5 flex-1 overflow-y-auto pb-10 pt-5">
+      <form
+        className="flex flex-col items-center gap-5 flex-1 overflow-y-auto pb-10 pt-5"
+        id="newItem"
+        action=""
+        onSubmit={handleSubmit}>
         <div className="relative w-80">
           <input
             type="text"
+            value={titol}
+            onChange={(e) => setTitol(e.target.value)}
             required
             className="w-full border border-gray-400 rounded-lg p-2 pt-4 focus:outline-none focus:ring-2 focus:ring-purple-200"
           />
@@ -113,6 +167,8 @@ function NewItem() {
         <div className="relative w-80">
           <input
             type="text"
+            value={nomUsuari}
+            onChange={(e) => setNomUsuari(e.target.value)}
             required
             className="w-full border border-gray-400 rounded-lg p-2 pt-4 focus:outline-none focus:ring-2 focus:ring-purple-200"
           />
@@ -124,6 +180,8 @@ function NewItem() {
         <div className="relative w-80">
           <input
             type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
             className="w-full border border-gray-400 rounded-lg p-2 pt-4 focus:outline-none focus:ring-2 focus:ring-purple-200"
           />
           <label className="absolute left-3 -top-2 bg-white px-1 text-sm text-gray-600">
@@ -134,8 +192,8 @@ function NewItem() {
         <div className="relative w-80">
           <input
             type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={contrasenya}
+            onChange={(e) => setContrasenya(e.target.value)}
             required
             className="w-full border border-gray-400 rounded-lg p-2 pt-4 pr-24 focus:outline-none focus:ring-2 focus:ring-purple-200"
           />
@@ -282,6 +340,8 @@ function NewItem() {
         <div className="relative w-80">
           <textarea
             rows={2}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
             className="w-full border border-gray-400 rounded-lg p-2 pt-6 focus:outline-none focus:ring-2 focus:ring-purple-200 resize-none"
           />
 
@@ -296,15 +356,17 @@ function NewItem() {
           </label>
 
           <select
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={carpeta}
+            onChange={(e) => setCarpeta(e.target.value)}
             onMouseDown={() => setOpen(true)}
             onBlur={() => setOpen(false)}
             className="w-full border border-gray-400 rounded-lg bg-transparent p-2 pt-4 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-purple-200">
             <option value=""></option>
 
-            {carpetas.map((carpeta) => (
-              <option value={carpeta.uuid}>{carpeta.nom}</option>
+            {carpetas.map((c) => (
+              <option key={c.uuid} value={c.uuid}>
+                {c.nom}
+              </option>
             ))}
           </select>
 
@@ -335,30 +397,36 @@ function NewItem() {
 
           <select
             multiple
-            value={selectedUsers}
+            value={compartir}
             onChange={(e) => {
               const values = Array.from(
                 e.target.selectedOptions,
                 (option) => option.value
               )
-              setSelectedUsers(values)
+              setCompartir(values)
             }}
             className="w-full border border-gray-400 rounded-lg p-2 pt-4">
             {" "}
-            <option value=""></option>
             {users.map((user) => (
-              <option value={user.uuid}>{user.correu}</option>
+              <option key={user.uuid} value={user.uuid}>
+                {user.correu}
+              </option>
             ))}
           </select>
         </div>
-      </div>
+      </form>
       <div className="absolute bottom-3 right-12 z-50">
-        <button onClick={() => navigate("/home")} className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
+        <button
+          onClick={() => navigate("/home")}
+          className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
           Cancelar
         </button>
       </div>
       <div className="absolute bottom-3 right-36 z-50">
-        <button className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
+        <button
+          type="submit"
+          form="newItem"
+          className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
           Guardar
         </button>
       </div>

@@ -32,6 +32,22 @@ export async function loginUser(correu: string, contrasenya: string) {
   }
 }
 
+export async function getStoredKey() {
+  const keyBase64 = localStorage.getItem("derivedKey")
+  if (!keyBase64) throw new Error("No key found")
+
+  const binary = atob(keyBase64)
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0))
+
+  return await crypto.subtle.importKey(
+    "raw",
+    bytes,
+    { name: "AES-GCM" },
+    false,
+    ["encrypt", "decrypt"]
+  )
+}
+
 async function deriveKey(password: string, salt: string) {
   const enc = new TextEncoder()
 
@@ -54,9 +70,9 @@ async function deriveKey(password: string, salt: string) {
     256
   )
 
-  return Array.from(new Uint8Array(derivedBits))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("")
+  const bytes = new Uint8Array(derivedBits)
+
+  return btoa(String.fromCharCode(...bytes))
 }
 
 export function getCurrentUser() {

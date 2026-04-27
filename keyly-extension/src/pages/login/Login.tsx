@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom"
 import AuthService from "src/api/auth-service"
 
 function Login() {
-  const [correu, setCorreu] = useState("")
-  const [contrasenya, setContrasenya] = useState("")
+  const [correu, setCorreu] = useState("user@domain.com")
+  const [contrasenya, setContrasenya] = useState("1234")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -18,8 +18,7 @@ function Login() {
     setLoading(true)
 
     try {
-      //const result = await AuthService(correu, contrasenya)
-      const result = await AuthService("user@domain.com", "1234")
+      const result = await AuthService(correu, contrasenya)
       navigate("/home")
     } catch (err) {
       setError(err.message)
@@ -73,6 +72,7 @@ function Login() {
         <input
           className="border rounded-lg p-2 w-full text-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-0"
           placeholder="Email"
+          required
           type="email"
           value={correu}
           onChange={(e) => setCorreu(e.target.value)}
@@ -82,6 +82,7 @@ function Login() {
           <input
             className="border rounded-lg p-2 w-full text-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-0"
             placeholder="Contrasenya"
+            required
             name="contrasenya"
             id="contrasenya"
             type={showPassword ? "text" : "password"}

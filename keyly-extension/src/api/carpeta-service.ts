@@ -1,4 +1,5 @@
 import type { Carpeta } from "~models/Carpeta"
+import type { Item } from "~models/Item"
 
 const API_BASE = "https://10.147.17.250:8081/api"
 
@@ -9,6 +10,25 @@ export class carpetasApi {
       headers: { Authorization: `Bearer ${token}` }
     })
     if (!response.ok) throw new Error("Error en la petición")
+    return response.json()
+  }
+
+  static async createNewItemInCarpeta(carpetaUuid: string, item: Item): Promise<void> {
+    const token = localStorage.getItem("jwtToken")
+    console.log("Token: " + localStorage.getItem("jwtToken"))
+    console.log("Item: " + JSON.stringify(item))
+    const response = await fetch(API_BASE + `/carpeta/add/${carpetaUuid}/item`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(item)
+    })
+
+    console.log(response)
+
+    if (!response.ok) throw new Error("Error en la petició")
     return response.json()
   }
 
