@@ -49,6 +49,9 @@ services:
   nginx:
     image: nginx:alpine
     container_name: keyly-nginx
+    build: 
+      context: ./frontend-react
+      dockerfile: Dockerfile
     ports:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
