@@ -1,4 +1,4 @@
-import { apiRequest, apiMultipartRequest } from './client';
+import { apiMultipartRequest } from './client';
 import type { Usuari } from '../context/AuthContext';
 
 export class usuarisApi {
