@@ -56,7 +56,6 @@ services:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./frontend-react/dist:/usr/share/nginx/html
     networks:
       - network
 
