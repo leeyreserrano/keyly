@@ -20,15 +20,17 @@ import UserAvatar from '../components/UserAvatar';
 import { usuarisApi } from '../api/usuarisapi';
 import toast from 'react-hot-toast';
 
-const ROL_LABEL: Record<string, { label: string; color: 'error' | 'warning' | 'default' }> = {
+type RolType = 'error' | 'warning' | 'default';
+
+const ROL_LABEL: Record<string, { label: string; color: RolType }> = {
   ADMIN:  { label: 'Administrador', color: 'error' },
   CAP:    { label: 'Cap',           color: 'warning' },
   USUARI: { label: 'Usuari',        color: 'default' },
 };
 
 export default function UserConfig() {
-  const { usuari, login, token } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { usuari, login, token, refreshAvatar } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const rol = usuari?.rolIntern ? ROL_LABEL[usuari.rolIntern] : null;
@@ -37,23 +39,21 @@ export default function UserConfig() {
     const file = e.target.files?.[0];
     if (!file || !usuari || !token) return;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = reader.result as string;
-      setUploadingImage(true);
-      try {
-        const updated = await usuarisApi.uploadImage(base64);
-        if (updated) {
-          login(updated, token, !!localStorage.getItem('jwtToken'));
-          toast.success('Imatge actualitzada correctament');
-        }
-      } catch {
-        toast.error('Error actualitzant la imatge');
-      } finally {
-        setUploadingImage(false);
-      }
-    };
-    reader.readAsDataURL(file);
+    const currentToken = token;
+    const currentUsuari = usuari;
+
+    setUploadingImage(true);
+    try {
+      const updated = await usuarisApi.uploadImage(file, currentToken);
+      const merged = { ...currentUsuari, ...(updated ?? {}) };
+      login(merged, currentToken, !!localStorage.getItem('jwtToken'));
+      refreshAvatar();
+      toast.success('Imatge actualitzada correctament');
+    } catch {
+      toast.error('Error actualitzant la imatge');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   return (
@@ -70,7 +70,7 @@ export default function UserConfig() {
             showBackButton={false}
           />
 
-          <Box sx={{ px: 4, py: 3 }}>
+          <Box sx={{ px: 4, py: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
             {!usuari ? (
               <Typography color="error" sx={{ mt: 4 }}>
                 No s'ha pogut obtenir l'usuari.
@@ -100,8 +100,8 @@ export default function UserConfig() {
                           position: 'absolute',
                           bottom: -4,
                           right: -4,
-                          width: 24,
-                          height: 24,
+                          width: 28,
+                          height: 28,
                           bgcolor: 'background.paper',
                           border: '1px solid',
                           borderColor: 'divider',
@@ -110,7 +110,7 @@ export default function UserConfig() {
                       >
                         {uploadingImage
                           ? <CircularProgress size={12} />
-                          : <EditOutlinedIcon sx={{ fontSize: 13 }} />
+                          : <EditOutlinedIcon sx={{ fontSize: 14 }} />
                         }
                       </IconButton>
                     </Tooltip>

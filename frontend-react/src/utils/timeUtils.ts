@@ -1,7 +1,7 @@
 export const getTimeAgo = (date: string, now: number): string => {
   if (!date) return '';
 
-  const past = new Date(date).getTime();
+  const past = new Date(date.replace(' ', 'T')).getTime();
   const diffMs = now - past;
 
   const seconds = Math.floor(diffMs / 1000);
@@ -27,5 +27,5 @@ export const formatDate = (date: string): string => {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(date));
+  }).format(new Date(date.replace(' ', 'T')));
 };

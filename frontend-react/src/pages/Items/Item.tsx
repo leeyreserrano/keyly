@@ -17,16 +17,28 @@ import ActionButtons from '../../components/ActionButtons';
 import { useTimeRefresh } from '../../components/UseTimeRefresh';
 import { getTimeAgo, formatDate } from '../../utils/timeUtils';
 import ShareModal from '../../components/ShareModal';
+import { useCrypto } from '../../context/CryptoContext';
+import { decryptPassword } from '../../crypto/cryptoService';
 
-export default function Item() {
+function esXifrat(iv: string): boolean {
+  try {
+    return atob(iv).length === 12;
+  } catch {
+    return false;
+  }
+}
+
+export default function ItemPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { uuid } = location.state || {};
+  const { derivedKey } = useCrypto();
 
   const [item, setItem] = useState<Item | null>(null);
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [decryptedPassword, setDecryptedPassword] = useState<string | null>(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openShareModal, setOpenShareModal] = useState(false);
   const [isFavorit, setIsFavorit] = useState(false);
@@ -47,6 +59,25 @@ export default function Item() {
         setItem(found);
         setIsFavorit(found?.favorit ?? false);
         setCarpetas(allCarpetas);
+
+        if (!found) return;
+
+        if (!derivedKey) {
+          setDecryptedPassword(null);
+          return;
+        }
+
+        if (!found.iv || !found.contrasenya || !esXifrat(found.iv)) {
+          setDecryptedPassword(found.contrasenya ?? null);
+          return;
+        }
+
+        try {
+          const plain = await decryptPassword(derivedKey, found.contrasenya, found.iv);
+          setDecryptedPassword(plain);
+        } catch {
+          setDecryptedPassword(found.contrasenya);
+        }
       } catch (error) {
         console.error('Error al cargar el item', error);
       } finally {
@@ -55,7 +86,7 @@ export default function Item() {
     };
 
     loadData();
-  }, [uuid]);
+  }, [uuid, derivedKey]);
 
   const toggleFavorit = async () => {
     if (!item) return;
@@ -70,9 +101,9 @@ export default function Item() {
   };
 
   const handleCopy = async () => {
-    if (!item?.contrasenya) return;
+    if (!decryptedPassword) return;
     try {
-      await navigator.clipboard.writeText(item.contrasenya);
+      await navigator.clipboard.writeText(decryptedPassword);
       toast.success('Contrasenya copiada al portapapers');
     } catch {
       toast.error('Error al copiar');
@@ -99,6 +130,12 @@ export default function Item() {
     } catch {
       toast.error('Error eliminant item');
     }
+  };
+
+  const passwordDisplay = () => {
+    if (!derivedKey) return 'Sessió expirada, torna a iniciar sessió';
+    if (!decryptedPassword) return 'No disponible';
+    return showPassword ? decryptedPassword : '********';
   };
 
   return (
@@ -151,23 +188,28 @@ export default function Item() {
                 <Divider />
 
                 <Typography><strong>Usuari / Email:</strong> {item.nomUsuari}</Typography>
+                <Typography><strong>Notes:</strong> {item.notes}</Typography>
                 <Typography><strong>URL:</strong> {item.url}</Typography>
 
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
                   <Typography>
                     <strong>Contrasenya:</strong>{' '}
-                    {showPassword
-                      ? item.contrasenya
-                      : item.contrasenya
-                      ? '********'
-                      : 'No disponible'}
+                    {passwordDisplay()}
                   </Typography>
 
                   <Stack direction="row" spacing={1}>
-                    <IconButton onClick={handleCopy} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'primary.main' }}>
+                    <IconButton
+                      onClick={handleCopy}
+                      disabled={!decryptedPassword}
+                      sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'primary.main' }}
+                    >
                       <ContentCopyOutlinedIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={toggleShowPassword} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}>
+                    <IconButton
+                      onClick={toggleShowPassword}
+                      disabled={!decryptedPassword}
+                      sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}
+                    >
                       {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                     </IconButton>
                   </Stack>

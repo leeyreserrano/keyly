@@ -18,8 +18,10 @@ type AuthContextType = {
   usuari: Usuari | null;
   token: string | null;
   loadingAuth: boolean;
+  avatarVersion: number;
   login: (usuari: Usuari, token: string, rememberMe: boolean) => void;
   logout: () => void;
+  refreshAvatar: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,10 +38,7 @@ function readStoredSession() {
   if (!token || !raw) return { usuari: null, token: null };
 
   try {
-    return {
-      usuari: JSON.parse(raw),
-      token
-    };
+    return { usuari: JSON.parse(raw), token };
   } catch {
     return { usuari: null, token: null };
   }
@@ -49,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuari, setUsuari] = useState<Usuari | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+  const [avatarVersion, setAvatarVersion] = useState(0);
 
   useEffect(() => {
     const stored = readStoredSession();
@@ -61,28 +61,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuari(usuariData);
     setToken(tokenData);
 
-    const storage = rememberMe ? localStorage : sessionStorage;
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('usuari');
+    sessionStorage.removeItem('jwtToken');
+    sessionStorage.removeItem('usuari');
 
+    const storage = rememberMe ? localStorage : sessionStorage;
     storage.setItem('jwtToken', tokenData);
     storage.setItem('usuari', JSON.stringify(usuariData));
-
-    if (rememberMe) {
-      sessionStorage.clear();
-    } else {
-      localStorage.clear();
-    }
   };
 
   const logout = () => {
     setUsuari(null);
     setToken(null);
-
     localStorage.clear();
     sessionStorage.clear();
   };
 
+  const refreshAvatar = () => setAvatarVersion(v => v + 1);
+
   return (
-    <AuthContext.Provider value={{ usuari, token, login, logout, loadingAuth }}>
+    <AuthContext.Provider value={{ usuari, token, login, logout, loadingAuth, avatarVersion, refreshAvatar }}>
       {children}
     </AuthContext.Provider>
   );

@@ -8,12 +8,14 @@ interface UserAvatarProps {
 }
 
 export default function UserAvatar({ size = 36 }: UserAvatarProps) {
-  const { token } = useAuth();
+  const { token, usuari, avatarVersion } = useAuth();
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const objectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
+
+    let cancelled = false;
 
     const loadImage = async () => {
       try {
@@ -24,26 +26,39 @@ export default function UserAvatar({ size = 36 }: UserAvatarProps) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const blob = await res.blob();
-        if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = URL.createObjectURL(blob);
-        setImgUrl(objectUrlRef.current);
+
+        if (cancelled) return;
+
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+        }
+        const url = URL.createObjectURL(blob);
+        objectUrlRef.current = url;
+        setImgUrl(url);
       } catch (e) {
-        console.error('UserAvatar fetch error:', e);
-        setImgUrl(null);
+        if (!cancelled) {
+          console.error('UserAvatar fetch error:', e);
+          setImgUrl(null);
+        }
       }
     };
 
     loadImage();
 
     return () => {
+      cancelled = true;
+    };
+  }, [token, avatarVersion]);
+
+  useEffect(() => {
+    return () => {
       if (objectUrlRef.current) {
         URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = null;
       }
     };
-  }, [token]);
+  }, []);
 
-  const { usuari } = useAuth();
   const initial = usuari?.nom?.charAt(0).toUpperCase() ?? '?';
 
   return (

@@ -11,9 +11,9 @@ type Props = {
 };
 
 const filters: { value: FilterValue; label: string }[] = [
-  { value: 'latest', label: 'Últimos usados' },
-  { value: 'most_used', label: 'Más usados' },
-  { value: 'favorites', label: 'Favoritos' },
+  { value: 'latest', label: 'Últims usats' },
+  { value: 'most_used', label: 'Més usats' },
+  { value: 'favorites', label: 'Favorits' },
 ];
 
 export default function ItemsToolbar({ search, setSearch, filter, setFilter, onAdd }: Props) {
@@ -23,11 +23,11 @@ export default function ItemsToolbar({ search, setSearch, filter, setFilter, onA
       sx={{ px: 4, py: 3, justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}
     >
       <TextField
-        placeholder="Buscar por título o usuario"
+        placeholder="Cercar per títol o usuari"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         size="small"
-        sx={{ width: { xs: '100%', sm: setFilter ? 1070 : '100%' } }}
+        sx={{ width: { xs: '100%', sm: setFilter ? 1090 : '100%' } }}
       />
 
       {filter !== undefined && setFilter && (

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Skeleton from '@mui/material/Skeleton';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
@@ -62,12 +62,20 @@ export default function Items() {
     loadData();
   }, []);
 
-  // Reset página cuando cambia filtro o búsqueda
   useEffect(() => {
     setPage(1);
   }, [search, filter]);
 
-  // Filtrado y ordenación
+  const handleAccess = async (uuid: string) => {
+    try {
+      const updated = await itemsApi.registrarAcces(uuid);
+      if (updated) {
+        setItems((prev) => prev.map((i) => (i.uuid === uuid ? { ...i, ...updated } : i)));
+      }
+    } catch {
+    }
+  };
+
   const filteredItems = items
     .filter((item) =>
       filter === 'favorites'
@@ -77,15 +85,12 @@ export default function Items() {
     )
     .sort((a, b) => {
       if (filter === 'latest')
-        return (
-          new Date(b.dataEditat).getTime() -
-          new Date(a.dataEditat).getTime()
-        );
-      if (filter === 'most_used')
-        return (
-          new Date(b.ultimAcces).getTime() -
-          new Date(a.ultimAcces).getTime()
-        );
+        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
+      if (filter === 'most_used') {
+        const diff = (b.comptadorAccess ?? 0) - (a.comptadorAccess ?? 0);
+        if (diff !== 0) return diff;
+        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
+      }
       return 0;
     });
 
@@ -120,11 +125,7 @@ export default function Items() {
         <Grid container spacing={2}>
           {Array.from({ length: 6 }).map((_, i) => (
             <Grid size={4} key={i}>
-              <Skeleton
-                variant="rounded"
-                height={110}
-                sx={{ borderRadius: '10px' }}
-              />
+              <Skeleton variant="rounded" height={110} sx={{ borderRadius: '10px' }} />
             </Grid>
           ))}
         </Grid>
@@ -132,23 +133,12 @@ export default function Items() {
     }
 
     if (error) {
-      return (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      );
+      return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;
     }
 
     if (filteredItems.length === 0) {
       return (
-        <Stack
-          sx={{
-            alignItems: 'center',
-            py: 10,
-            gap: 2,
-            color: 'text.disabled',
-          }}
-        >
+        <Stack sx={{ alignItems: 'center', py: 10, gap: 2, color: 'text.disabled' }}>
           <VpnKeyOffOutlinedIcon sx={{ fontSize: 64 }} />
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
             {search
@@ -157,7 +147,6 @@ export default function Items() {
                 ? 'No tens cap favorit'
                 : 'No tens cap contrasenya guardada'}
           </Typography>
-
           {!search && filter !== 'favorites' && (
             <Typography variant="body2" color="text.secondary">
               Afegeix la primera des del botó "+ Add New"
@@ -173,7 +162,6 @@ export default function Items() {
           const estaEnCarpeta = carpetas.some((c) =>
             c.items.some((i) => i.uuid === item.uuid)
           );
-
           return (
             <Grid size={4} key={item.uuid}>
               <CredentialCard
@@ -181,14 +169,13 @@ export default function Items() {
                 titol={item.titol}
                 nomUsuari={item.nomUsuari}
                 dataEditat={item.dataEditat}
+                dataCreacio={item.dataCreacio}
+                ultimAcces={item.ultimAcces}
                 dinsCarpeta={estaEnCarpeta}
                 favorit={item.favorit}
-                onClick={() =>
-                  navigate('/Item', { state: { uuid: item.uuid } })
-                }
-                onEdit={() =>
-                  navigate('/EditItem', { state: { uuid: item.uuid } })
-                }
+                onAccess={(uuid) => handleAccess(uuid)}
+                onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
+                onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
                 onDelete={() => handleDelete(item)}
               />
             </Grid>
@@ -205,14 +192,7 @@ export default function Items() {
       <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
         <Sidebar />
 
-        <Stack
-          sx={{
-            flex: 1,
-            bgcolor: 'background.default',
-            overflow: 'auto',
-            minWidth: 0,
-          }}
-        >
+        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
           <Header
             title="Items"
             icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
@@ -231,11 +211,7 @@ export default function Items() {
           </Box>
 
           {!loading && !error && filteredItems.length > 0 && (
-            <CustomPagination
-              count={totalPages}
-              page={page}
-              onChange={setPage}
-            />
+            <CustomPagination count={totalPages} page={page} onChange={setPage} />
           )}
         </Stack>
 

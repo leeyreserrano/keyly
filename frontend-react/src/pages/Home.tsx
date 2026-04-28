@@ -75,63 +75,66 @@ export default function Home() {
     loadData();
   }, []);
 
+  const handleAccess = async (uuid: string, esCarpeta: boolean) => {
+    try {
+      if (esCarpeta) {
+        const updated = await carpetasApi.registrarAcces(uuid);
+        setCarpetas((prev) => prev.map((c) => (c.uuid === uuid ? { ...c, ...updated } : c)));
+      } else {
+        const updated = await itemsApi.registrarAcces(uuid);
+        if (updated) {
+          setItems((prev) => prev.map((i) => (i.uuid === uuid ? { ...i, ...updated } : i)));
+        }
+      }
+    } catch {
+      // silencioso
+    }
+  };
+
   const itemsEnCarpetaSet = useMemo(() => {
     const set = new Set<string>();
     carpetas.forEach((c) => c.items.forEach((i) => set.add(i.uuid)));
     return set;
   }, [carpetas]);
 
-
   const filteredData = useMemo<HomeElement[]>(() => {
     const allData: HomeElement[] = [
-      ...items.map(i => ({
+      ...items.map((i) => ({
         ...i,
         esCarpeta: false as const,
       })),
-
-      ...carpetas.map(c => ({
+      ...carpetas.map((c) => ({
         ...c,
         esCarpeta: true as const,
         titol: c.nom,
         nomUsuari: '',
-        dataEditat: c.dataCreacio,
-        ultimAcces: c.dataCreacio,
+        dataEditat: c.dataEditat,
+        ultimAcces: c.ultimAccess,
       })),
     ];
 
     const base =
-      activeTab === 'favorites'
-        ? allData.filter((i) => i.favorit)
-        : allData;
+      activeTab === 'favorites' ? allData.filter((i) => i.favorit) : allData;
 
     return [...base].sort((a, b) => {
       if (activeTab === 'latest') {
-        return (
-          new Date(b.dataEditat).getTime() -
-          new Date(a.dataEditat).getTime()
-        );
+        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
       }
-
       if (activeTab === 'most_used') {
-        return (
-          new Date(b.ultimAcces).getTime() -
-          new Date(a.ultimAcces).getTime()
-        );
+        const countDiff = (b.comptadorAccess ?? 0) - (a.comptadorAccess ?? 0);
+        if (countDiff !== 0) return countDiff;
+        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
       }
-
       return 0;
     });
   }, [items, carpetas, activeTab]);
 
   const paginatedData = useMemo(() => {
-    return filteredData.slice(
-      (page - 1) * ITEMS_PER_PAGE,
-      page * ITEMS_PER_PAGE
-    );
+    return filteredData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
   }, [filteredData, page]);
 
-  const displayedCarpetas = paginatedData.filter(i => i.esCarpeta);
-  const displayedItems = paginatedData.filter(i => !i.esCarpeta);
+  const displayedCarpetas = paginatedData.filter((i) => i.esCarpeta);
+  const displayedItems = paginatedData.filter((i) => !i.esCarpeta);
 
   const totalCount = filteredData.length;
 
@@ -142,7 +145,6 @@ export default function Home() {
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-
     const { uuid, esCarpeta } = deleteTarget;
 
     if (esCarpeta) {
@@ -160,23 +162,17 @@ export default function Home() {
       } else {
         await itemsApi.deleteItem(uuid);
       }
-
       toast.success('Eliminado correctamente');
-    } catch (error) {
+    } catch {
       toast.error('Error al eliminar');
-
-      const reload = async () => {
-        try {
-          const [itemsData, carpetasData] = await Promise.all([
-            itemsApi.fetchItems(),
-            carpetasApi.fetchItems(),
-          ]);
-          setItems(itemsData ?? []);
-          setCarpetas(carpetasData ?? []);
-        } catch { }
-      };
-
-      reload();
+      try {
+        const [itemsData, carpetasData] = await Promise.all([
+          itemsApi.fetchItems(),
+          carpetasApi.fetchItems(),
+        ]);
+        setItems(itemsData ?? []);
+        setCarpetas(carpetasData ?? []);
+      } catch { }
     }
   };
 
@@ -194,11 +190,7 @@ export default function Home() {
     }
 
     if (error) {
-      return (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      );
+      return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;
     }
 
     if (displayedCarpetas.length === 0 && displayedItems.length === 0) {
@@ -227,9 +219,13 @@ export default function Home() {
               nomUsuari=""
               dataEditat={carpeta.dataEditat}
               dataCreacio={carpeta.dataCreacio}
+              ultimAcces={(carpeta as HomeElement & { esCarpeta: true }).ultimAcces}
               favorit={carpeta.favorit}
               esCarpeta
-              onClick={() => navigate('/Carpeta', { state: { uuid: carpeta.uuid, nombreCarpeta: carpeta.nom } })}
+              onAccess={handleAccess}
+              onClick={() =>
+                navigate('/Carpeta', { state: { uuid: carpeta.uuid, nombreCarpeta: carpeta.nom } })
+              }
               onEdit={() => navigate('/editCarpeta', { state: { uuid: carpeta.uuid } })}
               onDelete={() => handleDeleteClick(carpeta.uuid, true)}
             />
@@ -240,12 +236,14 @@ export default function Home() {
             <CredentialCard
               uuid={item.uuid}
               titol={item.titol}
-              nomUsuari=''
+              nomUsuari=""
               dataEditat={item.dataEditat}
               dataCreacio={item.dataCreacio}
+              ultimAcces={(item as Item).ultimAcces}
               dinsCarpeta={itemsEnCarpetaSet.has(item.uuid)}
               favorit={item.favorit}
               esCarpeta={false}
+              onAccess={handleAccess}
               onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
               onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
               onDelete={() => handleDeleteClick(item.uuid, false)}
@@ -263,12 +261,8 @@ export default function Home() {
         <Sidebar />
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          <Header
-            title="Home"
-            icon={<HomeRoundedIcon sx={{ fontSize: 30 }} />}
-          />
+          <Header title="Home" icon={<HomeRoundedIcon sx={{ fontSize: 30 }} />} />
 
-          {/* Tabs + Add New */}
           <Stack
             direction="row"
             sx={{ px: 4, pt: 3, pb: 2, justifyContent: 'space-between', alignItems: 'center' }}

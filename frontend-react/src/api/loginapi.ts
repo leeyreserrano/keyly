@@ -15,6 +15,7 @@ export async function loginUser(correu: string, contrasenya: string) {
 
   return {
     token: data.token,
+    kdfSalt: data.kdfSalt as string,
     usuari: {
       ...data.usuari,
       imatge: data.usuari?.imatge ?? null,

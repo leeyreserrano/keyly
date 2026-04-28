@@ -1,11 +1,10 @@
-import { apiRequest } from './client';
+import { apiRequest, apiMultipartRequest } from './client';
 import type { Usuari } from '../context/AuthContext';
 
 export class usuarisApi {
-  static uploadImage(file: string): Promise<Usuari | null> {
-    return apiRequest<Usuari>('/usuari/upload/image', {
-      method: 'POST',
-      body: JSON.stringify({ file }),
-    });
+  static uploadImage(file: File, token: string): Promise<Usuari | null> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiMultipartRequest<Usuari>('/usuari/upload/image', formData, token);
   }
 }

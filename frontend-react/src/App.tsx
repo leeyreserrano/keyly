@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider} from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
+import { CryptoProvider } from './context/CryptoContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -23,27 +24,29 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <Toaster position="top-center" />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/home"      element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/Item"      element={<ProtectedRoute><Item /></ProtectedRoute>} />
-          <Route path="/AddItem"   element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
-          <Route path="/ChooseType" element={<ProtectedRoute><ChooseType /></ProtectedRoute>} />
-          <Route path="/Items"     element={<ProtectedRoute><Items /></ProtectedRoute>} />
-          <Route path="/EditItem"  element={<ProtectedRoute><EditItem /></ProtectedRoute>} />
-          <Route path="/Carpetes"  element={<ProtectedRoute><Carpetas /></ProtectedRoute>} />
-          <Route path="/Carpeta"   element={<ProtectedRoute><Carpeta /></ProtectedRoute>} />
-          <Route path="/AddCarpeta" element={<ProtectedRoute><AddCarpeta /></ProtectedRoute>} />
-          <Route path="/Settings"  element={<ProtectedRoute><UserConfig /></ProtectedRoute>} />
-          <Route path="/EditCarpeta" element={<ProtectedRoute><EditCarpeta /></ProtectedRoute>} />
-          <Route path="/Compartits" element={<ProtectedRoute><Compartits /></ProtectedRoute>} />
-          <Route path="/Stadistics" element={<ProtectedRoute><Stadistics /></ProtectedRoute>} />
-          <Route path="/Duplicats" element={<ProtectedRoute><Duplicats /></ProtectedRoute>} />
-          <Route path="*"          element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <CryptoProvider>
+        <Toaster position="top-center" />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/home"        element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/Item"        element={<ProtectedRoute><Item /></ProtectedRoute>} />
+            <Route path="/AddItem"     element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
+            <Route path="/ChooseType"  element={<ProtectedRoute><ChooseType /></ProtectedRoute>} />
+            <Route path="/Items"       element={<ProtectedRoute><Items /></ProtectedRoute>} />
+            <Route path="/EditItem"    element={<ProtectedRoute><EditItem /></ProtectedRoute>} />
+            <Route path="/Carpetes"    element={<ProtectedRoute><Carpetas /></ProtectedRoute>} />
+            <Route path="/Carpeta"     element={<ProtectedRoute><Carpeta /></ProtectedRoute>} />
+            <Route path="/AddCarpeta"  element={<ProtectedRoute><AddCarpeta /></ProtectedRoute>} />
+            <Route path="/Settings"    element={<ProtectedRoute><UserConfig /></ProtectedRoute>} />
+            <Route path="/EditCarpeta" element={<ProtectedRoute><EditCarpeta /></ProtectedRoute>} />
+            <Route path="/Compartits"  element={<ProtectedRoute><Compartits /></ProtectedRoute>} />
+            <Route path="/Stadistics"  element={<ProtectedRoute><Stadistics /></ProtectedRoute>} />
+            <Route path="/Duplicats"   element={<ProtectedRoute><Duplicats /></ProtectedRoute>} />
+            <Route path="*"            element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </CryptoProvider>
     </AuthProvider>
   );
 }

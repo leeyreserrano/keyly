@@ -52,22 +52,30 @@ export default function Carpetas() {
     loadCarpetas();
   }, []);
 
+  const handleAccess = async (uuid: string) => {
+    try {
+      const updated = await carpetasApi.registrarAcces(uuid);
+      setCarpetas((prev) => prev.map((c) => (c.uuid === uuid ? { ...c, ...updated } : c)));
+    } catch {
+    }
+  };
+
   const filteredCarpetas = carpetas
-  .filter((c) =>
-    filter === 'favorites'
-      ? c.favorit
-      : c.nom.toLowerCase().includes(search.toLowerCase())
-  )
-  .sort((a, b) => {
-    if (filter === 'latest')
-      return (
-        new Date(b.dataEditat).getTime() -
-        new Date(a.dataEditat).getTime()
-      );
-    if (filter === 'most_used')
-      return (b.items?.length || 0) - (a.items?.length || 0);
-    return 0;
-  });
+    .filter((c) =>
+      filter === 'favorites'
+        ? c.favorit
+        : c.nom.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (filter === 'latest')
+        return new Date(b.ultimAccess).getTime() - new Date(a.ultimAccess).getTime();
+      if (filter === 'most_used') {
+        const diff = (b.comptadorAccess ?? 0) - (a.comptadorAccess ?? 0);
+        if (diff !== 0) return diff;
+        return new Date(b.ultimAccess).getTime() - new Date(a.ultimAccess).getTime();
+      }
+      return 0;
+    });
 
   const displayedCarpetas = filteredCarpetas.slice(
     (page - 1) * itemsPerPage,
@@ -80,26 +88,22 @@ export default function Carpetas() {
   };
 
   const confirmDelete = async () => {
-  if (!deleteTarget) return;
-
-  const uuid = deleteTarget.uuid;
-
-  setCarpetas((prev) => prev.filter((c) => c.uuid !== uuid));
-  setOpenDeleteModal(false);
-  setDeleteTarget(null);
-
-  try {
-    await carpetasApi.deleteCarpeta(uuid);
-    toast.success('Carpeta eliminada correctamente');
-  } catch {
-    toast.error('Error eliminando carpeta');
-
+    if (!deleteTarget) return;
+    const uuid = deleteTarget.uuid;
+    setCarpetas((prev) => prev.filter((c) => c.uuid !== uuid));
+    setOpenDeleteModal(false);
+    setDeleteTarget(null);
     try {
-      const data = await carpetasApi.fetchItems();
-      setCarpetas(data);
-    } catch {}
-  }
-};
+      await carpetasApi.deleteCarpeta(uuid);
+      toast.success('Carpeta eliminada correctamente');
+    } catch {
+      toast.error('Error eliminando carpeta');
+      try {
+        const data = await carpetasApi.fetchItems();
+        setCarpetas(data);
+      } catch { }
+    }
+  };
 
   return (
     <AppTheme>
@@ -109,10 +113,7 @@ export default function Carpetas() {
         <Sidebar />
 
         <Stack sx={{ flex: 1, bgcolor: 'background.default' }}>
-          <Header
-            title="Carpetas"
-            icon={<FolderOutlinedIcon sx={{ fontSize: 30 }} />}
-          />
+          <Header title="Carpetas" icon={<FolderOutlinedIcon sx={{ fontSize: 30 }} />} />
 
           <ItemsToolbar
             search={search}
@@ -133,22 +134,19 @@ export default function Carpetas() {
                       uuid={carpeta.uuid}
                       titol={carpeta.nom}
                       nomUsuari=""
-                      dataEditat={carpeta.dataCreacio}
+                      dataEditat={carpeta.dataEditat}
                       dataCreacio={carpeta.dataCreacio}
+                      ultimAcces={carpeta.ultimAccess}
                       esCarpeta
                       favorit={carpeta.favorit}
+                      onAccess={(uuid) => handleAccess(uuid)}
                       onClick={() =>
                         navigate('/Carpeta', {
-                          state: {
-                            uuid: carpeta.uuid,
-                            nombreCarpeta: carpeta.nom,
-                          },
+                          state: { uuid: carpeta.uuid, nombreCarpeta: carpeta.nom },
                         })
                       }
                       onEdit={() =>
-                        navigate('/editcarpeta', {
-                          state: { uuid: carpeta.uuid },
-                        })
+                        navigate('/editcarpeta', { state: { uuid: carpeta.uuid } })
                       }
                       onDelete={() => handleDelete(carpeta)}
                     />

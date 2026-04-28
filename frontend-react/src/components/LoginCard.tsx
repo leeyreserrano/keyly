@@ -18,10 +18,13 @@ import ForgotPassword from './ForgotPassword';
 
 import { loginUser } from '../api/loginapi';
 import { useAuth } from '../context/AuthContext';
+import { useCrypto } from '../context/CryptoContext';
+import { deriveKey } from '../crypto/cryptoService';
 
 export default function LoginCard() {
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
+  const { setDerivedKey } = useCrypto();
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -73,7 +76,10 @@ export default function LoginCard() {
     try {
       setLoading(true);
 
-      const { token, usuari } = await loginUser(correu, contrasenya);
+      const { token, usuari, kdfSalt } = await loginUser(correu, contrasenya);
+
+      const key = await deriveKey(contrasenya, kdfSalt);
+      setDerivedKey(key);
 
       login(usuari, token, rememberMe);
 
@@ -126,7 +132,7 @@ export default function LoginCard() {
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
-              )
+              ),
             }}
           />
         </FormControl>

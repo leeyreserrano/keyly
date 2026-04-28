@@ -10,25 +10,36 @@ export type PasswordConfig = {
   quantitatCaractersEspecials: number;
 };
 
-function getToken(): string | null {
-  return localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-}
-
 export class utilsApi {
   static async generatePassword(config: PasswordConfig): Promise<string> {
-    const token = getToken();
+    const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
 
-    const res = await fetch(`${API_BASE}/utils/costum/password`, {
+    const res = await fetch(`${API_BASE}/utils/custom/password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(config),
     });
 
-    if (!res.ok) throw new Error(`Error ${res.status}`);
+    if (res.status === 401) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/';
+      throw new Error('Sessió expirada');
+    }
 
-    return res.text();
+    if (!res.ok) {
+      let msg = `Error ${res.status}`;
+      try {
+        const data = await res.json();
+        msg = data.message || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    const data = await res.json();
+    return data.contrasenya;
   }
 }

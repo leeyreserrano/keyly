@@ -18,12 +18,14 @@ interface CredentialCardProps {
   nomUsuari: string;
   dataEditat: string;
   dataCreacio?: string;
+  ultimAcces?: string;
   esCarpeta?: boolean;
   dinsCarpeta?: boolean;
   favorit?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onAccess?: (uuid: string, esCarpeta: boolean) => void;
 }
 
 export default function CredentialCard({
@@ -38,11 +40,17 @@ export default function CredentialCard({
   onClick,
   onEdit,
   onDelete,
+  onAccess,
 }: CredentialCardProps) {
   const navigate = useNavigate();
   const { usuari } = useAuth();
   const [isFavorit, setIsFavorit] = useState(favorit);
   const now = useTimeRefresh(10000);
+
+  const handleClick = () => {
+    onAccess?.(uuid, esCarpeta);
+    onClick?.();
+  };
 
   const handleToggleFavorit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -76,7 +84,7 @@ export default function CredentialCard({
 
   return (
     <Paper
-      onClick={onClick}
+      onClick={handleClick}
       variant="outlined"
       sx={{
         p: 2,
@@ -129,7 +137,9 @@ export default function CredentialCard({
           Modificat: {getTimeAgo(dataEditat, now)}
         </Typography>
         <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-          {dataCreacio ? `Creat: ${formatDate(dataCreacio)}` : ''}
+          {dataCreacio
+            ? `Creat: ${formatDate(dataCreacio)}`
+            : ''}
         </Typography>
       </Stack>
     </Paper>

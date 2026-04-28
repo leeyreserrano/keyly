@@ -47,6 +47,10 @@ export class carpetasApi {
       method: 'DELETE',
     }).then(() => {});
   }
+
+  static registrarAcces(uuid: string): Promise<Carpeta | null> {
+    return apiRequest<Carpeta>(`/carpeta/access/${uuid}`, { method: 'POST' });
+  }
 }
 
 export type Carpeta = {
@@ -55,6 +59,8 @@ export type Carpeta = {
   dataCreacio: string;
   dataEditat: string;
   favorit: boolean;
+  ultimAccess: string;
+  comptadorAccess: number;
   items: {
     uuid: string;
     titol: string;

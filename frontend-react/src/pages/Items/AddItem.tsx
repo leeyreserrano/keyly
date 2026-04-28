@@ -29,6 +29,8 @@ import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import { utilsApi } from '../../api/utilsapi';
 import GeneratePasswordModal from '../../components/GeneratePasswordModal';
 import toast from 'react-hot-toast';
+import { useCrypto } from '../../context/CryptoContext';
+import { encryptPassword } from '../../crypto/cryptoService';
 
 const NOVA_CARPETA_VALUE = '__nova__';
 const SENSE_CARPETA_VALUE = '__cap__';
@@ -36,10 +38,12 @@ const SENSE_CARPETA_VALUE = '__cap__';
 export default function AddItem() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { derivedKey } = useCrypto();
 
   const [carpetaUuid] = useState<string | undefined>((location.state as { carpetaUuid?: string })?.carpetaUuid);
   const [titol, setTitol] = useState('');
   const [nomUsuari, setNomUsuari] = useState('');
+  const [notes, setNotes] = useState('');
   const [url, setUrl] = useState('');
   const [contrasenya, setContrasenya] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +62,7 @@ export default function AddItem() {
       if (carpetaUuid) {
         setCarpetaSeleccionada(carpetaUuid);
       }
-    }).catch(() => { });
+    }).catch(() => {});
   }, [carpetaUuid]);
 
   const validate = (): boolean => {
@@ -78,9 +82,15 @@ export default function AddItem() {
 
   const handleSave = async () => {
     if (!validate()) return;
+    if (!derivedKey) {
+      toast.error('Sessió de xifratge no disponible. Torna a iniciar sessió.');
+      return;
+    }
     setLoading(true);
     try {
-      const newItem = await itemsApi.addItem({ titol, nomUsuari, url, contrasenya });
+      const { encrypted, iv } = await encryptPassword(derivedKey, contrasenya);
+
+      const newItem = await itemsApi.addItem({ titol, nomUsuari, url, contrasenya: encrypted, iv });
       if (!newItem) throw new Error("Error creant l'item");
 
       if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
@@ -101,21 +111,22 @@ export default function AddItem() {
   };
 
   const handleComplexitat = async (nivell: string) => {
-  setAnchorEl(null);
+    setAnchorEl(null);
 
-  const configs = {
-    baixa:   { longitud: 8,  may: false, quantitatMay: 0, numeros: false, quantitatNumeros: 0, caractersEspecials: false, quantitatCaractersEspecials: 0 },
-    mitjana: { longitud: 12, may: true,  quantitatMay: 3, numeros: true,  quantitatNumeros: 3, caractersEspecials: false, quantitatCaractersEspecials: 0 },
-    alta:    { longitud: 20, may: true,  quantitatMay: 5, numeros: true,  quantitatNumeros: 4, caractersEspecials: true,  quantitatCaractersEspecials: 3 },
+    const configs = {
+      baixa:   { longitud: 8,  may: true, quantitatMay: 0, numeros: false, quantitatNumeros: 0, caractersEspecials: false, quantitatCaractersEspecials: 0 },
+      mitjana: { longitud: 12, may: true, quantitatMay: 3,  numeros: true,  quantitatNumeros: 3, caractersEspecials: false, quantitatCaractersEspecials: 0 },
+      alta:    { longitud: 20, may: true, quantitatMay: 5,  numeros: true,  quantitatNumeros: 4, caractersEspecials: true,  quantitatCaractersEspecials: 3 },
+    };
+
+    try {
+      const result = await utilsApi.generatePassword(configs[nivell as keyof typeof configs]);
+      if (result) setContrasenya(result);
+    } catch {
+      toast.error('Error generant la contrasenya');
+    }
   };
 
-  try {
-    const result = await utilsApi.generatePassword(configs[nivell as keyof typeof configs]);
-    if (result) setContrasenya(result);
-  } catch {
-    toast.error('Error generant la contrasenya');
-  }
-};
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
@@ -171,6 +182,17 @@ export default function AddItem() {
                   value={nomUsuari}
                   onChange={(e) => setNomUsuari(e.target.value)}
                   placeholder="Ex: usuari@exemple.com"
+                />
+              </Stack>
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
+                  Notes
+                </Typography>
+                <TextField
+                  fullWidth
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Ex: Notes sobre l'item"
                 />
               </Stack>
 
@@ -234,6 +256,7 @@ export default function AddItem() {
                   }}
                 />
               </Stack>
+
               <GeneratePasswordModal
                 open={openGenerateModal}
                 onClose={() => setOpenGenerateModal(false)}

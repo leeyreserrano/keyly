@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import LinearProgress from '@mui/material/LinearProgress';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
@@ -170,7 +170,7 @@ export default function Stadistics() {
                     {/* ── Topbar ── */}
                     <Header
                         title={'Estadistiques'}
-                        icon={<HomeRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+                        icon={<BarChartRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
                     />
 
                     {/* ── Contenido principal ── */}

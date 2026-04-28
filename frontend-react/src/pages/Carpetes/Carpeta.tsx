@@ -54,6 +54,16 @@ export default function Carpeta() {
     setPage(1);
   }, [search, filter]);
 
+  const handleAccess = async (uuid: string) => {
+    try {
+      const updated = await itemsApi.registrarAcces(uuid);
+      if (updated) {
+        setItems((prev) => prev.map((i) => (i.uuid === uuid ? { ...i, ...updated } : i)));
+      }
+    } catch {
+    }
+  };
+
   const handleDelete = (item: Item) => {
     setDeleteTarget(item);
     setOpenDeleteModal(true);
@@ -77,13 +87,16 @@ export default function Carpeta() {
       filter === 'favorites'
         ? item.favorit
         : item.titol.toLowerCase().includes(search.toLowerCase()) ||
-          item.nomUsuari.toLowerCase().includes(search.toLowerCase())
+        item.nomUsuari.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
       if (filter === 'latest')
-        return new Date(b.dataEditat).getTime() - new Date(a.dataEditat).getTime();
-      if (filter === 'most_used')
         return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
+      if (filter === 'most_used') {
+        const diff = (b.comptadorAccess ?? 0) - (a.comptadorAccess ?? 0);
+        if (diff !== 0) return diff;
+        return new Date(b.ultimAcces).getTime() - new Date(a.ultimAcces).getTime();
+      }
       return 0;
     });
 
@@ -128,7 +141,9 @@ export default function Carpeta() {
                       nomUsuari={item.nomUsuari}
                       dataEditat={item.dataEditat}
                       dataCreacio={item.dataCreacio}
+                      ultimAcces={item.ultimAcces}
                       favorit={item.favorit}
+                      onAccess={(itemUuid) => handleAccess(itemUuid)}
                       onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
                       onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
                       onDelete={() => handleDelete(item)}
@@ -139,11 +154,7 @@ export default function Carpeta() {
             </Box>
           )}
 
-          <CustomPagination
-            count={totalPages}
-            page={page}
-            onChange={setPage}
-          />
+          <CustomPagination count={totalPages} page={page} onChange={setPage} />
         </Stack>
 
         <DeleteConfirmationModal
