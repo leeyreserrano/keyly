@@ -1,3 +1,5 @@
+import type { Item } from "./Item";
+
 export type Compartit = {
     uuid: string;
     usuariCreador: {
@@ -8,6 +10,19 @@ export type Compartit = {
     permisos: Permisos;
     carpeta?: CompartitCarpeta;
     item?: CompartitItem;
+};
+
+export type CompartitRequest = {
+    entitatUuid: string,
+    tipusEntitat: TipusEntitat,
+    usuaris: {
+        additionalProp: Permisos
+    }
+};
+
+export type CompartitItemRequest = {
+    itemRequest: Item,
+    compartitRequest: CompartitRequest
 };
 
 type CompartitCarpeta = {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { getStoredKey } from "~api/auth-service"
 import { carpetasApi } from "~api/carpeta-service"
+import { compartitApi } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { utilsService } from "~api/utils-service"
@@ -85,9 +86,11 @@ function NewItem() {
     }
 
     if (carpeta.length > 0) {
-      const result = await carpetasApi.createNewItemInCarpeta(carpeta, item)
+      await carpetasApi.createNewItemInCarpeta(carpeta, item)
+    } else if (compartir.length > 0) {
+      await compartitApi.newItemCompartir(compartir ,item)
     } else {
-      const result = await itemsApi.saveItem(item)
+      await itemsApi.saveItem(item)
     }
 
     navigate("/home")
