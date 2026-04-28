@@ -17,7 +17,7 @@ function Login(props: { disableCustomTheme?: boolean }) {
           sx={{
             width: { xs: '100%', md: '50%' },
             minHeight: { xs: '300px', md: '100vh' },
-            bgcolor: '#EEE5FF',
+            bgcolor: 'rgb(238, 229, 255)',
             alignItems: 'center',
             justifyContent: 'center',
           }}

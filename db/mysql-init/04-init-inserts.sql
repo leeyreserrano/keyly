@@ -26,7 +26,7 @@ INSERT INTO Rols (uuid, sucursal_id, nom) VALUES
 
 
 INSERT INTO Usuaris (uuid, sucursal_id, departament_id, rol_id, rol_intern, nom, correu, imatge,
-contrasenya_master, data_creacio,pot_administrar) VALUES
+contrasenya_master,data_creacio,pot_administrar) VALUES
 (UUID_TO_BIN("6d5bb973-39a8-11f1-8e13-960a7d88f8c4"), 2, 1, 1, 'ADMIN','Geri', 'user@domain.com', '/app/uploads/profile-pictures/G.svg',
 '$2a$12$gC/zYDtNNNJrejFER9FpLe6adKCXuWUJ2cjRe7QOXz8dz1OOf0nVi', NOW(), true),
 (UUID_TO_BIN(UUID()), 2, 2, 2, 'ADMIN', 'Yami', 'yami@gmail.com', '/app/uploads/profile-pictures/Y.svg',

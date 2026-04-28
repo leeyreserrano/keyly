@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,12 +46,8 @@ public class Carpeta {
     @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID uuid;
 
-    @ManyToMany
-    @JoinTable(
-        name = "Carpetes_Items", 
-        joinColumns = @JoinColumn(name = "carpeta_id"), 
-        inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(name = "Carpetes_Items", joinColumns = @JoinColumn(name = "carpeta_id"), inverseJoinColumns = @JoinColumn(name = "item_id"))
     @JsonBackReference
     private Set<Item> items = new HashSet<>();
 

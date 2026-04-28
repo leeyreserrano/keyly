@@ -7,6 +7,7 @@ public record ItemRequest(
         String titol,
         String nomUsuari,
         String contrasenya,
+        String iv,
         String url,
         String notes,
         @JsonSetter(nulls = Nulls.AS_EMPTY)

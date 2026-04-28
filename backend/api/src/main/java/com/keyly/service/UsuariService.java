@@ -153,9 +153,10 @@ public class UsuariService {
 
     public void saveImage(UUID uuid, MultipartFile file) {
         try {
-            Files.createDirectories(root);
+            String originalName = file.getOriginalFilename();
+            String uniqueName = UUID.randomUUID() + "_" + originalName;
 
-            String fileName = IMAGES_PATH + file.getOriginalFilename();
+            String fileName = IMAGES_PATH + uniqueName;
             Path destinationFile = root.resolve(fileName);
 
             Files.copy(file.getInputStream(), destinationFile);

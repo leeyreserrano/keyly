@@ -14,11 +14,13 @@ import com.keyly.model.Compartit;
 import com.keyly.model.Item;
 import com.keyly.model.Usuari;
 import com.keyly.model.enums.TipusEntitat;
+import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.request.CompartitRequest;
+import com.keyly.model.request.ItemRequest;
+import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.CompartitResponse;
-import com.keyly.model.response.basics.CarpetaResponseBasic;
-import com.keyly.model.response.basics.ItemResponseBasic;
-import com.keyly.model.response.basics.UsuariResponseBasic;
+import com.keyly.model.response.ItemResponse;
+import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.CompartitRepo;
 
 @Service
@@ -69,7 +71,7 @@ public class CompartitService {
         }
 
         // Crea un compartit per a cada usuari
-        for (UUID usuariUuid : request.usuarisUuid()) {
+        for (UUID usuariUuid : request.usuaris().keySet()) {
             if (usuariUuid.equals(creadorUuid)) {
                 continue; // No el crea per l'usuari que ho crea
             }
@@ -81,13 +83,29 @@ public class CompartitService {
             compartit.setCreadorUuid(creadorUuid);
             compartit.setTipusEntitat(request.tipusEntitat());
             compartit.setEntitatUuid(request.entitatUuid());
-            compartit.setPermisos(request.permisos());
+            compartit.setPermisos(request.usuaris().get(usuariUuid));
 
             Compartit saved = repo.save(compartit);
             responses.add(convertToResponse(saved));
         }
 
         return responses;
+    }
+
+    public void createCompartit(UUID creadorUuid, ItemRequest item, CompartitRequest compartit) {
+        ItemResponse response = itemService.save(usuariService.getByUuid(creadorUuid), item);
+
+        CompartitRequest request = new CompartitRequest(response.uuid(), TipusEntitat.ITEM, compartit.usuaris());
+
+        createCompartit(creadorUuid, request);
+    }
+
+    public void createCompartit(UUID creadorUuid, CarpetaRequest carpeta, CompartitRequest compartit) {
+        CarpetaResponse response = carpetaService.save(usuariService.getUsuariEntityByUuid(creadorUuid), carpeta);
+
+        CompartitRequest request = new CompartitRequest(response.uuid(), TipusEntitat.ITEM, compartit.usuaris());
+
+        createCompartit(creadorUuid, request);
     }
 
     public void deleteCompartit(UUID uuid) {
@@ -106,28 +124,28 @@ public class CompartitService {
 
     private CompartitResponse convertToResponse(Compartit compartit) {
         Usuari creador = usuariService.getUsuariEntityByUuid(compartit.getCreadorUuid());
-        UsuariResponseBasic creadorBasic = new UsuariResponseBasic(creador);
+        UsuariResponse creadorResponse = new UsuariResponse(creador);
 
-        CarpetaResponseBasic carpetaBasic = null;
-        ItemResponseBasic itemBasic = null;
+        CarpetaResponse carpetaResponse = null;
+        ItemResponse itemResponse = null;
 
         if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
             try {
                 Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(compartit.getEntitatUuid());
-                carpetaBasic = new CarpetaResponseBasic(carpeta);
+                carpetaResponse = new CarpetaResponse(carpeta);
             } catch (EntitatNoTrobadaException e) {
                 
             }
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             try {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());
-                itemBasic = new ItemResponseBasic(item, false);
+                itemResponse = new ItemResponse(item, false);
             } catch (EntitatNoTrobadaException e) {
                 
             }
         }
 
-        return new CompartitResponse(compartit, creadorBasic, carpetaBasic, itemBasic);
+        return new CompartitResponse(compartit, creadorResponse, carpetaResponse, itemResponse);
     }
 
 }

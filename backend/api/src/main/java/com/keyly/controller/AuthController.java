@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Autorització", description = "Servei per fer login")
+@Tag(name = "Auth Controller", description = "Servei per fer login")
 public class AuthController {
 
     @Autowired
@@ -31,12 +31,7 @@ public class AuthController {
     })
     @PostMapping("login")
     public ResponseEntity<LoginResponse> login(@RequestBody AuthRequest request) {
-        boolean faLogin = service.login(request);
-
-        if (faLogin)
-            return ResponseEntity.ok(new LoginResponse(service.generateToken(request.correu()), service.getUsuari(request.correu())));
-
-        return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(service.login(request));
     }
 
 }
