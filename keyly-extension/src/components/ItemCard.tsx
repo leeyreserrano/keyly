@@ -110,9 +110,10 @@ function ItemCard({ search }: { search: string }) {
                     }}
                   />
                 )}
-                <div className="flex flex-col">
-                  <h1 className="text-lg font-bold">{item.titol}</h1>
-                  <p>{item.url}</p>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <h1 className="text-lg font-bold truncate">{item.titol}</h1>
+
+                  <p className="truncate text-sm text-gray-600">{item.url}</p>
                 </div>
                 <div className="ml-auto flex gap-2">
                   <svg
