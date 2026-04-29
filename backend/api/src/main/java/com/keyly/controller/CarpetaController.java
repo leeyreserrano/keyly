@@ -195,9 +195,9 @@ public class CarpetaController {
     public ResponseEntity<CarpetaResponse> addItemToUserCarpeta(@RequestBody ItemRequest item, @PathVariable UUID carpetaUuid) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        service.saveItemToUserCarpeta(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), carpetaUuid, item);
+        CarpetaResponse carpeta = service.saveItemToUserCarpeta(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), carpetaUuid, item);
         
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(carpeta);
     }
     
 
