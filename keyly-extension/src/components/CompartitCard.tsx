@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom"
 
 import { compartitApi } from "~api/compartit-service"
 import { TipusEntitat, type Compartit } from "~models/Compartit"
+import ModalConfirmDelete from "./ModalConfimDelete"
 
 function CompartitCard({ search }: { search: string }) {
   const [compartits, setCompartits] = useState<Compartit[]>([])
   const navigate = useNavigate()
   const [imgErrors, setImgErrors] = useState({})
+  const [showMenu, setShowMenu] = useState(false)
+  const [selectedCompartit, setSelectedCompartit] = useState(null)
 
   useEffect(() => {
     const loadCompartit = async () => {
@@ -57,6 +60,7 @@ function CompartitCard({ search }: { search: string }) {
       await compartitApi.deleteCompartit(compartit.uuid)
 
       setCompartits((prev) => prev.filter((i) => i.uuid !== compartit.uuid))
+      setShowMenu(false)
     } catch (error) {
       console.error(error)
     }
@@ -183,7 +187,8 @@ function CompartitCard({ search }: { search: string }) {
                     stroke="currentColor"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteCompartitClick(compartit)
+                      setSelectedCompartit(compartit)
+                      setShowMenu(true)
                     }}
                     className="size-6 hover:text-red-600 transition-colors">
                     <path
@@ -198,6 +203,14 @@ function CompartitCard({ search }: { search: string }) {
           </>
         )}
       </div>
+      <ModalConfirmDelete
+        open={showMenu}
+        item={selectedCompartit}
+        onClose={() => setShowMenu(false)}
+        onConfirm={(compartit) => {
+          handleDeleteCompartitClick(compartit)
+        }}
+      />
     </>
   )
 }

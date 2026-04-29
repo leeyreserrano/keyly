@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import { getStoredKey } from "~api/auth-service"
 import { carpetasApi } from "~api/carpeta-service"
@@ -36,6 +36,9 @@ function NewItem() {
   const [notes, setNotes] = useState("")
   const [carpeta, setCarpeta] = useState("")
   const [compartir, setCompartir] = useState([])
+  const location = useLocation()
+
+  const from = location.state?.from || "/home"
 
   useEffect(() => {
     const loadCarpeta = async () => {
@@ -91,7 +94,10 @@ function NewItem() {
     }
 
     if (compartir.length > 0 && carpeta.length > 0) {
-      const i: ItemResponse = await carpetasApi.createNewItemInCarpeta(carpeta, item)
+      const i: ItemResponse = await carpetasApi.createNewItemInCarpeta(
+        carpeta,
+        item
+      )
 
       console.log("ITEMS: " + JSON.stringify(i))
 
@@ -439,7 +445,7 @@ function NewItem() {
       </form>
       <div className="absolute bottom-3 right-12 z-50">
         <button
-          onClick={() => navigate("/home")}
+          onClick={() => navigate(from)}
           className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
           Cancelar
         </button>

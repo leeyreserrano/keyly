@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom"
 import { itemsApi } from "~api/item-service"
 import type { Item } from "~models/Item"
 
+import ModalConfirmDelete from "./ModalConfimDelete"
+
 function ItemCard({ search }: { search: string }) {
   const [items, setItems] = useState<Item[]>([])
   const navigate = useNavigate()
   const [imgErrors, setImgErrors] = useState({})
+  const [showMenu, setShowMenu] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   useEffect(() => {
     const loadItems = async () => {
@@ -49,6 +53,7 @@ function ItemCard({ search }: { search: string }) {
       await itemsApi.deleteItem(item.uuid)
 
       setItems((prev) => prev.filter((i) => i.uuid !== item.uuid))
+      setShowMenu(false)
     } catch (error) {
       console.error(error)
     }
@@ -160,7 +165,8 @@ function ItemCard({ search }: { search: string }) {
                     stroke="currentColor"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteItemClick(item)
+                      setSelectedItem(item)
+                      setShowMenu(true)
                     }}
                     className="size-6 hover:text-red-600 transition-colors">
                     <path
@@ -175,6 +181,14 @@ function ItemCard({ search }: { search: string }) {
           </>
         )}
       </div>
+      <ModalConfirmDelete
+        open={showMenu}
+        item={selectedItem}
+        onClose={() => setShowMenu(false)}
+        onConfirm={(item) => {
+          handleDeleteItemClick(item)
+        }}
+      />
     </>
   )
 }
