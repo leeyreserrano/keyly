@@ -12,3 +12,7 @@ export type Item = {
   ultimAcces: string
   dinsCarpeta: boolean
 }
+
+export type ItemResponse = {
+  uuid: string
+}

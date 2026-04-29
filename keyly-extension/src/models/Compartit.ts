@@ -1,52 +1,50 @@
-import type { Item } from "./Item";
+import type { Item } from "./Item"
 
 export type Compartit = {
-    uuid: string;
-    usuariCreador: {
-        uuid: string;
-        nom: string;
-    },
-    tipusEntitat: TipusEntitat;
-    permisos: Permisos;
-    carpeta?: CompartitCarpeta;
-    item?: CompartitItem;
-};
+  uuid: string
+  usuariCreador: {
+    uuid: string
+    nom: string
+  }
+  tipusEntitat: TipusEntitat
+  permisos: Permisos
+  carpeta?: CompartitCarpeta
+  item?: CompartitItem
+}
 
 export type CompartitRequest = {
-    entitatUuid: string,
-    tipusEntitat: TipusEntitat,
-    usuaris: {
-        additionalProp: Permisos
-    }
-};
+  entitatUuid: string
+  tipusEntitat: TipusEntitat
+  usuaris: Record<string, Permisos>
+}
 
 export type CompartitItemRequest = {
-    itemRequest: Item,
-    compartitRequest: CompartitRequest
-};
+  itemRequest: Item
+  compartitRequest: CompartitRequest
+}
 
 type CompartitCarpeta = {
-    uuid: string,
-    nom: string
-    favorit: boolean
-};
+  uuid: string
+  nom: string
+  favorit: boolean
+}
 
 type CompartitItem = {
-    uuid: string,
-    titol: string,
-    nomUsuari: string,
-    url: string,
-    favorit: boolean
-    dinsDeCarpeta: boolean
-};
+  uuid: string
+  titol: string
+  nomUsuari: string
+  url: string
+  favorit: boolean
+  dinsDeCarpeta: boolean
+}
 
 export enum TipusEntitat {
-    CARPETA = "CARPETA",
-    ITEM = "ITEM"
-};
+  CARPETA = "CARPETA",
+  ITEM = "ITEM"
+}
 
-enum Permisos {
-    LECTURA,
-    ESCRIPTURA,
-    ADMINISTRADOR
-};
+export enum Permisos {
+  LECTURA,
+  ESCRIPTURA,
+  ADMINISTRADOR
+}

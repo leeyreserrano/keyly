@@ -1,5 +1,5 @@
 import type { Carpeta } from "~models/Carpeta"
-import type { Item } from "~models/Item"
+import type { Item, ItemResponse } from "~models/Item"
 
 const API_BASE = "https://10.147.17.250:8081/api"
 
@@ -13,20 +13,49 @@ export class carpetasApi {
     return response.json()
   }
 
-  static async createNewItemInCarpeta(carpetaUuid: string, item: Item): Promise<void> {
+  static async createNewItemInCarpeta(
+    carpetaUuid: string,
+    item: Item
+  ): Promise<ItemResponse> {
+    console.log("Aquí también entra")
     const token = localStorage.getItem("jwtToken")
-    console.log("Token: " + localStorage.getItem("jwtToken"))
-    console.log("Item: " + JSON.stringify(item))
-    const response = await fetch(API_BASE + `/carpeta/add/${carpetaUuid}/item`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(item)
-    })
+    const response = await fetch(
+      API_BASE + `/carpeta/add/${carpetaUuid}/item`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(item)
+      }
+    )
 
-    console.log(response)
+    console.log("Item: " + JSON.stringify(item))
+
+    console.log("Response " + JSON.stringify(response))
+
+    if (!response.ok) throw new Error("Error en la petició")
+
+    const text = await response.text()
+    return text ? JSON.parse(text) : null
+  }
+
+  static async addItemInCarpeta(
+    carpetaUuid: string,
+    itemUuid: string
+  ): Promise<Item> {
+    const token = localStorage.getItem("jwtToken")
+    const response = await fetch(
+      API_BASE + `/carpeta/add/${carpetaUuid}/item/existing/${itemUuid}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    )
 
     if (!response.ok) throw new Error("Error en la petició")
     return response.json()

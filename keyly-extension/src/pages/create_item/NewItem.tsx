@@ -8,8 +8,13 @@ import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { utilsService } from "~api/utils-service"
 import type { Carpeta } from "~models/Carpeta"
+import {
+  Permisos,
+  TipusEntitat,
+  type CompartitRequest
+} from "~models/Compartit"
 import type { CustomPassword } from "~models/CustomPassword"
-import type { Item } from "~models/Item"
+import type { Item, ItemResponse } from "~models/Item"
 import type { User } from "~models/User"
 
 function bytesToBase64(bytes) {
@@ -85,10 +90,24 @@ function NewItem() {
       dinsCarpeta: carpeta.length > 0
     }
 
-    if (carpeta.length > 0) {
-      await carpetasApi.createNewItemInCarpeta(carpeta, item)
+    if (compartir.length > 0 && carpeta.length > 0) {
+      console.log("Entra aquí")
+
+      const i: ItemResponse = await carpetasApi.createNewItemInCarpeta(carpeta, item)
+
+      const compartit: CompartitRequest = {
+        entitatUuid: i.uuid,
+        tipusEntitat: TipusEntitat.ITEM,
+        usuaris: Object.fromEntries(
+          compartir.map((c) => [c, Permisos.ESCRIPTURA])
+        )
+      }
+
+      await compartitApi.addCompartit(compartit)
     } else if (compartir.length > 0) {
-      await compartitApi.newItemCompartir(compartir ,item)
+      await compartitApi.newItemCompartir(compartir, item)
+    } else if (carpeta.length > 0) {
+      await carpetasApi.createNewItemInCarpeta(carpeta, item)
     } else {
       await itemsApi.saveItem(item)
     }

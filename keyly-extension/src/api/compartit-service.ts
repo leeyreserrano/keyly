@@ -1,5 +1,6 @@
-import { TipusEntitat, type Compartit } from "~models/Compartit"
+import { Permisos, TipusEntitat, type Compartit } from "~models/Compartit"
 import type { Item } from "~models/Item"
+import type { User } from "~models/User"
 
 import {
   type CompartitItemRequest,
@@ -19,11 +20,12 @@ export class compartitApi {
   }
 
   static async newItemCompartir(
-    compartit: CompartitRequest[],
+    compartit: string[],
     item: Item
   ): Promise<void> {
-    const compartitItemRequest: CompartitItemRequest[] = compartit.map((c) => ({
+    const compartitItemRequest: CompartitItemRequest = {
       itemRequest: {
+        uuid: "",
         titol: item.titol,
         nomUsuari: item.nomUsuari,
         contrasenya: item.contrasenya,
@@ -31,21 +33,21 @@ export class compartitApi {
         url: item.url,
         notes: item.notes,
         favorit: item.favorit,
-        uuid: "",
         dataCreacio: "",
         dataEditat: "",
         ultimAcces: "",
         dinsCarpeta: false
       },
       compartitRequest: {
-        entitatUuid: c.entitatUuid,
-        tipusEntitat: c.tipusEntitat,
-        usuaris: c.usuaris
+        entitatUuid: "",
+        tipusEntitat: TipusEntitat.ITEM,
+        usuaris: Object.fromEntries(
+          compartit.map((c) => [c, Permisos.ESCRIPTURA])
+        )
       }
-    }))
+    }
 
     const token = localStorage.getItem("jwtToken")
-    console.log("Compartit: " + JSON.stringify(compartitItemRequest))
     const response = await fetch(API_BASE + "/compartit/add/item", {
       method: "POST",
       headers: {
@@ -54,6 +56,23 @@ export class compartitApi {
       },
 
       body: JSON.stringify(compartitItemRequest)
+    })
+    if (!response.ok) throw new Error("Error en la petició")
+    return response.json()
+  }
+
+  static async addCompartit(compartit: CompartitRequest): Promise<void> {
+    console.log("Compartido: " + compartit)
+
+    const token = localStorage.getItem("jwtToken")
+    const response = await fetch(API_BASE + "/compartit/add", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify(compartit)
     })
     if (!response.ok) throw new Error("Error en la petició")
     return response.json()
