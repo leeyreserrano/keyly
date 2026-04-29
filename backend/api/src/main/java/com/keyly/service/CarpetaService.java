@@ -143,6 +143,7 @@ public class CarpetaService {
 
         Item i = new Item(bagulService.getBagulEntityByUsuariUuid(u.getUuid()), item);
         carpeta.addItem(i);
+        repo.save(carpeta);
 
         return new ItemResponse(i, true);
     }
