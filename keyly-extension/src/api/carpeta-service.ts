@@ -17,7 +17,6 @@ export class carpetasApi {
     carpetaUuid: string,
     item: Item
   ): Promise<ItemResponse> {
-    console.log("Aquí también entra")
     const token = localStorage.getItem("jwtToken")
     const response = await fetch(
       API_BASE + `/carpeta/add/${carpetaUuid}/item`,

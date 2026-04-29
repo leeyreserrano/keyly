@@ -91,12 +91,12 @@ function NewItem() {
     }
 
     if (compartir.length > 0 && carpeta.length > 0) {
-      console.log("Entra aquí")
-
       const i: ItemResponse = await carpetasApi.createNewItemInCarpeta(carpeta, item)
 
+      console.log("ITEMS: " + JSON.stringify(i))
+
       const compartit: CompartitRequest = {
-        entitatUuid: i.uuid,
+        entitatUuid: i.items.uuid,
         tipusEntitat: TipusEntitat.ITEM,
         usuaris: Object.fromEntries(
           compartir.map((c) => [c, Permisos.ESCRIPTURA])
