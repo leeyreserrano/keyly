@@ -137,14 +137,14 @@ public class CarpetaService {
         return new CarpetaResponse(carpeta);
     }
 
-    public CarpetaResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, ItemRequest item) {
+    public ItemResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, ItemRequest item) {
         Carpeta carpeta = repo.findByBagulPropietariAndUuid(u, carpetaUuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
 
-        carpeta.addItem(new Item(bagulService.getBagulEntityByUsuariUuid(u.getUuid()), item));
-        repo.save(carpeta);
+        Item i = new Item(bagulService.getBagulEntityByUsuariUuid(u.getUuid()), item);
+        carpeta.addItem(i);
 
-        return new CarpetaResponse(carpeta);
+        return new ItemResponse(i, true);
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
