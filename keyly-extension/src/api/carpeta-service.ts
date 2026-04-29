@@ -31,13 +31,13 @@ export class carpetasApi {
       }
     )
 
-    console.log("Item: " + JSON.stringify(item))
-
-    console.log("Response " + JSON.stringify(response))
+    console.log(carpetaUuid)
+    console.log(JSON.stringify(item))
 
     if (!response.ok) throw new Error("Error en la petició")
 
     const text = await response.text()
+    console.log(text ? JSON.parse(text) : null);
     return text ? JSON.parse(text) : null
   }
 

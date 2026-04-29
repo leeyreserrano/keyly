@@ -62,7 +62,7 @@ export class compartitApi {
   }
 
   static async addCompartit(compartit: CompartitRequest): Promise<void> {
-    console.log("Compartido: " + compartit)
+    console.log("Compartido: " + JSON.stringify(compartit))
 
     const token = localStorage.getItem("jwtToken")
     const response = await fetch(API_BASE + "/compartit/add", {
