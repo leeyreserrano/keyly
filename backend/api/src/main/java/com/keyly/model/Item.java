@@ -43,7 +43,7 @@ public class Item {
 
     @UuidGenerator
     @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
-    private UUID uuid;
+    private UUID uuid = UUID.randomUUID();
 
     @ManyToMany(mappedBy = "items")
     @JsonManagedReference
