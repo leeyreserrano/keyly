@@ -96,7 +96,7 @@ function NewItem() {
       console.log("ITEMS: " + JSON.stringify(i))
 
       const compartit: CompartitRequest = {
-        entitatUuid: i.items.uuid,
+        entitatUuid: i.uuid,
         tipusEntitat: TipusEntitat.ITEM,
         usuaris: Object.fromEntries(
           compartir.map((c) => [c, Permisos.ESCRIPTURA])

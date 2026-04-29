@@ -14,7 +14,5 @@ export type Item = {
 }
 
 export type ItemResponse = {
-  items: {
-    uuid: string
-  }
+  uuid: string
 }
