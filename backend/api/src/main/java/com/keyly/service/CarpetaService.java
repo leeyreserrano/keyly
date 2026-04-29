@@ -17,6 +17,7 @@ import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.request.ItemRequest;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.ItemResponse;
+import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.CarpetaRepo;
 
 @Service
@@ -138,12 +139,15 @@ public class CarpetaService {
     }
 
     public ItemResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, ItemRequest item) {
+
         Carpeta carpeta = repo.findByBagulPropietariAndUuid(u, carpetaUuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
 
         Item i = new Item(bagulService.getBagulEntityByUsuariUuid(u.getUuid()), item);
+
         carpeta.addItem(i);
-        repo.save(carpeta);
+
+        itemService.save(new UsuariResponse(u), i);
 
         return new ItemResponse(i, true);
     }

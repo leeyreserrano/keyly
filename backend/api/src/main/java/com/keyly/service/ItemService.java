@@ -83,11 +83,31 @@ public class ItemService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
     }
 
+    public ItemResponse save(UsuariResponse u, Item item) {
+        if (item.getCarpetas() != null && !item.getCarpetas().isEmpty()) {
+            Set<Carpeta> managed = new HashSet<>();
+
+            for (Carpeta c : new HashSet<>(item.getCarpetas())) {
+                Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(c.getUuid());
+                managed.add(carpeta);
+            }
+            item.setCarpetas(managed);
+
+            for (Carpeta carpeta : managed) {
+                carpeta.getItems().add(item);
+            }
+        }
+
+        Item itemGuardat = repo.save(item);
+
+        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
+    }
+
     public ItemResponse save(UsuariResponse u, ItemRequest i) {
         Bagul b = bagulService.getBagulEntityByUsuariUuid(u.uuid());
 
         Item item = new Item(b, i);
-        
+
         if (item.getCarpetas() != null && !item.getCarpetas().isEmpty()) {
             Set<Carpeta> managed = new HashSet<>();
 
@@ -129,7 +149,7 @@ public class ItemService {
         item.setDataEditat(LocalDateTime.now());
 
         Item itemGuardat = repo.save(item);
-        
+
         return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
@@ -142,7 +162,8 @@ public class ItemService {
     }
 
     public ItemResponse deleteByUuid(Usuari usuari, UUID uuid) {
-        Item item = repo.findByBagulPropietariAndUuid(usuari, uuid).orElseThrow(() -> new EntitatNoTrobadaException("Item amb el uuid: " + uuid + " no trobat."));
+        Item item = repo.findByBagulPropietariAndUuid(usuari, uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Item amb el uuid: " + uuid + " no trobat."));
 
         repo.deleteByUuid(item.getUuid());
 
@@ -160,5 +181,5 @@ public class ItemService {
 
         repo.save(item);
     }
-    
+
 }
