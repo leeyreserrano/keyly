@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.keyly.exception.CompartitException;
 import com.keyly.exception.EntitatNoTrobadaException;
 import com.keyly.model.Carpeta;
 import com.keyly.model.Compartit;
 import com.keyly.model.Item;
 import com.keyly.model.Usuari;
+import com.keyly.model.enums.Permisos;
 import com.keyly.model.enums.TipusEntitat;
 import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.request.CompartitRequest;
@@ -47,6 +49,13 @@ public class CompartitService {
                 .toList();
     }
 
+    public List<CompartitResponse> getAllCompartitsOfUserCreats(UUID usuariUuid) {
+        return repo.findByCreadorUuid(usuariUuid)
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
+    }
+
     public List<CompartitResponse> getAllCompartits() {
         return repo.findAll()
                 .stream()
@@ -55,9 +64,13 @@ public class CompartitService {
     }
 
     public CompartitResponse getCompartitByUuid(UUID uuid) {
+        return convertToResponse(getCompartitEntityByUuid(uuid));
+    }
+
+    public Compartit getCompartitEntityByUuid(UUID uuid) {
         Compartit compartit = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb uuid: " + uuid));
-        return convertToResponse(compartit);
+        return compartit;
     }
 
     public List<CompartitResponse> createCompartit(UUID creadorUuid, CompartitRequest request) {
@@ -134,18 +147,29 @@ public class CompartitService {
                 Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(compartit.getEntitatUuid());
                 carpetaResponse = new CarpetaResponse(carpeta);
             } catch (EntitatNoTrobadaException e) {
-                
+
             }
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             try {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());
                 itemResponse = new ItemResponse(item, false);
             } catch (EntitatNoTrobadaException e) {
-                
+
             }
         }
 
         return new CompartitResponse(compartit, creadorResponse, carpetaResponse, itemResponse);
+    }
+
+    public void updateCompartit(UUID creadorUuid, UUID compartitUuid, Permisos permisos) {
+        Compartit compartit = getCompartitEntityByUuid(compartitUuid);
+
+        if (compartit.getPermisos() != Permisos.ADMINISTRADOR)
+            throw new CompartitException("L'usuari no és administrador.");
+
+        compartit.setPermisos(permisos);
+        repo.save(compartit);
+
     }
 
 }

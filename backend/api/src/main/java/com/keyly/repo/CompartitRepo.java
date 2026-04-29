@@ -18,6 +18,8 @@ public interface CompartitRepo extends JpaRepository<Compartit, Long> {
 
     List<Compartit> findByUsuariUuid(@Param("uuid") UUID uuid);
 
+    List<Compartit> findByCreadorUuid(UUID creadorUuid);
+
     Optional<Compartit> findByUsuariAndUuid(@Param("usuari") Usuari usuari, @Param("uuid") UUID uuid);
 
     void deleteByUuid(UUID uuid);
