@@ -10,7 +10,7 @@ export type Item = {
   dataCreacio: string
   dataEditat: string
   ultimAcces: string
-  dinsCarpeta: boolean
+  dinsDeCarpeta: boolean
 }
 
 export type ItemResponse = {

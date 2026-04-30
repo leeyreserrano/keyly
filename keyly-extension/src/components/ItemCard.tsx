@@ -18,6 +18,7 @@ function ItemCard({ search }: { search: string }) {
       try {
         const [itemsData] = await Promise.all([itemsApi.fetchItems()])
         setItems(itemsData)
+        console.log(JSON.stringify(itemsData))
       } catch (error) {
         console.error(error)
       }
@@ -121,6 +122,15 @@ function ItemCard({ search }: { search: string }) {
                   <p className="truncate text-sm text-gray-600">{item.url}</p>
                 </div>
                 <div className="ml-auto flex gap-2">
+                  {item.dinsDeCarpeta && (
+                    <svg
+                      fill="currentColor"
+                      className="size-6"
+                      viewBox="0 0 24 24">
+                      <path d="m9.17 6 2 2H20v10H4V6zM10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8z"></path>
+                    </svg>
+                  )}
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill={item.favorit ? "currentColor" : "none"}

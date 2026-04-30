@@ -90,7 +90,7 @@ function NewItem() {
       dataCreacio: null,
       dataEditat: null,
       ultimAcces: null,
-      dinsCarpeta: carpeta.length > 0
+      dinsDeCarpeta: carpeta.length > 0
     }
 
     if (compartir.length > 0 && carpeta.length > 0) {
@@ -98,8 +98,6 @@ function NewItem() {
         carpeta,
         item
       )
-
-      console.log("ITEMS: " + JSON.stringify(i))
 
       const compartit: CompartitRequest = {
         entitatUuid: i.uuid,
@@ -118,7 +116,7 @@ function NewItem() {
       await itemsApi.saveItem(item)
     }
 
-    navigate("/home")
+    navigate(from)
   }
 
   const customPasswordLow = async () => {
