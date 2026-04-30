@@ -110,19 +110,6 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(item);
     }
 
-    @Operation(summary = "Actualitza un item per UUID", description = "ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Item actualitzat"),
-            @ApiResponse(responseCode = "404", description = "Bagul no trobat")
-    })
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("update/admin/{uuid}")
-    public ResponseEntity<ItemResponse> updateItem(@PathVariable UUID uuid, @RequestBody ItemRequest request) {
-        ItemResponse response = service.update(uuid, request);
-
-        return ResponseEntity.ok(response);
-    }
-
     @Operation(summary = "Actualitza un item per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Item actualitzat"),
@@ -152,17 +139,19 @@ public class ItemController {
 
     @Operation(summary = "Elimina un item per UUID que l'usuari tingui", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Item eliminat"),
+            @ApiResponse(responseCode = "202", description = "Item eliminat"),
             @ApiResponse(responseCode = "404", description = "Item no trobat"),
             @ApiResponse(responseCode = "409", description = "Falta de permissos")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @DeleteMapping("delete/{uuid}")
-    public ResponseEntity<ItemResponse> deleteItem(@PathVariable UUID uuid) {
+    public ResponseEntity<HttpStatus> deleteItem(@PathVariable UUID uuid) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return ResponseEntity.ok(service.deleteByUuid(
-                usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid));
+        service.deleteByUuid(
+                usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), uuid);
+
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
-    
+
 }

@@ -19,12 +19,16 @@ import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.CarpetaRepo;
+import com.keyly.repo.EncryptedDataKeysRepo;
 
 @Service
 public class CarpetaService {
 
     @Autowired
     private CarpetaRepo repo;
+
+    @Autowired
+    private EncryptedDataKeysRepo repoEncryptedDataKeys;
 
     @Autowired
     private BagulService bagulService;
@@ -78,7 +82,7 @@ public class CarpetaService {
 
         return carpeta.getItems()
                 .stream()
-                .map(item -> new ItemResponse(item, true))
+                .map(item -> new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()),true))
                 .toList();
     }
 
@@ -88,7 +92,7 @@ public class CarpetaService {
 
         return carpeta.getItems()
                 .stream()
-                .map(item -> new ItemResponse(item, true))
+                .map(item -> new ItemResponse(item, repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(uuid, usuari.getUuid()),true))
                 .toList();
     }
 
@@ -147,9 +151,9 @@ public class CarpetaService {
 
         carpeta.addItem(i);
 
-        itemService.save(new UsuariResponse(u), i);
+        ItemResponse response = itemService.save(new UsuariResponse(u), item);
 
-        return new ItemResponse(i, true);
+        return new ItemResponse(i, response.encryptedDataKey(),true);
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {

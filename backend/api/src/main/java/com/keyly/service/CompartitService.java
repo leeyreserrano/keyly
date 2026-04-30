@@ -24,12 +24,16 @@ import com.keyly.model.response.CompartitResponse;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.CompartitRepo;
+import com.keyly.repo.EncryptedDataKeysRepo;
 
 @Service
 public class CompartitService {
 
     @Autowired
     private CompartitRepo repo;
+
+    @Autowired
+    private EncryptedDataKeysRepo repoEncryptedDataKeys;
 
     @Autowired
     private UsuariService usuariService;
@@ -152,7 +156,7 @@ public class CompartitService {
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             try {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());
-                itemResponse = new ItemResponse(item, false);
+                itemResponse = new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()),false);
             } catch (EntitatNoTrobadaException e) {
 
             }

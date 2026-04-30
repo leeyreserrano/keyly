@@ -14,11 +14,14 @@ import com.keyly.exception.EntitatNoTrobadaException;
 import com.keyly.mapper.ItemMapper;
 import com.keyly.model.Bagul;
 import com.keyly.model.Carpeta;
+import com.keyly.model.EncryptedDataKeys;
 import com.keyly.model.Item;
 import com.keyly.model.Usuari;
 import com.keyly.model.request.ItemRequest;
+import com.keyly.model.response.EncryptedDataKeyResponse;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.model.response.UsuariResponse;
+import com.keyly.repo.EncryptedDataKeysRepo;
 import com.keyly.repo.ItemRepo;
 
 @Service
@@ -26,6 +29,9 @@ public class ItemService {
 
     @Autowired
     private ItemRepo repo;
+
+    @Autowired
+    private EncryptedDataKeysRepo repoEncryptedDataKeys;
 
     @Autowired
     private BagulService bagulService;
@@ -45,6 +51,7 @@ public class ItemService {
                 .stream()
                 .map(item -> new ItemResponse(
                         item,
+                        repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()),
                         carpetaService.hasItemInAnyCarpeta(item.getUuid())))
                 .toList();
     }
@@ -52,7 +59,9 @@ public class ItemService {
     public List<ItemResponse> getAllItemsByUsuariUuid(UUID usuariUuid) {
         return repo.findByBagulPropietariUuid(usuariUuid)
                 .stream()
-                .map(item -> new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid())))
+                .map(item -> new ItemResponse(item,
+                        repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(item.getUuid(), usuariUuid),
+                        carpetaService.hasItemInAnyCarpeta(item.getUuid())))
                 .toList();
     }
 
@@ -60,7 +69,8 @@ public class ItemService {
         Item item = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
 
-        return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
+        return new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(uuid),
+                carpetaService.hasItemInAnyCarpeta(item.getUuid()));
     }
 
     public Item getItemEntityByUuid(UUID uuid) {
@@ -75,32 +85,13 @@ public class ItemService {
         item.setDataUltimAcces(LocalDateTime.now());
         repo.save(item);
 
-        return new ItemResponse(item, carpetaService.hasItemInAnyCarpeta(item.getUuid()));
+        return new ItemResponse(item, repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(uuid, usuari.getUuid()),
+                carpetaService.hasItemInAnyCarpeta(item.getUuid()));
     }
 
     public Item getUserItemEntity(Usuari usuari, UUID uuid) {
         return repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item no trobat amb el uuid: " + uuid));
-    }
-
-    public ItemResponse save(UsuariResponse u, Item item) {
-        if (item.getCarpetas() != null && !item.getCarpetas().isEmpty()) {
-            Set<Carpeta> managed = new HashSet<>();
-
-            for (Carpeta c : new HashSet<>(item.getCarpetas())) {
-                Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(c.getUuid());
-                managed.add(carpeta);
-            }
-            item.setCarpetas(managed);
-
-            for (Carpeta carpeta : managed) {
-                carpeta.getItems().add(item);
-            }
-        }
-
-        Item itemGuardat = repo.save(item);
-
-        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     public ItemResponse save(UsuariResponse u, ItemRequest i) {
@@ -124,19 +115,13 @@ public class ItemService {
 
         Item itemGuardat = repo.save(item);
 
-        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
-    }
+        EncryptedDataKeys e = new EncryptedDataKeys(null, null, itemGuardat, item.getBagul().getPropietari(),
+                i.encryptedDataKey());
 
-    public ItemResponse update(UUID uuid, ItemRequest request) {
-        Item item = getItemEntityByUuid(uuid);
+        EncryptedDataKeys encryptedDataKeyGuardat = repoEncryptedDataKeys.save(e);
 
-        mapper.updateItemFromDto(request, item);
-
-        item.setDataEditat(LocalDateTime.now());
-
-        Item itemGuardat = repo.save(item);
-
-        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
+        return new ItemResponse(itemGuardat, new EncryptedDataKeyResponse(encryptedDataKeyGuardat),
+                carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     public ItemResponse update(UsuariResponse usuari, UUID uuid, ItemRequest request) {
@@ -150,7 +135,13 @@ public class ItemService {
 
         Item itemGuardat = repo.save(item);
 
-        return new ItemResponse(itemGuardat, carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
+        EncryptedDataKeys e = new EncryptedDataKeys(null, null, itemGuardat, item.getBagul().getPropietari(),
+                request.encryptedDataKey());
+
+        EncryptedDataKeys encryptedDataKeyGuardat = repoEncryptedDataKeys.save(e);
+
+        return new ItemResponse(itemGuardat, new EncryptedDataKeyResponse(encryptedDataKeyGuardat),
+                carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
     }
 
     public ItemResponse deleteByUuid(UUID uuid) {
@@ -161,13 +152,11 @@ public class ItemService {
         return item;
     }
 
-    public ItemResponse deleteByUuid(Usuari usuari, UUID uuid) {
+    public void deleteByUuid(Usuari usuari, UUID uuid) {
         Item item = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Item amb el uuid: " + uuid + " no trobat."));
 
         repo.deleteByUuid(item.getUuid());
-
-        return new ItemResponse(item, false);
     }
 
     public void registerAccess(UUID userUuid, UUID itemUuid) {

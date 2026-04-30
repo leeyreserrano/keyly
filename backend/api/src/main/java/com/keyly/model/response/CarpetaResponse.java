@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.keyly.model.Carpeta;
+import com.keyly.model.Item;
+import com.keyly.model.Usuari;
+import com.keyly.repo.EncryptedDataKeysRepo;
 
 public record CarpetaResponse(
         UUID uuid,
@@ -17,7 +20,7 @@ public record CarpetaResponse(
         Long comptadorAccess,
         List<ItemResponse> items) {
 
-    public CarpetaResponse(Carpeta c) {
+    public CarpetaResponse(Carpeta c, Usuari u) {
         this(
                 c.getUuid(),
                 new BagulResponse(c.getBagul()),
@@ -29,8 +32,14 @@ public record CarpetaResponse(
                 c.getComptadorAccess(),
                 c.getItems()
                         .stream()
-                        .map(item -> new ItemResponse(item, true))
+                        .map(item -> new ItemResponse(item, searchEncryptedDataKeys(u, item),true))
                         .toList());
+    }
+
+    private static EncryptedDataKeyResponse searchEncryptedDataKeys(Usuari u, Item item) {
+        EncryptedDataKeysRepo repo;
+
+        return repo.findByItemUuidAndUsuariUuid(item.getUuid(), u.getUuid());
     }
 
 }

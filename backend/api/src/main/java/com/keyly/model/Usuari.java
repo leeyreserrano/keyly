@@ -73,6 +73,12 @@ public class Usuari {
     @Column(name = "kdf_salt")
     private byte[] kdfSalt;
 
+    @Column(name= "public_key")
+    private String publicKey;
+
+    @Column(name = "encrypted_private_key")
+    private String encryptedPrivateKey;
+
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
@@ -89,6 +95,8 @@ public class Usuari {
         this.rol = rol;
         this.nom = request.nom();
         this.correu = request.correu();
+        this.publicKey = request.publicKey();
+        this.encryptedPrivateKey = request.encryptedPrivateKey();
         this.potAdministrar = request.potAdministrar();
     }
 

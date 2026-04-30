@@ -12,6 +12,7 @@ public record ItemResponse(
         String nomUsuari,
         String contrasenya,
         byte[] iv,
+        EncryptedDataKeyResponse encryptedDataKey,
         String url,
         String notes,
         boolean favorit,
@@ -22,13 +23,14 @@ public record ItemResponse(
         boolean dinsDeCarpeta,
         BagulResponseBasic bagul) {
 
-    public ItemResponse(Item i, boolean dinsDeCarpeta) {
+    public ItemResponse(Item i, EncryptedDataKeyResponse encryptedDataKey, boolean dinsDeCarpeta) {
         this(
                 i.getUuid(),
                 i.getTitol(),
                 i.getNomUsuari(),
                 i.getContrasenya(),
                 i.getIv(),
+                encryptedDataKey,
                 i.getUrl(),
                 i.getNotes(),
                 i.getFavorit(),
