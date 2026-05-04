@@ -1,6 +1,7 @@
 package com.keyly.model;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -95,6 +96,7 @@ public class Usuari {
         this.rol = rol;
         this.nom = request.nom();
         this.correu = request.correu();
+        this.kdfSalt = Base64.getDecoder().decode(request.kdfSalt());
         this.publicKey = request.publicKey();
         this.encryptedPrivateKey = request.encryptedPrivateKey();
         this.potAdministrar = request.potAdministrar();

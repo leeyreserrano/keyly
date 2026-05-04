@@ -12,6 +12,7 @@ public record UsuariRequest(
         String nom,
         String correu,
         String contrasenya,
+        String kdfSalt,
         String publicKey,
         String encryptedPrivateKey,
         @JsonSetter(nulls = Nulls.AS_EMPTY) Boolean potAdministrar) {

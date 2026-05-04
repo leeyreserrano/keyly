@@ -60,7 +60,6 @@ public class UsuariController {
 
         return ResponseEntity.ok(usuaris);
     }
-    
 
     @Operation(summary = "Crea un usuari", description = "ADMIN / CAP", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
