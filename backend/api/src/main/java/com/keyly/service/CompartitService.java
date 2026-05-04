@@ -12,6 +12,7 @@ import com.keyly.exception.CompartitException;
 import com.keyly.exception.EntitatNoTrobadaException;
 import com.keyly.model.Carpeta;
 import com.keyly.model.Compartit;
+import com.keyly.model.EncryptedDataKeys;
 import com.keyly.model.Item;
 import com.keyly.model.Usuari;
 import com.keyly.model.enums.Permisos;
@@ -19,17 +20,23 @@ import com.keyly.model.enums.TipusEntitat;
 import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.request.CompartitRequest;
 import com.keyly.model.request.ItemRequest;
+import com.keyly.model.request.UsuarisCompartits;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.CompartitResponse;
+import com.keyly.model.response.EncryptedDataKeyResponse;
 import com.keyly.model.response.ItemResponse;
 import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.CompartitRepo;
+import com.keyly.repo.EncryptedDataKeysRepo;
 
 @Service
 public class CompartitService {
 
     @Autowired
     private CompartitRepo repo;
+
+    @Autowired
+    private EncryptedDataKeysRepo repoEncryptedDataKeys;
 
     @Autowired
     private UsuariService usuariService;
@@ -84,7 +91,8 @@ public class CompartitService {
         }
 
         // Crea un compartit per a cada usuari
-        for (UUID usuariUuid : request.usuaris().keySet()) {
+        for (UsuarisCompartits usuari : request.usuaris()) {
+            UUID usuariUuid = usuari.usuariUuid();
             if (usuariUuid.equals(creadorUuid)) {
                 continue; // No el crea per l'usuari que ho crea
             }
@@ -96,17 +104,22 @@ public class CompartitService {
             compartit.setCreadorUuid(creadorUuid);
             compartit.setTipusEntitat(request.tipusEntitat());
             compartit.setEntitatUuid(request.entitatUuid());
-            compartit.setPermisos(request.usuaris().get(usuariUuid));
+            compartit.setPermisos(usuari.permis());
 
             Compartit saved = repo.save(compartit);
             responses.add(convertToResponse(saved));
+
+            EncryptedDataKeys e = new EncryptedDataKeys(null, null,
+                    itemService.getItemEntityByUuid(request.entitatUuid()), usuariReceptor, usuari.encryptedDataKey());
+
+            repoEncryptedDataKeys.save(e);
         }
 
         return responses;
     }
 
     public void createCompartit(UUID creadorUuid, ItemRequest item, CompartitRequest compartit) {
-        ItemResponse response = itemService.save(usuariService.getByUuid(creadorUuid), item);
+        ItemResponse response = itemService.save(usuariService.getUsuariEntityByUuid(creadorUuid), item);
 
         CompartitRequest request = new CompartitRequest(response.uuid(), TipusEntitat.ITEM, compartit.usuaris());
 
@@ -137,7 +150,6 @@ public class CompartitService {
 
     private CompartitResponse convertToResponse(Compartit compartit) {
         Usuari creador = usuariService.getUsuariEntityByUuid(compartit.getCreadorUuid());
-        UsuariResponse creadorResponse = new UsuariResponse(creador);
 
         CarpetaResponse carpetaResponse = null;
         ItemResponse itemResponse = null;
@@ -145,20 +157,21 @@ public class CompartitService {
         if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
             try {
                 Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(compartit.getEntitatUuid());
-                carpetaResponse = new CarpetaResponse(carpeta);
-            } catch (EntitatNoTrobadaException e) {
-
+                carpetaResponse = carpetaService.toCarpetaResponse(carpeta);
+            } catch (EntitatNoTrobadaException ignored) {
             }
+
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             try {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());
-                itemResponse = new ItemResponse(item, false);
-            } catch (EntitatNoTrobadaException e) {
-
+                EncryptedDataKeyResponse edk = repoEncryptedDataKeys
+                        .findByItemUuidAndUsuariUuid(item.getUuid(), compartit.getUsuari().getUuid());
+                itemResponse = new ItemResponse(item, edk, false);
+            } catch (EntitatNoTrobadaException ignored) {
             }
         }
 
-        return new CompartitResponse(compartit, creadorResponse, carpetaResponse, itemResponse);
+        return new CompartitResponse(compartit, new UsuariResponse(creador), carpetaResponse, itemResponse);
     }
 
     public void updateCompartit(UUID creadorUuid, UUID compartitUuid, Permisos permisos) {

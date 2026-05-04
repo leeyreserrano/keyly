@@ -42,7 +42,6 @@ services:
       - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
     volumes:
       - cassandra-data:/var/lib/cassandra
-      - ./db/cassandra-init:/cassandra-init
     networks:
       - network
 
