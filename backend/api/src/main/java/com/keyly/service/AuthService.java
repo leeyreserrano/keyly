@@ -29,7 +29,7 @@ public class AuthService {
             usuariService.actualitzarUltimLogin(usuari);
         }
 
-        return new LoginResponse(generateToken(usuari.getCorreu()), new UsuariResponse(usuari), usuari.getKdfSalt());
+        return new LoginResponse(generateToken(usuari.getCorreu()), new UsuariResponse(usuari), usuari.getKdfSalt(), usuari.getEncryptedPrivateKey());
     }
 
     public UsuariResponse getUsuari(String correu) {

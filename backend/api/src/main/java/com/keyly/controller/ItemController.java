@@ -105,7 +105,7 @@ public class ItemController {
     public ResponseEntity<ItemResponse> addItem(@RequestBody ItemRequest i) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        ItemResponse item = service.save(usuariService.getByUuid(UUID.fromString(authentication.getName())), i);
+        ItemResponse item = service.save(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), i);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(item);
     }

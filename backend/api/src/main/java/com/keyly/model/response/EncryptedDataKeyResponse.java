@@ -1,12 +1,14 @@
 package com.keyly.model.response;
 
+import java.util.UUID;
+
 import com.keyly.model.EncryptedDataKeys;
 
 public record EncryptedDataKeyResponse(
-        String uuid,
-        String encryptedDataKey) {
+        UUID uuid,
+        String encryptedDatakey) {
 
     public EncryptedDataKeyResponse(EncryptedDataKeys e) {
-        this(e.getUuid().toString(), e.getEncryptedDatakey());
+        this(e.getUuid(), e.getEncryptedDatakey());
     }
 }
