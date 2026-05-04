@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
-import { getPublicKey, getStoredKey } from "~api/auth-service"
+import { getStoredKey } from "~api/auth-service"
 import { carpetasApi } from "~api/carpeta-service"
 import { compartitApi } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
@@ -92,15 +92,23 @@ function NewItem() {
       new TextEncoder().encode(contrasenya)
     )
 
+    const data = new TextEncoder().encode(contrasenya)
+
+    const key = await getStoredKey()
+
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      data
+    )
     const item: Item = {
       uuid: null,
-      titol,
-      nomUsuari,
-      contrasenya: bytesToBase64(encryptedPassword),
+      titol: titol,
+      nomUsuari: nomUsuari,
+      contrasenya: bytesToBase64(encrypted),
       iv: bytesToBase64(iv),
-      encryptedDataKey: bytesToBase64(encryptedDataKey),
-      url,
-      notes,
+      url: url,
+      notes: notes,
       favorit: false,
       dataCreacio: null,
       dataEditat: null,
