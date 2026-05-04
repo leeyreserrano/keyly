@@ -92,10 +92,6 @@ function NewItem() {
       new TextEncoder().encode(contrasenya)
     )
 
-    const data = new TextEncoder().encode(contrasenya)
-
-    const key = await getStoredKey()
-
     const item: Item = {
       uuid: null,
       titol,
