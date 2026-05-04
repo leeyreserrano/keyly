@@ -140,7 +140,7 @@ CREATE TABLE `Encrypted_Data_Keys` (
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `item_id` BIGINT NOT NULL,
   `user_id` BIGINT NOT NULL,
-  `encrypted_datakey` varchar(255) NOT NULL UNIQUE,
+  `encrypted_datakey` TEXT NOT NULL UNIQUE,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_encrypted_data_keys_items` FOREIGN KEY (`item_id`) REFERENCES `Items` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_encrypted_data_keys_usuaris` FOREIGN KEY (`user_id`) REFERENCES `Usuaris` (`id`) ON DELETE CASCADE
