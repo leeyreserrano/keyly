@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
-import { getStoredKey } from "~api/auth-service"
+import { getPublicKey, getStoredKey } from "~api/auth-service"
 import { carpetasApi } from "~api/carpeta-service"
 import { compartitApi } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
@@ -69,23 +69,42 @@ function NewItem() {
     e.preventDefault()
     const iv = crypto.getRandomValues(new Uint8Array(12))
 
+    const dataKey = await crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: 256
+      },
+      true,
+      ["encrypt", "decrypt"]
+    )
+
+    const rawDataKey = await crypto.subtle.exportKey("raw", dataKey)
+
+    const encryptedDataKey = await crypto.subtle.encrypt(
+      { name: "RSA-OAEP" },
+      await getPublicKey(),
+      rawDataKey
+    )
+
+    const encryptedPassword = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      dataKey,
+      new TextEncoder().encode(contrasenya)
+    )
+
     const data = new TextEncoder().encode(contrasenya)
 
     const key = await getStoredKey()
 
-    const encrypted = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      key,
-      data
-    )
     const item: Item = {
       uuid: null,
-      titol: titol,
-      nomUsuari: nomUsuari,
-      contrasenya: bytesToBase64(encrypted),
+      titol,
+      nomUsuari,
+      contrasenya: bytesToBase64(encryptedPassword),
       iv: bytesToBase64(iv),
-      url: url,
-      notes: notes,
+      encryptedDataKey: bytesToBase64(encryptedDataKey),
+      url,
+      notes,
       favorit: false,
       dataCreacio: null,
       dataEditat: null,

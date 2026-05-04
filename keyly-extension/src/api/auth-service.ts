@@ -16,20 +16,43 @@ export async function loginUser(correu: string, contrasenya: string) {
     }
 
     const data = await res.json()
-    const { token, user, kdfSalt } = data
+    const { token, usuari, kdfSalt, encryptedPrivateKey } = data
 
     const derivedKey = await deriveKey(contrasenya, kdfSalt)
+    const decryptedPrivateKey = await decryptPrivateKey(
+      encryptedPrivateKey,
+      derivedKey
+    )
 
     localStorage.setItem("jwtToken", token)
-    localStorage.setItem("derivedKey", derivedKey)
+    localStorage.setItem("publicKey", usuari.publicKey)
+    localStorage.setItem("privateKey", decryptedPrivateKey)
 
-    console.log("KDF " + kdfSalt)
-    console.log("DERIVED " + localStorage.getItem("derivedKey"))
-
-    return { user, token }
+    return { usuari, token }
   } catch (err: any) {
+    console.error("Login error:", err)
     throw new Error(err.message || "Error de conexión")
   }
+}
+
+export async function getPublicKey(): Promise<CryptoKey> {
+  const publicKeyString = localStorage.getItem("publicKey")
+
+  if (!publicKeyString) throw new Error("No public key")
+
+  const binary = atob(publicKeyString)
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0))
+
+  return await crypto.subtle.importKey(
+    "spki",
+    bytes,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    },
+    false,
+    ["encrypt"]
+  )
 }
 
 export async function getStoredKey() {
@@ -48,18 +71,49 @@ export async function getStoredKey() {
   )
 }
 
-async function deriveKey(password: string, salt: string) {
+async function decryptPrivateKey(
+  encryptedPrivateKey: string,
+  derivedKey: CryptoKey
+) {
+  try {
+    const [ivBase64, dataBase64] = encryptedPrivateKey.split(":")
+
+    if (!ivBase64 || !dataBase64) {
+      throw new Error("Formato inválido de encryptedPrivateKey")
+    }
+    const iv = Uint8Array.from(atob(ivBase64), (c) => c.charCodeAt(0))
+    const encryptedData = Uint8Array.from(atob(dataBase64), (c) =>
+      c.charCodeAt(0)
+    )
+
+    const decrypted = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv
+      },
+      derivedKey,
+      encryptedData
+    )
+
+    const decoder = new TextDecoder()
+    return decoder.decode(decrypted)
+  } catch (err) {
+    throw new Error("Error al desencriptar la private key")
+  }
+}
+
+async function deriveKey(password: string, salt: string): Promise<CryptoKey> {
   const enc = new TextEncoder()
 
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
     enc.encode(password),
-    "PBKDF2",
+    { name: "PBKDF2" },
     false,
-    ["deriveBits"]
+    ["deriveKey"]
   )
 
-  const derivedBits = await crypto.subtle.deriveBits(
+  const derivedKey = await crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
       salt: enc.encode(salt),
@@ -67,12 +121,15 @@ async function deriveKey(password: string, salt: string) {
       hash: "SHA-256"
     },
     keyMaterial,
-    256
+    {
+      name: "AES-GCM",
+      length: 256
+    },
+    false,
+    ["encrypt", "decrypt"]
   )
 
-  const bytes = new Uint8Array(derivedBits)
-
-  return btoa(String.fromCharCode(...bytes))
+  return derivedKey
 }
 
 export function getCurrentUser() {
