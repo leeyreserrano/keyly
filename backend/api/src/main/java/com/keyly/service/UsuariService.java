@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -110,8 +109,6 @@ public class UsuariService {
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
         usuari.setContrasenya(contrasenyaEncriptada);
 
-        usuari.setKdfSalt(generateSalt());
-
         usuari.setImatge(IMAGES_PATH + u.nom().toUpperCase().charAt(0) + ".svg");
 
         return new UsuariResponse(repo.save(usuari));
@@ -137,18 +134,9 @@ public class UsuariService {
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
         usuari.setContrasenya(contrasenyaEncriptada);
 
-        usuari.setKdfSalt(generateSalt());
-
         usuari.setImatge(IMAGES_PATH + nouUsuari.nom().toUpperCase().charAt(0) + ".svg");
 
         return new UsuariResponse(repo.save(usuari));
-    }
-
-    private static byte[] generateSalt() {
-        byte[] salt = new byte[32];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(salt);
-        return salt;
     }
 
     public void saveImage(UUID uuid, MultipartFile file) {
@@ -179,9 +167,6 @@ public class UsuariService {
 
         mapper.updateUsuariFromDto(request, usuari);
 
-        if (request.contrasenya() != null)
-            usuari.setKdfSalt(generateSalt());
-
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
 
@@ -208,9 +193,6 @@ public class UsuariService {
             usuari.setRol(rolService.getRolEntityByUuid(request.rolUuid()));
 
         mapper.updateUsuariFromDto(request, usuari);
-
-        if (request.contrasenya() != null)
-            usuari.setKdfSalt(generateSalt());
 
         if (!correuValid(usuari))
             throw new CorreuException("El correu " + usuari.getCorreu() + " no es válid.");
