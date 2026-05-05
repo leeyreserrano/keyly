@@ -37,6 +37,7 @@ export class compartitApi {
         nomUsuari: item.nomUsuari,
         contrasenya: item.contrasenya,
         iv: item.iv,
+        encryptedDataKey: item.encryptedDataKey,
         url: item.url,
         notes: item.notes,
         favorit: item.favorit,
