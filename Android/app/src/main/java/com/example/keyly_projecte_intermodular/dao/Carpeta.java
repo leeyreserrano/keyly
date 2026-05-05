@@ -17,4 +17,8 @@ public class Carpeta implements Serializable {
     private String dataCreacio;
     private List<Item> items;
 
+    public Carpeta(String nom, boolean favorit) {
+        this.nom = nom;
+        this.favorit = favorit;
+    }
 }

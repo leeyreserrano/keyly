@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.keyly_projecte_intermodular.config.TokenForEver;
 import com.example.keyly_projecte_intermodular.dao.Item;
+import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -41,8 +42,9 @@ public class ItemDTO {
         Call<ArrayList<Item>> getAllItems();
 
         // Afegir un item
+        // FUNCIONA
         @POST("/api/item/add")
-        Call<Item> addItem(@Body Item item);
+        Call<Item> addItem2(@Body ItemRequest itemRequest);
 
         // Incrementar accés a un item
         @POST("/api/item/access/{uuid}")
@@ -51,6 +53,8 @@ public class ItemDTO {
         // Actualitzar un item per UUID
         @PUT("/api/item/update/{uuid}")
         Call<Item> updateItem(@Path("uuid") String uuid, @Body Item item);
+        @PUT("/api/item/update/{uuid}")
+        Call<Item> updateItem2(@Path("uuid") String uuid, @Body ItemRequest itemRequest);
 
         // Eliminar un item per UUID
         @DELETE("/api/item/delete/{uuid}")
@@ -84,42 +88,5 @@ public class ItemDTO {
         }
 
         return retrofit;
-    }
-
-    public static String carregarJSONItem(Context context, int nomArxiu) {
-
-        String json = "[]";
-
-        try {
-            URL url = new URL("https://10.147.17.250:8081/api/items");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            InputStream isP = conn.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(isP));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            reader.close();
-
-            json = sb.toString();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            Log.d("Error", ex.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("Error", e.getMessage());
-        }
-
-        return json;
-
-    }
-
-    public static Item[] getItems(String json) {
-        Gson gson = new Gson();
-        Item[] itemsLlista = gson.fromJson(json, Item[].class);
-        return itemsLlista;
     }
 }

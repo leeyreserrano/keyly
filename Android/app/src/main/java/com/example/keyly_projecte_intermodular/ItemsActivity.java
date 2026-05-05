@@ -28,6 +28,7 @@ import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -70,6 +71,8 @@ public class ItemsActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (id == R.id.nav_shared) {
+                Intent intent = new Intent(this, CompartitActivity.class);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.nav_profile) {
                 return true;
@@ -89,18 +92,23 @@ public class ItemsActivity extends AppCompatActivity {
                     items.addAll(response.body());
                     itemAdapter.notifyDataSetChanged();
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
+                } else {
+                    Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
                 recyclerView.setVisibility(View.GONE);
+                Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
 
+        Log.d("ITEMS_JSON", new Gson().toJson(items));
+
         actulitzarItems(items);
 
-        etCercar = findViewById(R.id.et_search);
+        etCercar = findViewById(R.id.aCTVCercarItems);
         etCercar.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -117,7 +125,7 @@ public class ItemsActivity extends AppCompatActivity {
             }
         });
 
-        btnFiltres = findViewById(R.id.btn_filtres);
+        btnFiltres = findViewById(R.id.imgBtnFiltres);
         btnFiltres.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -210,23 +218,27 @@ public class ItemsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
         requestItem.getAllItems().enqueue(new Callback<ArrayList<Item>>() {
             @Override
             public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("RAW_JSON", response.body().toString());
                     items.clear();
                     items.addAll(response.body());
                     itemAdapter.notifyDataSetChanged();
                     actulitzarItems(items);
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.GONE);
+                    Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
                 recyclerView.setVisibility(View.GONE);
+                Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
     }
@@ -241,19 +253,7 @@ public class ItemsActivity extends AppCompatActivity {
             }
         }
 
-        itemAdapter = new ItemAdapter(llistaFiltradaItems, item -> {
-            Intent intent = new Intent(this, ItemActivity.class);
-            intent.putExtra("uuid", item.getUuid().toString());
-            intent.putExtra("title", item.getTitol());
-            intent.putExtra("url", item.getUrl());
-            intent.putExtra("nom_usuari", item.getNomUsuari());
-            intent.putExtra("password", item.getContrasenya());
-            intent.putExtra("notes", item.getNotes());
-            intent.putExtra("fav", item.isFavorit());
-            intent.putExtra("add_edit", 0);
-            startActivity(intent);
-        });
-        recyclerView.setAdapter(itemAdapter);
+        actulitzarItems(llistaFiltradaItems);
     }
 
     private ArrayList<Item> filtrarItems(ArrayList<Integer> filtres) {
@@ -297,6 +297,10 @@ public class ItemsActivity extends AppCompatActivity {
             intent.putExtra("notes", item.getNotes());
             intent.putExtra("fav", item.isFavorit());
             intent.putExtra("add_edit", 0);
+            intent.putExtra("iv", item.getIv());
+            intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDatakey());
+            Log.d("EDK_DEBUG", "edk: " + (item.getEncryptedDataKey() != null ? item.getEncryptedDataKey().getEncryptedDatakey() : "NULL"));
+            Log.d("EDK_DEBUG", "item json: " + new Gson().toJson(item));
             startActivity(intent);
         });
         recyclerView.setAdapter(itemAdapter);

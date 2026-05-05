@@ -1,11 +1,11 @@
-package com.example.keyly_projecte_intermodular.utils;
+package com.example.keyly_projecte_intermodular.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Password {
+public class GeneradorContrasenya {
     private int longitud;
     private boolean may;
     private int quantitatMay;

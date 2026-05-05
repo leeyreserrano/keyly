@@ -34,19 +34,7 @@ public class HomeActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
     private BottomNavigationView menu;
-    private String json;
     private ArrayList<Item> items = new ArrayList<>();
-    private JSONArray jsonArray;
-
-    /*interface RequestItem {
-        // Obtenir tots els items
-        @GET("/api/items")
-        Call<ArrayList<Item>> getAllItems();
-
-        // Obtenir un item en concret
-        //@GET("/api/items/{uuid}")
-        //Call<ItemData> getItem(@Path("uuid") String uuid);
-    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,53 +52,6 @@ public class HomeActivity extends AppCompatActivity {
 
         layoutError = findViewById(R.id.layoutError);
 
-        /*OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .hostnameVerifier((hostname, session) -> true)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://10.147.17.250:8081")
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();*/
-
-        actualizarInfo();
-
-
-        // Carregar el JSON
-//        Thread t = new Thread(() -> {
-//            json = ItemDTO.carregarJSONItem(this, R.raw.prueba);
-//
-//            if (json == null || json.equals("[]")) {
-//                // Mostrar Toast en el hilo principal
-//                runOnUiThread(() -> {
-//                    layoutError.setVisibility(View.VISIBLE);
-//                    recyclerView.setVisibility(View.GONE);
-//                });
-//            } else {
-//                // Parsear JSON
-//                Gson gson = new Gson();
-//                Item[] itemsArray = gson.fromJson(json, Item[].class);
-//                ArrayList<Item> itemsList = new ArrayList<>(Arrays.asList(itemsArray));
-//
-//                // Actualizar UI en hilo principal
-//                runOnUiThread(() -> {
-//                    items.clear();
-//                    items.addAll(itemsList);
-//                    itemAdapter.notifyDataSetChanged();
-//                    recyclerView.setVisibility(RecyclerView.VISIBLE);
-//                });
-//            }
-//        });
-//
-//        t.start();
-
-        /*try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
         menu = findViewById(R.id.menu_app);
         menu.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -123,6 +64,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (id == R.id.nav_shared) {
+                Intent intent = new Intent(this, CompartitActivity.class);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.nav_profile) {
                 return true;
@@ -138,19 +81,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void actualizarInfo() {
-        itemAdapter = new ItemAdapter(items, item -> {
-            Intent intent = new Intent(this, ItemActivity.class);
-            intent.putExtra("uuid", item.getUuid().toString());
-            intent.putExtra("title", item.getTitol());
-            intent.putExtra("url", item.getUrl());
-            intent.putExtra("nom_usuari", item.getNomUsuari());
-            intent.putExtra("password", item.getContrasenya());
-            intent.putExtra("notes", item.getNotes());
-            intent.putExtra("fav", item.isFavorit());
-            startActivity(intent);
-        });
-        recyclerView.setAdapter(itemAdapter);
-
         ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
 
         // Obtenir un item en concret
@@ -174,5 +104,19 @@ public class HomeActivity extends AppCompatActivity {
                 recyclerView.setVisibility(View.GONE);
             }
         });
+
+        itemAdapter = new ItemAdapter(items, item -> {
+            Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("uuid", item.getUuid().toString());
+            intent.putExtra("title", item.getTitol());
+            intent.putExtra("url", item.getUrl());
+            intent.putExtra("nom_usuari", item.getNomUsuari());
+            intent.putExtra("password", item.getContrasenya());
+            intent.putExtra("notes", item.getNotes());
+            intent.putExtra("fav", item.isFavorit());
+            intent.putExtra("iv", item.getIv());
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(itemAdapter);
     }
 }

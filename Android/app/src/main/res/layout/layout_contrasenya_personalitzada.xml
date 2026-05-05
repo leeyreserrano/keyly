@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="17dp"
+    android:paddingBottom="17dp"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:background="@drawable/background_dialog">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:text="Personalitzar contrasenya"
+        android:fontFamily="sans-serif-black"
+        android:textSize="23dp"
+        android:textColor="@color/black"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Longitud"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="19dp"
+            android:textColor="@color/black"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/txtLongitud"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="32"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="19dp"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/sbLongitud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progressBackgroundTint="@color/black"
+        android:thumbTint="@color/purple_light"
+        android:min="1"
+        android:progress="32"
+        android:max="64"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:background="@color/grey"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:text="Tipus de caràcters"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="19dp"
+        android:textColor="@color/black"/>
+
+    <CheckBox
+        android:id="@+id/cbMin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="17dp"
+        android:text="Minúscules (a-z)"
+        android:fontFamily="sans-serif"
+        android:textSize="19dp"
+        android:textColor="@color/black"
+        android:buttonTint="@color/purple_light"/>
+
+    <CheckBox
+        android:id="@+id/cbMay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="17dp"
+        android:text="Majúscules (A-Z)"
+        android:fontFamily="sans-serif"
+        android:textSize="19dp"
+        android:textColor="@color/black"
+        android:buttonTint="@color/purple_light"/>
+
+    <CheckBox
+        android:id="@+id/cbNum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="17dp"
+        android:text="Números (0-9)"
+        android:fontFamily="sans-serif"
+        android:textSize="19dp"
+        android:textColor="@color/black"
+        android:buttonTint="@color/purple_light"/>
+
+    <CheckBox
+        android:id="@+id/cbEspcials"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="17dp"
+        android:text="Caràcters especials (!@#...)"
+        android:fontFamily="sans-serif"
+        android:textSize="19dp"
+        android:textColor="@color/black"
+        android:buttonTint="@color/purple_light"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:background="@color/grey"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:text="Previsualització"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="19dp"
+        android:textColor="@color/black"/>
+
+    <LinearLayout
+        android:id="@+id/ll_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/etContrasenyaGenerada"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="15dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:text=""
+            android:textColor="@color/not_enabled"
+            android:hint="oY{4/5!d1s6t"
+            android:textColorHint="@color/dark_grey"
+            android:enabled="false"
+            android:background="@drawable/backgroung_edit_text_password"/>
+
+        <ImageButton
+            android:id="@+id/imbBtnCopy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/copy"
+            android:background="@color/transparent"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnUsar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Utilitzar"
+        android:fontFamily="sans-serif-medium"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        app:backgroundTint="@null"
+        android:background="@drawable/background_button_purple"/>
+
+    <Button
+        android:id="@+id/btnGenerar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Generar"
+        android:fontFamily="sans-serif-medium"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        app:backgroundTint="@null"
+        android:background="@drawable/background_button_normal"/>
+
+    <Button
+        android:id="@+id/btnCancelar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Cancel·lar"
+        android:fontFamily="sans-serif-medium"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        app:backgroundTint="@null"
+        android:background="@drawable/background_button_normal"/>
+
+</LinearLayout>

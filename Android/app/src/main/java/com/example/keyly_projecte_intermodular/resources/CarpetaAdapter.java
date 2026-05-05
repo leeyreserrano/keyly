@@ -10,10 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.R;
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
-import com.example.keyly_projecte_intermodular.dao.Item;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHolder> {
 
     private List<Carpeta> carpetaList;
@@ -24,17 +28,12 @@ public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHold
         void onItemClick(Carpeta carpeta);
     }
 
-    public CarpetaAdapter(List<Carpeta> carpetaList, OnItemClickListener listener) {
-        this.carpetaList = carpetaList;
-        this.listener = listener;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Infla el layout de cada carpeta de la lista
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_layout, parent, false);
+                .inflate(R.layout.layout_item_carpeta, parent, false);
         return new ViewHolder(view);
     }
 
@@ -65,10 +64,10 @@ public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHold
         TextView carpetaTextView;
         TextView nameUserTextView;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            carpetaTextView = itemView.findViewById(R.id.txtNameItem);
-            nameUserTextView = itemView.findViewById(R.id.txtNameUser);
+        public ViewHolder(@NonNull View carpetaView) {
+            super(carpetaView);
+            carpetaTextView = carpetaView.findViewById(R.id.txtNameItemCarpeta);
+            nameUserTextView = carpetaView.findViewById(R.id.txtNameUser);
         }
     }
 }

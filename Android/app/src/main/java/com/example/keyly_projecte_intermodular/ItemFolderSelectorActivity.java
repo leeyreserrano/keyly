@@ -16,6 +16,7 @@ public class ItemFolderSelectorActivity extends AppCompatActivity {
 
     LinearLayout items_button, carpetes_button;
     private BottomNavigationView menu;
+    private boolean afegir;
 
 
     @Override
@@ -29,6 +30,8 @@ public class ItemFolderSelectorActivity extends AppCompatActivity {
             return insets;
         });
 
+        afegir = getIntent().getBooleanExtra("afegir", false);
+
         menu = findViewById(R.id.menu_app);
         menu.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -41,6 +44,8 @@ public class ItemFolderSelectorActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (id == R.id.nav_shared) {
+                Intent intent = new Intent(this, CompartitActivity.class);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.nav_profile) {
                 return true;
@@ -53,11 +58,17 @@ public class ItemFolderSelectorActivity extends AppCompatActivity {
 
         items_button.setOnClickListener(v -> {
             Intent intent = new Intent(this, ItemsActivity.class);
+            if (afegir) {
+                intent.putExtra("afegir", true);
+            }
             startActivity(intent);
         });
 
         carpetes_button.setOnClickListener(v -> {
             Intent intent = new Intent(this, CarpetesActivity.class);
+            if (afegir) {
+                intent.putExtra("afegir", true);
+            }
             startActivity(intent);
         });
 

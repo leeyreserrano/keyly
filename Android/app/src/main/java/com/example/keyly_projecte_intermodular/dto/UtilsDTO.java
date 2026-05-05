@@ -5,8 +5,8 @@ import static com.example.keyly_projecte_intermodular.config.TokenForEver.tokenN
 import android.util.Log;
 
 import com.example.keyly_projecte_intermodular.config.TokenForEver;
-import com.example.keyly_projecte_intermodular.dao.Item;
-import com.example.keyly_projecte_intermodular.utils.Password;
+import com.example.keyly_projecte_intermodular.dao.GeneradorContrasenya;
+import com.example.keyly_projecte_intermodular.dao.Contrasenya;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -24,7 +24,7 @@ public class UtilsDTO {
     public static interface RequestUtils {
         // Generar contrasenya
         @POST("/api/utils/custom/password")
-        Call<Item> generatePassword(@Body Password password);
+        Call<Contrasenya> generatePassword(@Body GeneradorContrasenya password);
     }
 
     public static Retrofit obtenirJSONPassword() {

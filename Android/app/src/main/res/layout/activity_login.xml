@@ -50,9 +50,10 @@
         android:layout_gravity="center"
         android:layout_marginTop="50px"
         android:text="Log In"
+        android:textColor="@color/white"
         android:textSize="17dp"
         android:fontFamily="@font/airbnb_cereal_w_bd"
         android:textAllCaps="false"
-        android:background="@drawable/background_buttons"
-        android:textColor="@color/white" />
+        android:background="@drawable/background_button_purple"
+        app:backgroundTint="@null" />
 </LinearLayout>

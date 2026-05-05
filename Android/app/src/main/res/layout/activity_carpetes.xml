@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ItemsActivity">
+    tools:context=".CarpetesActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -102,14 +102,14 @@
                 android:paddingHorizontal="16dp">
 
                 <ImageView
-                    android:id="@+id/btn_filtres"
+                    android:id="@+id/imgBtnFiltres"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:src="@drawable/filtro_rayas"
                     app:tint="#49454F" />
 
                 <EditText
-                    android:id="@+id/et_search"
+                    android:id="@+id/aCTVCercarItems"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -154,13 +154,14 @@
         android:elevation="8dp"/>
 
     <ImageButton
+        android:id="@+id/imgBtnAgefirCarpeta"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="80dp"
         android:layout_marginEnd="20dp"
-        android:src="@drawable/anadir"
-        android:background="@drawable/background_add"
+        android:src="@drawable/add"
+        android:background="@drawable/background_button_circle_purple"
         android:elevation="8dp"/>
 
 </FrameLayout>

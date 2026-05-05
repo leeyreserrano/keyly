@@ -55,67 +55,75 @@
             android:fontFamily="@font/airbnb_cereal_w_bd"/>
 
         <LinearLayout
-            android:id="@+id/items_button"
-            android:layout_width="wrap_content"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_gravity="center"
-            android:elevation="8dp"
-            android:background="@drawable/background_items_folder">
+            android:layout_gravity="center">
 
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:padding="20dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="15dp"
-                android:src="@drawable/key"
-                android:layout_gravity="center"
-                android:background="@drawable/background_items_folders_button"/>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/items_button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="25dp"
-                android:layout_marginStart="75dp"
-                android:layout_marginEnd="75dp"
-                android:text="Items"
-                android:textSize="30dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/manrope_regular"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/carpetes_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical"
-            android:layout_gravity="center"
-            android:elevation="8dp"
-            android:background="@drawable/background_items_folder">
-
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:padding="20dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="15dp"
-                android:src="@drawable/carpeta"
+                android:layout_margin="20dp"
                 android:layout_gravity="center"
-                android:background="@drawable/background_items_folders_button"/>
+                android:orientation="vertical"
+                android:elevation="8dp"
+                android:background="@drawable/background_items_folder">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:padding="20dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="15dp"
+                    android:src="@drawable/key"
+                    android:layout_gravity="center"
+                    android:background="@drawable/background_items_folders_button"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:layout_marginStart="75dp"
+                    android:layout_marginEnd="75dp"
+                    android:text="Items"
+                    android:textSize="30dp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/manrope_regular"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/carpetes_button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="25dp"
-                android:layout_marginStart="75dp"
-                android:layout_marginEnd="75dp"
-                android:text="Carpetes"
-                android:textSize="30dp"
-                android:textColor="@color/black"
-                android:fontFamily="@font/manrope_regular"/>
+                android:layout_margin="20dp"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:elevation="8dp"
+                android:background="@drawable/background_items_folder">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:padding="20dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="15dp"
+                    android:src="@drawable/carpeta"
+                    android:layout_gravity="center"
+                    android:background="@drawable/background_items_folders_button"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:layout_gravity="center"
+                    android:text="Carpetes"
+                    android:textSize="30dp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/manrope_regular"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -1,10 +1,15 @@
 package com.example.keyly_projecte_intermodular.dto;
 
+import static com.example.keyly_projecte_intermodular.config.TokenForEver.tokenNou;
+
 import android.content.Context;
 import android.util.Log;
 
+import com.example.keyly_projecte_intermodular.config.TokenForEver;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
+import com.example.keyly_projecte_intermodular.request.UsuariRequest;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -12,43 +17,92 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 
 public class UsuariDTO {
 
-    public static String carregarJSONUsuari (Context context, int nomArxiu) {
+    private static Retrofit retrofit = null;
 
-        String json = "[]";
+    public static interface RequestUsuari {
 
-        try {
-            URL url = new URL("https://10.147.17.250:8081/api/login/id/1");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+        /* ****************************** USUARI ****************************** */
+        // Obté tots els usuaris de la mateixa sucursal del que fa la petició
+        @GET("/api/usuari/all")
+        Call<ArrayList<Usuari>> getAllUsuaris();
 
-            InputStream isP = conn.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(isP));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            reader.close();
+        // Obté tots els usuaris
+        @GET("/api/usuari/all/admin")
+        Call<ArrayList<Usuari>> getAllUsuarisAdmin();
 
-            json = sb.toString();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            Log.d("Error", ex.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("Error", e.getMessage());
-        }
+        // Crea un usuari l'administrador
+        @POST("/api/usuari/add/admin")
+        Call<Usuari> crearUsuari(@Body UsuariRequest usuariRequest);
 
-        return json;
+        // Actualitza l'usuari que fa la petició
+        @PUT("/api/usuari/update")
+        Call<Usuari> actualitzarUsuari(@Body UsuariRequest usuariRequest);
 
+        // Actualitza un usuari per UUID
+        @PUT("/api/usuari/update/admin/cap/{uuid}")
+        Call<Usuari> actualitzarUsuari(@Path("uuid") String uuid, @Body UsuariRequest usuariRequest);
+
+        // Elimina un usuari per UUID (admin)
+        @DELETE("/api/usuari/delete/admin/cap/{uuid}")
+        Call<Usuari> eliminarUsuari(@Path("uuid") String uuid);
+
+        /* ****************************** IMATGE ****************************** */
+        // Retorna la imatge de l'usuari (inicial del seu nom)
+        @GET("/api/usuari/image")
+        Call<String> getImage();
+
+        // Retorna la imatge d'un usuari especificat
+        @GET("/api/usuari/image/{uuid}")
+        Call<String> getImage(@Path("uuid") String uuid);
+
+        // Puja una imatge de perfil l'usuari
+        @POST("/api/usuari/upload/image")
+        Call<String> pujarImatge(@Body String file);
     }
 
-    public static Usuari[] getUsuaris(String json) {
-        Gson gson = new Gson();
-        Usuari[] usuarisLlista = gson.fromJson(json, Usuari[].class);
-        return usuarisLlista;
+    public static Retrofit obtenirJSONUsuari() {
+
+        Log.d("TOKEN", tokenNou);
+
+        if (retrofit == null) {
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(chain -> {
+                        Request newRequest = chain.request().newBuilder()
+                                .addHeader("Authorization", "Bearer " + tokenNou)
+                                .build();
+                        return chain.proceed(newRequest);
+                    })
+                    .hostnameVerifier((hostname, session) -> true)
+                    .build();
+
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(TokenForEver.BASE_URL)
+                    .client(okHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+        }
+
+        return retrofit;
     }
 }

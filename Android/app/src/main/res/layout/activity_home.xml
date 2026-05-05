@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity"
+    tools:context=".HomeActivity"
     android:orientation="vertical">
 
 
@@ -206,7 +206,8 @@
                 android:text="Tot"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:background="@drawable/btn_filtres_home"/>
+                android:background="@drawable/background_btn_filtres_home_selected"
+                app:backgroundTint="@null"/>
 
             <Button
                 android:id="@+id/btn_filtre_usades"
@@ -219,7 +220,8 @@
                 android:text="Més usades"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:background="@drawable/btn_filtres_home"/>
+                android:background="@drawable/background_btn_filtres_home"
+                app:backgroundTint="@null"/>
 
             <Button
                 android:id="@+id/btn_filtre_favorites"
@@ -230,7 +232,8 @@
                 android:text="Favorites"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:background="@drawable/btn_filtres_home"/>
+                android:background="@drawable/background_btn_filtres_home"
+                app:backgroundTint="@null"/>
 
         </LinearLayout>
 

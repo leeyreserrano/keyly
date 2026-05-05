@@ -7,13 +7,18 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -24,18 +29,18 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.keyly_projecte_intermodular.dao.Carpeta;
 import com.example.keyly_projecte_intermodular.dao.Item;
+import com.example.keyly_projecte_intermodular.dto.CarpetaDTO;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.keyly_projecte_intermodular.resources.RecercaAdapter;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,10 +53,11 @@ public class CarpetaActivity extends AppCompatActivity {
     private ItemAdapter itemAdapter;
     private TextView nomCarpeta, dataCreacio;
     private EditText etCercar;
-    private ImageView btnFiltres;
-    private BottomNavigationView menu;
+    private ImageView imgBtnFiltres;
+    private ImageButton imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
+    private String uuid;
     private boolean filtrat = false;
-    private ArrayList<Item> items;
+    private ArrayList<Item> items, totalItems = new ArrayList<>(), itemSeleccionats = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +70,15 @@ public class CarpetaActivity extends AppCompatActivity {
             return insets;
         });
 
-        items = (ArrayList<Item>) getIntent().getSerializableExtra("items");
-
+        uuid = getIntent().getStringExtra("uuid");
         String nom = getIntent().getStringExtra("nom");
+        boolean favorit = getIntent().getBooleanExtra("favorit", false);
         String data_creacio = getIntent().getStringExtra("data_creacio");
+
+        items = (ArrayList<Item>) getIntent().getSerializableExtra("items");
+        Log.e("ITEMS_CARPETA" + nom, items.toString());
+
+        AtomicBoolean favActual = new AtomicBoolean(favorit);
 
         // Formatejar data
         String dataFormatejada = formatDataCreacio(data_creacio);
@@ -79,32 +90,293 @@ public class CarpetaActivity extends AppCompatActivity {
         dataCreacio = findViewById(R.id.dataCreacio);
         dataCreacio.setText(data_creacio);
 
-
-        menu = findViewById(R.id.menu_app);
-        menu.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                Intent intent = new Intent(this, HomeActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (id == R.id.nav_items_folders) {
-                Intent intent = new Intent(this, ItemFolderSelectorActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (id == R.id.nav_shared) {
-                return true;
-            } else if (id == R.id.nav_profile) {
-                return true;
+        imgBtnStar = findViewById(R.id.imgBtnStar);
+        if (favActual.get()) {
+            imgBtnStar.setImageResource(R.drawable.filled_star);
+        } else {
+            imgBtnStar.setImageResource(R.drawable.star);
+        }
+        imgBtnStar.setOnClickListener(v -> {
+            // TODO hacer que se guarde el favoritos
+            if (favActual.get()) {
+                imgBtnStar.setImageResource(R.drawable.star);
+                favActual.set(false);
+            } else {
+                imgBtnStar.setImageResource(R.drawable.filled_star);
+                favActual.set(true);
             }
-            return false;
+        });
+
+        imgBtnEditar = findViewById(R.id.imgBtnEdit);
+        imgBtnEditar.setOnClickListener(v -> {
+            // TODO editar la carpeta
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_carpeta_editar, null);
+
+            builder.setView(view);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            LinearLayout llNomCarpeta = view.findViewById(R.id.llNomCarpeta);
+            llNomCarpeta.setVisibility(View.VISIBLE);
+
+            View vSeparador = view.findViewById(R.id.vSeparador1);
+            vSeparador.setVisibility(View.GONE);
+
+            LinearLayout llAfegirItems = view.findViewById(R.id.llDesplegableItems);
+            llAfegirItems.setVisibility(View.GONE);
+
+            View vSeparador2 = view.findViewById(R.id.vSeparador2);
+            vSeparador2.setVisibility(View.GONE);
+
+            LinearLayout llAfegirUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
+            llAfegirUsuaris.setVisibility(View.GONE);
+
+            View vSeparador3 = view.findViewById(R.id.vSeparador3);
+            vSeparador3.setVisibility(View.GONE);
+
+            ImageButton imgBtnStarEdit = view.findViewById(R.id.imgBtnStar);
+            EditText etNomCarpeta = view.findViewById(R.id.etNomCarpeta);
+            Button btnGuardarCarpeta = view.findViewById(R.id.btnGuardarCarpeta);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            etNomCarpeta.setText(nom);
+
+            if (favActual.get()) {
+                imgBtnStarEdit.setImageResource(R.drawable.filled_star);
+            } else {
+                imgBtnStarEdit.setImageResource(R.drawable.star);
+            }
+            imgBtnStarEdit.setOnClickListener(c -> {
+                // TODO hacer que se guarde el favoritos
+                if (favActual.get()) {
+                    imgBtnStarEdit.setImageResource(R.drawable.star);
+                    favActual.set(false);
+                } else {
+                    imgBtnStarEdit.setImageResource(R.drawable.filled_star);
+                    favActual.set(true);
+                }
+            });
+
+            btnGuardarCarpeta.setText("Guardar carpeta");
+            btnGuardarCarpeta.setOnClickListener(c -> {
+                Carpeta carpeta = new Carpeta(etNomCarpeta.getText().toString(), favActual.get());
+
+                Call<Carpeta> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).editarCarpeta(uuid, carpeta);
+                call.enqueue(new Callback<Carpeta>() {
+                    @Override
+                    public void onResponse(Call<Carpeta> call, Response<Carpeta> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(CarpetaActivity.this, "Carpeta " + etNomCarpeta.getText().toString() + " editada", Toast.LENGTH_SHORT).show();
+                            alertDialog.dismiss();
+                        } else {
+                            Toast.makeText(CarpetaActivity.this, "No s'ha pogut editar la carpeta", Toast.LENGTH_SHORT).show();
+                            Log.d("ERROR_RESPONSE", response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Carpeta> call, Throwable t) {
+                        Toast.makeText(CarpetaActivity.this, "No s'ha pogut editar la carpeta", Toast.LENGTH_SHORT).show();
+                        Log.d("ERROR_FAILURE",t.getMessage());
+                    }
+                });
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
+        });
+
+        imgBtnEliminar = findViewById(R.id.imgBtnEliminar);
+        imgBtnEliminar.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_eliminar, null);
+
+            builder.setView(view);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            TextView txtPregunta = view.findViewById(R.id.txtPregunta);
+            Button btnEliminar = view.findViewById(R.id.btnEliminar);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            txtPregunta.setText("Desitja eliminar la carpeta \"" + nom + "\" ?");
+
+            btnEliminar.setOnClickListener(e -> {
+                Call<Void> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).eliminarCarpeta(uuid);
+                call.enqueue(new Callback<Void>() {
+                   @Override
+                   public void onResponse(Call<Void> call, Response<Void> response) {
+                       if (response.isSuccessful()) {
+                           Toast.makeText(CarpetaActivity.this, "Carpeta " + nom + " eliminada", Toast.LENGTH_SHORT).show();
+                           finish();
+                       } else {
+                           Toast.makeText(CarpetaActivity.this, "No s'ha pogut eliminar la carpeta " + nom, Toast.LENGTH_SHORT).show();
+                           Log.d("ERROR_RESPONSE", response.message());
+                       }
+                   }
+                   @Override
+                   public void onFailure(Call<Void> call, Throwable t) {
+                       Log.d("ERROR_FAILURE", t.getMessage());
+                       Toast.makeText(CarpetaActivity.this, "No s'ha pogut eliminar la carpeta " + nom, Toast.LENGTH_SHORT).show();
+                   }
+                });
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
+        });
+
+        imgBtnBack = findViewById(R.id.imgBtnBack);
+        imgBtnBack.setOnClickListener(v -> {
+            finish();
+        });
+
+        imgBtnAfegirItem = findViewById(R.id.imgBtnAfegirItem);
+        imgBtnAfegirItem.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_carpeta_editar, null);
+
+            builder.setView(view);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            LinearLayout llNomCarpeta = view.findViewById(R.id.llNomCarpeta);
+            llNomCarpeta.setVisibility(View.GONE);
+
+            View vSeparador = view.findViewById(R.id.vSeparador1);
+            vSeparador.setVisibility(View.GONE);
+
+            LinearLayout llAfegirItems = view.findViewById(R.id.llDesplegableItems);
+            llAfegirItems.setVisibility(View.VISIBLE);
+
+            View vSeparador2 = view.findViewById(R.id.vSeparador2);
+            vSeparador2.setVisibility(View.VISIBLE);
+
+            LinearLayout llAfegirUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
+            llAfegirUsuaris.setVisibility(View.VISIBLE);
+
+            View vSeparador3 = view.findViewById(R.id.vSeparador3);
+            vSeparador3.setVisibility(View.VISIBLE);
+
+            AutoCompleteTextView aCTVCercar = view.findViewById(R.id.aCTVCercarItems);
+            RecyclerView recyclerItems = view.findViewById(R.id.recyclerItems);
+            Button btnGuardarCarpeta = view.findViewById(R.id.btnGuardarCarpeta);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            recyclerItems.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
+            RecercaAdapter recercaAdapter = new RecercaAdapter(itemSeleccionats, null);
+            recyclerItems.setAdapter(recercaAdapter);
+
+            // Carregar ítems
+            ItemDTO.RequestItem requestItem = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class);
+            requestItem.getAllItems().enqueue(new Callback<ArrayList<Item>>() {
+                @Override
+                public void onResponse(Call<ArrayList<Item>> call, Response<ArrayList<Item>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        totalItems = new ArrayList<>();
+                        totalItems.addAll(response.body());
+                        //Log.d("ITEMS_CARPETA", items.toString());
+
+                        // Cercador d'ítems
+                        ArrayList<String> titols = new ArrayList<>();
+
+                        for (Item item : totalItems) {
+                            titols.add(item.getTitol());
+                        }
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(CarpetaActivity.this, android.R.layout.simple_dropdown_item_1line, titols);
+                        aCTVCercar.setAdapter(adapter);
+                        aCTVCercar.setThreshold(1);
+                    } else {
+                        Log.d("ERROR_RESPONSE", response.message());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ArrayList<Item>> call, Throwable t) {
+                    Log.d("ERROR_FAILURE", t.getMessage());
+                }
+            });
+
+            aCTVCercar.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    aCTVCercar.showDropDown();
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+            });
+
+            aCTVCercar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String seleccionat = parent.getItemAtPosition(position).toString();
+
+                    for (Item item : totalItems) {
+                        if (item.getTitol().equals(seleccionat)) {
+                            itemSeleccionats.add(item);
+                        }
+                    }
+
+                    recercaAdapter.notifyDataSetChanged();
+                    recyclerItems.setAdapter(recercaAdapter);
+                }
+            });
+
+            btnGuardarCarpeta.setText("Afegir ítems");
+            btnGuardarCarpeta.setOnClickListener(c -> {
+                for (int i = 0; i < itemSeleccionats.size(); i++) {
+                    Call<Carpeta> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(uuid, itemSeleccionats.get(i).getUuid().toString());
+                    callAddItem.enqueue(new Callback<Carpeta>() {
+                        @Override
+                        public void onResponse(Call<Carpeta> callAddItem, Response<Carpeta> response) {
+                            if (response.isSuccessful()) {
+                                Log.d("ITEMS_AFEGITS", itemSeleccionats.toString());
+                                alertDialog.dismiss();
+                            } else {
+                                Log.d("ERROR_RESPONSE", response.message());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Carpeta> callAddItem, Throwable t) {
+                            Log.d("ERROR_FAILURE", t.getMessage());
+                        }
+                    });
+                }
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         recyclerView = findViewById(R.id.recyclerItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        actulitzarItems(items);
+        actulitzarItems(items, uuid);
 
-        etCercar = findViewById(R.id.et_search);
+        etCercar = findViewById(R.id.aCTVCercarItems);
         etCercar.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -117,12 +389,12 @@ public class CarpetaActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Filtrar items
                 String titolItem = s.toString();
-                resultatsCerca(titolItem);
+                resultatsCerca(titolItem, uuid);
             }
         });
 
-        btnFiltres = findViewById(R.id.btn_filtres);
-        btnFiltres.setOnClickListener(v -> {
+        imgBtnFiltres = findViewById(R.id.imgBtnFiltres);
+        imgBtnFiltres.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             LayoutInflater inflater = getLayoutInflater();
@@ -191,7 +463,7 @@ public class CarpetaActivity extends AppCompatActivity {
 
                 ArrayList<Item> itemsFiltrats = filtrarItems(filtres);
 
-                actulitzarItems(itemsFiltrats);
+                actulitzarItems(itemsFiltrats, uuid);
 
                 alertDialog.dismiss();
             });
@@ -202,6 +474,12 @@ public class CarpetaActivity extends AppCompatActivity {
             });
 
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        actulitzarItems(items, uuid);
     }
 
     //TODO arreglar el formateo de la fecha
@@ -252,7 +530,7 @@ public class CarpetaActivity extends AppCompatActivity {
         return temps;
     }
 
-    private void resultatsCerca(String titolItem) {
+    private void resultatsCerca(String titolItem, String uuidCarpeta) {
         ArrayList<Item> llistaFiltradaItems = new ArrayList<>();
 
         for (Item item : items) {
@@ -262,17 +540,7 @@ public class CarpetaActivity extends AppCompatActivity {
             }
         }
 
-        itemAdapter = new ItemAdapter(llistaFiltradaItems, item -> {
-            Intent intent = new Intent(this, ItemActivity.class);
-            intent.putExtra("title", item.getTitol());
-            intent.putExtra("url", item.getUrl());
-            intent.putExtra("propietari", item.getNomUsuari());
-            intent.putExtra("password", item.getContrasenya());
-            intent.putExtra("notes", item.getNotes());
-            intent.putExtra("fav", item.isFavorit());
-            startActivity(intent);
-        });
-        recyclerView.setAdapter(itemAdapter);
+        actulitzarItems(llistaFiltradaItems, uuidCarpeta);
     }
 
     private ArrayList<Item> filtrarItems(ArrayList<Integer> filtres) {
@@ -305,9 +573,10 @@ public class CarpetaActivity extends AppCompatActivity {
         return llistaFiltradaItems;
     }
 
-    private void actulitzarItems(ArrayList<Item> items) {
-        itemAdapter = new ItemAdapter(items, item -> {
+    private void actulitzarItems(ArrayList<Item> items, String uuidCarpeta) {
+        itemAdapter = new ItemAdapter(items, uuidCarpeta, item -> {
             Intent intent = new Intent(this, ItemActivity.class);
+            intent.putExtra("uuid", item.getUuid());
             intent.putExtra("title", item.getTitol());
             intent.putExtra("url", item.getUrl());
             intent.putExtra("propietari", item.getNomUsuari());
@@ -315,7 +584,7 @@ public class CarpetaActivity extends AppCompatActivity {
             intent.putExtra("notes", item.getNotes());
             intent.putExtra("fav", item.isFavorit());
             startActivity(intent);
-        });
+        }, CarpetaActivity.this);
         recyclerView.setAdapter(itemAdapter);
     }
 }
