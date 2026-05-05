@@ -80,7 +80,7 @@ function ItemCard({ search }: { search: string }) {
             {filteredItems.map((item) => (
               <span
                 key={item.uuid}
-                onClick={() => navigate(`/item/${item.uuid}`)}
+                onClick={() => navigate(`/item/${item.uuid}`, { state: item })}
                 className="flex items-center gap-3 p-2 border w-full h-16 bg-purple-100 border-purple-300 rounded-lg mb-2 cursor-pointer hover:bg-purple-300 hover:border-purple-400 transition-colors">
                 {imgErrors[item.uuid] ? (
                   <svg
