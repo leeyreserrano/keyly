@@ -1,13 +1,17 @@
 import { Permisos, TipusEntitat, type Compartit } from "~models/Compartit"
 import type { Item } from "~models/Item"
-import type { User } from "~models/User"
 
 import {
   type CompartitItemRequest,
   type CompartitRequest
 } from "./../models/Compartit"
+import { importPublicKey, type User } from "~models/User"
 
 const API_BASE = "https://10.147.17.250:8081/api"
+
+function bytesToBase64(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)))
+}
 
 export class compartitApi {
   static async fetchCompartits(): Promise<Compartit[]> {
@@ -20,9 +24,12 @@ export class compartitApi {
   }
 
   static async newItemCompartir(
-    compartit: string[],
-    item: Item
+    compartit: User[],
+    item: Item,
+    rawDataKey: any
   ): Promise<void> {
+    const usuaris = await usuarisCompartits(compartit, rawDataKey)
+    
     const compartitItemRequest: CompartitItemRequest = {
       itemRequest: {
         uuid: "",
@@ -36,16 +43,16 @@ export class compartitApi {
         dataCreacio: "",
         dataEditat: "",
         ultimAcces: "",
-        dinsCarpeta: false
+        dinsDeCarpeta: false
       },
       compartitRequest: {
         entitatUuid: "",
         tipusEntitat: TipusEntitat.ITEM,
-        usuaris: Object.fromEntries(
-          compartit.map((c) => [c, Permisos.ESCRIPTURA])
-        )
+        usuaris: usuaris
       }
     }
+
+    console.log(JSON.stringify(compartitItemRequest))
 
     const token = localStorage.getItem("jwtToken")
     const response = await fetch(API_BASE + "/compartit/add/item", {
@@ -62,8 +69,6 @@ export class compartitApi {
   }
 
   static async addCompartit(compartit: CompartitRequest): Promise<void> {
-    console.log("Compartido: " + JSON.stringify(compartit))
-
     const token = localStorage.getItem("jwtToken")
     const response = await fetch(API_BASE + "/compartit/add", {
       method: "POST",
@@ -122,4 +127,25 @@ export class compartitApi {
     })
     if (!response.ok) throw new Error("Error eliminant el compartit")
   }
+}
+
+export async function usuarisCompartits(usuaris: User[], rawDataKey: any): Promise<any[]> {
+  const usuarisCompartits = await Promise.all(
+    usuaris.map(async (u) => {
+      const publicKey = await importPublicKey(u.publicKey)
+
+      const receptorEncryptedDataKey = await crypto.subtle.encrypt(
+        { name: "RSA-OAEP" },
+        publicKey,
+        rawDataKey
+      )
+
+      return {
+        usuariUuid: u.uuid,
+        permis: Permisos.ESCRIPTURA,
+        encryptedDataKey: bytesToBase64(receptorEncryptedDataKey)
+      }
+    })
+  )
+  return usuarisCompartits;
 }

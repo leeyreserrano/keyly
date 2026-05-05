@@ -32,6 +32,30 @@ export async function loginUser(correu: string, contrasenya: string) {
   }
 }
 
+export async function getPublicKey(): Promise<CryptoKey> {
+  const token =
+    localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken")
+
+  if (!token) throw new Error("No autenticado")
+
+  const publicKeyString = localStorage.getItem("publicKey")
+  if (!publicKeyString) throw new Error("No public key")
+
+  const binary = atob(publicKeyString)
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0))
+
+  return await crypto.subtle.importKey(
+    "spki",
+    bytes,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    },
+    false,
+    ["encrypt"]
+  )
+}
+
 export async function getStoredKey() {
   const keyBase64 = localStorage.getItem("derivedKey")
   if (!keyBase64) throw new Error("No key found")

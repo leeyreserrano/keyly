@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
-import { getStoredKey } from "~api/auth-service"
+import { getPublicKey, getStoredKey } from "~api/auth-service"
 import { carpetasApi } from "~api/carpeta-service"
-import { compartitApi } from "~api/compartit-service"
+import { compartitApi, usuarisCompartits } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { utilsService } from "~api/utils-service"
@@ -15,7 +15,7 @@ import {
 } from "~models/Compartit"
 import type { CustomPassword } from "~models/CustomPassword"
 import type { Item, ItemResponse } from "~models/Item"
-import type { User } from "~models/User"
+import { importPublicKey, type User } from "~models/User"
 
 function bytesToBase64(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)))
@@ -86,12 +86,6 @@ function NewItem() {
       rawDataKey
     )
 
-    const encryptedPassword = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      dataKey,
-      new TextEncoder().encode(contrasenya)
-    )
-
     const data = new TextEncoder().encode(contrasenya)
 
     const key = await getStoredKey()
@@ -107,6 +101,7 @@ function NewItem() {
       nomUsuari: nomUsuari,
       contrasenya: bytesToBase64(encrypted),
       iv: bytesToBase64(iv),
+      encryptedDataKey: bytesToBase64(encryptedDataKey),
       url: url,
       notes: notes,
       favorit: false,
@@ -122,17 +117,20 @@ function NewItem() {
         item
       )
 
+      const selectedUsers = users.filter((u) => compartir.includes(u.uuid))
+
+      const usuaris = await usuarisCompartits(selectedUsers, rawDataKey)
+
       const compartit: CompartitRequest = {
         entitatUuid: i.uuid,
         tipusEntitat: TipusEntitat.ITEM,
-        usuaris: Object.fromEntries(
-          compartir.map((c) => [c, Permisos.ESCRIPTURA])
-        )
+        usuaris
       }
 
       await compartitApi.addCompartit(compartit)
     } else if (compartir.length > 0) {
-      await compartitApi.newItemCompartir(compartir, item)
+      const selectedUsers = users.filter((u) => compartir.includes(u.uuid))
+      await compartitApi.newItemCompartir(selectedUsers, item, rawDataKey)
     } else if (carpeta.length > 0) {
       await carpetasApi.createNewItemInCarpeta(carpeta, item)
     } else {
@@ -302,7 +300,7 @@ function NewItem() {
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                className="size-6">
+                className="size-6 transition-transform hover:rotate-45 duration-500">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"

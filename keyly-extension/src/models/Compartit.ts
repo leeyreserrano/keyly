@@ -15,7 +15,11 @@ export type Compartit = {
 export type CompartitRequest = {
   entitatUuid: string
   tipusEntitat: TipusEntitat
-  usuaris: Record<string, Permisos>
+  usuaris: {
+    usuariUuid: string
+    permis: Permisos
+    encryptedDataKey?: string
+  }[]
 }
 
 export type CompartitItemRequest = {
