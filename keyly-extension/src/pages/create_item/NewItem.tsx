@@ -9,13 +9,12 @@ import { userApi } from "~api/user-service"
 import { utilsService } from "~api/utils-service"
 import type { Carpeta } from "~models/Carpeta"
 import {
-  Permisos,
   TipusEntitat,
   type CompartitRequest
 } from "~models/Compartit"
 import type { CustomPassword } from "~models/CustomPassword"
 import type { Item, ItemResponse } from "~models/Item"
-import { importPublicKey, type User } from "~models/User"
+import { type User } from "~models/User"
 
 function bytesToBase64(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)))
@@ -88,11 +87,9 @@ function NewItem() {
 
     const data = new TextEncoder().encode(contrasenya)
 
-    const key = await getStoredKey()
-
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv },
-      key,
+      dataKey,
       data
     )
     const item: Item = {

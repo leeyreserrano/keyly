@@ -9,9 +9,16 @@ export type Compartit = {
   tipusEntitat: TipusEntitat
   permisos: Permisos
   carpeta?: CompartitCarpeta
-  item?: CompartitItem
+  item?: Item  // ← usa Item directamente
+  dataCreacio: string
 }
 
+type CompartitCarpeta = {
+  uuid: string
+  nom: string
+  favorit: boolean
+  items: Item[]  // ← también aquí
+}
 export type CompartitRequest = {
   entitatUuid: string
   tipusEntitat: TipusEntitat
@@ -27,17 +34,18 @@ export type CompartitItemRequest = {
   compartitRequest: CompartitRequest
 }
 
-type CompartitCarpeta = {
-  uuid: string
-  nom: string
-  favorit: boolean
-}
-
 type CompartitItem = {
   uuid: string
   titol: string
   nomUsuari: string
+  contrasenya: string
+  iv: string
+  encryptedDataKey: {
+    uuid: string
+    encryptedDatakey: string
+  }
   url: string
+  notes: string
   favorit: boolean
   dinsDeCarpeta: boolean
 }

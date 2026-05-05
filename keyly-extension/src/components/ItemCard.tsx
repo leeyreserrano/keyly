@@ -17,15 +17,18 @@ function ItemCard({ search }: { search: string }) {
     const loadItems = async () => {
       try {
         const [itemsData] = await Promise.all([itemsApi.fetchItems()])
-        setItems(itemsData)
-        console.log(JSON.stringify(itemsData))
+
+        const decryptedItems = await Promise.all(itemsData.map(decryptItem))
+
+        console.log("Items desencriptados:", decryptedItems)
+
+        setItems(decryptedItems)
       } catch (error) {
         console.error(error)
       }
     }
     loadItems()
   }, [])
-
   const filteredItems = items.filter(
     (item) =>
       item.titol.toLowerCase().includes(search.toLowerCase()) ||
@@ -204,3 +207,64 @@ function ItemCard({ search }: { search: string }) {
 }
 
 export default ItemCard
+
+export async function decryptItem(item: any): Promise<Item> {
+  try {
+    const privateKeyB64 = localStorage.getItem("privateKey")
+    if (!privateKeyB64) throw new Error("No hay private key en localStorage")
+
+    const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
+      c.charCodeAt(0)
+    )
+    const privateKey = await crypto.subtle.importKey(
+      "pkcs8",
+      privateKeyBytes,
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      ["decrypt"]
+    )
+
+    const encryptedDataKeyBytes = Uint8Array.from(
+      atob(item.encryptedDataKey.encryptedDatakey),
+      (c) => c.charCodeAt(0)
+    )
+    const dataKeyBuffer = await crypto.subtle.decrypt(
+      { name: "RSA-OAEP" },
+      privateKey,
+      encryptedDataKeyBytes
+    )
+
+    const dataKey = await crypto.subtle.importKey(
+      "raw",
+      dataKeyBuffer,
+      { name: "AES-GCM" },
+      false,
+      ["decrypt"]
+    )
+
+    const iv = Uint8Array.from(atob(item.iv), (c) => c.charCodeAt(0))
+    const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) =>
+      c.charCodeAt(0)
+    )
+    const decryptedPswBuffer = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      dataKey,
+      encryptedPswBytes
+    )
+
+    const contrasenya = new TextDecoder().decode(decryptedPswBuffer)
+
+    return {
+      ...item,
+      contrasenya,
+      encryptedDataKey: item.encryptedDataKey.uuid
+    }
+  } catch (err) {
+    console.error("Error desencriptando item:", item.uuid, err)
+    return {
+      ...item,
+      contrasenya: "",
+      encryptedDataKey: item.encryptedDataKey?.uuid
+    }
+  }
+}
