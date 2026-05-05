@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom"
 
 import { carpetasApi } from "~api/carpeta-service"
 import type { Carpeta } from "~models/Carpeta"
+import ModalConfirmDelete from "./ModalConfimDelete"
 
 function CarpetCard({ search }: { search: string }) {
   const [carpetas, setCarpetas] = useState<Carpeta[]>([])
   const navigate = useNavigate()
+  const [showMenu, setShowMenu] = useState(false)
+  const [selectedCarpeta, setSelectedCarpeta] = useState(null)
 
   useEffect(() => {
     const loadCarpeta = async () => {
@@ -47,6 +50,7 @@ function CarpetCard({ search }: { search: string }) {
       await carpetasApi.deleteCarpeta(carpeta.uuid)
 
       setCarpetas((prev) => prev.filter((i) => i.uuid !== carpeta.uuid))
+      setShowMenu(false)
     } catch (error) {
       console.error(error)
     }
@@ -133,7 +137,8 @@ function CarpetCard({ search }: { search: string }) {
                     stroke="currentColor"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteCarpetaClick(carpetes)
+                      setSelectedCarpeta(carpetes)
+                      setShowMenu(true)
                     }}
                     className="size-6 hover:text-red-600 transition-colors">
                     <path
@@ -148,6 +153,14 @@ function CarpetCard({ search }: { search: string }) {
           </>
         )}
       </div>
+      <ModalConfirmDelete
+        open={showMenu}
+        item={selectedCarpeta}
+        onClose={() => setShowMenu(false)}
+        onConfirm={(carpeta) => {
+          handleDeleteCarpetaClick(carpeta)
+        }}
+      />
     </>
   )
 }

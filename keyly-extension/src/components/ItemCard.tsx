@@ -4,16 +4,21 @@ import { useNavigate } from "react-router-dom"
 import { itemsApi } from "~api/item-service"
 import type { Item } from "~models/Item"
 
+import ModalConfirmDelete from "./ModalConfimDelete"
+
 function ItemCard({ search }: { search: string }) {
   const [items, setItems] = useState<Item[]>([])
   const navigate = useNavigate()
   const [imgErrors, setImgErrors] = useState({})
+  const [showMenu, setShowMenu] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   useEffect(() => {
     const loadItems = async () => {
       try {
         const [itemsData] = await Promise.all([itemsApi.fetchItems()])
         setItems(itemsData)
+        console.log(JSON.stringify(itemsData))
       } catch (error) {
         console.error(error)
       }
@@ -49,6 +54,7 @@ function ItemCard({ search }: { search: string }) {
       await itemsApi.deleteItem(item.uuid)
 
       setItems((prev) => prev.filter((i) => i.uuid !== item.uuid))
+      setShowMenu(false)
     } catch (error) {
       console.error(error)
     }
@@ -110,11 +116,21 @@ function ItemCard({ search }: { search: string }) {
                     }}
                   />
                 )}
-                <div className="flex flex-col">
-                  <h1 className="text-lg font-bold">{item.titol}</h1>
-                  <p>{item.url}</p>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <h1 className="text-lg font-bold truncate">{item.titol}</h1>
+
+                  <p className="truncate text-sm text-gray-600">{item.url}</p>
                 </div>
                 <div className="ml-auto flex gap-2">
+                  {item.dinsDeCarpeta && (
+                    <svg
+                      fill="currentColor"
+                      className="size-6"
+                      viewBox="0 0 24 24">
+                      <path d="m9.17 6 2 2H20v10H4V6zM10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8z"></path>
+                    </svg>
+                  )}
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill={item.favorit ? "currentColor" : "none"}
@@ -159,7 +175,8 @@ function ItemCard({ search }: { search: string }) {
                     stroke="currentColor"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteItemClick(item)
+                      setSelectedItem(item)
+                      setShowMenu(true)
                     }}
                     className="size-6 hover:text-red-600 transition-colors">
                     <path
@@ -174,6 +191,14 @@ function ItemCard({ search }: { search: string }) {
           </>
         )}
       </div>
+      <ModalConfirmDelete
+        open={showMenu}
+        item={selectedItem}
+        onClose={() => setShowMenu(false)}
+        onConfirm={(item) => {
+          handleDeleteItemClick(item)
+        }}
+      />
     </>
   )
 }
