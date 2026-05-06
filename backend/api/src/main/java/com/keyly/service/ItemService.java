@@ -128,8 +128,10 @@ public class ItemService {
 
         Item itemGuardat = repo.save(item);
 
-        EncryptedDataKeys e = new EncryptedDataKeys(null, null, itemGuardat, item.getBagul().getPropietari(),
-                request.encryptedDataKey());
+
+        EncryptedDataKeys e = repoEncryptedDataKeys.findByUsuariUuidAndItemUuid(usuari.uuid(), item.getUuid());
+
+        e.setEncryptedDatakey(request.encryptedDataKey());
 
         EncryptedDataKeys encryptedDataKeyGuardat = repoEncryptedDataKeys.save(e);
 

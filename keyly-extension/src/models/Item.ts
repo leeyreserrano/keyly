@@ -4,14 +4,14 @@ export type Item = {
   nomUsuari: string
   contrasenya: string
   iv?: string
-  encryptedDataKey?: string,
+  encryptedDataKey?: string
   url: string
   notes: string
   favorit: boolean
   dataCreacio: string
   dataEditat: string
-  ultimAcces: string
   dinsDeCarpeta: boolean
+  ultimAccess: string
 }
 
 export type ItemResponse = {

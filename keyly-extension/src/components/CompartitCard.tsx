@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { compartitApi } from "~api/compartit-service"
 import { TipusEntitat, type Compartit } from "~models/Compartit"
 import ModalConfirmDelete from "./ModalConfimDelete"
+import { decryptItem } from "./ItemCard"
 
 function CompartitCard({ search }: { search: string }) {
   const [compartits, setCompartits] = useState<Compartit[]>([])
@@ -15,15 +16,35 @@ function CompartitCard({ search }: { search: string }) {
   useEffect(() => {
     const loadCompartit = async () => {
       try {
-        const [compartitsData] = await Promise.all([
-          compartitApi.fetchCompartits()
-        ])
-        setCompartits(compartitsData)
+        const compartitsData = await compartitApi.fetchCompartits()
+  
+        // Desencriptar items directos
+        const decrypted = await Promise.all(
+          compartitsData.map(async (compartit) => {
+            if (compartit.tipusEntitat === TipusEntitat.ITEM && compartit.item) {
+              return {
+                ...compartit,
+                item: await decryptItem(compartit.item)
+              }
+            }
+            if (compartit.tipusEntitat === TipusEntitat.CARPETA && compartit.carpeta?.items) {
+              const decryptedItems = await Promise.all(
+                compartit.carpeta.items.map(decryptItem)
+              )
+              return {
+                ...compartit,
+                carpeta: { ...compartit.carpeta, items: decryptedItems }
+              }
+            }
+            return compartit
+          })
+        )
+        console.log(decrypted)
+        setCompartits(decrypted)
       } catch (error) {
         console.error(error)
       }
     }
-
     loadCompartit()
   }, [])
 
@@ -83,7 +104,7 @@ function CompartitCard({ search }: { search: string }) {
             {filteredCompartits.map((compartit) => (
               <span
                 key={compartit.uuid}
-                onClick={() => navigate(`/compartit/${compartit.uuid}`)}
+                onClick={() => navigate(compartit.tipusEntitat === TipusEntitat.CARPETA ? `/carpeta/${compartit.uuid}` : `/item/${compartit.uuid}`, { state: compartit.item })}
                 className="flex items-center gap-3 p-2 border w-full h-16 bg-purple-100 border-purple-300 rounded-lg mb-2 cursor-pointer hover:bg-purple-300 hover:border-purple-400 transition-colors">
                 {compartit.tipusEntitat === TipusEntitat.CARPETA ? (
                   <svg

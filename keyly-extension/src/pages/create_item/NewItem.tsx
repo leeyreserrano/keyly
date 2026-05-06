@@ -8,14 +8,10 @@ import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { utilsService } from "~api/utils-service"
 import type { Carpeta } from "~models/Carpeta"
-import {
-  Permisos,
-  TipusEntitat,
-  type CompartitRequest
-} from "~models/Compartit"
+import { TipusEntitat, type CompartitRequest } from "~models/Compartit"
 import type { CustomPassword } from "~models/CustomPassword"
 import type { Item, ItemResponse } from "~models/Item"
-import { importPublicKey, type User } from "~models/User"
+import { type User } from "~models/User"
 
 function bytesToBase64(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes)))
@@ -88,11 +84,9 @@ function NewItem() {
 
     const data = new TextEncoder().encode(contrasenya)
 
-    const key = await getStoredKey()
-
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv },
-      key,
+      dataKey,
       data
     )
     const item: Item = {
@@ -107,7 +101,7 @@ function NewItem() {
       favorit: false,
       dataCreacio: null,
       dataEditat: null,
-      ultimAcces: null,
+      ultimAccess: null,
       dinsDeCarpeta: carpeta.length > 0
     }
 
@@ -194,7 +188,7 @@ function NewItem() {
   return (
     <div className="relative flex flex-col flex-1 h-full w-full overflow-hidden">
       <form
-        className="flex flex-col items-center gap-5 flex-1 overflow-y-auto pb-10 pt-5"
+        className="flex flex-col items-center gap-5 flex-1 overflow-y-auto pb-16 pt-5"
         id="newItem"
         action=""
         onSubmit={handleSubmit}>
@@ -462,19 +456,17 @@ function NewItem() {
           </select>
         </div>
       </form>
-      <div className="absolute bottom-3 right-12 z-50">
-        <button
-          onClick={() => navigate(from)}
-          className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
-          Cancelar
-        </button>
-      </div>
-      <div className="absolute bottom-3 right-36 z-50">
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 pt-4">
         <button
           type="submit"
           form="newItem"
-          className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
+          className="bg-purple-500 text-white py-2 px-10 rounded-lg hover:bg-purple-600">
           Guardar
+        </button>
+        <button
+          onClick={() => navigate(from)}
+          className="border py-2 px-10 rounded-lg hover:bg-gray-100">
+          Cancelar
         </button>
       </div>
     </div>

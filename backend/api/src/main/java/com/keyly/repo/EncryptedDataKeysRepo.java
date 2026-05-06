@@ -13,6 +13,10 @@ public interface EncryptedDataKeysRepo extends JpaRepository<EncryptedDataKeys, 
 
     EncryptedDataKeyResponse findByItemUuidAndUsuariUuid(UUID uuid, UUID usuariUuid);
 
+    EncryptedDataKeys findByUsuariUuidAndItemUuid(UUID usuariUuid, UUID itemUuid);
+
     EncryptedDataKeyResponse findAllByItemUuid(UUID uuid);
+
+    void deleteByItemUuidAndUsuariUuid(UUID itemUuid, UUID usuariUuid);
 
 }
