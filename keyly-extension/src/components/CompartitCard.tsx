@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { compartitApi } from "~api/compartit-service"
-import { TipusEntitat, type Compartit } from "~models/Compartit"
-import ModalConfirmDelete from "./ModalConfimDelete"
+import { Permisos, TipusEntitat, type Compartit } from "~models/Compartit"
+
 import { decryptItem } from "./ItemCard"
+import ModalConfirmDelete from "./ModalConfimDelete"
 
 function CompartitCard({ search }: { search: string }) {
   const [compartits, setCompartits] = useState<Compartit[]>([])
@@ -12,22 +13,28 @@ function CompartitCard({ search }: { search: string }) {
   const [imgErrors, setImgErrors] = useState({})
   const [showMenu, setShowMenu] = useState(false)
   const [selectedCompartit, setSelectedCompartit] = useState(null)
+  const [modalCompartit, setModalCompartit] = useState<Compartit | null>(null)
 
   useEffect(() => {
     const loadCompartit = async () => {
       try {
         const compartitsData = await compartitApi.fetchCompartits()
-  
-        // Desencriptar items directos
+
         const decrypted = await Promise.all(
           compartitsData.map(async (compartit) => {
-            if (compartit.tipusEntitat === TipusEntitat.ITEM && compartit.item) {
+            if (
+              compartit.tipusEntitat === TipusEntitat.ITEM &&
+              compartit.item
+            ) {
               return {
                 ...compartit,
                 item: await decryptItem(compartit.item)
               }
             }
-            if (compartit.tipusEntitat === TipusEntitat.CARPETA && compartit.carpeta?.items) {
+            if (
+              compartit.tipusEntitat === TipusEntitat.CARPETA &&
+              compartit.carpeta?.items
+            ) {
               const decryptedItems = await Promise.all(
                 compartit.carpeta.items.map(decryptItem)
               )
@@ -104,7 +111,14 @@ function CompartitCard({ search }: { search: string }) {
             {filteredCompartits.map((compartit) => (
               <span
                 key={compartit.uuid}
-                onClick={() => navigate(compartit.tipusEntitat === TipusEntitat.CARPETA ? `/carpeta/${compartit.uuid}` : `/item/${compartit.uuid}`, { state: compartit.item })}
+                onClick={() =>
+                  navigate(
+                    compartit.tipusEntitat === TipusEntitat.CARPETA
+                      ? `/carpeta/${compartit.uuid}`
+                      : `/item/${compartit.uuid}`,
+                    { state: compartit.item }
+                  )
+                }
                 className="flex items-center gap-3 p-2 border w-full h-16 bg-purple-100 border-purple-300 rounded-lg mb-2 cursor-pointer hover:bg-purple-300 hover:border-purple-400 transition-colors">
                 {compartit.tipusEntitat === TipusEntitat.CARPETA ? (
                   <svg
@@ -153,9 +167,29 @@ function CompartitCard({ search }: { search: string }) {
                       ? compartit.carpeta?.nom
                       : compartit.item?.titol}
                   </h1>
-                  <p className="truncate text-sm text-gray-600">{compartit.item?.url}</p>
+                  <p className="truncate text-sm text-gray-600">
+                    {compartit.item?.url}
+                  </p>
                 </div>
                 <div className="ml-auto flex gap-2">
+                  {/* Compartit */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-6 hover:text-gray-600"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setModalCompartit(compartit)
+                    }}>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+                    />
+                  </svg>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill={
@@ -185,20 +219,21 @@ function CompartitCard({ search }: { search: string }) {
                       d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
                     />
                   </svg>
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                    />
-                  </svg>
+                  {compartit.permisos !== Permisos.LECTURA && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                      />
+                    </svg>
+                  )}
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -232,6 +267,124 @@ function CompartitCard({ search }: { search: string }) {
           handleDeleteCompartitClick(compartit)
         }}
       />
+      {modalCompartit &&
+        (() => {
+          const entitatUuid =
+            modalCompartit.tipusEntitat === TipusEntitat.CARPETA
+              ? modalCompartit.carpeta?.uuid
+              : modalCompartit.item?.uuid
+
+          const totsElsReceptors = compartits.filter(
+            (c) =>
+              c.tipusEntitat === modalCompartit.tipusEntitat &&
+              (c.tipusEntitat === TipusEntitat.CARPETA
+                ? c.carpeta?.uuid === entitatUuid
+                : c.item?.uuid === entitatUuid)
+          )
+
+          const nom =
+            modalCompartit.tipusEntitat === TipusEntitat.CARPETA
+              ? modalCompartit.carpeta?.nom
+              : modalCompartit.item?.titol
+
+          const permisLabel = (p: string) => {
+            if (p === "LECTURA") return "Lectura"
+            if (p === "ESCRIPTURA") return "Escriptura"
+            if (p === "ADMINISTRADOR") return "Administrador"
+            return p
+          }
+          return (
+            <div
+              className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+              onClick={() => setModalCompartit(null)}>
+              <div
+                className="bg-white rounded-2xl shadow-xl w-[380px] p-6 space-y-4"
+                onClick={(e) => e.stopPropagation()}>
+                {/* Títol */}
+                <div className="flex items-center justify-between border-b pb-3">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide">
+                      {modalCompartit.tipusEntitat === TipusEntitat.CARPETA
+                        ? "Carpeta"
+                        : "Item"}
+                    </p>
+                    <h2 className="text-lg font-bold">{nom}</h2>
+                  </div>
+                  <button onClick={() => setModalCompartit(null)}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-5">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18 18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* El teu rol */}
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">El teu permís</p>
+                  <span className="inline-block bg-purple-100 text-purple-700 text-xs font-medium px-3 py-1 rounded-full">
+                    {permisLabel(modalCompartit.permisos)}
+                  </span>
+                </div>
+
+                {/* Creador */}
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Compartit per</p>
+                  <div className="flex items-center gap-2 border rounded-lg px-3 py-2">
+                    <div className="size-7 rounded-full bg-purple-200 flex items-center justify-center text-xs font-bold text-purple-700">
+                      {modalCompartit.usuariCreador.nom.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {modalCompartit.usuariCreador.nom}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {modalCompartit.usuariCreador.correu}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tots els receptors */}
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Compartit amb</p>
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {totsElsReceptors.map((c) => (
+                      <div
+                        key={c.uuid}
+                        className="flex items-center justify-between border rounded-lg px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                            {c.usuariReceptor.nom.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">
+                              {c.usuariReceptor.nom}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {c.usuariReceptor.correu}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-xs text-purple-600 font-medium">
+                          {permisLabel(c.permisos)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
     </>
   )
 }

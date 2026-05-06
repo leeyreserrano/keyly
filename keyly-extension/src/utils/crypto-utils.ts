@@ -24,3 +24,17 @@ export async function encryptItemPassword(
     ivB64: bytesToBase64(iv)
   }
 }
+
+const EXPIRATION_MARGIN = 60 * 1000;
+
+export function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    if (!payload.exp) return true;
+
+    return Date.now() >= payload.exp * 1000 - EXPIRATION_MARGIN;
+  } catch {
+    return true;
+  }
+}

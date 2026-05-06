@@ -22,6 +22,7 @@ import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.request.CompartitRequest;
 import com.keyly.model.request.ItemRequest;
 import com.keyly.model.request.UsuarisCompartits;
+import com.keyly.model.request.combined.ItemEncryptedDataKey;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.CompartitResponse;
 import com.keyly.model.response.EncryptedDataKeyResponse;
@@ -83,48 +84,52 @@ public class CompartitService {
     }
 
     public List<CompartitResponse> createCompartit(UUID creadorUuid, CompartitRequest request) {
-        usuariService.getUsuariEntityByUuid(creadorUuid); // Validar que el creador existe
+        usuariService.getUsuariEntityByUuid(creadorUuid);
         List<CompartitResponse> responses = new ArrayList<>();
-
+    
         if (request.tipusEntitat() == TipusEntitat.CARPETA) {
             carpetaService.getCarpetaEntityByUuid(request.entitatUuid());
         } else if (request.tipusEntitat() == TipusEntitat.ITEM) {
             itemService.getItemEntityByUuid(request.entitatUuid());
         }
-
-        // Crea un compartit per a cada usuari
+    
         for (UsuarisCompartits usuari : request.usuaris()) {
             UUID usuariUuid = usuari.usuariUuid();
-            if (usuariUuid.equals(creadorUuid)) {
-                continue; // No el crea per l'usuari que ho crea
-            }
-
+            if (usuariUuid.equals(creadorUuid)) continue;
+    
             Usuari usuariReceptor = usuariService.getUsuariEntityByUuid(usuariUuid);
-
+    
             Compartit compartit = new Compartit();
             compartit.setUsuari(usuariReceptor);
             compartit.setCreadorUuid(creadorUuid);
             compartit.setTipusEntitat(request.tipusEntitat());
             compartit.setEntitatUuid(request.entitatUuid());
             compartit.setPermisos(usuari.permis());
-
+    
             Compartit saved = repo.save(compartit);
             responses.add(convertToResponse(saved));
-
-            EncryptedDataKeys e = new EncryptedDataKeys(null, null,
-                    itemService.getItemEntityByUuid(request.entitatUuid()), usuariReceptor, usuari.encryptedDataKey());
-
-            repoEncryptedDataKeys.save(e);
+    
+            if (request.tipusEntitat() == TipusEntitat.ITEM) {
+                ItemEncryptedDataKey edk = usuari.encryptedDataKeys().get(0);
+                Item item = itemService.getItemEntityByUuid(request.entitatUuid());
+                EncryptedDataKeys e = new EncryptedDataKeys(null, null, item, usuariReceptor, edk.encryptedDataKey());
+                repoEncryptedDataKeys.save(e);
+    
+            } else if (request.tipusEntitat() == TipusEntitat.CARPETA) {
+                for (ItemEncryptedDataKey edk : usuari.encryptedDataKeys()) {
+                    Item item = itemService.getItemEntityByUuid(edk.itemUuid());
+                    EncryptedDataKeys e = new EncryptedDataKeys(null, null, item, usuariReceptor, edk.encryptedDataKey());
+                    repoEncryptedDataKeys.save(e);
+                }
+            }
         }
-
+    
         return responses;
     }
 
     public void createCompartit(UUID creadorUuid, ItemRequest item, CompartitRequest compartit) {
         ItemResponse response = itemService.save(usuariService.getUsuariEntityByUuid(creadorUuid), item);
-
         CompartitRequest request = new CompartitRequest(response.uuid(), TipusEntitat.ITEM, compartit.usuaris());
-
         createCompartit(creadorUuid, request);
     }
 

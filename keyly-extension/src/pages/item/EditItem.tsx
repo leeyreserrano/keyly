@@ -14,12 +14,10 @@ function EditItem() {
   const [itemOriginal, setItemOriginal] = useState(null)
   const { state: item } = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const location = useLocation()
   const [usuarisAmbAcces, setUsuarisAmbAcces] = useState([])
   const [totsElsUsuaris, setTotsElsUsuaris] = useState([])
   const [searchUsuari, setSearchUsuari] = useState("")
   const [rawDataKey, setRawDataKey] = useState<ArrayBuffer | null>(null)
-  const [loadingShare, setLoadingShare] = useState(false)
   const [usuarisAAfegir, setUsuarisAAfegir] = useState([])
   const [usuarisAEliminar, setUsuarisAEliminar] = useState([])
 

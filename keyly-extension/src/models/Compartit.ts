@@ -5,11 +5,17 @@ export type Compartit = {
   usuariCreador: {
     uuid: string
     nom: string
+    correu: string
+  },
+    usuariReceptor: {
+        uuid: string
+        nom: string
+        correu: string
   }
   tipusEntitat: TipusEntitat
   permisos: Permisos
   carpeta?: CompartitCarpeta
-  item?: Item  // ← usa Item directamente
+  item?: Item
   dataCreacio: string
 }
 
@@ -17,7 +23,7 @@ type CompartitCarpeta = {
   uuid: string
   nom: string
   favorit: boolean
-  items: Item[]  // ← también aquí
+  items: Item[]
 }
 export type CompartitRequest = {
   entitatUuid: string
@@ -56,7 +62,7 @@ export enum TipusEntitat {
 }
 
 export enum Permisos {
-  LECTURA,
-  ESCRIPTURA,
-  ADMINISTRADOR
+  LECTURA = "LECTURA",
+  ESCRIPTURA = "ESCRIPTURA",
+  ADMINISTRADOR = "ADMINISTRADOR"
 }
