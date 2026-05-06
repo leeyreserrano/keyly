@@ -2,13 +2,16 @@ import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { carpetasApi } from "~api/carpeta-service"
-import { compartitApi } from "~api/compartit-service"
+import { compartitApi, usuarisCompartits } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { decryptItemWithRawKey } from "~components/ItemCard"
+import { TipusEntitat, type CompartitRequest } from "~models/Compartit"
+import { encryptItemPassword } from "~utils/crypto-utils"
 
 function EditItem() {
   const navigate = useNavigate()
+  const [itemOriginal, setItemOriginal] = useState(null)
   const { state: item } = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const location = useLocation()
@@ -54,8 +57,7 @@ function EditItem() {
     const loadDades = async () => {
       try {
         const itemOriginalRes = await itemsApi.fetchItem(item.uuid)
-        console.log("itemOriginal:", itemOriginalRes)
-
+        setItemOriginal(itemOriginalRes)
         const { rawDataKey: rdk } = await decryptItemWithRawKey(itemOriginalRes)
         setRawDataKey(rdk)
 
@@ -112,17 +114,36 @@ function EditItem() {
 
   const handleSubmit = async () => {
     try {
+      const { contrasenyaEncriptada, ivB64 } = await encryptItemPassword(
+        formData.contrasenya,
+        rawDataKey
+      )
+
       await itemsApi.updateItem({
-        ...item,
-        ...formData
+        ...itemOriginal,
+        ...formData,
+        contrasenya: contrasenyaEncriptada,
+        iv: ivB64,
+        encryptedDataKey: itemOriginal.encryptedDataKey.encryptedDatakey
       })
+
+      // Si la carpeta ha cambiado, mover el item
+      if (formData.carpetaUuid && formData.carpetaUuid !== carpetaActual) {
+        await carpetasApi.addItemInCarpeta(formData.carpetaUuid, item.uuid)
+      }
 
       await Promise.all(
         usuarisAEliminar.map((uuid) => compartitApi.deleteCompartit(uuid))
       )
 
       if (usuarisAAfegir.length > 0) {
-        await compartitApi.newItemCompartir(usuarisAAfegir, item, rawDataKey)
+        const usuaris = await usuarisCompartits(usuarisAAfegir, rawDataKey)
+        const compartit: CompartitRequest = {
+          entitatUuid: item.uuid,
+          tipusEntitat: TipusEntitat.ITEM,
+          usuaris
+        }
+        await compartitApi.addCompartit(compartit)
       }
 
       navigate(from)
