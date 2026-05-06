@@ -147,13 +147,13 @@ function CompartitCard({ search }: { search: string }) {
                     }
                   />
                 )}
-                <div className="flex flex-col">
-                  <h1 className="text-lg font-bold">
+                <div className="flex flex-col min-w-0">
+                  <h1 className="text-lg font-bold truncate">
                     {compartit.tipusEntitat === TipusEntitat.CARPETA
                       ? compartit.carpeta?.nom
                       : compartit.item?.titol}
                   </h1>
-                  <p>{compartit.item?.url}</p>
+                  <p className="truncate text-sm text-gray-600">{compartit.item?.url}</p>
                 </div>
                 <div className="ml-auto flex gap-2">
                   <svg

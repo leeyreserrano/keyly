@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import { itemsApi } from "~api/item-service"
 
 function Item() {
   const [showPassword, setShowPassword] = useState(false)
   const { state: item } = useLocation()
+  const location = useLocation()
+  const from = location.state?.from || "/home"
+  const navigate = useNavigate()
 
   const getFavicon = (url) => {
     try {
@@ -22,7 +25,7 @@ function Item() {
   return (
     <div className="relative flex flex-col flex-1 h-full w-full overflow-hidden bg-gray-50">
       <div className="flex flex-col items-center flex-1 overflow-y-auto py-8">
-        <div className="w-[400px] bg-white rounded-2xl shadow-md border border-gray-200 p-6 space-y-5 transition hover:shadow-lg">
+        <div className="w-[400px] bg-white mb-10 rounded-2xl shadow-md border border-gray-200 p-6 space-y-5 transition hover:shadow-lg">
           {/* HEADER CON LOGO */}
           <div className="relative flex items-center justify-center border-b pb-4">
             {/* LOGO IZQUIERDA */}
@@ -200,6 +203,14 @@ function Item() {
               </p>
             </div>
           </div>
+        </div>
+        {/* ACTIONS */}
+        <div className="fixed bottom-12 ml-64 z-50">
+          <button
+            onClick={() => navigate(from)}
+            className="bg-white border py-2 px-10 rounded-lg hover:bg-gray-100">
+            Tornar
+          </button>
         </div>
       </div>
     </div>

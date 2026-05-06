@@ -15,7 +15,6 @@ function EditItem() {
   const { state: item } = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const location = useLocation()
-  const from = location.state?.from || "/home"
   const [usuarisAmbAcces, setUsuarisAmbAcces] = useState([])
   const [totsElsUsuaris, setTotsElsUsuaris] = useState([])
   const [searchUsuari, setSearchUsuari] = useState("")
@@ -146,7 +145,7 @@ function EditItem() {
         await compartitApi.addCompartit(compartit)
       }
 
-      navigate(from)
+      navigate("/home")
     } catch (err) {
       console.error("Error guardant:", err)
     }
@@ -387,7 +386,7 @@ function EditItem() {
             Guardar
           </button>
           <button
-            onClick={() => navigate(from)}
+            onClick={() => navigate("/home")}
             className="border py-2 px-10 rounded-lg hover:bg-gray-100">
             Cancelar
           </button>
