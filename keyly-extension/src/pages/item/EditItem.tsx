@@ -2,22 +2,22 @@ import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { carpetasApi } from "~api/carpeta-service"
-import { compartitApi } from "~api/compartit-service"
+import { compartitApi, usuarisCompartits } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
 import { userApi } from "~api/user-service"
 import { decryptItemWithRawKey } from "~components/ItemCard"
+import { TipusEntitat, type CompartitRequest } from "~models/Compartit"
+import { encryptItemPassword } from "~utils/crypto-utils"
 
 function EditItem() {
   const navigate = useNavigate()
+  const [itemOriginal, setItemOriginal] = useState(null)
   const { state: item } = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const location = useLocation()
-  const from = location.state?.from || "/home"
   const [usuarisAmbAcces, setUsuarisAmbAcces] = useState([])
   const [totsElsUsuaris, setTotsElsUsuaris] = useState([])
   const [searchUsuari, setSearchUsuari] = useState("")
   const [rawDataKey, setRawDataKey] = useState<ArrayBuffer | null>(null)
-  const [loadingShare, setLoadingShare] = useState(false)
   const [usuarisAAfegir, setUsuarisAAfegir] = useState([])
   const [usuarisAEliminar, setUsuarisAEliminar] = useState([])
 
@@ -27,6 +27,7 @@ function EditItem() {
   const [formData, setFormData] = useState({
     titol: item.titol || "",
     url: item.url || "",
+    nomUsuari: item.nomUsuari || "",
     contrasenya: item.contrasenya || "",
     notes: item.notes || "",
     favorit: item.favorit || false,
@@ -54,8 +55,7 @@ function EditItem() {
     const loadDades = async () => {
       try {
         const itemOriginalRes = await itemsApi.fetchItem(item.uuid)
-        console.log("itemOriginal:", itemOriginalRes)
-
+        setItemOriginal(itemOriginalRes)
         const { rawDataKey: rdk } = await decryptItemWithRawKey(itemOriginalRes)
         setRawDataKey(rdk)
 
@@ -112,20 +112,39 @@ function EditItem() {
 
   const handleSubmit = async () => {
     try {
+      const { contrasenyaEncriptada, ivB64 } = await encryptItemPassword(
+        formData.contrasenya,
+        rawDataKey
+      )
+
       await itemsApi.updateItem({
-        ...item,
-        ...formData
+        ...itemOriginal,
+        ...formData,
+        contrasenya: contrasenyaEncriptada,
+        iv: ivB64,
+        encryptedDataKey: itemOriginal.encryptedDataKey.encryptedDatakey
       })
+
+      // Si la carpeta ha cambiado, mover el item
+      if (formData.carpetaUuid && formData.carpetaUuid !== carpetaActual) {
+        await carpetasApi.addItemInCarpeta(formData.carpetaUuid, item.uuid)
+      }
 
       await Promise.all(
         usuarisAEliminar.map((uuid) => compartitApi.deleteCompartit(uuid))
       )
 
       if (usuarisAAfegir.length > 0) {
-        await compartitApi.newItemCompartir(usuarisAAfegir, item, rawDataKey)
+        const usuaris = await usuarisCompartits(usuarisAAfegir, rawDataKey)
+        const compartit: CompartitRequest = {
+          entitatUuid: item.uuid,
+          tipusEntitat: TipusEntitat.ITEM,
+          usuaris
+        }
+        await compartitApi.addCompartit(compartit)
       }
 
-      navigate(from)
+      navigate("/home")
     } catch (err) {
       console.error("Error guardant:", err)
     }
@@ -172,6 +191,14 @@ function EditItem() {
                 />
               </svg>
             </div>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Nom usuari</p>
+            <input
+              value={formData.nomUsuari}
+              onChange={(e) => handleChange("nomUsuari", e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 outline-none"
+            />
           </div>
           {/* PASSWORD */}
           <div>
@@ -366,7 +393,7 @@ function EditItem() {
             Guardar
           </button>
           <button
-            onClick={() => navigate(from)}
+            onClick={() => navigate("/home")}
             className="border py-2 px-10 rounded-lg hover:bg-gray-100">
             Cancelar
           </button>

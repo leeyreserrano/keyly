@@ -42,6 +42,11 @@ function NewFolder() {
         id="newCarpeta"
         action=""
         onSubmit={handleSubmit}>
+        <fieldset>
+          <legend className="text-lg font-bold">
+            Creació d'una nova carpeta
+          </legend>
+        </fieldset>
         <div className="relative w-80">
           <input
             type="text"
@@ -79,19 +84,17 @@ function NewFolder() {
           </select>
         </div>
       </form>
-      <div className="absolute bottom-3 right-12 z-50">
-        <button
-          onClick={() => navigate(from)}
-          className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
-          Cancelar
-        </button>
-      </div>
-      <div className="absolute bottom-3 right-36 z-50">
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 pt-4">
         <button
           type="submit"
-          form="newCarpeta"
-          className="bg-purple-400 text-sm text-white border-purple-600 border px-4 py-2 rounded-lg shadow-md hover:bg-purple-500">
+          form="newItem"
+          className="bg-purple-500 text-white py-2 px-10 rounded-lg hover:bg-purple-600">
           Guardar
+        </button>
+        <button
+          onClick={() => navigate(from)}
+          className="border py-2 px-10 rounded-lg hover:bg-gray-100">
+          Cancelar
         </button>
       </div>
     </div>

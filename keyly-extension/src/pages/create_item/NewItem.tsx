@@ -192,6 +192,9 @@ function NewItem() {
         id="newItem"
         action=""
         onSubmit={handleSubmit}>
+        <fieldset>
+          <legend className="text-lg font-bold">Creació d'un nou item</legend>
+        </fieldset>
         <div className="relative w-80">
           <input
             type="text"

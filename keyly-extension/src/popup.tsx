@@ -13,18 +13,27 @@ import "~style.css"
 
 import NewFolder from "~pages/create_folder/NewFolder"
 import NewItem from "~pages/create_item/NewItem"
+import CarpetaDetall from "~pages/folder/CarpetaDetall"
 import EditItem from "~pages/item/EditItem"
+import { AuthGate, ProtectedRoute } from "~utils/AuthGate"
 
 function IndexPopup() {
   return (
     <div className="w-[500] h-[550]">
       <MemoryRouter>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route element={<Layout />}>
+          <Route path="/" element={<AuthGate />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }>
             <Route path="/home" element={<Home />} />
             <Route path="/item" element={<ItemPage />} />
             <Route path="/carpeta" element={<CarpetaPage />} />
+            <Route path="/carpeta/:id" element={<CarpetaDetall />} />
             <Route path="/compartit" element={<CompartitPage />} />
             <Route path="/create/item" element={<NewItem />} />
             <Route path="/create/folder" element={<NewFolder />} />
