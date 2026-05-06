@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.keyly.exception.CompartitException;
 import com.keyly.exception.EntitatNoTrobadaException;
@@ -30,6 +31,7 @@ import com.keyly.repo.CompartitRepo;
 import com.keyly.repo.EncryptedDataKeysRepo;
 
 @Service
+@Transactional
 public class CompartitService {
 
     @Autowired
@@ -137,6 +139,9 @@ public class CompartitService {
     public void deleteCompartit(UUID uuid) {
         Compartit compartit = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Compartit no trobat amb uuid: " + uuid));
+
+        repoEncryptedDataKeys.deleteByItemUuidAndUsuariUuid(compartit.getEntitatUuid(), compartit.getUsuari().getUuid());
+
         repo.delete(compartit);
     }
 

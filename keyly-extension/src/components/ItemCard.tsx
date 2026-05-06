@@ -35,6 +35,15 @@ function ItemCard({ search }: { search: string }) {
       item.url.toLowerCase().includes(search.toLowerCase())
   )
 
+  const getFavicon = (url) => {
+    try {
+      const domain = new URL(url).hostname
+      return `https://icons.duckduckgo.com/ip3/${domain}.ico`
+    } catch {
+      return null
+    }
+  }
+
   const handleFavoriteItemClick = async (item: Item) => {
     const updatedItem = {
       ...item,
@@ -82,7 +91,19 @@ function ItemCard({ search }: { search: string }) {
                 key={item.uuid}
                 onClick={() => navigate(`/item/${item.uuid}`, { state: item })}
                 className="flex items-center gap-3 p-2 border w-full h-16 bg-purple-100 border-purple-300 rounded-lg mb-2 cursor-pointer hover:bg-purple-300 hover:border-purple-400 transition-colors">
-                {imgErrors[item.uuid] ? (
+                {getFavicon(item.url) ? (
+                  <img
+                    className="size-6"
+                    src={getFavicon(item.url)}
+                    alt=""
+                    onError={() =>
+                      setImgErrors((prev) => ({
+                        ...prev,
+                        [item.uuid]: true
+                      }))
+                    }
+                  />
+                ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -96,28 +117,6 @@ function ItemCard({ search }: { search: string }) {
                       d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
                     />
                   </svg>
-                ) : (
-                  <img
-                    className="size-6"
-                    src={`https://www.google.com/s2/favicons?sz=64&domain=${item.url}`}
-                    alt=""
-                    onError={() =>
-                      setImgErrors((prev) => ({
-                        ...prev,
-                        [item.uuid]: true
-                      }))
-                    }
-                    onLoad={(e) => {
-                      const img = e.currentTarget
-
-                      if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
-                        setImgErrors((prev) => ({
-                          ...prev,
-                          [item.uuid]: true
-                        }))
-                      }
-                    }}
-                  />
                 )}
                 <div className="flex flex-col min-w-0 flex-1">
                   <h1 className="text-lg font-bold truncate">{item.titol}</h1>
@@ -162,7 +161,11 @@ function ItemCard({ search }: { search: string }) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors">
+                    className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/item/edit/${item.uuid}`, { state: item })
+                    }}>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -265,6 +268,58 @@ export async function decryptItem(item: any): Promise<Item> {
       ...item,
       contrasenya: "",
       encryptedDataKey: item.encryptedDataKey?.uuid
+    }
+  }
+}
+
+export async function decryptItemWithRawKey(item: any): Promise<{ item: Item, rawDataKey: ArrayBuffer }> {
+  const privateKeyB64 = localStorage.getItem("privateKey")
+  if (!privateKeyB64) throw new Error("No hay private key en localStorage")
+
+  const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) => c.charCodeAt(0))
+  const privateKey = await crypto.subtle.importKey(
+    "pkcs8",
+    privateKeyBytes,
+    { name: "RSA-OAEP", hash: "SHA-256" },
+    false,
+    ["decrypt"]
+  )
+
+  const encryptedDataKeyBytes = Uint8Array.from(
+    atob(item.encryptedDataKey.encryptedDatakey),
+    (c) => c.charCodeAt(0)
+  )
+
+  const rawDataKey = await crypto.subtle.decrypt(
+    { name: "RSA-OAEP" },
+    privateKey,
+    encryptedDataKeyBytes
+  )
+
+  const dataKey = await crypto.subtle.importKey(
+    "raw",
+    rawDataKey,
+    { name: "AES-GCM" },
+    false,
+    ["decrypt"]
+  )
+
+  const iv = Uint8Array.from(atob(item.iv), (c) => c.charCodeAt(0))
+  const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) => c.charCodeAt(0))
+  const decryptedPswBuffer = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv },
+    dataKey,
+    encryptedPswBytes
+  )
+
+  const contrasenya = new TextDecoder().decode(decryptedPswBuffer)
+
+  return {
+    rawDataKey,
+    item: {
+      ...item,
+      contrasenya,
+      encryptedDataKey: item.encryptedDataKey.uuid
     }
   }
 }

@@ -1,5 +1,7 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
+
+import { itemsApi } from "~api/item-service"
 
 function Item() {
   const [showPassword, setShowPassword] = useState(false)
@@ -7,12 +9,16 @@ function Item() {
 
   const getFavicon = (url) => {
     try {
-      const domain = new URL(url).origin
-      return `${domain}/favicon.ico`
+      const domain = new URL(url).hostname
+      return `https://icons.duckduckgo.com/ip3/${domain}.ico`
     } catch {
       return null
     }
   }
+
+  useEffect(() => {
+    itemsApi.accesItem(item.uuid)
+  })
   return (
     <div className="relative flex flex-col flex-1 h-full w-full overflow-hidden bg-gray-50">
       <div className="flex flex-col items-center flex-1 overflow-y-auto py-8">
@@ -22,14 +28,19 @@ function Item() {
             {/* LOGO IZQUIERDA */}
             <div className="absolute left-0">
               {item.url && getFavicon(item.url) ? (
-                <img
-                  src={getFavicon(item.url)}
-                  alt="logo"
-                  className="w-12 h-12 rounded-lg border p-1 bg-white"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none"
-                  }}
-                />
+                <a
+                  href={item.url}
+                  target="_blank"
+                  className="hover:cursor-pointer">
+                  <img
+                    src={getFavicon(item.url)}
+                    alt="logo"
+                    className="w-12 h-12 rounded-lg border p-1 bg-white"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none"
+                    }}
+                  />
+                </a>
               ) : (
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-200">
                   <svg
@@ -135,7 +146,7 @@ function Item() {
             <a
               href={item.url}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="url"
               className="text-purple-500 break-all hover:underline">
               {item.url || "-"}
             </a>
@@ -157,22 +168,36 @@ function Item() {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-xs text-gray-500">Creat</p>
-              <p className="text-gray-700">{item.dataCreacio}</p>
+              <p className="text-gray-700">
+                {item.dataCreacio
+                  ? new Date(item.dataCreacio).toLocaleString("es-ES")
+                  : "-"}
+              </p>
             </div>
 
             <div>
               <p className="text-xs text-gray-500">Editat</p>
-              <p className="text-gray-700">{item.dataEditat}</p>
+              <p className="text-gray-700">
+                {item.dataEditat
+                  ? new Date(item.dataEditat).toLocaleDateString("es-ES")
+                  : "-"}
+              </p>
             </div>
 
             <div>
               <p className="text-xs text-gray-500">Últim accés</p>
-              <p className="text-gray-700">{item.ultimAcces}</p>
+              <p className="text-gray-700">
+                {item.ultimAcces
+                  ? new Date(item.ultimAccess).toLocaleDateString("es-ES")
+                  : "-"}
+              </p>
             </div>
 
             <div>
               <p className="text-xs text-gray-500">Carpeta</p>
-              <p className="text-gray-700">{item.dinsDeCarpeta || "-"}</p>
+              <p className="text-gray-700">
+                {item.dinsDeCarpeta ? "Sí" : "No"}
+              </p>
             </div>
           </div>
         </div>

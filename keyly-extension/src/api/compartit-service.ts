@@ -23,6 +23,24 @@ export class compartitApi {
     return response.json()
   }
 
+  static async fetchCompartitsCreats(): Promise<Compartit[]> {
+    const token = localStorage.getItem("jwtToken")
+    const response = await fetch(`${API_BASE}/compartit/get/all/creats`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!response.ok) throw new Error("Error en la petició")
+    return response.json()
+  }
+
+    static async getCompartit(uuid: string): Promise<Compartit> {
+    const token = localStorage.getItem("jwtToken")
+    const response = await fetch(`${API_BASE}/compartit/get/${uuid}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!response.ok) throw new Error("Error en la petició")
+    return response.json()
+  }
+
   static async newItemCompartir(
     compartit: User[],
     item: Item,
@@ -43,7 +61,7 @@ export class compartitApi {
         favorit: item.favorit,
         dataCreacio: "",
         dataEditat: "",
-        ultimAcces: "",
+        ultimAccess: "",
         dinsDeCarpeta: false
       },
       compartitRequest: {
@@ -66,7 +84,6 @@ export class compartitApi {
       body: JSON.stringify(compartitItemRequest)
     })
     if (!response.ok) throw new Error("Error en la petició")
-    return response.json()
   }
 
   static async addCompartit(compartit: CompartitRequest): Promise<void> {
