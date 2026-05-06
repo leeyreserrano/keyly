@@ -27,6 +27,7 @@ function EditItem() {
   const [formData, setFormData] = useState({
     titol: item.titol || "",
     url: item.url || "",
+    nomUsuari: item.nomUsuari || "",
     contrasenya: item.contrasenya || "",
     notes: item.notes || "",
     favorit: item.favorit || false,
@@ -190,6 +191,14 @@ function EditItem() {
                 />
               </svg>
             </div>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Nom usuari</p>
+            <input
+              value={formData.nomUsuari}
+              onChange={(e) => handleChange("nomUsuari", e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 outline-none"
+            />
           </div>
           {/* PASSWORD */}
           <div>

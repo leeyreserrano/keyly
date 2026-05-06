@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { itemsApi } from "~api/item-service"
 import type { Item } from "~models/Item"
+import { autofill } from "~utils/autofill"
 
 import ModalConfirmDelete from "./ModalConfimDelete"
 
@@ -124,6 +125,24 @@ function ItemCard({ search }: { search: string }) {
                   <p className="truncate text-sm text-gray-600">{item.url}</p>
                 </div>
                 <div className="ml-auto flex gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="size-6 hover:text-gray-600"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      autofill(item)
+                    }}>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z"
+                    />
+                  </svg>
+
                   {item.dinsDeCarpeta && (
                     <svg
                       fill="currentColor"
@@ -163,8 +182,8 @@ function ItemCard({ search }: { search: string }) {
                     stroke="currentColor"
                     className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors"
                     onClick={(e) => {
-                        e.stopPropagation()
-                        navigate(`/item/edit/${item.uuid}`, { state: item })
+                      e.stopPropagation()
+                      navigate(`/item/edit/${item.uuid}`, { state: item })
                     }}>
                     <path
                       strokeLinecap="round"
@@ -272,11 +291,15 @@ export async function decryptItem(item: any): Promise<Item> {
   }
 }
 
-export async function decryptItemWithRawKey(item: any): Promise<{ item: Item, rawDataKey: ArrayBuffer }> {
+export async function decryptItemWithRawKey(
+  item: any
+): Promise<{ item: Item; rawDataKey: ArrayBuffer }> {
   const privateKeyB64 = localStorage.getItem("privateKey")
   if (!privateKeyB64) throw new Error("No hay private key en localStorage")
 
-  const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) => c.charCodeAt(0))
+  const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
+    c.charCodeAt(0)
+  )
   const privateKey = await crypto.subtle.importKey(
     "pkcs8",
     privateKeyBytes,
@@ -305,7 +328,9 @@ export async function decryptItemWithRawKey(item: any): Promise<{ item: Item, ra
   )
 
   const iv = Uint8Array.from(atob(item.iv), (c) => c.charCodeAt(0))
-  const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) => c.charCodeAt(0))
+  const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) =>
+    c.charCodeAt(0)
+  )
   const decryptedPswBuffer = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv },
     dataKey,

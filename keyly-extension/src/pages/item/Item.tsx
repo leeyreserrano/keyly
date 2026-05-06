@@ -71,6 +71,10 @@ function Item() {
 
           {/* PASSWORD */}
           <div>
+            <p className="text-xs text-gray-500 mb-1">Nom usuari</p>
+            <p>{item.nomUsuari}</p>
+          </div>
+          <div>
             <p className="text-xs text-gray-500 mb-1">Contrasenya</p>
 
             <div className="flex items-center justify-between bg-gray-50 border rounded-lg px-3 py-2">
