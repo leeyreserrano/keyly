@@ -6,9 +6,9 @@ import com.keyly.model.EncryptedDataKeys;
 
 public record EncryptedDataKeyResponse(
         UUID uuid,
-        String encryptedDatakey) {
+        String encryptedDataKey) {
 
     public EncryptedDataKeyResponse(EncryptedDataKeys e) {
-        this(e.getUuid(), e.getEncryptedDatakey());
+        this(e.getUuid(), e.getEncryptedDataKey());
     }
 }

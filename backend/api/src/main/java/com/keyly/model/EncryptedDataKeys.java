@@ -41,6 +41,6 @@ public class EncryptedDataKeys {
     private Usuari usuari;
 
     @Column(name = "encrypted_datakey")
-    private String encryptedDatakey;
+    private String encryptedDataKey;
 
 }
