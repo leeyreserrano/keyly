@@ -32,15 +32,22 @@ export async function loginUser(correu: string, contrasenya: string) {
   }
 }
 
-async function decryptPrivateKey(encryptedPrivateKey: string, derivedKeyB64: string): Promise<string> {
+async function decryptPrivateKey(
+  encryptedPrivateKey: string,
+  derivedKeyB64: string
+): Promise<string> {
   try {
     const [ivB64, ciphertextB64] = encryptedPrivateKey.split(":")
-  
-    const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0))
-    
-    const ciphertext = Uint8Array.from(atob(ciphertextB64), c => c.charCodeAt(0))
-    const derivedKeyBytes = Uint8Array.from(atob(derivedKeyB64), c => c.charCodeAt(0))
-  
+
+    const iv = Uint8Array.from(atob(ivB64), (c) => c.charCodeAt(0))
+
+    const ciphertext = Uint8Array.from(atob(ciphertextB64), (c) =>
+      c.charCodeAt(0)
+    )
+    const derivedKeyBytes = Uint8Array.from(atob(derivedKeyB64), (c) =>
+      c.charCodeAt(0)
+    )
+
     const key = await crypto.subtle.importKey(
       "raw",
       derivedKeyBytes,
@@ -48,19 +55,18 @@ async function decryptPrivateKey(encryptedPrivateKey: string, derivedKeyB64: str
       false,
       ["decrypt"]
     )
-  
+
     const decryptedBuffer = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       key,
       ciphertext
     )
-  
+
     return btoa(String.fromCharCode(...new Uint8Array(decryptedBuffer)))
   } catch (err) {
-    console.error(err);
+    console.error(err)
     throw new Error("Error al desencriptar la clave privada")
   }
-
 }
 
 export async function getPublicKey(): Promise<CryptoKey> {
@@ -73,7 +79,7 @@ export async function getPublicKey(): Promise<CryptoKey> {
   if (!publicKeyString) throw new Error("No public key")
 
   const binary = atob(publicKeyString)
-  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0))
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0))
 
   return await crypto.subtle.importKey(
     "spki",
@@ -106,7 +112,7 @@ export async function getStoredKey() {
 async function deriveKey(password: string, saltB64: string) {
   const enc = new TextEncoder()
 
-  const saltBytes = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0))
+  const saltBytes = Uint8Array.from(atob(saltB64), (c) => c.charCodeAt(0))
 
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
