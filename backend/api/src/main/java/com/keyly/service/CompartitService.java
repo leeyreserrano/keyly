@@ -167,10 +167,9 @@ public class CompartitService {
         if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
             try {
                 Carpeta carpeta = carpetaService.getCarpetaEntityByUuid(compartit.getEntitatUuid());
-                carpetaResponse = carpetaService.toCarpetaResponse(carpeta);
+                carpetaResponse = carpetaService.toCarpetaResponse(carpeta, compartit.getUsuari());
             } catch (EntitatNoTrobadaException ignored) {
             }
-
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             try {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());

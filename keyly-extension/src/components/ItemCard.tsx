@@ -233,7 +233,7 @@ export default ItemCard
 export async function decryptItem(item: any): Promise<Item> {
   try {
     const privateKeyB64 = localStorage.getItem("privateKey")
-    if (!privateKeyB64) throw new Error("No hay private key en localStorage")
+      if (!privateKeyB64) throw new Error("No hay private key en localStorage")
 
     const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
       c.charCodeAt(0)

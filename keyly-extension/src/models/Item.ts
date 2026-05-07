@@ -4,7 +4,10 @@ export type Item = {
   nomUsuari: string
   contrasenya: string
   iv?: string
-  encryptedDataKey: string
+  encryptedDataKey: {
+    uuid: string
+    encryptedDataKey: string
+  }
   url: string
   notes: string
   favorit: boolean
