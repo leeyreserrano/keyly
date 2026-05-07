@@ -2,8 +2,11 @@ import React, { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { carpetasApi } from "~api/carpeta-service"
+import { compartitApi, usuarisCompartits } from "~api/compartit-service"
 import { itemsApi } from "~api/item-service"
-import { decryptItem } from "~components/ItemCard"
+import { userApi } from "~api/user-service"
+import { decryptItem, decryptItemWithRawKey } from "~components/ItemCard"
+import { TipusEntitat, type CompartitRequest } from "~models/Compartit"
 
 function CarpetaDetall() {
   const { state: carpeta } = useLocation()
@@ -13,6 +16,51 @@ function CarpetaDetall() {
   const [loaded, setLoaded] = useState(false)
   const [nom, setNom] = useState(carpeta.nom)
   const [editant, setEditant] = useState(false)
+  const [modalCompartir, setModalCompartir] = useState(false)
+  const [totsElsUsuaris, setTotsElsUsuaris] = useState([])
+  const [searchUsuari, setSearchUsuari] = useState("")
+  const [usuarisSeleccionats, setUsuarisSeleccionats] = useState<
+    { usuari: any; permis: string }[]
+  >([])
+  const [guardant, setGuardant] = useState(false)
+
+  const handleCompartir = async () => {
+    if (usuarisSeleccionats.length === 0) return
+    setGuardant(true)
+    try {
+      const itemsAmbRawKey = await Promise.all(
+        carpeta.items.map(async (item) => {
+          const itemOriginal = await itemsApi.fetchItem(item.uuid)
+          const { rawDataKey } = await decryptItemWithRawKey(itemOriginal)
+          return { itemUuid: item.uuid, rawDataKey }
+        })
+      )
+
+      const usuaris = await usuarisCompartits(
+        usuarisSeleccionats.map((u) => u.usuari),
+        itemsAmbRawKey
+      )
+
+      const usuarisAmbPermis = usuaris.map((u, i) => ({
+        ...u,
+        permis: usuarisSeleccionats[i].permis
+      }))
+
+      const compartitRequest: CompartitRequest = {
+        entitatUuid: carpeta.uuid,
+        tipusEntitat: TipusEntitat.CARPETA,
+        usuaris: usuarisAmbPermis
+      }
+
+      await compartitApi.addCompartit(compartitRequest)
+      setModalCompartir(false)
+      setUsuarisSeleccionats([])
+    } catch (err) {
+      console.error("Error compartint carpeta:", err)
+    } finally {
+      setGuardant(false)
+    }
+  }
 
   const handleSaveNom = async () => {
     setEditant(false)
@@ -21,20 +69,24 @@ function CarpetaDetall() {
       await carpetasApi.updateCarpeta({ ...carpeta, nom })
     } catch (err) {
       console.error("Error actualitzant carpeta:", err)
-      setNom(carpeta.nom) // revertir si falla
+      setNom(carpeta.nom)
     }
   }
 
-  // Desencriptar los items al montar
   React.useEffect(() => {
     const load = async () => {
       const decrypted = await Promise.all(carpeta.items.map(decryptItem))
+      console.log(decrypted)
       setItems(decrypted)
       setLoaded(true)
     }
+    const loadUsuaris = async () => {
+      const usuaris = await userApi.fetchUsers()
+      setTotsElsUsuaris(usuaris)
+    }
     load()
+    loadUsuaris()
   }, [])
-
   const getFavicon = (url) => {
     try {
       const domain = new URL(url).hostname
@@ -80,19 +132,20 @@ function CarpetaDetall() {
             editant ? "border-purple-400" : "border-transparent"
           }`}
         />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="size-6 hover:text-gray-600 ml-20 cursor-pointer">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
-            />
-          </svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="size-6 hover:text-gray-600 ml-20 cursor-pointer"
+          onClick={() => setModalCompartir(true)}>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+          />
+        </svg>
       </div>
 
       {/* ITEMS */}
@@ -182,6 +235,166 @@ function CarpetaDetall() {
           </div>
         </span>
       ))}
+      {modalCompartir && (
+        <div
+          className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+          onClick={() => setModalCompartir(false)}>
+          <div
+            className="bg-white rounded-2xl shadow-xl w-[380px] p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}>
+            {/* Títol */}
+            <div className="flex items-center justify-between border-b pb-3">
+              <h2 className="text-lg font-bold">Compartir "{nom}"</h2>
+              <button onClick={() => setModalCompartir(false)}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-5">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Usuaris seleccionats */}
+            {usuarisSeleccionats.length > 0 && (
+              <div className="space-y-1">
+                {usuarisSeleccionats.map(({ usuari, permis }) => (
+                  <div
+                    key={usuari.uuid}
+                    className="flex items-center justify-between border rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <div className="size-7 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-700">
+                        {usuari.nom.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{usuari.nom}</p>
+                        <p className="text-xs text-gray-400">{usuari.correu}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={permis}
+                        onChange={(e) =>
+                          setUsuarisSeleccionats((prev) =>
+                            prev.map((u) =>
+                              u.usuari.uuid === usuari.uuid
+                                ? { ...u, permis: e.target.value }
+                                : u
+                            )
+                          )
+                        }
+                        className="text-xs border rounded px-1 py-1 outline-none">
+                        <option value="LECTURA">Lectura</option>
+                        <option value="ESCRIPTURA">Escriptura</option>
+                        <option value="ADMINISTRADOR">Administrador</option>
+                      </select>
+                      <button
+                        onClick={() =>
+                          setUsuarisSeleccionats((prev) =>
+                            prev.filter((u) => u.usuari.uuid !== usuari.uuid)
+                          )
+                        }
+                        className="text-red-400 hover:text-red-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-4">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18 18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Buscador */}
+            <div className="relative">
+              <input
+                value={searchUsuari}
+                onChange={(e) => setSearchUsuari(e.target.value)}
+                placeholder="Afegir usuari..."
+                className="w-full border rounded-lg px-3 py-2 outline-none text-sm"
+              />
+              {searchUsuari && (
+                <div className="absolute z-10 w-full bg-white border rounded-lg shadow mt-1 max-h-40 overflow-y-auto">
+                  {totsElsUsuaris
+                    .filter(
+                      (u) =>
+                        !usuarisSeleccionats.some(
+                          (s) => s.usuari.uuid === u.uuid
+                        ) &&
+                        (u.nom
+                          .toLowerCase()
+                          .includes(searchUsuari.toLowerCase()) ||
+                          u.correu
+                            .toLowerCase()
+                            .includes(searchUsuari.toLowerCase()))
+                    )
+                    .map((u) => (
+                      <div
+                        key={u.uuid}
+                        onClick={() => {
+                          setUsuarisSeleccionats((prev) => [
+                            ...prev,
+                            { usuari: u, permis: "LECTURA" }
+                          ])
+                          setSearchUsuari("")
+                        }}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-purple-50 cursor-pointer">
+                        <div className="size-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                          {u.nom.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{u.nom}</p>
+                          <p className="text-xs text-gray-400">{u.correu}</p>
+                        </div>
+                      </div>
+                    ))}
+                  {totsElsUsuaris.filter(
+                    (u) =>
+                      !usuarisSeleccionats.some(
+                        (s) => s.usuari.uuid === u.uuid
+                      ) &&
+                      (u.nom
+                        .toLowerCase()
+                        .includes(searchUsuari.toLowerCase()) ||
+                        u.correu
+                          .toLowerCase()
+                          .includes(searchUsuari.toLowerCase()))
+                  ).length === 0 && (
+                    <div className="px-3 py-2 text-sm text-gray-400">
+                      No s'han trobat usuaris
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Botó compartir */}
+            <button
+              onClick={handleCompartir}
+              disabled={usuarisSeleccionats.length === 0 || guardant}
+              className="w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed">
+              {guardant ? "Compartint..." : "Compartir"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

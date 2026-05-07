@@ -242,7 +242,7 @@ public class CarpetaService {
         repo.save(carpeta);
     }
 
-    private CarpetaResponse toCarpetaResponse(Carpeta carpeta, Usuari usuari) {
+    public CarpetaResponse toCarpetaResponse(Carpeta carpeta, Usuari usuari) {
         List<ItemResponse> items = carpeta.getItems()
                 .stream()
                 .map(item -> {
