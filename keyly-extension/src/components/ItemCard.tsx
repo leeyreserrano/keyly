@@ -232,8 +232,15 @@ export default ItemCard
 
 export async function decryptItem(item: any): Promise<Item> {
   try {
+    if (!item.encryptedDataKey || !item.encryptedDataKey.encryptedDatakey) {
+      return {
+        ...item,
+        contrasenya: "",
+        encryptedDataKey: item.encryptedDataKey?.uuid ?? null
+      }
+    }
     const privateKeyB64 = localStorage.getItem("privateKey")
-      if (!privateKeyB64) throw new Error("No hay private key en localStorage")
+    if (!privateKeyB64) throw new Error("No hay private key en localStorage")
 
     const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
       c.charCodeAt(0)
@@ -275,6 +282,7 @@ export async function decryptItem(item: any): Promise<Item> {
     )
 
     const contrasenya = new TextDecoder().decode(decryptedPswBuffer)
+    console.log("Contrasenya OK:", item.uuid, contrasenya)
 
     return {
       ...item,
@@ -283,11 +291,6 @@ export async function decryptItem(item: any): Promise<Item> {
     }
   } catch (err) {
     console.error("Error desencriptando item:", item.uuid, err)
-    return {
-      ...item,
-      contrasenya: "",
-      encryptedDataKey: item.encryptedDataKey?.uuid
-    }
   }
 }
 

@@ -35,6 +35,22 @@ function CompartitCard({ search }: { search: string }) {
               compartit.tipusEntitat === TipusEntitat.CARPETA &&
               compartit.carpeta?.items
             ) {
+              console.log(
+                "Items de la carpeta:",
+                compartit.carpeta.items.map((i) => ({
+                  uuid: i.uuid,
+                  encryptedDataKey: i.encryptedDataKey
+                }))
+              )
+              compartitsData.forEach((c) => {
+                if (c.tipusEntitat === TipusEntitat.CARPETA) {
+                  console.log("Carpeta:", c.carpeta?.uuid, c.carpeta?.nom)
+                  c.carpeta?.items.forEach((i) => {
+                    console.log("  Item:", i.uuid, "EDK:", i.encryptedDataKey)
+                  })
+                }
+              })
+
               const decryptedItems = await Promise.all(
                 compartit.carpeta.items.map(decryptItem)
               )
