@@ -131,7 +131,7 @@ public class ItemService {
 
         EncryptedDataKeys e = repoEncryptedDataKeys.findByUsuariUuidAndItemUuid(usuari.uuid(), item.getUuid());
 
-        e.setEncryptedDatakey(request.encryptedDataKey());
+        e.setEncryptedDataKey(request.encryptedDataKey());
 
         EncryptedDataKeys encryptedDataKeyGuardat = repoEncryptedDataKeys.save(e);
 
