@@ -136,7 +136,7 @@ public class UsuariController {
         @ApiResponse(responseCode = "404", description = "Usuari/Departament/Rol/Sucursal no trobat"),
         @ApiResponse(responseCode = "409", description = "Correu no válid")
     })
-    @PreAuthorize("hasRole('USUARI')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @PutMapping("update")
     public ResponseEntity<UsuariResponse> updateUsuari(@RequestBody UsuariRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
