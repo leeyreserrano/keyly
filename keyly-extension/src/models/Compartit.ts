@@ -40,22 +40,6 @@ export type CompartitItemRequest = {
   compartitRequest: CompartitRequest
 }
 
-type CompartitItem = {
-  uuid: string
-  titol: string
-  nomUsuari: string
-  contrasenya: string
-  iv: string
-  encryptedDataKey: {
-    uuid: string
-    encryptedDatakey: string
-  }
-  url: string
-  notes: string
-  favorit: boolean
-  dinsDeCarpeta: boolean
-}
-
 export enum TipusEntitat {
   CARPETA = "CARPETA",
   ITEM = "ITEM"

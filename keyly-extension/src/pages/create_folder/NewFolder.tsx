@@ -16,15 +16,19 @@ function NewFolder() {
   const from = location.state?.from || "/home"
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const carpeta: Carpeta = await carpetasApi.createCarpeta(nomCarpeta)
-    if (selectItems.length > 0) {
-      for (const item of selectItems) {
-        await carpetasApi.addItemInCarpeta(carpeta.uuid, item)
+    try {
+      e.preventDefault()
+      const carpeta: Carpeta = await carpetasApi.createCarpeta(nomCarpeta)
+      if (selectItems.length > 0) {
+        for (const item of selectItems) {
+          await carpetasApi.addItemInCarpeta(carpeta.uuid, item)
+        }
       }
-    }
 
-    navigate(from)
+      navigate(from)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   useEffect(() => {
@@ -87,7 +91,7 @@ function NewFolder() {
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 pt-4">
         <button
           type="submit"
-          form="newItem"
+          form="newCarpeta"
           className="bg-purple-500 text-white py-2 px-10 rounded-lg hover:bg-purple-600">
           Guardar
         </button>

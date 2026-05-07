@@ -6,6 +6,8 @@ import { itemsApi } from "~api/item-service"
 function Item() {
   const [showPassword, setShowPassword] = useState(false)
   const { state: item } = useLocation()
+  console.log("Item state:", item.uuid, "contrasenya:", item.contrasenya)
+
   const location = useLocation()
   const from = location.state?.from || "/home"
   const navigate = useNavigate()

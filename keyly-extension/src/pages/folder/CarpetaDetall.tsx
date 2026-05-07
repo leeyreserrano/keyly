@@ -75,17 +75,21 @@ function CarpetaDetall() {
 
   React.useEffect(() => {
     const load = async () => {
-      const decrypted = await Promise.all(carpeta.items.map(decryptItem))
-      console.log(decrypted)
+      const decrypted = await Promise.all(
+        carpeta.items.map(async (item) => {
+          if (
+            !item.encryptedDataKey ||
+            typeof item.encryptedDataKey === "string"
+          ) {
+            return item
+          }
+          return decryptItem(item)
+        })
+      )
       setItems(decrypted)
       setLoaded(true)
     }
-    const loadUsuaris = async () => {
-      const usuaris = await userApi.fetchUsers()
-      setTotsElsUsuaris(usuaris)
-    }
     load()
-    loadUsuaris()
   }, [])
   const getFavicon = (url) => {
     try {
