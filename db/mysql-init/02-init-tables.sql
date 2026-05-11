@@ -51,6 +51,8 @@ CREATE TABLE `Usuaris` (
   `imatge` VARCHAR(255),
   `contrasenya_master` VARCHAR(60) NOT NULL,
   `kdf_salt` VARBINARY(32),
+  `public_key` TEXT,
+  `encrypted_private_key` TEXT, 
   `data_creacio` TIMESTAMP NOT NULL,
   `data_ultim_login` TIMESTAMP,
   `pot_administrar` BOOLEAN NOT NULL DEFAULT FALSE,
@@ -131,4 +133,15 @@ CREATE TABLE `Config` (
   `dies_expiracio` INT,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_config_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `Encrypted_Data_Keys` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+  `uuid` BINARY(16) NOT NULL UNIQUE,
+  `item_id` BIGINT NOT NULL,
+  `user_id` BIGINT NOT NULL,
+  `encrypted_datakey` TEXT NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_encrypted_data_keys_items` FOREIGN KEY (`item_id`) REFERENCES `Items` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_encrypted_data_keys_usuaris` FOREIGN KEY (`user_id`) REFERENCES `Usuaris` (`id`) ON DELETE CASCADE
 );

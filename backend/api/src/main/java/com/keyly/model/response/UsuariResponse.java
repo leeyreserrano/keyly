@@ -14,6 +14,7 @@ public record UsuariResponse(
         String nom,
         String correu,
         String imatge,
+        String publicKey,
         LocalDateTime dataCreacio,
         LocalDateTime ultimLogin,
         boolean potAdministrar,
@@ -21,13 +22,14 @@ public record UsuariResponse(
         SucursalResponseBasic sucursal,
         DepartamentResponseBasic departament,
         RolResponseBasic rol) {
-
+            
     public UsuariResponse(Usuari u) {
         this(
                 u.getUuid(),
                 u.getNom(),
                 u.getCorreu(),
                 u.getImatge(),
+                u.getPublicKey(),
                 u.getDataCreacio(),
                 u.getDataUltimLogin(),
                 u.getPotAdministrar(),

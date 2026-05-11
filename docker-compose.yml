@@ -42,18 +42,18 @@ services:
       - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
     volumes:
       - cassandra-data:/var/lib/cassandra
-      - ./db/cassandra-init:/cassandra-init
     networks:
       - network
 
   nginx:
-    image: nginx:alpine
+    build: 
+      context: ./frontend-react
+      dockerfile: Dockerfile
     container_name: keyly-nginx
     ports:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./frontend-react/dist:/usr/share/nginx/html
     networks:
       - network
 

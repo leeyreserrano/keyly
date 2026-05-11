@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.keyly.model.enums.Permisos;
 import com.keyly.model.request.CompartitRequest;
 import com.keyly.model.request.combined.CombinedCarpetaRequestCompartitRequest;
 import com.keyly.model.request.combined.CombinedItemRequestCompartitRequest;
@@ -28,6 +29,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/compartit")
@@ -44,7 +47,7 @@ public class CompartitController {
         return ResponseEntity.ok(service.getAllCompartits());
     }
 
-    @Operation(summary = "Obté tots els compartits de l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Obté tots els compartits que arriven l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @GetMapping("get/all")
     public ResponseEntity<List<CompartitResponse>> getAllCompartitsOfUser() {
@@ -53,6 +56,17 @@ public class CompartitController {
 
         return ResponseEntity.ok(service.getAllCompartitsOfUser(usuariUuid));
     }
+
+    @Operation(summary = "Obté tots els compartits que crea l'usuari", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @GetMapping("get/all/creats")
+    public ResponseEntity<List<CompartitResponse>> getAllCompartitsOfUserCreats() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID usuariUuid = UUID.fromString(authentication.getName());
+
+        return ResponseEntity.ok(service.getAllCompartitsOfUserCreats(usuariUuid));
+    }
+    
 
     @Operation(summary = "Obté un compartit per UUID", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
@@ -84,9 +98,9 @@ public class CompartitController {
 
     @Operation(summary = "Crea un item i el comparteix a múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Item creat i compartit"),
-        @ApiResponse(responseCode = "400", description = "Dades invàlides"),
-        @ApiResponse(responseCode = "404", description = "Usuari o item no trobat")
+            @ApiResponse(responseCode = "201", description = "Item creat i compartit"),
+            @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+            @ApiResponse(responseCode = "404", description = "Usuari o item no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @PostMapping("add/item")
@@ -101,9 +115,9 @@ public class CompartitController {
 
     @Operation(summary = "Crea una carpeta i la comparteix a múltiples usuaris", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Carpeta creada i compartida"),
-        @ApiResponse(responseCode = "400", description = "Dades invàlides"),
-        @ApiResponse(responseCode = "404", description = "Usuari o carpeta no trobat")
+            @ApiResponse(responseCode = "201", description = "Carpeta creada i compartida"),
+            @ApiResponse(responseCode = "400", description = "Dades invàlides"),
+            @ApiResponse(responseCode = "404", description = "Usuari o carpeta no trobat")
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @PostMapping("add/carpeta")
@@ -115,7 +129,23 @@ public class CompartitController {
 
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
-    
+
+    @Operation(summary = "Cambia el permis d'una entitat compartida", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+        @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Entitat editada"),
+            @ApiResponse(responseCode = "404", description = "Entitat no trobada"),
+            @ApiResponse(responseCode = "409", description = "L'usuari no té permisos suficients")
+    })
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
+    @PutMapping("update/{compartitUuid}/{permisos}")
+    public ResponseEntity<HttpStatus> updateCompartit(@PathVariable UUID compartitUuid, @PathVariable Permisos permisos) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UUID creadorUuid = UUID.fromString(authentication.getName());
+
+        service.updateCompartit(creadorUuid, compartitUuid, permisos);
+
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
+    }
 
     @Operation(summary = "Elimina un compartit", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({

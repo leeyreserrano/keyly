@@ -8,7 +8,10 @@ export class userApi {
     const response = await fetch(API_BASE + "/usuari/all", {
       headers: { Authorization: `Bearer ${token}` }
     })
+    console.log("Hola")
     if (!response.ok) throw new Error("Error en la petició")
-    return response.json()
+    const users = await response.json()
+    console.log("Usuarios " + JSON.stringify(users))
+    return users
   }
 }

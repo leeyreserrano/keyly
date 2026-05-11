@@ -1,6 +1,7 @@
 package com.keyly.model;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -55,7 +57,14 @@ public class Usuari {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol_intern")
-    private RolIntern rolIntern = RolIntern.USUARI;
+    private RolIntern rolIntern;
+
+    @PrePersist
+    public void prePresist() {
+        if (rolIntern == null) {
+            rolIntern = RolIntern.USUARI;
+        }
+    }
     
     @Column(name = "nom")
     private String nom;
@@ -73,6 +82,12 @@ public class Usuari {
     @Column(name = "kdf_salt")
     private byte[] kdfSalt;
 
+    @Column(name= "public_key")
+    private String publicKey;
+
+    @Column(name = "encrypted_private_key")
+    private String encryptedPrivateKey;
+
     @CreationTimestamp
     @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
@@ -89,7 +104,11 @@ public class Usuari {
         this.rol = rol;
         this.nom = request.nom();
         this.correu = request.correu();
+        this.kdfSalt = Base64.getDecoder().decode(request.kdfSalt());
+        this.publicKey = request.publicKey();
+        this.encryptedPrivateKey = request.encryptedPrivateKey();
         this.potAdministrar = request.potAdministrar();
+        this.rolIntern = request.rolIntern();
     }
 
     public Usuari(Sucursal sucursal, Departament departament, Rol rol, UsuariResponse response) {
@@ -102,6 +121,7 @@ public class Usuari {
         this.dataCreacio = response.dataCreacio();
         this.dataUltimLogin = response.ultimLogin();
         this.potAdministrar = response.potAdministrar();
+        this.rolIntern = response.rolIntern();
     }
 
 }

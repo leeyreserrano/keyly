@@ -55,4 +55,11 @@ public class GestorGlobalExcepcions {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    @ExceptionHandler(CompartitException.class)
+    public ResponseEntity<ErrorResponse> compartitException(CompartitException e) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
 }

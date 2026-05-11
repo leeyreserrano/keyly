@@ -7,3 +7,7 @@ export type Carpeta = {
   dataCreacio: string;
   items: Item[];
 };
+
+export type CarpetaRequest = {
+  nom: string
+};

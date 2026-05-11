@@ -192,12 +192,12 @@ public class CarpetaController {
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
     @PostMapping("add/{carpetaUuid}/item")
-    public ResponseEntity<CarpetaResponse> addItemToUserCarpeta(@RequestBody ItemRequest item, @PathVariable UUID carpetaUuid) {
+    public ResponseEntity<ItemResponse> addItemToUserCarpeta(@RequestBody ItemRequest item, @PathVariable UUID carpetaUuid) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        service.saveItemToUserCarpeta(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), carpetaUuid, item);
+        ItemResponse itemResponse = service.saveItemToUserCarpeta(usuariService.getUsuariEntityByUuid(UUID.fromString(authentication.getName())), carpetaUuid, item);
         
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(itemResponse);
     }
     
 

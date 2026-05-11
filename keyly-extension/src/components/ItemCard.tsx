@@ -3,29 +3,47 @@ import { useNavigate } from "react-router-dom"
 
 import { itemsApi } from "~api/item-service"
 import type { Item } from "~models/Item"
+import { autofill } from "~utils/autofill"
+
+import ModalConfirmDelete from "./ModalConfimDelete"
 
 function ItemCard({ search }: { search: string }) {
   const [items, setItems] = useState<Item[]>([])
   const navigate = useNavigate()
   const [imgErrors, setImgErrors] = useState({})
+  const [showMenu, setShowMenu] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
 
   useEffect(() => {
     const loadItems = async () => {
       try {
         const [itemsData] = await Promise.all([itemsApi.fetchItems()])
-        setItems(itemsData)
+
+        const decryptedItems = await Promise.all(itemsData.map(decryptItem))
+
+        console.log("Items desencriptados:", decryptedItems)
+
+        setItems(decryptedItems)
       } catch (error) {
         console.error(error)
       }
     }
     loadItems()
   }, [])
-
   const filteredItems = items.filter(
     (item) =>
       item.titol.toLowerCase().includes(search.toLowerCase()) ||
       item.url.toLowerCase().includes(search.toLowerCase())
   )
+
+  const getFavicon = (url) => {
+    try {
+      const domain = new URL(url).hostname
+      return `https://icons.duckduckgo.com/ip3/${domain}.ico`
+    } catch {
+      return null
+    }
+  }
 
   const handleFavoriteItemClick = async (item: Item) => {
     const updatedItem = {
@@ -49,6 +67,7 @@ function ItemCard({ search }: { search: string }) {
       await itemsApi.deleteItem(item.uuid)
 
       setItems((prev) => prev.filter((i) => i.uuid !== item.uuid))
+      setShowMenu(false)
     } catch (error) {
       console.error(error)
     }
@@ -71,9 +90,21 @@ function ItemCard({ search }: { search: string }) {
             {filteredItems.map((item) => (
               <span
                 key={item.uuid}
-                onClick={() => navigate(`/item/${item.uuid}`)}
+                onClick={() => navigate(`/item/${item.uuid}`, { state: item })}
                 className="flex items-center gap-3 p-2 border w-full h-16 bg-purple-100 border-purple-300 rounded-lg mb-2 cursor-pointer hover:bg-purple-300 hover:border-purple-400 transition-colors">
-                {imgErrors[item.uuid] ? (
+                {getFavicon(item.url) ? (
+                  <img
+                    className="size-6"
+                    src={getFavicon(item.url)}
+                    alt=""
+                    onError={() =>
+                      setImgErrors((prev) => ({
+                        ...prev,
+                        [item.uuid]: true
+                      }))
+                    }
+                  />
+                ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -87,34 +118,40 @@ function ItemCard({ search }: { search: string }) {
                       d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
                     />
                   </svg>
-                ) : (
-                  <img
-                    className="size-6"
-                    src={`https://www.google.com/s2/favicons?sz=64&domain=${item.url}`}
-                    alt=""
-                    onError={() =>
-                      setImgErrors((prev) => ({
-                        ...prev,
-                        [item.uuid]: true
-                      }))
-                    }
-                    onLoad={(e) => {
-                      const img = e.currentTarget
-
-                      if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
-                        setImgErrors((prev) => ({
-                          ...prev,
-                          [item.uuid]: true
-                        }))
-                      }
-                    }}
-                  />
                 )}
-                <div className="flex flex-col">
-                  <h1 className="text-lg font-bold">{item.titol}</h1>
-                  <p>{item.url}</p>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <h1 className="text-lg font-bold truncate">{item.titol}</h1>
+
+                  <p className="truncate text-sm text-gray-600">{item.url}</p>
                 </div>
                 <div className="ml-auto flex gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="size-6 hover:text-gray-600"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      autofill(item)
+                    }}>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z"
+                    />
+                  </svg>
+
+                  {item.dinsDeCarpeta && (
+                    <svg
+                      fill="currentColor"
+                      className="size-6"
+                      viewBox="0 0 24 24">
+                      <path d="m9.17 6 2 2H20v10H4V6zM10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8z"></path>
+                    </svg>
+                  )}
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill={item.favorit ? "currentColor" : "none"}
@@ -143,7 +180,11 @@ function ItemCard({ search }: { search: string }) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors">
+                    className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/item/edit/${item.uuid}`, { state: item })
+                    }}>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -159,7 +200,8 @@ function ItemCard({ search }: { search: string }) {
                     stroke="currentColor"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteItemClick(item)
+                      setSelectedItem(item)
+                      setShowMenu(true)
                     }}
                     className="size-6 hover:text-red-600 transition-colors">
                     <path
@@ -174,8 +216,135 @@ function ItemCard({ search }: { search: string }) {
           </>
         )}
       </div>
+      <ModalConfirmDelete
+        open={showMenu}
+        item={selectedItem}
+        onClose={() => setShowMenu(false)}
+        onConfirm={(item) => {
+          handleDeleteItemClick(item)
+        }}
+      />
     </>
   )
 }
 
 export default ItemCard
+
+export async function decryptItem(item: any): Promise<Item> {
+  try {
+    const privateKeyB64 = localStorage.getItem("privateKey")
+      if (!privateKeyB64) throw new Error("No hay private key en localStorage")
+
+    const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
+      c.charCodeAt(0)
+    )
+    const privateKey = await crypto.subtle.importKey(
+      "pkcs8",
+      privateKeyBytes,
+      { name: "RSA-OAEP", hash: "SHA-256" },
+      false,
+      ["decrypt"]
+    )
+
+    const encryptedDataKeyBytes = Uint8Array.from(
+      atob(item.encryptedDataKey.encryptedDatakey),
+      (c) => c.charCodeAt(0)
+    )
+    const dataKeyBuffer = await crypto.subtle.decrypt(
+      { name: "RSA-OAEP" },
+      privateKey,
+      encryptedDataKeyBytes
+    )
+
+    const dataKey = await crypto.subtle.importKey(
+      "raw",
+      dataKeyBuffer,
+      { name: "AES-GCM" },
+      false,
+      ["decrypt"]
+    )
+
+    const iv = Uint8Array.from(atob(item.iv), (c) => c.charCodeAt(0))
+    const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) =>
+      c.charCodeAt(0)
+    )
+    const decryptedPswBuffer = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      dataKey,
+      encryptedPswBytes
+    )
+
+    const contrasenya = new TextDecoder().decode(decryptedPswBuffer)
+
+    return {
+      ...item,
+      contrasenya,
+      encryptedDataKey: item.encryptedDataKey.uuid
+    }
+  } catch (err) {
+    console.error("Error desencriptando item:", item.uuid, err)
+    return {
+      ...item,
+      contrasenya: "",
+      encryptedDataKey: item.encryptedDataKey?.uuid
+    }
+  }
+}
+
+export async function decryptItemWithRawKey(
+  item: any
+): Promise<{ item: Item; rawDataKey: ArrayBuffer }> {
+  const privateKeyB64 = localStorage.getItem("privateKey")
+  if (!privateKeyB64) throw new Error("No hay private key en localStorage")
+
+  const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
+    c.charCodeAt(0)
+  )
+  const privateKey = await crypto.subtle.importKey(
+    "pkcs8",
+    privateKeyBytes,
+    { name: "RSA-OAEP", hash: "SHA-256" },
+    false,
+    ["decrypt"]
+  )
+
+  const encryptedDataKeyBytes = Uint8Array.from(
+    atob(item.encryptedDataKey.encryptedDatakey),
+    (c) => c.charCodeAt(0)
+  )
+
+  const rawDataKey = await crypto.subtle.decrypt(
+    { name: "RSA-OAEP" },
+    privateKey,
+    encryptedDataKeyBytes
+  )
+
+  const dataKey = await crypto.subtle.importKey(
+    "raw",
+    rawDataKey,
+    { name: "AES-GCM" },
+    false,
+    ["decrypt"]
+  )
+
+  const iv = Uint8Array.from(atob(item.iv), (c) => c.charCodeAt(0))
+  const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) =>
+    c.charCodeAt(0)
+  )
+  const decryptedPswBuffer = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv },
+    dataKey,
+    encryptedPswBytes
+  )
+
+  const contrasenya = new TextDecoder().decode(decryptedPswBuffer)
+
+  return {
+    rawDataKey,
+    item: {
+      ...item,
+      contrasenya,
+      encryptedDataKey: item.encryptedDataKey.uuid
+    }
+  }
+}

@@ -1,1 +1,1 @@
-- Guardar contraseña master encriptada
+- Cuando creas un usuario, deberías de poder seleccionar si será cap, usuario o admin

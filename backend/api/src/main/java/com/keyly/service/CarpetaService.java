@@ -15,15 +15,22 @@ import com.keyly.model.Item;
 import com.keyly.model.Usuari;
 import com.keyly.model.request.CarpetaRequest;
 import com.keyly.model.request.ItemRequest;
+import com.keyly.model.response.BagulResponse;
 import com.keyly.model.response.CarpetaResponse;
+import com.keyly.model.response.EncryptedDataKeyResponse;
 import com.keyly.model.response.ItemResponse;
+import com.keyly.model.response.basics.CarpetaResponseBasic;
 import com.keyly.repo.CarpetaRepo;
+import com.keyly.repo.EncryptedDataKeysRepo;
 
 @Service
 public class CarpetaService {
 
     @Autowired
     private CarpetaRepo repo;
+
+    @Autowired
+    private EncryptedDataKeysRepo repoEncryptedDataKeys;
 
     @Autowired
     private BagulService bagulService;
@@ -37,14 +44,14 @@ public class CarpetaService {
     public List<CarpetaResponse> getAllCarpetes() {
         return repo.findAll()
                 .stream()
-                .map(carpeta -> new CarpetaResponse(carpeta))
+                .map(this::toCarpetaResponse)
                 .toList();
     }
 
     public List<CarpetaResponse> getAllCarpetesByUsuariUuid(UUID uuid) {
         return repo.findByBagulPropietariUuid(uuid)
                 .stream()
-                .map(carpeta -> new CarpetaResponse(carpeta))
+                .map(this::toCarpetaResponse)
                 .toList();
     }
 
@@ -52,11 +59,13 @@ public class CarpetaService {
         Carpeta carpeta = repo.findByUuid(uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid: " + uuid));
 
-        return new CarpetaResponse(carpeta);
+        return toCarpetaResponse(carpeta);
     }
 
     public CarpetaResponse getUserCarpeta(Usuari usuari, UUID uuid) {
-        return new CarpetaResponse(getUserEntityCarpeta(usuari, uuid));
+        Carpeta carpeta = getUserEntityCarpeta(usuari, uuid);
+
+        return toCarpetaResponse(carpeta, usuari);
     }
 
     public Carpeta getUserEntityCarpeta(Usuari usuari, UUID carpetaUuid) {
@@ -77,7 +86,8 @@ public class CarpetaService {
 
         return carpeta.getItems()
                 .stream()
-                .map(item -> new ItemResponse(item, true))
+                .map(item -> new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()),
+                        foldersOfItem(item.getUuid())))
                 .toList();
     }
 
@@ -87,7 +97,9 @@ public class CarpetaService {
 
         return carpeta.getItems()
                 .stream()
-                .map(item -> new ItemResponse(item, true))
+                .map(item -> new ItemResponse(item,
+                        repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(uuid, usuari.getUuid()),
+                        foldersOfItem(item.getUuid())))
                 .toList();
     }
 
@@ -103,7 +115,9 @@ public class CarpetaService {
 
         carpeta.setDataEditat(LocalDateTime.now());
 
-        return new CarpetaResponse(repo.save(carpeta));
+        Carpeta carpetaGuardada = repo.save(carpeta);
+
+        return toCarpetaResponse(carpetaGuardada);
     }
 
     public CarpetaResponse save(Usuari u, CarpetaRequest c) {
@@ -113,7 +127,9 @@ public class CarpetaService {
 
         carpeta.setDataEditat(LocalDateTime.now());
 
-        return new CarpetaResponse(repo.save(carpeta));
+        Carpeta carpetaGuardada = repo.save(carpeta);
+
+        return toCarpetaResponse(carpetaGuardada);
     }
 
     public CarpetaResponse saveItemToCarpeta(UUID carpetaUuid, UUID itemUuid) {
@@ -134,17 +150,20 @@ public class CarpetaService {
         carpeta.addItem(itemRecuperat);
         repo.save(carpeta);
 
-        return new CarpetaResponse(carpeta);
+        return toCarpetaResponse(carpeta, u);
     }
 
-    public CarpetaResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, ItemRequest item) {
+    public ItemResponse saveItemToUserCarpeta(Usuari u, UUID carpetaUuid, ItemRequest itemRequest) {
         Carpeta carpeta = repo.findByBagulPropietariAndUuid(u, carpetaUuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + carpetaUuid));
 
-        carpeta.addItem(new Item(bagulService.getBagulEntityByUsuariUuid(u.getUuid()), item));
+        ItemResponse response = itemService.save(u, itemRequest);
+
+        Item itemGuardat = itemService.getUserItemEntity(u, response.uuid());
+        carpeta.addItem(itemGuardat);
         repo.save(carpeta);
 
-        return new CarpetaResponse(carpeta);
+        return new ItemResponse(itemGuardat, response.encryptedDataKey(), foldersOfItem(itemGuardat.getUuid()));
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
@@ -159,7 +178,7 @@ public class CarpetaService {
 
         Carpeta carpetaGuardada = repo.save(carpeta);
 
-        return new CarpetaResponse(carpetaGuardada);
+        return toCarpetaResponse(carpetaGuardada);
     }
 
     public CarpetaResponse update(Usuari usuari, UUID uuid, CarpetaRequest request) {
@@ -180,7 +199,7 @@ public class CarpetaService {
 
         Carpeta carpetaGuardada = repo.save(carpeta);
 
-        return new CarpetaResponse(carpetaGuardada);
+        return toCarpetaResponse(carpetaGuardada);
     }
 
     public CarpetaResponse deleteByUuid(UUID uuid) {
@@ -213,8 +232,8 @@ public class CarpetaService {
         repo.save(carpeta);
     }
 
-    public boolean hasItemInAnyCarpeta(UUID itemUuid) {
-        return (repo.existItemInCarpetes(itemUuid) > 0) ? true : false;
+    public List<CarpetaResponseBasic> foldersOfItem(UUID itemUuid) {
+        return toCarpetaResponseBasic(repo.findByItemsUuid(itemUuid));
     }
 
     public void registerAccess(Usuari usuari, UUID carpetaUuid) {
@@ -224,6 +243,39 @@ public class CarpetaService {
         carpeta.setComptadorAccess(carpeta.getComptadorAccess() + 1);
 
         repo.save(carpeta);
+    }
+
+    public List<CarpetaResponseBasic> toCarpetaResponseBasic(List<Carpeta> carpeta) {
+        return carpeta
+                .stream()
+                .map(c -> new CarpetaResponseBasic(c.getUuid(), c.getNom()))
+                .toList();
+    }
+
+    public CarpetaResponse toCarpetaResponse(Carpeta carpeta, Usuari usuari) {
+        List<ItemResponse> items = carpeta.getItems()
+                .stream()
+                .map(item -> {
+                    EncryptedDataKeyResponse edk = repoEncryptedDataKeys
+                            .findByItemUuidAndUsuariUuid(item.getUuid(), usuari.getUuid());
+                    return new ItemResponse(item, edk, foldersOfItem(item.getUuid()));
+                })
+                .toList();
+
+        return new CarpetaResponse(
+                carpeta.getUuid(),
+                new BagulResponse(carpeta.getBagul()),
+                carpeta.getNom(),
+                carpeta.getFavorit(),
+                carpeta.getDataCreacio(),
+                carpeta.getDataEditat(),
+                carpeta.getUltimAccess(),
+                carpeta.getComptadorAccess(),
+                items);
+    }
+
+    public CarpetaResponse toCarpetaResponse(Carpeta carpeta) {
+        return toCarpetaResponse(carpeta, carpeta.getBagul().getPropietari());
     }
 
 }

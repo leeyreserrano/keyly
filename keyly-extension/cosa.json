@@ -1,0 +1,1156 @@
+[
+  {
+    "uuid": "55df3a5f-47e5-11f1-921c-fad082e0f0fc",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "LECTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-04T16:16:13"
+  },
+  {
+    "uuid": "55df3cc4-47e5-11f1-921c-fad082e0f0fc",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": {
+      "uuid": "55cece7d-47e5-11f1-921c-fad082e0f0fc",
+      "titol": "Moodle",
+      "nomUsuari": "alumneDAM",
+      "contrasenya": "",
+      "iv": "x0YHzy+ytzFSlZYo",
+      "url": "https://educaciodigital.cat/iesgabrielamistral/moodle/",
+      "notes": "El moodle del cole jijiji",
+      "favorit": false,
+      "dataCreacio": "2026-05-04T16:16:13",
+      "dataEditat": "2026-05-06T10:36:15",
+      "ultimAccess": "2026-05-07T07:08:34",
+      "comptadorAccess": 22,
+      "dinsDeCarpeta": false,
+      "bagul": {
+        "uuid": "55b5ec71-47e5-11f1-921c-fad082e0f0fc",
+        "usuari": {
+          "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+          "nom": "Geri"
+        }
+      }
+    },
+    "dataCreacio": "2026-05-04T16:16:13"
+  },
+  {
+    "uuid": "65efeda7-2f75-455c-8993-2c12a58d7c7e",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T07:16:09"
+  },
+  {
+    "uuid": "fd636e65-7c0a-402e-b87b-8960f7af06ea",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T07:17:07"
+  },
+  {
+    "uuid": "5efda9d8-afb4-4354-808a-c463cb2b685f",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T07:18:30"
+  },
+  {
+    "uuid": "a3e5ebff-34a5-43b1-9541-09a52a8b2f37",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T07:20:00"
+  },
+  {
+    "uuid": "7f52d09e-ec10-439b-b791-75ed5e4b23e2",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T07:31:42"
+  },
+  {
+    "uuid": "6b5dca3d-11db-4d0f-821f-c8083be78f79",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T08:39:08"
+  },
+  {
+    "uuid": "e7f53ce3-2f00-494b-a130-ea4e9f3a79ac",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T08:39:37"
+  },
+  {
+    "uuid": "7ba34d2b-872d-4183-ad7f-3c3de8e7e403",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T10:41:46"
+  },
+  {
+    "uuid": "786d606d-4dc4-492c-9f9f-6ba0651a5c06",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T11:43:58"
+  },
+  {
+    "uuid": "0c11b8f8-7276-483d-8341-79c6225b13c5",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-05T11:47:18"
+  },
+  {
+    "uuid": "d9e5c2c3-6852-47a0-b1fe-664ec08d7954",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T08:36:33"
+  },
+  {
+    "uuid": "d0a8886f-934f-4047-8f82-dbb83d2da3c4",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T08:44:05"
+  },
+  {
+    "uuid": "583b4a74-f437-469e-8260-2d1d387fc26d",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T08:44:39"
+  },
+  {
+    "uuid": "ebb95298-08fd-4b47-913c-db2b733cda9c",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T08:44:57"
+  },
+  {
+    "uuid": "24ca4c22-11d1-494d-8fc5-441225cc8b4a",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T09:07:28"
+  },
+  {
+    "uuid": "371dafb5-f4e8-4412-aa7a-d60f4271e356",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T10:01:12"
+  },
+  {
+    "uuid": "4493f11f-8c45-46b3-b486-826a4ac6f481",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": null,
+    "dataCreacio": "2026-05-06T10:03:03"
+  },
+  {
+    "uuid": "847502dc-ff45-4092-9c1b-cc4844993d62",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "ITEM",
+    "permisos": "ESCRIPTURA",
+    "carpeta": null,
+    "item": {
+      "uuid": "28a7f189-aca3-4606-a872-940093f313fd",
+      "titol": "Prueba1",
+      "nomUsuari": "fds",
+      "contrasenya": "hola",
+      "iv": "/NUBjM1zNfUTjIjt",
+      "encryptedDataKey": "327cf8eb-5871-46ad-b753-902f7f0383d6",
+      "url": "fds",
+      "notes": "fds",
+      "favorit": false,
+      "dataCreacio": "2026-05-06T10:07:00",
+      "dataEditat": null,
+      "ultimAccess": "2026-05-07T07:07:49",
+      "comptadorAccess": 3,
+      "dinsDeCarpeta": false,
+      "bagul": {
+        "uuid": "55b5ec71-47e5-11f1-921c-fad082e0f0fc",
+        "usuari": {
+          "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+          "nom": "Geri"
+        }
+      }
+    },
+    "dataCreacio": "2026-05-06T10:07:00"
+  },
+  {
+    "uuid": "69a49333-dcfe-4c69-88f3-4988bc99e725",
+    "usuariCreador": {
+      "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+      "nom": "Geri",
+      "correu": "user@domain.com",
+      "imatge": "/app/uploads/profile-pictures/0a32d1a1-faa9-448c-aade-961356b58fd2_gerardpique.jpg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:15:44",
+      "potAdministrar": true,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a14f2c-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Metrologia"
+      },
+      "rol": {
+        "uuid": "55ae1ac5-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Administrador"
+      }
+    },
+    "usuariReceptor": {
+      "uuid": "55b5edaa-47e5-11f1-921c-fad082e0f0fc",
+      "nom": "Yami",
+      "correu": "yami@gmail.com",
+      "imatge": "/app/uploads/profile-pictures/Y.svg",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJOctJJPoXcMGum/v50pfuRh8jW3FWHxtLvxF5qFDrayUHCDFBnXEP3SkJ7NlUs9vc6jPLbdFlbrVwBNhztYVjTJVAbQdoY2eugWicCt86Ln3Q7LcRQ4oZuRR8V6Alha0qLsJlB1KjA4DBicgVvDuab7l06S3ywk9cc+oEKfta1vUVYlS+QYKS8QzoG7uSIMOw9v8He8eQgE0bcKRfEwFpqMBeTqPaT0cwDK0LYDPDr7RvljfdDmllVqq8YxDEpuM5NzJpXxiXlQ2eNKu9UBUeR6+nwtf6f0Jguf/T9k20UfSAx6ByRnCb0SrI1BBtcVDUjkwUGT7LskqjH3QRzXvQIDAQAB",
+      "dataCreacio": "2026-05-04T16:16:13",
+      "ultimLogin": "2026-05-07T07:21:24",
+      "potAdministrar": false,
+      "rolIntern": "ADMIN",
+      "sucursal": {
+        "uuid": "558cb35e-47e5-11f1-921c-fad082e0f0fc",
+        "nom": "Prova2"
+      },
+      "departament": {
+        "uuid": "55a15147-47e5-11f1-921c-fad082e0f0fc",
+        "departament": "Chapistas"
+      },
+      "rol": { "uuid": "55ae1c21-47e5-11f1-921c-fad082e0f0fc", "nom": "Cap IT" }
+    },
+    "tipusEntitat": "CARPETA",
+    "permisos": "LECTURA",
+    "carpeta": {
+      "uuid": "55bd98de-47e5-11f1-921c-fad082e0f0fc",
+      "bagul": {
+        "uuid": "55b5ec71-47e5-11f1-921c-fad082e0f0fc",
+        "usuari": {
+          "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+          "nom": "Geri"
+        }
+      },
+      "nom": "Casa",
+      "favorit": false,
+      "dataCreacio": "2026-05-04T16:16:13",
+      "dataEditat": null,
+      "ultimAccess": "2026-05-05T18:16:05",
+      "comptadorAccess": 1,
+      "items": [
+        {
+          "uuid": "97f14c25-460f-4c9c-b03d-137a73bf2857",
+          "titol": "gmail",
+          "nomUsuari": "gpozo@insgabrielamistral.cat",
+          "contrasenya": "1234",
+          "iv": "7vDTl13EwQ4fhJsL",
+          "encryptedDataKey": "db11f656-de28-44f6-b7cf-8e8a0df13d36",
+          "url": "https://accounts.google.com/",
+          "notes": "",
+          "favorit": false,
+          "dataCreacio": "2026-05-06T16:56:23",
+          "dataEditat": "2026-05-06T18:13:24",
+          "ultimAccess": "2026-05-07T07:15:49",
+          "comptadorAccess": 32,
+          "dinsDeCarpeta": true,
+          "bagul": {
+            "uuid": "55b5ec71-47e5-11f1-921c-fad082e0f0fc",
+            "usuari": {
+              "uuid": "6d5bb973-39a8-11f1-8e13-960a7d88f8c4",
+              "nom": "Geri"
+            }
+          }
+        }
+      ]
+    },
+    "item": null,
+    "dataCreacio": "2026-05-06T18:13:37"
+  }
+]

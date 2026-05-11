@@ -4,9 +4,13 @@ import { useNavigate } from "react-router-dom"
 import { carpetasApi } from "~api/carpeta-service"
 import type { Carpeta } from "~models/Carpeta"
 
+import ModalConfirmDelete from "./ModalConfimDelete"
+
 function CarpetCard({ search }: { search: string }) {
   const [carpetas, setCarpetas] = useState<Carpeta[]>([])
   const navigate = useNavigate()
+  const [showMenu, setShowMenu] = useState(false)
+  const [selectedCarpeta, setSelectedCarpeta] = useState(null)
 
   useEffect(() => {
     const loadCarpeta = async () => {
@@ -47,6 +51,7 @@ function CarpetCard({ search }: { search: string }) {
       await carpetasApi.deleteCarpeta(carpeta.uuid)
 
       setCarpetas((prev) => prev.filter((i) => i.uuid !== carpeta.uuid))
+      setShowMenu(false)
     } catch (error) {
       console.error(error)
     }
@@ -69,7 +74,9 @@ function CarpetCard({ search }: { search: string }) {
             {filteredCarpetes.map((carpetes) => (
               <span
                 key={carpetes.uuid}
-                onClick={() => navigate(`/carpeta/${carpetes.uuid}`)}
+                onClick={() =>
+                  navigate(`/carpeta/${carpetes.uuid}`, { state: carpetes })
+                }
                 className="flex items-center gap-3 p-2 border w-full h-16 bg-purple-100 border-purple-300 rounded-lg mb-2 cursor-pointer hover:bg-purple-300 hover:border-purple-400 transition-colors">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -85,8 +92,8 @@ function CarpetCard({ search }: { search: string }) {
                   />
                 </svg>
 
-                <div className="flex flex-col">
-                  <h1 className="text-lg font-bold">{carpetes.nom}</h1>
+                <div className="flex flex-col min-w-0">
+                  <h1 className="text-lg font-bold truncate">{carpetes.nom}</h1>
                 </div>
                 <div className="ml-auto flex gap-2">
                   <svg
@@ -115,25 +122,12 @@ function CarpetCard({ search }: { search: string }) {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6 hover:cursor-pointer hover:text-purple-900 transition-colors">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                    />
-                  </svg>
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteCarpetaClick(carpetes)
+                      setSelectedCarpeta(carpetes)
+                      setShowMenu(true)
                     }}
                     className="size-6 hover:text-red-600 transition-colors">
                     <path
@@ -148,6 +142,14 @@ function CarpetCard({ search }: { search: string }) {
           </>
         )}
       </div>
+      <ModalConfirmDelete
+        open={showMenu}
+        item={selectedCarpeta}
+        onClose={() => setShowMenu(false)}
+        onConfirm={(carpeta) => {
+          handleDeleteCarpetaClick(carpeta)
+        }}
+      />
     </>
   )
 }
