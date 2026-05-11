@@ -19,6 +19,7 @@ import com.keyly.model.response.BagulResponse;
 import com.keyly.model.response.CarpetaResponse;
 import com.keyly.model.response.EncryptedDataKeyResponse;
 import com.keyly.model.response.ItemResponse;
+import com.keyly.model.response.basics.CarpetaResponseBasic;
 import com.keyly.repo.CarpetaRepo;
 import com.keyly.repo.EncryptedDataKeysRepo;
 
@@ -85,7 +86,8 @@ public class CarpetaService {
 
         return carpeta.getItems()
                 .stream()
-                .map(item -> new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()), true))
+                .map(item -> new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()),
+                        foldersOfItem(item.getUuid())))
                 .toList();
     }
 
@@ -96,7 +98,8 @@ public class CarpetaService {
         return carpeta.getItems()
                 .stream()
                 .map(item -> new ItemResponse(item,
-                        repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(uuid, usuari.getUuid()), true))
+                        repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(uuid, usuari.getUuid()),
+                        foldersOfItem(item.getUuid())))
                 .toList();
     }
 
@@ -160,7 +163,7 @@ public class CarpetaService {
         carpeta.addItem(itemGuardat);
         repo.save(carpeta);
 
-        return new ItemResponse(itemGuardat, response.encryptedDataKey(), true);
+        return new ItemResponse(itemGuardat, response.encryptedDataKey(), foldersOfItem(itemGuardat.getUuid()));
     }
 
     public CarpetaResponse update(UUID uuid, CarpetaRequest request) {
@@ -229,8 +232,8 @@ public class CarpetaService {
         repo.save(carpeta);
     }
 
-    public boolean hasItemInAnyCarpeta(UUID itemUuid) {
-        return (repo.existItemInCarpetes(itemUuid) > 0) ? true : false;
+    public List<CarpetaResponseBasic> foldersOfItem(UUID itemUuid) {
+        return toCarpetaResponseBasic(repo.findByItemsUuid(itemUuid));
     }
 
     public void registerAccess(Usuari usuari, UUID carpetaUuid) {
@@ -242,13 +245,20 @@ public class CarpetaService {
         repo.save(carpeta);
     }
 
+    public List<CarpetaResponseBasic> toCarpetaResponseBasic(List<Carpeta> carpeta) {
+        return carpeta
+                .stream()
+                .map(c -> new CarpetaResponseBasic(c.getUuid(), c.getNom()))
+                .toList();
+    }
+
     public CarpetaResponse toCarpetaResponse(Carpeta carpeta, Usuari usuari) {
         List<ItemResponse> items = carpeta.getItems()
                 .stream()
                 .map(item -> {
                     EncryptedDataKeyResponse edk = repoEncryptedDataKeys
                             .findByItemUuidAndUsuariUuid(item.getUuid(), usuari.getUuid());
-                    return new ItemResponse(item, edk, true);
+                    return new ItemResponse(item, edk, foldersOfItem(item.getUuid()));
                 })
                 .toList();
 

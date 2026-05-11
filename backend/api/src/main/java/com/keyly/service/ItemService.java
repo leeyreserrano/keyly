@@ -49,7 +49,7 @@ public class ItemService {
                 .map(item -> new ItemResponse(
                         item,
                         repoEncryptedDataKeys.findAllByItemUuid(item.getUuid()),
-                        carpetaService.hasItemInAnyCarpeta(item.getUuid())))
+                        carpetaService.foldersOfItem(item.getUuid())))
                 .toList();
     }
 
@@ -59,7 +59,7 @@ public class ItemService {
                 .map(item -> new ItemResponse(item,
                         repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(item.getUuid(),
                                 usuariUuid),
-                        carpetaService.hasItemInAnyCarpeta(item.getUuid())))
+                        carpetaService.foldersOfItem(item.getUuid())))
                 .toList();
     }
 
@@ -69,7 +69,7 @@ public class ItemService {
                         "Item no trobat amb el uuid: " + uuid));
 
         return new ItemResponse(item, repoEncryptedDataKeys.findAllByItemUuid(uuid),
-                carpetaService.hasItemInAnyCarpeta(item.getUuid()));
+                carpetaService.foldersOfItem(item.getUuid()));
     }
 
     public Item getItemEntityByUuid(UUID uuid) {
@@ -87,7 +87,7 @@ public class ItemService {
         repo.save(item);
 
         return new ItemResponse(item, repoEncryptedDataKeys.findByItemUuidAndUsuariUuid(uuid, usuari.getUuid()),
-                carpetaService.hasItemInAnyCarpeta(item.getUuid()));
+                carpetaService.foldersOfItem(item.getUuid()));
     }
 
     public Item getUserItemEntity(Usuari usuari, UUID uuid) {
@@ -113,7 +113,7 @@ public class ItemService {
         return new ItemResponse(
                 itemGuardat,
                 new EncryptedDataKeyResponse(encryptedDataKeyGuardat),
-                false);
+                null);
     }
 
     public ItemResponse update(UsuariResponse usuari, UUID uuid, ItemRequest request) {
@@ -136,7 +136,7 @@ public class ItemService {
         EncryptedDataKeys encryptedDataKeyGuardat = repoEncryptedDataKeys.save(e);
 
         return new ItemResponse(itemGuardat, new EncryptedDataKeyResponse(encryptedDataKeyGuardat),
-                carpetaService.hasItemInAnyCarpeta(itemGuardat.getUuid()));
+                carpetaService.foldersOfItem(itemGuardat.getUuid()));
     }
 
     public ItemResponse deleteByUuid(UUID uuid) {

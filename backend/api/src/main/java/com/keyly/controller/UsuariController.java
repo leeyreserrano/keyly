@@ -130,7 +130,7 @@ public class UsuariController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Actualitza el usuari que fa la petició", description = "USUARI", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Actualitza el usuari que fa la petició", description = "ADMIN / CAP / USUARI", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuari actualitzat"),
         @ApiResponse(responseCode = "404", description = "Usuari/Departament/Rol/Sucursal no trobat"),

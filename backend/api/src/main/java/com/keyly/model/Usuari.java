@@ -20,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -56,7 +57,14 @@ public class Usuari {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rol_intern")
-    private RolIntern rolIntern = RolIntern.USUARI;
+    private RolIntern rolIntern;
+
+    @PrePersist
+    public void prePresist() {
+        if (rolIntern == null) {
+            rolIntern = RolIntern.USUARI;
+        }
+    }
     
     @Column(name = "nom")
     private String nom;
@@ -100,6 +108,7 @@ public class Usuari {
         this.publicKey = request.publicKey();
         this.encryptedPrivateKey = request.encryptedPrivateKey();
         this.potAdministrar = request.potAdministrar();
+        this.rolIntern = request.rolIntern();
     }
 
     public Usuari(Sucursal sucursal, Departament departament, Rol rol, UsuariResponse response) {
@@ -112,6 +121,7 @@ public class Usuari {
         this.dataCreacio = response.dataCreacio();
         this.dataUltimLogin = response.ultimLogin();
         this.potAdministrar = response.potAdministrar();
+        this.rolIntern = response.rolIntern();
     }
 
 }

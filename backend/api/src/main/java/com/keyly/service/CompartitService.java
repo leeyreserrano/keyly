@@ -175,7 +175,7 @@ public class CompartitService {
                 Item item = itemService.getItemEntityByUuid(compartit.getEntitatUuid());
                 EncryptedDataKeyResponse edk = repoEncryptedDataKeys
                         .findByItemUuidAndUsuariUuid(item.getUuid(), compartit.getUsuari().getUuid());
-                itemResponse = new ItemResponse(item, edk, false);
+                itemResponse = new ItemResponse(item, edk, null);
             } catch (EntitatNoTrobadaException ignored) {
             }
         }
