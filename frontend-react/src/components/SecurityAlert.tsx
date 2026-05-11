@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Button from '@mui/material/Button';
@@ -9,25 +10,23 @@ interface SecurityAlertProps {
   onReview: () => void;
 }
 
-const ALERT_CONFIG = {
-  compromised: {
-    severity: 'error' as const,
-    title: 'Contraseñas comprometidas detectadas',
-    description: (n: number) =>
-      `${n} de tus contraseñas coinciden con contraseñas conocidas como inseguras. Cámbialas lo antes posible.`,
-    buttonLabel: 'Revisar ahora',
-  },
-  reused: {
-    severity: 'warning' as const,
-    title: 'Contraseñas reutilizadas',
-    description: (n: number) =>
-      `Estás usando la misma contraseña en ${n} cuentas distintas. Usar contraseñas únicas mejora tu seguridad.`,
-    buttonLabel: 'Ver duplicadas',
-  },
-};
-
 export default function SecurityAlert({ type, count, onReview }: SecurityAlertProps) {
-  const config = ALERT_CONFIG[type];
+  const { t } = useTranslation('stats');
+
+  const config = {
+    compromised: {
+      severity: 'error' as const,
+      title: t('alerts.compromised.title'),
+      description: t('alerts.compromised.description', { count }),
+      buttonLabel: t('alerts.compromised.button'),
+    },
+    reused: {
+      severity: 'warning' as const,
+      title: t('alerts.reused.title'),
+      description: t('alerts.reused.description', { count }),
+      buttonLabel: t('alerts.reused.button'),
+    },
+  }[type];
 
   return (
     <Alert
@@ -42,7 +41,7 @@ export default function SecurityAlert({ type, count, onReview }: SecurityAlertPr
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={1}>
         <Stack>
           <AlertTitle sx={{ fontWeight: 700, mb: 0.25 }}>{config.title}</AlertTitle>
-          <span style={{ fontSize: '0.85rem' }}>{config.description(count)}</span>
+          <span style={{ fontSize: '0.85rem' }}>{config.description}</span>
         </Stack>
         <Button
           variant="outlined"

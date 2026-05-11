@@ -4,12 +4,32 @@ function getToken(): string | null {
   return localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
 }
 
+function handleUnauthorized() {
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = '/';
+}
+
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit & { _token?: string } = {}
+  options: RequestInit & { _token?: string; _skipLogoutOn401?: boolean } = {}
 ): Promise<T | null> {
-  const { _token, ...fetchOptions } = options;
+  const { _token, _skipLogoutOn401, ...fetchOptions } = options;
   const token = _token ?? getToken();
+
+  if (token && isTokenExpired(token)) {
+    handleUnauthorized();
+    throw new Error('Sessió expirada');
+  }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -23,10 +43,10 @@ export async function apiRequest<T>(
   });
 
   if (res.status === 401) {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = '/';
-    throw new Error('Sesión expirada');
+    if (!_skipLogoutOn401) {
+      handleUnauthorized();
+    }
+    throw new Error('No autoritzat');
   }
 
   if (!res.ok) {
@@ -58,9 +78,7 @@ export async function apiMultipartRequest<T>(
   });
 
   if (res.status === 401) {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = '/';
+    handleUnauthorized();
     throw new Error('Sesión expirada');
   }
 

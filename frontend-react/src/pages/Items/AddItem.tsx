@@ -1,46 +1,57 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import {
-  Stack,
-  Typography,
-  Paper,
-  Button,
-  TextField,
-  CssBaseline,
-  IconButton,
-  Box,
-  Divider,
-  InputAdornment,
-  MenuItem,
-  Select,
-  FormControl,
-  Menu,
+  Stack, Typography, Paper, Button, TextField,
+  IconButton, Box, Divider, InputAdornment, MenuItem, Select,
+  FormControl, Menu,
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
-import Sidebar from '../../components/Sidebar';
-import AppTheme from '../../theme/AppTheme';
 import Header from '../../components/Header';
-import { itemsApi } from '../../api/itemsapi';
-import { useLocation } from 'react-router';
-import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
-import { utilsApi } from '../../api/utilsapi';
 import GeneratePasswordModal from '../../components/GeneratePasswordModal';
+import { itemsApi } from '../../api/itemsapi';
+import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
+import { compartitsApi, type Permisos } from '../../api/compartitsapi';
+import { utilsApi } from '../../api/utilsapi';
 import toast from 'react-hot-toast';
 import { useCrypto } from '../../context/CryptoContext';
-import { encryptPassword } from '../../crypto/cryptoService';
+import {
+  generateDataKey, encryptPasswordWithDataKey,
+  rsaEncrypt, importPublicKey,
+} from '../../crypto/cryptoService';
 
 const NOVA_CARPETA_VALUE = '__nova__';
 const SENSE_CARPETA_VALUE = '__cap__';
 
+type LocationState = {
+  carpetaUuid?: string;
+  compartitUuid?: string;
+  carpetaCompartitUuid?: string;
+  usuariCreadorUuid?: string;
+  usuariCreadorPublicKey?: string;
+  permisos?: Permisos;
+};
+
 export default function AddItem() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { derivedKey } = useCrypto();
+  const { t } = useTranslation('item');
+  const { publicKey } = useCrypto();
 
-  const [carpetaUuid] = useState<string | undefined>((location.state as { carpetaUuid?: string })?.carpetaUuid);
+  const {
+    carpetaUuid,
+    compartitUuid,
+    carpetaCompartitUuid,
+    usuariCreadorUuid,
+    usuariCreadorPublicKey,
+    permisos,
+  } = (location.state as LocationState) ?? {};
+
+  const esCompartit = !!compartitUuid;
+
   const [titol, setTitol] = useState('');
   const [nomUsuari, setNomUsuari] = useState('');
   const [notes, setNotes] = useState('');
@@ -57,53 +68,86 @@ export default function AddItem() {
   const [novaCarpetaError, setNovaCarpetaError] = useState<string | undefined>();
 
   useEffect(() => {
+    if (esCompartit) return;
     carpetasApi.fetchItems().then((data) => {
       setCarpetes(data);
-      if (carpetaUuid) {
-        setCarpetaSeleccionada(carpetaUuid);
-      }
+      if (carpetaUuid) setCarpetaSeleccionada(carpetaUuid);
     }).catch(() => {});
-  }, [carpetaUuid]);
+  }, [carpetaUuid, esCompartit]);
 
   const validate = (): boolean => {
     const newErrors: { titol?: string; contrasenya?: string } = {};
-    if (!titol.trim()) newErrors.titol = 'El títol és obligatori';
-    if (!contrasenya.trim()) newErrors.contrasenya = 'La contrasenya és obligatòria';
+    if (!titol.trim()) newErrors.titol = t('required.title');
+    if (!contrasenya.trim()) newErrors.contrasenya = t('required.password');
     setErrors(newErrors);
-
-    if (carpetaSeleccionada === NOVA_CARPETA_VALUE && !novaCarpetaNom.trim()) {
-      setNovaCarpetaError('El nom de la carpeta és obligatori');
+    if (!esCompartit && carpetaSeleccionada === NOVA_CARPETA_VALUE && !novaCarpetaNom.trim()) {
+      setNovaCarpetaError(t('required.folder_name'));
       return false;
     }
     setNovaCarpetaError(undefined);
-
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = async () => {
     if (!validate()) return;
-    if (!derivedKey) {
-      toast.error('Sessió de xifratge no disponible. Torna a iniciar sessió.');
+    if (!publicKey) {
+      toast.error(t('error.crypto_session'));
       return;
     }
     setLoading(true);
     try {
-      const { encrypted, iv } = await encryptPassword(derivedKey, contrasenya);
+      const dataKeyBytes = generateDataKey();
+      const { encrypted: encryptedPassword, iv } = await encryptPasswordWithDataKey(dataKeyBytes, contrasenya);
+      const encryptedDataKeyPropi = await rsaEncrypt(publicKey, dataKeyBytes);
 
-      const newItem = await itemsApi.addItem({ titol, nomUsuari, url, contrasenya: encrypted, iv });
-      if (!newItem) throw new Error("Error creant l'item");
+      if (esCompartit) {
+        if (!usuariCreadorPublicKey || !usuariCreadorUuid || !carpetaCompartitUuid) {
+          throw new Error('Falten dades del compartit');
+        }
+        const pubKeyCreador = await importPublicKey(usuariCreadorPublicKey);
+        const encryptedDataKeyCreador = await rsaEncrypt(pubKeyCreador, dataKeyBytes);
 
-      if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
-        const novaCarpeta = await carpetasApi.addCarpeta({ nom: novaCarpetaNom });
-        await carpetasApi.addExistingItem(novaCarpeta.uuid, newItem.uuid);
-      } else if (carpetaSeleccionada !== SENSE_CARPETA_VALUE) {
-        await carpetasApi.addExistingItem(carpetaSeleccionada, newItem.uuid);
+        await compartitsApi.addItemCompartit({
+          itemRequest: {
+            titol, nomUsuari, notes, url,
+            contrasenya: encryptedPassword,
+            iv,
+            encryptedDataKey: encryptedDataKeyPropi,
+            favorit: false,
+          },
+          compartitRequest: {
+            entitatUuid: carpetaCompartitUuid,
+            tipusEntitat: 'CARPETA',
+            usuaris: [{
+              usuariUuid: usuariCreadorUuid,
+              permis: permisos ?? 'LECTURA',
+              encryptedDataKeys: [{
+                itemUuid: '',
+                encryptedDataKey: encryptedDataKeyCreador,
+              }],
+            }],
+          },
+        });
+      } else {
+        const newItem = await itemsApi.addItem({
+          titol, nomUsuari, notes, url,
+          contrasenya: encryptedPassword,
+          iv,
+          encryptedDataKey: encryptedDataKeyPropi,
+        });
+        if (!newItem) throw new Error(t('toast.error.create'));
+        if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
+          const novaCarpeta = await carpetasApi.addCarpeta({ nom: novaCarpetaNom });
+          await carpetasApi.addExistingItem(novaCarpeta.uuid, newItem.uuid);
+        } else if (carpetaSeleccionada !== SENSE_CARPETA_VALUE) {
+          await carpetasApi.addExistingItem(carpetaSeleccionada, newItem.uuid);
+        }
       }
 
-      toast.success('Item creat correctament');
-      navigate('/Items');
+      toast.success(t('toast.success.create'));
+      navigate(-1);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Error creant l'item";
+      const message = err instanceof Error ? err.message : t('toast.error.create');
       toast.error(message);
     } finally {
       setLoading(false);
@@ -112,215 +156,119 @@ export default function AddItem() {
 
   const handleComplexitat = async (nivell: string) => {
     setAnchorEl(null);
-
     const configs = {
-      baixa:   { longitud: 8,  may: true, quantitatMay: 0, numeros: false, quantitatNumeros: 0, caractersEspecials: false, quantitatCaractersEspecials: 0 },
-      mitjana: { longitud: 12, may: true, quantitatMay: 3,  numeros: true,  quantitatNumeros: 3, caractersEspecials: false, quantitatCaractersEspecials: 0 },
-      alta:    { longitud: 20, may: true, quantitatMay: 5,  numeros: true,  quantitatNumeros: 4, caractersEspecials: true,  quantitatCaractersEspecials: 3 },
+      baixa: { longitud: 8, may: true, quantitatMay: 0, numeros: false, quantitatNumeros: 0, caractersEspecials: false, quantitatCaractersEspecials: 0 },
+      mitjana: { longitud: 12, may: true, quantitatMay: 3, numeros: true, quantitatNumeros: 3, caractersEspecials: false, quantitatCaractersEspecials: 0 },
+      alta: { longitud: 20, may: true, quantitatMay: 5, numeros: true, quantitatNumeros: 4, caractersEspecials: true, quantitatCaractersEspecials: 3 },
     };
-
     try {
       const result = await utilsApi.generatePassword(configs[nivell as keyof typeof configs]);
       if (result) setContrasenya(result);
     } catch {
-      toast.error('Error generant la contrasenya');
+      toast.error(t('toast.error.generate_password'));
     }
   };
 
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
-      <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
-        <Sidebar />
+    <Stack sx={{ height: '100%', overflow: 'hidden' }}>
+      <Header
+        title={t('add.title')}
+        icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+        showBackButton
+      />
 
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          <Header
-            title="Afegir Item"
-            icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
-            showBackButton
-          />
+      <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+        <Box sx={{ px: 4, py: 3, display: 'flex', justifyContent: 'center' }}>
+          <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, width: '70%', maxWidth: 500, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{t('add.new')}</Typography>
+            <Divider />
 
-          <Box sx={{ px: 4, py: 3, display: 'flex', justifyContent: 'center' }}>
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 4,
-                borderRadius: 3,
-                width: '70%',
-                maxWidth: 500,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 3,
-              }}
-            >
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                Nou Item
-              </Typography>
+            <Stack spacing={0.5}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.title')} *</Typography>
+              <TextField fullWidth value={titol} onChange={(e) => setTitol(e.target.value)} error={!!errors.titol} helperText={errors.titol} placeholder={t('placeholder.title')} />
+            </Stack>
 
-              <Divider />
+            <Stack spacing={0.5}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.user')}</Typography>
+              <TextField fullWidth value={nomUsuari} onChange={(e) => setNomUsuari(e.target.value)} placeholder={t('placeholder.user')} />
+            </Stack>
 
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                  Títol *
-                </Typography>
-                <TextField
-                  fullWidth
-                  value={titol}
-                  onChange={(e) => setTitol(e.target.value)}
-                  error={!!errors.titol}
-                  helperText={errors.titol}
-                  placeholder="Ex: Gmail personal"
-                />
+            <Stack spacing={0.5}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.notes')}</Typography>
+              <TextField fullWidth value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t('placeholder.notes')} />
+            </Stack>
+
+            <Stack spacing={0.5}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.url')}</Typography>
+              <TextField fullWidth value={url} onChange={(e) => setUrl(e.target.value)} placeholder={t('placeholder.url')} />
+            </Stack>
+
+            <Stack spacing={0.5}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.password')} *</Typography>
+                <Button size="small" startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 15 }} />} onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}>
+                  {t('generate.button')}
+                </Button>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                  <MenuItem onClick={() => handleComplexitat('baixa')}>{t('generate.low')}</MenuItem>
+                  <MenuItem onClick={() => handleComplexitat('mitjana')}>{t('generate.medium')}</MenuItem>
+                  <MenuItem onClick={() => handleComplexitat('alta')}>{t('generate.high')}</MenuItem>
+                  <Divider />
+                  <MenuItem onClick={() => { setAnchorEl(null); setOpenGenerateModal(true); }}>{t('generate.custom')}</MenuItem>
+                </Menu>
               </Stack>
-
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                  Usuari / Email
-                </Typography>
-                <TextField
-                  fullWidth
-                  value={nomUsuari}
-                  onChange={(e) => setNomUsuari(e.target.value)}
-                  placeholder="Ex: usuari@exemple.com"
-                />
-              </Stack>
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                  Notes
-                </Typography>
-                <TextField
-                  fullWidth
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Ex: Notes sobre l'item"
-                />
-              </Stack>
-
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                  URL
-                </Typography>
-                <TextField
-                  fullWidth
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Ex: https://gmail.com"
-                />
-              </Stack>
-
-              <Stack spacing={0.5}>
-                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                    Contrasenya *
-                  </Typography>
-                  <Button
-                    size="small"
-                    startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 15 }} />}
-                    onClick={(e) => setAnchorEl(e.currentTarget)}
-                    sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
-                  >
-                    Generar
-                  </Button>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={() => setAnchorEl(null)}
-                  >
-                    <MenuItem onClick={() => handleComplexitat('baixa')}>Complexitat baixa</MenuItem>
-                    <MenuItem onClick={() => handleComplexitat('mitjana')}>Complexitat mitjana</MenuItem>
-                    <MenuItem onClick={() => handleComplexitat('alta')}>Complexitat alta</MenuItem>
-                    <Divider />
-                    <MenuItem onClick={() => { setAnchorEl(null); setOpenGenerateModal(true); }}>
-                      Personalitzada
-                    </MenuItem>
-                  </Menu>
-                </Stack>
-                <TextField
-                  fullWidth
-                  type={showPassword ? 'text' : 'password'}
-                  value={contrasenya}
-                  onChange={(e) => setContrasenya(e.target.value)}
-                  error={!!errors.contrasenya}
-                  helperText={errors.contrasenya}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword((p) => !p)}
-                          sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}
-                        >
-                          {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Stack>
-
-              <GeneratePasswordModal
-                open={openGenerateModal}
-                onClose={() => setOpenGenerateModal(false)}
-                onConfirm={(password) => setContrasenya(password)}
+              <TextField
+                fullWidth
+                type={showPassword ? 'text' : 'password'}
+                value={contrasenya}
+                onChange={(e) => setContrasenya(e.target.value)}
+                error={!!errors.contrasenya}
+                helperText={errors.contrasenya}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword((p) => !p)} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}>
+                        {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+            </Stack>
 
-              <Stack spacing={0.5}>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                  Carpeta
-                </Typography>
-                <FormControl fullWidth>
-                  <Select
-                    value={carpetaSeleccionada}
-                    onChange={(e) => setCarpetaSeleccionada(e.target.value)}
-                    displayEmpty
-                  >
-                    <MenuItem value={SENSE_CARPETA_VALUE}>Sense carpeta</MenuItem>
-                    {carpetes.map((c) => (
-                      <MenuItem key={c.uuid} value={c.uuid}>{c.nom}</MenuItem>
-                    ))}
-                    <MenuItem value={NOVA_CARPETA_VALUE}>+ Nova carpeta</MenuItem>
-                  </Select>
-                </FormControl>
-              </Stack>
+            <GeneratePasswordModal open={openGenerateModal} onClose={() => setOpenGenerateModal(false)} onConfirm={(password) => setContrasenya(password)} />
 
-              {carpetaSeleccionada === NOVA_CARPETA_VALUE && (
+            {!esCompartit && (
+              <>
                 <Stack spacing={0.5}>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
-                    Nom de la nova carpeta *
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    value={novaCarpetaNom}
-                    onChange={(e) => setNovaCarpetaNom(e.target.value)}
-                    error={!!novaCarpetaError}
-                    helperText={novaCarpetaError}
-                    placeholder="Ex: Xarxes socials"
-                  />
+                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.folder')}</Typography>
+                  <FormControl fullWidth>
+                    <Select value={carpetaSeleccionada} onChange={(e) => setCarpetaSeleccionada(e.target.value)} displayEmpty>
+                      <MenuItem value={SENSE_CARPETA_VALUE}>{t('placeholder.folder')}</MenuItem>
+                      {carpetes.map((c) => <MenuItem key={c.uuid} value={c.uuid}>{c.nom}</MenuItem>)}
+                      <MenuItem value={NOVA_CARPETA_VALUE}>+ {t('field.new_folder_name')}</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Stack>
-              )}
+                {carpetaSeleccionada === NOVA_CARPETA_VALUE && (
+                  <Stack spacing={0.5}>
+                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.new_folder_name')} *</Typography>
+                    <TextField fullWidth value={novaCarpetaNom} onChange={(e) => setNovaCarpetaNom(e.target.value)} error={!!novaCarpetaError} helperText={novaCarpetaError} placeholder={t('placeholder.new_folder')} />
+                  </Stack>
+                )}
+              </>
+            )}
 
-              <Divider />
-
-              <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
-                <Button
-                  onClick={() => navigate(-1)}
-                  variant="outlined"
-                  sx={{ textTransform: 'none', fontWeight: 600 }}
-                >
-                  Cancel·lar
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  variant="contained"
-                  disabled={loading}
-                  sx={{ textTransform: 'none', fontWeight: 600 }}
-                >
-                  {loading ? 'Guardant...' : 'Guardar'}
-                </Button>
-              </Stack>
-            </Paper>
-          </Box>
-        </Stack>
+            <Divider />
+            <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
+              <Button onClick={() => navigate(-1)} variant="outlined" sx={{ textTransform: 'none', fontWeight: 600 }}>{t('button.cancel')}</Button>
+              <Button onClick={handleSave} variant="contained" disabled={loading} sx={{ textTransform: 'none', fontWeight: 600 }}>
+                {loading ? t('button.saving') : t('button.save')}
+              </Button>
+            </Stack>
+          </Paper>
+        </Box>
       </Stack>
-    </AppTheme>
+    </Stack>
   );
 }

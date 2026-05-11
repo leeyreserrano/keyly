@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Stack, TextField, MenuItem, Button } from '@mui/material';
 import type { FilterValue } from '../pages/Items/Items';
 
@@ -10,20 +11,22 @@ type Props = {
   onAdd?: () => void;
 };
 
-const filters: { value: FilterValue; label: string }[] = [
-  { value: 'latest', label: 'Últims usats' },
-  { value: 'most_used', label: 'Més usats' },
-  { value: 'favorites', label: 'Favorits' },
-];
-
 export default function ItemsToolbar({ search, setSearch, filter, setFilter, onAdd }: Props) {
+  const { t } = useTranslation('toolbar');
+
+  const filters: { value: FilterValue; label: string }[] = [
+    { value: 'latest', label: t('filter.latest') },
+    { value: 'most_used', label: t('filter.most_used') },
+    { value: 'favorites', label: t('filter.favorites') },
+  ];
+
   return (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
       sx={{ px: 4, py: 3, justifyContent: 'flex-start', alignItems: 'center', gap: 1 }}
     >
       <TextField
-        placeholder="Cercar per títol o usuari"
+        placeholder={t('search_placeholder')}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         size="small"
@@ -52,7 +55,7 @@ export default function ItemsToolbar({ search, setSearch, filter, setFilter, onA
           onClick={onAdd}
           sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
         >
-          + Add New
+          {t('add_new')}
         </Button>
       )}
     </Stack>

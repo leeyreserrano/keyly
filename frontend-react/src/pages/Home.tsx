@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import CssBaseline from '@mui/material/CssBaseline';
+import { useTranslation } from 'react-i18next';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -11,8 +11,6 @@ import Skeleton from '@mui/material/Skeleton';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import CheckIcon from '@mui/icons-material/Check';
 import VpnKeyOffOutlinedIcon from '@mui/icons-material/VpnKeyOffOutlined';
-import AppTheme from '../theme/AppTheme';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import CredentialCard from '../components/CredentialCard';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
@@ -26,24 +24,26 @@ const LAVENDER = '#EEE5FF';
 const ITEMS_PER_PAGE = 12;
 
 type TabValue = 'latest' | 'most_used' | 'favorites';
-const tabs: { value: TabValue; label: string }[] = [
-  { value: 'latest', label: 'Últims usats' },
-  { value: 'most_used', label: 'Més usats' },
-  { value: 'favorites', label: 'Favorits' },
-];
 
 type HomeElement =
   | (Item & { esCarpeta: false })
   | (Carpeta & {
-    esCarpeta: true;
-    titol: string;
-    nomUsuari: string;
-    dataEditat: string;
-    ultimAcces: string;
-  });
+      esCarpeta: true;
+      titol: string;
+      nomUsuari: string;
+      dataEditat: string;
+      ultimAcces: string;
+    });
 
 export default function Home() {
   const navigate = useNavigate();
+  const { t } = useTranslation('home');
+
+  const tabs: { value: TabValue; label: string }[] = [
+    { value: 'latest', label: t('tabs.latest') },
+    { value: 'most_used', label: t('tabs.most_used') },
+    { value: 'favorites', label: t('tabs.favorites') },
+  ];
 
   const [items, setItems] = useState<Item[]>([]);
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
@@ -65,9 +65,9 @@ export default function Home() {
         setItems(itemsData ?? []);
         setCarpetas(carpetasData ?? []);
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Error carregant les dades';
+        const message = err instanceof Error ? err.message : t('error.loading');
         setError(message);
-        toast.error('Error carregant les dades');
+        toast.error(t('error.loading'));
       } finally {
         setLoading(false);
       }
@@ -99,10 +99,7 @@ export default function Home() {
 
   const filteredData = useMemo<HomeElement[]>(() => {
     const allData: HomeElement[] = [
-      ...items.map((i) => ({
-        ...i,
-        esCarpeta: false as const,
-      })),
+      ...items.map((i) => ({ ...i, esCarpeta: false as const })),
       ...carpetas.map((c) => ({
         ...c,
         esCarpeta: true as const,
@@ -135,7 +132,6 @@ export default function Home() {
 
   const displayedCarpetas = paginatedData.filter((i) => i.esCarpeta);
   const displayedItems = paginatedData.filter((i) => !i.esCarpeta);
-
   const totalCount = filteredData.length;
 
   const handleDeleteClick = (uuid: string, esCarpeta: boolean) => {
@@ -162,9 +158,9 @@ export default function Home() {
       } else {
         await itemsApi.deleteItem(uuid);
       }
-      toast.success('Eliminado correctamente');
+      toast.success(t('toast.delete_success'));
     } catch {
-      toast.error('Error al eliminar');
+      toast.error(t('toast.delete_error'));
       try {
         const [itemsData, carpetasData] = await Promise.all([
           itemsApi.fetchItems(),
@@ -172,7 +168,7 @@ export default function Home() {
         ]);
         setItems(itemsData ?? []);
         setCarpetas(carpetasData ?? []);
-      } catch { }
+      } catch {}
     }
   };
 
@@ -198,11 +194,11 @@ export default function Home() {
         <Stack sx={{ alignItems: 'center', py: 10, gap: 2, color: 'text.disabled' }}>
           <VpnKeyOffOutlinedIcon sx={{ fontSize: 64 }} />
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
-            {activeTab === 'favorites' ? 'No tens cap favorit' : 'No tens cap element guardat'}
+            {activeTab === 'favorites' ? t('empty.favorites') : t('empty.no_items')}
           </Typography>
           {activeTab !== 'favorites' && (
             <Button variant="contained" onClick={() => navigate('/ChooseType')}>
-              + Afegir el primer
+              {t('empty.add_first')}
             </Button>
           )}
         </Stack>
@@ -239,6 +235,7 @@ export default function Home() {
               nomUsuari=""
               dataEditat={item.dataEditat}
               dataCreacio={item.dataCreacio}
+              url={item.url}
               ultimAcces={(item as Item).ultimAcces}
               dinsCarpeta={itemsEnCarpetaSet.has(item.uuid)}
               favorit={item.favorit}
@@ -255,65 +252,60 @@ export default function Home() {
   };
 
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
-      <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
-        <Sidebar />
+    <Stack sx={{ height: '100%', overflow: 'hidden' }}>
+      <Header title={t('title')} icon={<HomeRoundedIcon sx={{ fontSize: 30 }} />} />
 
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          <Header title="Home" icon={<HomeRoundedIcon sx={{ fontSize: 30 }} />} />
-
-          <Stack
-            direction="row"
-            sx={{ px: 4, pt: 3, pb: 2, justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <Stack direction="row" sx={{ gap: 1 }}>
-              {tabs.map((tab) => {
-                const isActive = activeTab === tab.value;
-                return (
-                  <Button
-                    key={tab.value}
-                    startIcon={isActive ? <CheckIcon sx={{ fontSize: '16px !important' }} /> : undefined}
-                    onClick={() => { setActiveTab(tab.value); setPage(1); }}
-                    sx={{
-                      borderRadius: '100px',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      px: 2.5,
-                      py: 1,
-                      fontSize: '0.875rem',
-                      ...(isActive
-                        ? { bgcolor: brand[400], color: 'white', '&:hover': { bgcolor: brand[500] } }
-                        : { bgcolor: LAVENDER, color: 'text.primary', '&:hover': { bgcolor: '#E0D0FF' } }),
-                    }}
-                  >
-                    {tab.label}
-                  </Button>
-                );
-              })}
-            </Stack>
-
-            <Button
-              variant="contained"
-              onClick={() => navigate('/ChooseType')}
-              sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, px: 2.5 }}
-            >
-              + Add New
-            </Button>
+      <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+        <Stack
+          direction="row"
+          sx={{ px: 4, pt: 3, pb: 2, justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <Stack direction="row" sx={{ gap: 1 }}>
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.value;
+              return (
+                <Button
+                  key={tab.value}
+                  startIcon={isActive ? <CheckIcon sx={{ fontSize: '16px !important' }} /> : undefined}
+                  onClick={() => { setActiveTab(tab.value); setPage(1); }}
+                  sx={{
+                    borderRadius: '100px',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 2.5,
+                    py: 1,
+                    fontSize: '0.875rem',
+                    ...(isActive
+                      ? { bgcolor: brand[400], color: 'white', '&:hover': { bgcolor: brand[500] } }
+                      : { bgcolor: LAVENDER, color: 'text.primary', '&:hover': { bgcolor: '#E0D0FF' } }),
+                  }}
+                >
+                  {tab.label}
+                </Button>
+              );
+            })}
           </Stack>
 
-          <Box sx={{ px: 4, pb: 3, flex: 1 }}>
-            {renderGrid()}
-          </Box>
-
-          {!loading && !error && totalCount > ITEMS_PER_PAGE && (
-            <CustomPagination
-              count={Math.ceil(totalCount / ITEMS_PER_PAGE)}
-              page={page}
-              onChange={(val) => { setPage(val); window.scrollTo(0, 0); }}
-            />
-          )}
+          <Button
+            variant="contained"
+            onClick={() => navigate('/ChooseType')}
+            sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, px: 2.5 }}
+          >
+            {t('add_new')}
+          </Button>
         </Stack>
+
+        <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+          {renderGrid()}
+        </Box>
+
+        {!loading && !error && totalCount > ITEMS_PER_PAGE && (
+          <CustomPagination
+            count={Math.ceil(totalCount / ITEMS_PER_PAGE)}
+            page={page}
+            onChange={(val) => { setPage(val); window.scrollTo(0, 0); }}
+          />
+        )}
       </Stack>
 
       <DeleteConfirmationModal
@@ -321,6 +313,6 @@ export default function Home() {
         onClose={() => setOpenDeleteModal(false)}
         onConfirm={confirmDelete}
       />
-    </AppTheme>
+    </Stack>
   );
 }

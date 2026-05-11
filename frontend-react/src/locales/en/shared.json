@@ -1,0 +1,14 @@
+{
+  "title": "Shared",
+  "tab.received": "Received",
+  "tab.created": "Created",
+
+  "empty.received": "You don't have any shared items",
+  "empty.created": "You haven't shared any items",
+
+  "error.load": "Error loading shared items",
+  "error.delete": "Error deleting shared item",
+  "success.delete": "Shared item deleted successfully",
+
+  "loading": "Loading..."
+}

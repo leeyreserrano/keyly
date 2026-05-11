@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
 interface DeleteConfirmationModalProps {
@@ -14,22 +15,26 @@ export default function DeleteConfirmationModal({
   open,
   onClose,
   onConfirm,
-  title = "Confirmar eliminación",
-  description = "¿Estás segura de que quieres eliminar este item? Esta acción no se puede deshacer.",
-  confirmText = "Eliminar",
-  cancelText = "Cancelar"
+  title,
+  description,
+  confirmText,
+  cancelText,
 }: DeleteConfirmationModalProps) {
+  const { t } = useTranslation('common');
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle sx={{ fontWeight: 700, color: 'text.primary' }}>{title}</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 700, color: 'text.primary' }}>
+        {title ?? t('delete_modal.title')}
+      </DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ color: 'text.secondary', fontSize: '1rem' }}>
-          {description}
+          {description ?? t('delete_modal.description')}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary" sx={{ textTransform: 'none', fontWeight: 600 }}>
-          {cancelText}
+          {cancelText ?? t('cancel')}
         </Button>
         <Button
           onClick={onConfirm}
@@ -41,7 +46,7 @@ export default function DeleteConfirmationModal({
             '&:hover': { bgcolor: 'error.dark' },
           }}
         >
-          {confirmText}
+          {confirmText ?? t('delete')}
         </Button>
       </DialogActions>
     </Dialog>

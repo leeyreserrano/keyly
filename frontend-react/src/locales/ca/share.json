@@ -1,0 +1,20 @@
+{
+  "title.folder": "Compartir carpeta",
+  "title.item": "Compartir item",
+  "subtitle": "Comparteix \"{{nom}}\" amb altres usuaris.",
+  "permissions.label": "Permisos",
+  "permissions.read": "Lectura",
+  "permissions.write": "Escriptura",
+  "search_placeholder": "Cerca per nom o correu...",
+  "no_users": "Cap usuari trobat",
+  "cancel": "Cancel·lar",
+  "share": "Compartir",
+  "share_with_count": "Compartir ({{count}})",
+  "sharing": "Compartint...",
+  "success": "\"{{nom}}\" compartit correctament",
+  "error.load_users": "Error carregant usuaris",
+  "error.no_users": "Selecciona almenys un usuari",
+  "error.crypto": "Sessió criptogràfica expirada, torna a iniciar sessió",
+  "error.item_not_found": "No s'ha trobat l'item",
+  "error.share": "Error compartint"
+}

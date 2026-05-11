@@ -1,6 +1,5 @@
 import { API_BASE } from './client';
 
-// Login de usuario
 export async function loginUser(
   correu: string,
   contrasenya: string,
@@ -21,9 +20,8 @@ export async function loginUser(
       throw new Error(data.message || 'Error en login');
     }
 
-    const { token, usuari, kdfSalt } = data;
+    const { token, usuari, kdfSalt, encryptedPrivateKey } = data;
 
-    // Guardar token
     if (rememberMe) {
       localStorage.setItem('jwtToken', token);
     } else {
@@ -33,6 +31,8 @@ export async function loginUser(
     return {
       token,
       kdfSalt,
+      encryptedPrivateKey,
+      publicKeyB64: usuari?.publicKey ?? null,
       usuari: {
         ...usuari,
         imatge: usuari?.imatge ?? null,
@@ -43,26 +43,8 @@ export async function loginUser(
   }
 }
 
-// Logout
 export function logout() {
   localStorage.removeItem('jwtToken');
   localStorage.removeItem('usuari');
   sessionStorage.removeItem('jwtToken');
-}
-
-// GET con token
-export async function apiGet(endpoint: string) {
-  const token =
-    localStorage.getItem('jwtToken') ||
-    sessionStorage.getItem('jwtToken');
-
-  if (!token) throw new Error('No autenticado');
-
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!res.ok) throw new Error('Error en la petición GET');
-
-  return await res.json();
 }

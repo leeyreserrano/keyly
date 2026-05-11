@@ -1,0 +1,21 @@
+{
+  "title": "Home",
+  "add_new": "+ Add New",
+  "tabs": {
+    "latest": "Recently used",
+    "most_used": "Most used",
+    "favorites": "Favorites"
+  },
+  "empty": {
+    "favorites": "You have no favorites",
+    "no_items": "You have no saved items",
+    "add_first": "+ Add the first one"
+  },
+  "error": {
+    "loading": "Error loading data"
+  },
+  "toast": {
+    "delete_success": "Deleted successfully",
+    "delete_error": "Error deleting"
+  }
+}
