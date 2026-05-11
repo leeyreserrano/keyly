@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -19,14 +20,26 @@ interface CredentialCardProps {
   dataEditat: string;
   dataCreacio?: string;
   ultimAcces?: string;
+  url?: string;
   esCarpeta?: boolean;
   dinsCarpeta?: boolean;
   favorit?: boolean;
+  showFavorit?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
   onAccess?: (uuid: string, esCarpeta: boolean) => void;
 }
+
+const getFavicon = (url?: string): string | null => {
+  if (!url) return null;
+  try {
+    const domain = new URL(url).hostname;
+    return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+  } catch {
+    return null;
+  }
+};
 
 export default function CredentialCard({
   uuid,
@@ -34,18 +47,24 @@ export default function CredentialCard({
   nomUsuari: _nomUsuari,
   dataEditat,
   dataCreacio,
+  url,
   esCarpeta = false,
   dinsCarpeta = false,
   favorit = false,
+  showFavorit = true,
   onClick,
   onEdit,
   onDelete,
   onAccess,
 }: CredentialCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('card');
   const { usuari } = useAuth();
   const [isFavorit, setIsFavorit] = useState(favorit);
+  const [imgError, setImgError] = useState(false);
   const now = useTimeRefresh(10000);
+
+  const faviconUrl = getFavicon(url);
 
   const handleClick = () => {
     onAccess?.(uuid, esCarpeta);
@@ -54,17 +73,35 @@ export default function CredentialCard({
 
   const handleToggleFavorit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
+    e.preventDefault();
     const newValue = !isFavorit;
     setIsFavorit(newValue);
     try {
       if (esCarpeta) {
-        await carpetasApi.updateCarpeta(uuid, { favorit: newValue });
+        const current = await carpetasApi.getCarpeta(uuid);
+        if (!current) throw new Error('No trobada');
+        await carpetasApi.updateCarpeta(uuid, {
+          bagulUuid: current.bagulUuid ?? '',
+          nom: current.nom,
+          favorit: newValue,
+        });
       } else {
-        await itemsApi.updateItem(uuid, { favorit: newValue });
+        const current = await itemsApi.getItem(uuid);
+        if (!current) throw new Error('No trobat');
+        await itemsApi.updateItem(uuid, {
+          titol: current.titol,
+          nomUsuari: current.nomUsuari,
+          contrasenya: current.contrasenya,
+          iv: current.iv,
+          encryptedDataKey: current.encryptedDataKey?.encryptedDataKey,
+          url: current.url,
+          notes: current.notes,
+          favorit: newValue,
+        });
       }
     } catch {
       setIsFavorit(!newValue);
-      toast.error('Error al canviar favorit');
+      toast.error(t('error.fav'));
     }
   };
 
@@ -80,6 +117,38 @@ export default function CredentialCard({
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onDelete?.();
+  };
+
+  const renderIcon = () => {
+    if (esCarpeta) {
+      return <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary', flexShrink: 0 }} />;
+    }
+    if (faviconUrl && !imgError) {
+      return (
+        <img
+          src={faviconUrl}
+          alt=""
+          style={{ width: 16, height: 16, flexShrink: 0, objectFit: 'contain' }}
+          onError={() => setImgError(true)}
+        />
+      );
+    }
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        style={{ width: 16, height: 16, flexShrink: 0, color: 'inherit' }}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
+        />
+      </svg>
+    );
   };
 
   return (
@@ -102,9 +171,7 @@ export default function CredentialCard({
     >
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center', minWidth: 0 }}>
-          {esCarpeta && (
-            <FolderOutlinedIcon sx={{ fontSize: 17, color: 'text.primary', flexShrink: 0 }} />
-          )}
+          {renderIcon()}
           <Typography
             sx={{
               fontWeight: 600,
@@ -120,26 +187,24 @@ export default function CredentialCard({
 
         <ActionButtons
           isFavorit={isFavorit}
-          onToggleFavorit={handleToggleFavorit}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          onToggleFavorit={showFavorit ? handleToggleFavorit : undefined}
+          onEdit={onEdit ? handleEdit : undefined}
+          onDelete={onDelete ? handleDelete : undefined}
           showFolderIcon={dinsCarpeta}
           size="small"
         />
       </Stack>
 
       <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-        Propietari: {usuari?.nom ?? ''}
+        {t('owner')}: {usuari?.nom ?? ''}
       </Typography>
 
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-          Modificat: {getTimeAgo(dataEditat, now)}
+          {t('modified')}: {getTimeAgo(dataEditat, now)}
         </Typography>
         <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-          {dataCreacio
-            ? `Creat: ${formatDate(dataCreacio)}`
-            : ''}
+          {dataCreacio ? `${t('created')}: ${formatDate(dataCreacio)}` : ''}
         </Typography>
       </Stack>
     </Paper>

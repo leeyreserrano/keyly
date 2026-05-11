@@ -1,0 +1,11 @@
+{
+  "nav.home": "Inici",
+  "nav.stats": "Estadístiques",
+  "nav.items": "Items",
+  "nav.folders": "Carpetes",
+  "nav.shared": "Compartit",
+  "nav.settings": "Configuració",
+  "logout": "Tancar sessió",
+  "share": "Compartir",
+  "back": "Tornar"
+}

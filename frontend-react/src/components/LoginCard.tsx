@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -15,16 +16,16 @@ import Typography from '@mui/material/Typography';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ForgotPassword from './ForgotPassword';
-
 import { loginUser } from '../api/loginapi';
 import { useAuth } from '../context/AuthContext';
 import { useCrypto } from '../context/CryptoContext';
-import { deriveKey } from '../crypto/cryptoService';
+import { deriveKey, decryptPrivateKey, importPrivateKey, importPublicKey } from '../crypto/cryptoService';
 
 export default function LoginCard() {
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
   const { login } = useAuth();
-  const { setDerivedKey } = useCrypto();
+  const { setPrivateKey, setPublicKey } = useCrypto();
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -37,17 +38,16 @@ export default function LoginCard() {
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const handleTogglePassword = () => setShowPassword(prev => !prev);
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   const validateInputs = () => {
     const email = (document.getElementById('email') as HTMLInputElement).value;
     const password = (document.getElementById('password') as HTMLInputElement).value;
-
     let isValid = true;
 
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
-      setEmailErrorMessage('Email no válido');
+      setEmailErrorMessage(t('validation.email_required'));
       isValid = false;
     } else {
       setEmailError(false);
@@ -56,7 +56,7 @@ export default function LoginCard() {
 
     if (!password) {
       setPasswordError(true);
-      setPasswordErrorMessage('La contraseña es obligatoria');
+      setPasswordErrorMessage(t('validation.password_required'));
       isValid = false;
     } else {
       setPasswordError(false);
@@ -76,17 +76,26 @@ export default function LoginCard() {
     try {
       setLoading(true);
 
-      const { token, usuari, kdfSalt } = await loginUser(correu, contrasenya);
+      const { token, usuari, kdfSalt, encryptedPrivateKey, publicKeyB64 } =
+        await loginUser(correu, contrasenya, rememberMe);
 
-      const key = await deriveKey(contrasenya, kdfSalt);
-      setDerivedKey(key);
+      const derivedKeyB64 = await deriveKey(contrasenya, kdfSalt);
+      const privateKeyB64 = await decryptPrivateKey(encryptedPrivateKey, derivedKeyB64);
+      const privateKey = await importPrivateKey(privateKeyB64);
+      setPrivateKey(privateKey);
+      sessionStorage.setItem('privateKey', privateKeyB64);
+
+      if (publicKeyB64) {
+        const publicKey = await importPublicKey(publicKeyB64);
+        setPublicKey(publicKey);
+        sessionStorage.setItem('publicKey', publicKeyB64);
+      }
 
       login(usuari, token, rememberMe);
-
       navigate('/home');
     } catch (err: any) {
       setPasswordError(true);
-      setPasswordErrorMessage(err.message || 'Error al iniciar sesión');
+      setPasswordErrorMessage(err.message || t('error.login'));
     } finally {
       setLoading(false);
     }
@@ -95,7 +104,7 @@ export default function LoginCard() {
   return (
     <Stack sx={{ width: '100%', maxWidth: '420px', gap: 3 }}>
       <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
-        Login
+        {t('login.title')}
       </Typography>
 
       <Box
@@ -105,7 +114,7 @@ export default function LoginCard() {
         sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
       >
         <FormControl>
-          <FormLabel>Email</FormLabel>
+          <FormLabel>{t('field.email')}</FormLabel>
           <TextField
             error={emailError}
             helperText={emailErrorMessage}
@@ -117,7 +126,7 @@ export default function LoginCard() {
         </FormControl>
 
         <FormControl>
-          <FormLabel>Password</FormLabel>
+          <FormLabel>{t('field.password')}</FormLabel>
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
@@ -140,15 +149,12 @@ export default function LoginCard() {
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <FormControlLabel
             control={
-              <Checkbox
-                checked={rememberMe}
-                onChange={e => setRememberMe(e.target.checked)}
-              />
+              <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
             }
-            label="Remember me"
+            label={t('remember_me')}
           />
           <Link component="button" onClick={handleClickOpen}>
-            Forgot Password?
+            {t('forgot_password')}
           </Link>
         </Stack>
 
@@ -162,7 +168,7 @@ export default function LoginCard() {
           disabled={loading}
           sx={{ py: 1.5, borderRadius: '8px' }}
         >
-          {loading ? 'Entrando...' : 'Login'}
+          {loading ? t('button.loading') : t('button.login')}
         </Button>
       </Box>
     </Stack>

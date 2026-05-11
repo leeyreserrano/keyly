@@ -1,170 +1,68 @@
-import { useState, useRef } from 'react';
-import {
-  Stack,
-  Typography,
-  Paper,
-  Box,
-  CircularProgress,
-  CssBaseline,
-  Divider,
-  IconButton,
-  Chip,
-  Tooltip,
-} from '@mui/material';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import Sidebar from '../components/Sidebar';
-import AppTheme from '../theme/AppTheme';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Stack, Typography, Paper, Box, Tabs, Tab } from '@mui/material';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
-import UserAvatar from '../components/UserAvatar';
-import { usuarisApi } from '../api/usuarisapi';
-import toast from 'react-hot-toast';
+import PerfilTab from '../components/PerfilTab';
+import UsuarisTab from '../components/UsuarisTab';
+import ItemsTab from '../components/ItemsTab';
+import CarpetesTab from '../components/CarpetesTab';
+import DepartamentsTab from '../components/DepartamentsTab';
+import SucursalsTab from '../components/SucursalsTab';
 
-type RolType = 'error' | 'warning' | 'default';
-
-const ROL_LABEL: Record<string, { label: string; color: RolType }> = {
-  ADMIN:  { label: 'Administrador', color: 'error' },
-  CAP:    { label: 'Cap',           color: 'warning' },
-  USUARI: { label: 'Usuari',        color: 'default' },
-};
+type TabValue = 'perfil' | 'items' | 'carpetes' | 'usuaris' | 'departaments' | 'sucursals';
 
 export default function UserConfig() {
-  const { usuari, login, token, refreshAvatar } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const { usuari } = useAuth();
+  const { t } = useTranslation('config');
+  const [tab, setTab] = useState<TabValue>('perfil');
 
-  const rol = usuari?.rolIntern ? ROL_LABEL[usuari.rolIntern] : null;
+  const isCapOrAdmin = usuari?.rolIntern === 'CAP' || usuari?.rolIntern === 'ADMIN';
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !usuari || !token) return;
-
-    const currentToken = token;
-    const currentUsuari = usuari;
-
-    setUploadingImage(true);
-    try {
-      const updated = await usuarisApi.uploadImage(file, currentToken);
-      const merged = { ...currentUsuari, ...(updated ?? {}) };
-      login(merged, currentToken, !!localStorage.getItem('jwtToken'));
-      refreshAvatar();
-      toast.success('Imatge actualitzada correctament');
-    } catch {
-      toast.error('Error actualitzant la imatge');
-    } finally {
-      setUploadingImage(false);
-    }
-  };
+  const tabsConfig: Array<{ value: TabValue; label: string }> = [
+    { value: 'perfil', label: t('tabs.profile') },
+    { value: 'items', label: t('tabs.items') },
+    { value: 'carpetes', label: t('tabs.folders') },
+    ...(isCapOrAdmin ? [{ value: 'usuaris' as TabValue, label: t('tabs.users') }] : []),
+    ...(isCapOrAdmin ? [{ value: 'departaments' as TabValue, label: t('tabs.departments') }] : []),
+    ...(isCapOrAdmin ? [{ value: 'sucursals' as TabValue, label: t('tabs.branches') }] : []),
+  ];
 
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
+    <Stack sx={{ height: '100%', overflow: 'hidden' }}>
+      <Header
+        title={t('title')}
+        icon={<SettingsOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+        showBackButton={false}
+      />
 
-      <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
-        <Sidebar />
-
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto' }}>
-          <Header
-            title="Perfil"
-            icon={<UserAvatar />}
-            showBackButton={false}
-          />
-
-          <Box sx={{ px: 4, py: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {!usuari ? (
-              <Typography color="error" sx={{ mt: 4 }}>
-                No s'ha pogut obtenir l'usuari.
-              </Typography>
-            ) : (
-              <Paper
-                variant="outlined"
-                sx={{
-                  p: 3,
-                  borderRadius: '12px',
-                  borderColor: 'divider',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2,
-                  maxWidth: 500,
-                }}
+      <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+        <Box sx={{ px: 4, py: 3 }}>
+          {!usuari ? (
+            <Typography color="error">{t('error.no_user')}</Typography>
+          ) : (
+            <>
+              <Tabs
+                value={tab}
+                onChange={(_, v) => setTab(v)}
+                sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
               >
-                <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ position: 'relative' }}>
-                    <UserAvatar size={64} />
+                {tabsConfig.map((t) => (
+                  <Tab key={t.value} value={t.value} label={t.label} />
+                ))}
+              </Tabs>
 
-                    <Tooltip title="Canviar imatge">
-                      <IconButton
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadingImage}
-                        sx={{
-                          position: 'absolute',
-                          bottom: -4,
-                          right: -4,
-                          width: 28,
-                          height: 28,
-                          bgcolor: 'background.paper',
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          '&:hover': { bgcolor: 'action.hover' },
-                        }}
-                      >
-                        {uploadingImage
-                          ? <CircularProgress size={12} />
-                          : <EditOutlinedIcon sx={{ fontSize: 14 }} />
-                        }
-                      </IconButton>
-                    </Tooltip>
-
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={handleImageChange}
-                    />
-                  </Box>
-
-                  <Stack>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                      {usuari.nom}
-                    </Typography>
-                    {rol && (
-                      <Chip
-                        label={rol.label}
-                        color={rol.color}
-                        size="small"
-                        sx={{ mt: 0.5, width: 'fit-content', fontWeight: 600 }}
-                      />
-                    )}
-                  </Stack>
-                </Stack>
-
-                <Divider />
-
-                <Stack spacing={1.5}>
-                  <Stack spacing={0.25}>
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>
-                      Nom
-                    </Typography>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      {usuari.nom}
-                    </Typography>
-                  </Stack>
-
-                  <Stack spacing={0.25}>
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>
-                      Email
-                    </Typography>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      {usuari.correu}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Paper>
-            )}
-          </Box>
-        </Stack>
+              {tab === 'perfil' && <PerfilTab />}
+              {tab === 'items' && <ItemsTab />}
+              {tab === 'carpetes' && <CarpetesTab />}
+              {tab === 'usuaris' && isCapOrAdmin && <UsuarisTab />}
+              {tab === 'departaments' && isCapOrAdmin && <DepartamentsTab />}
+              {tab === 'sucursals' && isCapOrAdmin && <SucursalsTab />}
+            </>
+          )}
+        </Box>
       </Stack>
-    </AppTheme>
+    </Stack>
   );
 }

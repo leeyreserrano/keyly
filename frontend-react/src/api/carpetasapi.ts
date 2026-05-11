@@ -6,6 +6,10 @@ export class carpetasApi {
     return apiRequest<Carpeta[]>('/carpeta/get/all').then(result => result ?? []);
   }
 
+  static getCarpeta(uuid: string): Promise<Carpeta | null> {
+    return apiRequest<Carpeta>(`/carpeta/get/${uuid}`);
+  }
+
   static addCarpeta(data: Partial<Carpeta>): Promise<Carpeta> {
     return apiRequest<Carpeta>('/carpeta/add', {
       method: 'POST',
@@ -16,7 +20,7 @@ export class carpetasApi {
     });
   }
 
-  static updateCarpeta(uuid: string, data: Partial<Carpeta>): Promise<Carpeta> {
+  static updateCarpeta(uuid: string, data: Partial<CarpetaPayload>): Promise<Carpeta> {
     return apiRequest<Carpeta>(`/carpeta/update/${uuid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -56,6 +60,7 @@ export class carpetasApi {
 export type Carpeta = {
   uuid: string;
   nom: string;
+  bagulUuid?: string;
   dataCreacio: string;
   dataEditat: string;
   favorit: boolean;
@@ -66,4 +71,10 @@ export type Carpeta = {
     titol: string;
     dinsDeCarpeta: boolean;
   }[];
+};
+
+export type CarpetaPayload = {
+  bagulUuid: string;
+  nom: string;
+  favorit: boolean;
 };

@@ -1,0 +1,10 @@
+{
+  "title": "Configuració",
+  "error.no_user": "No s'ha pogut obtenir l'usuari.",
+  "tabs.profile": "Perfil",
+  "tabs.items": "Gestió d'items",
+  "tabs.folders": "Gestió de carpetes",
+  "tabs.users": "Gestió d'usuaris",
+  "tabs.departments": "Gestió de departaments",
+  "tabs.branches": "Gestió de sucursals"
+}
