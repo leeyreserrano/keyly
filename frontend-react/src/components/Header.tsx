@@ -1,8 +1,9 @@
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { Stack, Typography, IconButton, Button, Tooltip } from '@mui/material';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
-import { useNavigate } from 'react-router';
 import type { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
@@ -23,6 +24,7 @@ export default function Header({
   onShare,
 }: HeaderProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('sidebar');
   const { usuari, logout } = useAuth();
 
   const handleLogout = () => {
@@ -42,6 +44,11 @@ export default function Header({
         alignItems: 'center',
         borderBottom: '1px solid',
         borderColor: 'divider',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        bgcolor: 'background.default',
+        flexShrink: 0,
       }}
     >
       <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center' }}>
@@ -58,21 +65,17 @@ export default function Header({
           </div>
         </Tooltip>
 
-        <Tooltip title="Tancar sessió" arrow>
+        <Tooltip title={t('logout')} arrow>
           <IconButton onClick={handleLogout}>
             <LogoutOutlinedIcon />
           </IconButton>
         </Tooltip>
 
         {onShare && (
-          <Tooltip title="Compartir" arrow>
+          <Tooltip title={t('share')} arrow>
             <IconButton
               onClick={onShare}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                color: 'primary.main',
-              }}
+              sx={{ border: '1px solid', borderColor: 'divider', color: 'primary.main' }}
             >
               <ShareOutlinedIcon />
             </IconButton>
@@ -91,7 +94,7 @@ export default function Header({
               '&:hover': { bgcolor: 'primary.dark' },
             }}
           >
-            Tornar
+            {t('back')}
           </Button>
         )}
       </Stack>

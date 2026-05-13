@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import CssBaseline from '@mui/material/CssBaseline';
+import { useTranslation } from 'react-i18next';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -9,35 +9,29 @@ import Alert from '@mui/material/Alert';
 import Skeleton from '@mui/material/Skeleton';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import VpnKeyOffOutlinedIcon from '@mui/icons-material/VpnKeyOffOutlined';
-
-import AppTheme from '../../theme/AppTheme';
-import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import ItemsToolbar from '../../components/ItemsToolbar';
 import CustomPagination from '../../components/CustomPagination';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import CredentialCard from '../../components/CredentialCard';
-
 import { itemsApi, type Item } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import toast from 'react-hot-toast';
 
 export type FilterValue = 'latest' | 'most_used' | 'favorites';
-
 const ITEMS_PER_PAGE = 12;
 
 export default function Items() {
   const navigate = useNavigate();
+  const { t } = useTranslation('item');
 
   const [items, setItems] = useState<Item[]>([]);
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterValue>('latest');
   const [page, setPage] = useState(1);
-
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
 
@@ -52,28 +46,22 @@ export default function Items() {
         setItems(itemsData ?? []);
         setCarpetas(carpetasData ?? []);
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : 'Error carregant les dades';
+        const message = err instanceof Error ? err.message : t('item.error.load');
         setError(message);
       } finally {
         setLoading(false);
       }
     };
     loadData();
-  }, []);
+  }, [t]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, filter]);
+  useEffect(() => { setPage(1); }, [search, filter]);
 
   const handleAccess = async (uuid: string) => {
     try {
       const updated = await itemsApi.registrarAcces(uuid);
-      if (updated) {
-        setItems((prev) => prev.map((i) => (i.uuid === uuid ? { ...i, ...updated } : i)));
-      }
-    } catch {
-    }
+      if (updated) setItems((prev) => prev.map((i) => (i.uuid === uuid ? { ...i, ...updated } : i)));
+    } catch { }
   };
 
   const filteredItems = items
@@ -81,7 +69,7 @@ export default function Items() {
       filter === 'favorites'
         ? item.favorit
         : item.titol.toLowerCase().includes(search.toLowerCase()) ||
-        item.nomUsuari.toLowerCase().includes(search.toLowerCase())
+          item.nomUsuari.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
       if (filter === 'latest')
@@ -95,27 +83,20 @@ export default function Items() {
     });
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const paginatedItems = filteredItems.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  const paginatedItems = filteredItems.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
-
-  const handleDelete = (item: Item) => {
-    setDeleteTarget(item);
-    setOpenDeleteModal(true);
-  };
+  const handleDelete = (item: Item) => { setDeleteTarget(item); setOpenDeleteModal(true); };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
       await itemsApi.deleteItem(deleteTarget.uuid);
       setItems((prev) => prev.filter((i) => i.uuid !== deleteTarget.uuid));
-      toast.success('Item eliminat correctament');
+      toast.success(t('item.toast.delete'));
       setOpenDeleteModal(false);
       setDeleteTarget(null);
     } catch {
-      toast.error("Error eliminant l'item");
+      toast.error(t('item.error.delete'));
     }
   };
 
@@ -131,37 +112,30 @@ export default function Items() {
         </Grid>
       );
     }
-
-    if (error) {
-      return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;
-    }
-
+    if (error) return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;
     if (filteredItems.length === 0) {
       return (
         <Stack sx={{ alignItems: 'center', py: 10, gap: 2, color: 'text.disabled' }}>
           <VpnKeyOffOutlinedIcon sx={{ fontSize: 64 }} />
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
             {search
-              ? 'Cap resultat per a la cerca'
+              ? t('list.empty.search')
               : filter === 'favorites'
-                ? 'No tens cap favorit'
-                : 'No tens cap contrasenya guardada'}
+              ? t('item.toast.fav_remove')
+              : t('list.empty.no_items')}
           </Typography>
           {!search && filter !== 'favorites' && (
             <Typography variant="body2" color="text.secondary">
-              Afegeix la primera des del botó "+ Add New"
+              {t('list.empty.hint')}
             </Typography>
           )}
         </Stack>
       );
     }
-
     return (
       <Grid container spacing={2}>
         {paginatedItems.map((item) => {
-          const estaEnCarpeta = carpetas.some((c) =>
-            c.items.some((i) => i.uuid === item.uuid)
-          );
+          const estaEnCarpeta = carpetas.some((c) => c.items.some((i) => i.uuid === item.uuid));
           return (
             <Grid size={4} key={item.uuid}>
               <CredentialCard
@@ -171,6 +145,7 @@ export default function Items() {
                 dataEditat={item.dataEditat}
                 dataCreacio={item.dataCreacio}
                 ultimAcces={item.ultimAcces}
+                url={item.url}
                 dinsCarpeta={estaEnCarpeta}
                 favorit={item.favorit}
                 onAccess={(uuid) => handleAccess(uuid)}
@@ -186,41 +161,33 @@ export default function Items() {
   };
 
   return (
-    <AppTheme>
-      <CssBaseline enableColorScheme />
+    <Stack sx={{ height: '100%', overflow: 'hidden' }}>
+      <Header
+        title={t('item.title')}
+        icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+      />
 
-      <Stack direction="row" sx={{ minHeight: '100vh', width: '100%' }}>
-        <Sidebar />
-
-        <Stack sx={{ flex: 1, bgcolor: 'background.default', overflow: 'auto', minWidth: 0 }}>
-          <Header
-            title="Items"
-            icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
-          />
-
-          <ItemsToolbar
-            search={search}
-            setSearch={setSearch}
-            filter={filter}
-            setFilter={setFilter}
-            onAdd={() => navigate('/AddItem')}
-          />
-
-          <Box sx={{ px: 4, pb: 3, flex: 1 }}>
-            {renderContent()}
-          </Box>
-
-          {!loading && !error && filteredItems.length > 0 && (
-            <CustomPagination count={totalPages} page={page} onChange={setPage} />
-          )}
-        </Stack>
-
-        <DeleteConfirmationModal
-          open={openDeleteModal}
-          onClose={() => setOpenDeleteModal(false)}
-          onConfirm={confirmDelete}
+      <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
+        <ItemsToolbar
+          search={search}
+          setSearch={setSearch}
+          filter={filter}
+          setFilter={setFilter}
+          onAdd={() => navigate('/AddItem')}
         />
+        <Box sx={{ px: 4, pb: 3, flex: 1 }}>
+          {renderContent()}
+        </Box>
+        {!loading && !error && filteredItems.length > 0 && (
+          <CustomPagination count={totalPages} page={page} onChange={setPage} />
+        )}
       </Stack>
-    </AppTheme>
+
+      <DeleteConfirmationModal
+        open={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onConfirm={confirmDelete}
+      />
+    </Stack>
   );
 }

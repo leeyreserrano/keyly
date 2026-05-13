@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Paper, Stack, Typography, Chip } from '@mui/material';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
@@ -12,6 +13,8 @@ interface SharedCardProps {
 }
 
 export default function SharedCard({ compartit, onClick, onDelete }: SharedCardProps) {
+  const { t } = useTranslation('card');
+
   const nom =
     compartit.tipusEntitat === 'CARPETA'
       ? compartit.carpeta?.nom ?? ''
@@ -54,10 +57,7 @@ export default function SharedCard({ compartit, onClick, onDelete }: SharedCardP
           </Typography>
         </Stack>
 
-        <ActionButtons
-          onDelete={onDelete}
-          size="small"
-        />
+        <ActionButtons onDelete={onDelete} size="small" />
       </Stack>
 
       <Typography
@@ -69,15 +69,11 @@ export default function SharedCard({ compartit, onClick, onDelete }: SharedCardP
           whiteSpace: 'nowrap',
         }}
       >
-        Compartit per: {compartit.usuari.nom}
+        {t('shared_by')}: {compartit.usuari.nom}
       </Typography>
 
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <Chip
-          label={compartit.permisos}
-          size="small"
-          sx={{ fontSize: '0.7rem', fontWeight: 600 }}
-        />
+        <Chip label={compartit.permisos} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600 }} />
         <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
           {formatDate(compartit.dataCreacio)}
         </Typography>

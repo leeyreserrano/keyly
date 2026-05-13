@@ -1,0 +1,11 @@
+{
+  "nav.home": "Home",
+  "nav.stats": "Statistics",
+  "nav.items": "Items",
+  "nav.folders": "Folders",
+  "nav.shared": "Shared",
+  "nav.settings": "Settings",
+  "logout": "Log out",
+  "share": "Share",
+  "back": "Back"
+}

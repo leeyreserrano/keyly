@@ -6,12 +6,24 @@ import {
   type ReactNode
 } from 'react';
 
+export type SucursalObj = {
+  uuid: string;
+  nom: string;
+};
+
+export type DepartamentObj = {
+  uuid: string;
+  departament: string;
+};
+
 export type Usuari = {
   uuid: string;
   nom: string;
   correu: string;
   imatge: string;
   rolIntern: 'ADMIN' | 'CAP' | 'USUARI';
+  sucursal?: SucursalObj | null;
+  departament?: DepartamentObj | null;
 };
 
 type AuthContextType = {
@@ -38,7 +50,7 @@ function readStoredSession() {
   if (!token || !raw) return { usuari: null, token: null };
 
   try {
-    return { usuari: JSON.parse(raw), token };
+    return { usuari: JSON.parse(raw) as Usuari, token };
   } catch {
     return { usuari: null, token: null };
   }
@@ -55,6 +67,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuari(stored.usuari);
     setToken(stored.token);
     setLoadingAuth(false);
+  }, []);
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setUsuari(null);
+      setToken(null);
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/';
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
   }, []);
 
   const login = (usuariData: Usuari, tokenData: string, rememberMe: boolean) => {

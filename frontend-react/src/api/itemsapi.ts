@@ -16,6 +16,7 @@ export class itemsApi {
     return apiRequest<Item>(`/item/update/${uuid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+      _skipLogoutOn401: true,
     });
   }
 
@@ -32,12 +33,18 @@ export class itemsApi {
   }
 }
 
+export type DataKey = {
+  uuid: string;
+  encryptedDataKey: string;
+};
+
 export type Item = {
   uuid: string;
   titol: string;
   nomUsuari: string;
   contrasenya: string;
   iv: string;
+  encryptedDataKey: DataKey | null;
   url: string;
   notes?: string;
   dataCreacio: string;
@@ -48,4 +55,8 @@ export type Item = {
   favorit: boolean;
 };
 
-export type ItemPayload = Omit<Item, 'uuid' | 'dataCreacio' | 'dataEditat' | 'ultimAcces' | 'comptadorAccess' | 'dinsCarpeta'>;
+export type ItemPayload = Omit<Item,
+  'uuid' | 'dataCreacio' | 'dataEditat' | 'ultimAcces' | 'comptadorAccess' | 'dinsCarpeta' | 'encryptedDataKey'
+> & {
+  encryptedDataKey?: string;
+};

@@ -1,0 +1,10 @@
+{
+  "title": "Settings",
+  "error.no_user": "Could not retrieve user.",
+  "tabs.profile": "Profile",
+  "tabs.items": "Item management",
+  "tabs.folders": "Folder management",
+  "tabs.users": "User management",
+  "tabs.departments": "Department management",
+  "tabs.branches": "Branch management"
+}

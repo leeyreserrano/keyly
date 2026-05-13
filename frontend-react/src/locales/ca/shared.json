@@ -1,0 +1,14 @@
+{
+  "title": "Compartits",
+  "tab.received": "Rebuts",
+  "tab.created": "Creats",
+
+  "empty.received": "No tens cap element compartit amb tu",
+  "empty.created": "No has compartit cap element",
+
+  "error.load": "Error carregant els compartits",
+  "error.delete": "Error eliminant el compartit",
+  "success.delete": "Compartit eliminat correctament",
+
+  "loading": "Carregant..."
+}
