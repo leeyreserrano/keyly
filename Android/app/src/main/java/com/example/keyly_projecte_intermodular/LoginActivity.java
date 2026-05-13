@@ -26,7 +26,6 @@ import com.example.keyly_projecte_intermodular.rest_api.UsuariResponse;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
 import com.google.gson.Gson;
 
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -80,8 +79,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void CallLoginService() {
-        String usuari = "user@domain.com";//txtUsuari.getText().toString();
-        String password = "1234"; //txtContrasenya.getText().toString();
+//        String usuari = "yami@gmail.com";
+//        String password = "1234";
+        String usuari = txtUsuari.getText().toString();
+        String password = txtContrasenya.getText().toString();
 
         ApiService service = APIUsuari.getUsuari().create(ApiService.class);
         Call<ResponseBody> srvLogin = service.getToken(new LoginDto(usuari, password));
@@ -100,30 +101,30 @@ public class LoginActivity extends AppCompatActivity {
                         PrivateKeyResponse privateKeyResponse = gson.fromJson(ResponseJSON, PrivateKeyResponse.class);
                         UsuariResponse usuariResponse = gson.fromJson(ResponseJSON, UsuariResponse.class);
 
-                        Usuari usuari = usuariResponse.getUsuari();
+                        usuariPropi = usuariResponse.getUsuari();
+                        Log.d("USUARI", usuariPropi.toString());
 
-                        Log.d("USUARI", usuari.toString());
+                        clauMestra = password;
 
+                        Log.d("TOKEN", token.getToken());
                         tokenNou = token.getToken();
 
-                        Encrypt.clauDerivada = Encrypt.clauDerivada(password, kdf.getKdf());
+                        Encrypt.clauDerivada = Encrypt.generarClauDerivada(password, kdf.getKdf());
                         Log.d("CLAU_DERIVADA", Encrypt.clauDerivada.toString());
                         Log.d("KDF_SALT", kdf.getKdf());
                         Log.d("CLAU_DERIVADA_B64", Base64.encodeToString(Encrypt.clauDerivada.getEncoded(), Base64.DEFAULT));
 
                         privateKeyEncrypt = privateKeyResponse.getPrivateKey();
 
-                        String pkFormatejada = desencriptarPrivateKey();
-
-                        byte[] privateKeyBytes = Encrypt.desencriptarContrasenya2(pkFormatejada, Encrypt.clauDerivada.getEncoded());
+                        byte[] privateKeyBytes = Encrypt.desencriptarContrasenya2(privateKeyEncrypt, Encrypt.clauDerivada.getEncoded());
                         Log.d("PK_BYTES_LENGTH", String.valueOf(privateKeyBytes.length));
                         Log.d("PK_BYTES_B64", Base64.encodeToString(privateKeyBytes, Base64.DEFAULT));
                         Log.d("PK_BYTES_STRING", new String(privateKeyBytes, "UTF-8"));
-                        KeyFactory keyFactory = KeyFactory.getInstance("RSA"); // o el algoritmo que uses
+                        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                         privateKeyDecrypt = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
                         Log.d("PRIVATE_KEY", privateKeyDecrypt.toString());
 
-                        publicKey = getPublicKey(usuari.getPublicKey());
+                        publicKey = getPublicKey(usuariPropi.getPublicKey());
                         Log.d("PUBLIC_KEY", publicKey.toString());
 
                         Toast.makeText(LoginActivity.this, "Login correcto", Toast.LENGTH_SHORT).show();
@@ -157,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
         return pubKey;
     }
 
-    private String desencriptarPrivateKey() throws Exception {
+    private byte[] desencriptarPrivateKey() throws Exception {
         String[] parts = privateKeyEncrypt.split(":");
         // El IV viene como texto UTF-8, no como Base64
         //byte[] iv = parts[0].getBytes(StandardCharsets.UTF_8);   // 12 bytes directos
@@ -169,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         System.arraycopy(iv, 0, combined, 0, iv.length);
         System.arraycopy(cipherText, 0, combined, iv.length, cipherText.length);
 
-        return Base64.encodeToString(combined, Base64.NO_WRAP);
+        return combined;
     }
 
 }

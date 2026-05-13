@@ -2,7 +2,6 @@ package com.example.keyly_projecte_intermodular.dto;
 
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.tokenNou;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.keyly_projecte_intermodular.config.TokenForEver;
@@ -11,17 +10,11 @@ import com.example.keyly_projecte_intermodular.request.UsuariRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -65,12 +58,12 @@ public class UsuariDTO {
 
         /* ****************************** IMATGE ****************************** */
         // Retorna la imatge de l'usuari (inicial del seu nom)
-        @GET("/api/usuari/image")
-        Call<String> getImage();
+        @GET("/api/usuari/get/image")
+        Call<ResponseBody> getImage();
 
         // Retorna la imatge d'un usuari especificat
         @GET("/api/usuari/image/{uuid}")
-        Call<String> getImage(@Path("uuid") String uuid);
+        Call<ResponseBody> getImageUUID(@Path("uuid") String uuid);
 
         // Puja una imatge de perfil l'usuari
         @POST("/api/usuari/upload/image")

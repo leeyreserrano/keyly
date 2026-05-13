@@ -1,9 +1,12 @@
 package com.example.keyly_projecte_intermodular.resources;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,16 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.keyly_projecte_intermodular.R;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
+import com.example.keyly_projecte_intermodular.utils.Permisos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHolder> {
 
     private List<Item> itemList;
-    private List<Usuari> usuariList;
+    private Context context;
+    private ArrayList<Usuari> usuariList;
 
-    public RecercaAdapter(List<Item> itemList, List<Usuari> usuariList) {
+    public RecercaAdapter(List<Item> itemList, ArrayList<Usuari> usuariList, Context context) {
         this.itemList = itemList;
+        this.context = context;
         this.usuariList = usuariList;
     }
 
@@ -30,6 +37,12 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
     public RecercaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (itemList != null) {
             // Infla el layout de cada ítem de la lista
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.layout_cerques, parent, false);
+            return new RecercaAdapter.ViewHolder(view);
+        }
+        if (usuariList != null) {
+            // Infla el layout de cada usuari de la lista
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_cerques, parent, false);
             return new RecercaAdapter.ViewHolder(view);
@@ -70,12 +83,20 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView itemUsuariTextView;
+        Spinner spPermisos;
         ImageButton imgBtnX;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            itemUsuariTextView = itemView.findViewById(R.id.txtNameItemCarpeta);
-            imgBtnX = itemView.findViewById(R.id.imgBtnX);
+        public ViewHolder(@NonNull View recercaView) {
+            super(recercaView);
+            itemUsuariTextView = recercaView.findViewById(R.id.txtNom);
+            spPermisos = recercaView.findViewById(R.id.spPermisos);
+            imgBtnX = recercaView.findViewById(R.id.imgBtnX);
+
+            ArrayAdapter<Permisos> adapter = new ArrayAdapter<>(
+                    recercaView.getContext(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    Permisos.values());
+            spPermisos.setAdapter(adapter);
         }
     }
 }

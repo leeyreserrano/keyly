@@ -3,17 +3,25 @@ package com.example.keyly_projecte_intermodular.utils;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.dataKey;
 
 import android.util.Base64;
+import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -22,13 +30,18 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 public class Encrypt {
     public static SecretKey clauDerivada;
     // FUNCIONA
-    public static SecretKey clauDerivada(String contrasenyaLogin, String kdfSaltUsuari) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static SecretKey generarClauDerivada(String contrasenyaLogin, String kdfSaltUsuari) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 
         byte[] saltBytes = Base64.decode(kdfSaltUsuari, Base64.DEFAULT);
@@ -86,11 +99,34 @@ public class Encrypt {
 
     // FUNCIONA
     public static byte[] desencriptarDataKey(PrivateKey privateKey, String edk) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-            BadPaddingException, IllegalBlockSizeException {
-        Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-        rsaCipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] dataKeyRaw = rsaCipher.doFinal(Base64.decode(edk, Base64.DEFAULT));
-        return dataKeyRaw;
+            BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+//        Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+//
+//        OAEPParameterSpec oaepParams = new OAEPParameterSpec(
+//                "SHA-256",           // Hash principal
+//                "MGF1",              // MGF algoritmo
+//                MGF1ParameterSpec.SHA256,  // Hash del MGF1 → SHA-256 explícito
+//                PSource.PSpecified.DEFAULT
+//        );
+//
+//        rsaCipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParams);
+//
+//        byte[] dataKeyRaw = rsaCipher.doFinal(Base64.decode(edk, Base64.DEFAULT));
+//        return dataKeyRaw;
+        // Limpiar posibles saltos de línea o espacios del Base64
+        String edkClean = edk.replaceAll("\\s", "").trim();
+
+        Log.d("EDK_CLEAN", edkClean);
+        Log.d("EDK_DECODED_LEN", String.valueOf(Base64.decode(edkClean, Base64.NO_WRAP).length));
+
+        Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        OAEPParameterSpec oaepParams = new OAEPParameterSpec(
+                "SHA-256", "MGF1",
+                MGF1ParameterSpec.SHA256,
+                PSource.PSpecified.DEFAULT
+        );
+        rsaCipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParams);
+        return rsaCipher.doFinal(Base64.decode(edkClean, Base64.NO_WRAP));
     }
 
     // FUNCIONA
@@ -133,5 +169,82 @@ public class Encrypt {
         byte[] dataKey = new byte[32]; // AES-256
         new SecureRandom().nextBytes(dataKey);
         return dataKey;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class ParellClaus {
+        private KeyPair keyPair;
+        private String publicKeyB64;
+        private String privateKeyB64;
+    }
+
+    public static ParellClaus generarKeyPair() throws NoSuchAlgorithmException {
+
+        // Generar parell de claus RSA 2048
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        // Obtenir les claus
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        // Guardar en bytes la clau pública
+        byte[] publicKeyBytes = publicKey.getEncoded();
+        // Convertir a Base64 la clau pública
+        String publicKeyB64 = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP);
+
+        // // Guardar en bytes la clau privada
+        byte[] privateKeyBytes = privateKey.getEncoded();
+        // Convertir a Base64 la clau privada
+        String privateKeyB64 = Base64.encodeToString(privateKeyBytes, Base64.NO_WRAP);
+
+        // Guardar parell claus
+        ParellClaus parellClaus = new ParellClaus(keyPair, publicKeyB64, privateKeyB64);
+
+        return parellClaus;
+    }
+
+    public static PublicKey stringToPublicKey(String publicKeyB64) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        byte[] keyBytes = Base64.decode(publicKeyB64, Base64.NO_WRAP);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(spec);
+    }
+
+    public static byte[] generarKdfSalt() {
+        // Generar 32 bytes aleatoris
+        byte[] kdfSalt = new byte[32];
+
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(kdfSalt);
+
+        return kdfSalt;
+    }
+
+    public static String encriptarClauPrivada(SecretKey clauDerivada, PrivateKey privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+
+        // 1. IV de 12 bytes
+        byte[] iv = new byte[12];
+        new SecureRandom().nextBytes(iv);
+
+        // 2. Cipher AES-GCM
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+
+        javax.crypto.spec.GCMParameterSpec spec =
+                new javax.crypto.spec.GCMParameterSpec(128, iv);
+
+        cipher.init(Cipher.ENCRYPT_MODE, clauDerivada, spec);
+
+        // Xifra la clau privada
+        byte[] encryptedBuf = cipher.doFinal(privateKey.getEncoded());
+
+        // 4. Base64
+        String ivB64 = Base64.encodeToString(iv, Base64.NO_WRAP);
+        String encryptedB64 = Base64.encodeToString(encryptedBuf, Base64.NO_WRAP);
+
+        return ivB64 + ":" + encryptedB64;
     }
 }

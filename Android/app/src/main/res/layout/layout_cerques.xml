@@ -17,7 +17,7 @@
         android:layout_marginStart="10dp">
 
         <TextView
-            android:id="@+id/txtNameItemCarpeta"
+            android:id="@+id/txtNom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Item"
@@ -26,6 +26,11 @@
             android:fontFamily="@font/airbnb_cereal_w_bd"/>
 
     </LinearLayout>
+    
+    <Spinner
+        android:id="@+id/spPermisos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <ImageButton
         android:id="@+id/imgBtnX"

@@ -57,7 +57,7 @@ public class CarpetaActivity extends AppCompatActivity {
     private ImageButton imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
     private String uuid;
     private boolean filtrat = false;
-    private ArrayList<Item> items, totalItems = new ArrayList<>(), itemSeleccionats = new ArrayList<>();
+    private ArrayList<Item> items, totalItems = new ArrayList<>(), itemsSeleccionats = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,7 +276,7 @@ public class CarpetaActivity extends AppCompatActivity {
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
             recyclerItems.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
-            RecercaAdapter recercaAdapter = new RecercaAdapter(itemSeleccionats, null);
+            RecercaAdapter recercaAdapter = new RecercaAdapter(itemsSeleccionats, null, this);
             recyclerItems.setAdapter(recercaAdapter);
 
             // Carregar ítems
@@ -334,7 +334,7 @@ public class CarpetaActivity extends AppCompatActivity {
 
                     for (Item item : totalItems) {
                         if (item.getTitol().equals(seleccionat)) {
-                            itemSeleccionats.add(item);
+                            itemsSeleccionats.add(item);
                         }
                     }
 
@@ -345,13 +345,13 @@ public class CarpetaActivity extends AppCompatActivity {
 
             btnGuardarCarpeta.setText("Afegir ítems");
             btnGuardarCarpeta.setOnClickListener(c -> {
-                for (int i = 0; i < itemSeleccionats.size(); i++) {
-                    Call<Carpeta> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(uuid, itemSeleccionats.get(i).getUuid().toString());
-                    callAddItem.enqueue(new Callback<Carpeta>() {
+                for (int i = 0; i < itemsSeleccionats.size(); i++) {
+                    Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(uuid, itemsSeleccionats.get(i).getUuid().toString());
+                    callAddItem.enqueue(new Callback<Item>() {
                         @Override
-                        public void onResponse(Call<Carpeta> callAddItem, Response<Carpeta> response) {
+                        public void onResponse(Call<Item> callAddItem, Response<Item> response) {
                             if (response.isSuccessful()) {
-                                Log.d("ITEMS_AFEGITS", itemSeleccionats.toString());
+                                Log.d("ITEMS_AFEGITS", itemsSeleccionats.toString());
                                 alertDialog.dismiss();
                             } else {
                                 Log.d("ERROR_RESPONSE", response.message());
@@ -359,7 +359,7 @@ public class CarpetaActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<Carpeta> callAddItem, Throwable t) {
+                        public void onFailure(Call<Item> callAddItem, Throwable t) {
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
@@ -398,7 +398,7 @@ public class CarpetaActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             LayoutInflater inflater = getLayoutInflater();
-            View view = inflater.inflate(R.layout.alert_dialog_filtre, null);
+            View view = inflater.inflate(R.layout.layout_filtres, null);
 
             builder.setView(view);
 

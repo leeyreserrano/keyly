@@ -3,20 +3,28 @@ package com.example.keyly_projecte_intermodular;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.dataKey;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.publicKey;
+import static com.example.keyly_projecte_intermodular.config.TokenForEver.usuariPropi;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.cypherIV;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarContrasenya2;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
+import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
+import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -33,21 +41,36 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.keyly_projecte_intermodular.dao.EncryptedDataKey;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.GeneradorContrasenya;
 import com.example.keyly_projecte_intermodular.dao.Contrasenya;
+import com.example.keyly_projecte_intermodular.dao.Usuari;
+import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
+import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.dto.UtilsDTO;
+import com.example.keyly_projecte_intermodular.request.CompartitItemRequest;
+import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.ItemRequest;
+import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
+import com.example.keyly_projecte_intermodular.resources.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
+import com.example.keyly_projecte_intermodular.utils.Permisos;
+import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -66,11 +89,16 @@ public class ItemActivity extends AppCompatActivity {
     private EditText etTitolItem, etLlocItem, etNomUsuariItem, etPassword, etNotes;
     private ImageButton imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
     // TODO añadir botón de editar y eliminar
-    private Button btnGuardarEliminarItem, btnBack;
+    private Button btnCompartir, btnGuardarEliminarItem, btnBack;
     private int edit = 0;
     private String uuid, contrasenyaGenerada;
     private boolean isPasswordVisible = false;
     private AtomicBoolean favActual;
+    private Item itemCreat;
+    private ArrayList<Usuari> usuaris = new ArrayList<>();
+    private ArrayList<Usuari> usuarisSeleccionats = new ArrayList<>();
+    private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,13 +111,11 @@ public class ItemActivity extends AppCompatActivity {
             return insets;
         });
 
-
         /* Camps */
-
         // Layouts
         llNomItem = findViewById(R.id.ll_nom_item);
         llPassword = findViewById(R.id.ll_password);
-        llActions = findViewById(R.id.ll_actions);
+        llActions = findViewById(R.id.llActions);
 
         // Nom Item
         txtTitle = findViewById(R.id.txtTitleItem);
@@ -120,6 +146,9 @@ public class ItemActivity extends AppCompatActivity {
 
         // Botó Generar Contrasenya
         imgBtnGenerate = findViewById(R.id.imgBtnGenerate);
+
+        // Botó Compartir Ítem
+        btnCompartir = findViewById(R.id.btnCompartir);
 
         // Botó Guardar Eliminar Item
         btnGuardarEliminarItem = findViewById(R.id.btnGuardarItem);
@@ -257,11 +286,10 @@ public class ItemActivity extends AppCompatActivity {
         });
 
         imgBtnGenerate.setOnClickListener(v -> {
-            // TODO generar contrasenya
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             LayoutInflater inflater = getLayoutInflater();
-            View view = inflater.inflate(R.layout.layout_generate_password, null);
+            View view = inflater.inflate(R.layout.layout_generar_contrasenya, null);
 
             builder.setView(view);
 
@@ -298,7 +326,6 @@ public class ItemActivity extends AppCompatActivity {
 
             // Botó Complexitat Personalitzada
             btnPersonalitzada.setOnClickListener(c -> {
-                // TODO cambiar d'alertDialog a altre
                 alertDialog.dismiss();
 
                 AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
@@ -395,6 +422,17 @@ public class ItemActivity extends AppCompatActivity {
             etNotes.setEnabled(true);
             etNotes.setBackground(ContextCompat.getDrawable(this, R.drawable.background_text_notes));
 
+            // Botó Compartir Ítem
+            if (add_edit == 1) {
+                btnCompartir.setOnClickListener(v -> {
+                    // TODO compartir item
+                    afegirUsuaris(2);
+                });
+            } else if (add_edit == 2) {
+                // TODO compartir item
+                afegirUsuaris(3);
+            }
+
             // Botó Guardar Eliminar Item
             btnGuardarEliminarItem.setText("Guardar");
             btnGuardarEliminarItem.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
@@ -413,10 +451,11 @@ public class ItemActivity extends AppCompatActivity {
                 byte[] encrypted = null;
                 byte[] encrypted2 = null;
                 byte[] encryptedDataKey = null;
+
                 try {
                     encrypted = Encrypt.encriptarContrasenya(novaContrasenya, iv);
                     encrypted2 = Encrypt.encriptarContrasenya2(novaContrasenya, publicKey, iv);
-                    encryptedDataKey = Encrypt.encriptarDataKey(publicKey, dataKey);
+                    encryptedDataKey = encriptarDataKey(publicKey, dataKey);
                 } catch (NoSuchAlgorithmException e) {
                     throw new RuntimeException(e);
                 } catch (InvalidKeySpecException e) {
@@ -459,6 +498,40 @@ public class ItemActivity extends AppCompatActivity {
                         public void onResponse(Call<Item> call, Response<Item> response) {
                             if (response.isSuccessful()) {
                                 Toast.makeText(ItemActivity.this, "Ítem afegit", Toast.LENGTH_SHORT).show();
+                                itemCreat = response.body();
+                                if (usuarisSeleccionats.size() > 0) {
+                                    ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
+                                    // TODO compartir item
+                                    for (Usuari usuari : usuarisSeleccionats) {
+                                        // TODO desencriptar datakey
+                                        byte[] dataKeyDecrypted = null;
+                                        byte[] dataKeyEncrypted = null;
+                                        try {
+                                            dataKeyDecrypted = desencriptarDataKey(privateKeyDecrypt, itemCreat.getEncryptedDataKey().getEncryptedDataKey());
+                                            dataKeyEncrypted = encriptarDataKey(stringToPublicKey(usuari.getPublicKey()), dataKeyDecrypted);
+                                        } catch (Exception e) {
+                                            throw new RuntimeException(e);
+                                        }
+
+                                        String encryptedDataKeyBase64 = Base64.encodeToString(dataKeyEncrypted, Base64.DEFAULT);
+                                        EncryptedDataKey edk = new EncryptedDataKey(null, encryptedDataKeyBase64);
+                                        encryptedDataKeys.add(edk);
+                                    }
+
+                                    for (Usuari usuari : usuarisSeleccionats) {
+                                        usuarisCompartitRequest.add(new UsuariCompartitRequest(
+                                                usuari.getUuid(),
+                                                Permisos.LECTURA,
+                                                encryptedDataKeys));
+                                    }
+
+                                    try {
+                                        compartirItem(itemCreat);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+
                                 finish();
                             } else {
                                 Toast.makeText(ItemActivity.this, "No s'ha pogut afegir l'ítem", Toast.LENGTH_SHORT).show();
@@ -585,21 +658,22 @@ public class ItemActivity extends AppCompatActivity {
             btnGuardarEliminarItem.setText("Eliminar");
             btnGuardarEliminarItem.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
             btnGuardarEliminarItem.setOnClickListener(v -> {
-                Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).deleteItem(uuid);
-                call.enqueue(new Callback<Item>() {
+                String titolItem = txtTitle.getText().toString();
+                Call<Void> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).deleteItem(uuid);
+                call.enqueue(new Callback<Void>() {
                     @Override
-                    public void onResponse(Call<Item> call, Response<Item> response) {
+                    public void onResponse(Call<Void> call, Response<Void> response) {
                         if (response.isSuccessful()) {
-                            Toast.makeText(ItemActivity.this, "Ítem eliminat", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ItemActivity.this, "Ítem " + titolItem + " eliminat", Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
-                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_RESPONSE", response.message());
                         }
                     }
                     @Override
-                    public void onFailure(Call<Item> call, Throwable t) {
-                        Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem", Toast.LENGTH_SHORT).show();
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
                         Log.d("ERROR_FAILURE", t.getMessage());
                     }
                 });
@@ -730,6 +804,136 @@ public class ItemActivity extends AppCompatActivity {
 
         btnCancelar.setOnClickListener(v -> {
             alertDialog.dismiss();
+        });
+
+    }
+
+    private void afegirUsuaris(int add_edit_view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.layout_compartir_item, null);
+
+        builder.setView(view);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        // Elements del AlertDialog
+        AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarUsuaris);
+        RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerUsuaris);
+        Button btnGuardar = view.findViewById(R.id.btnGuardarUsuaris);
+        Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+        recyclerUsuaris.setLayoutManager(new LinearLayoutManager(ItemActivity.this));
+        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, usuarisSeleccionats, this);
+        recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
+
+        // Carregar usuaris
+        UsuariDTO.RequestUsuari requestUsuari = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class);
+        requestUsuari.getAllUsuaris().enqueue(new Callback<ArrayList<Usuari>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Usuari>> call, Response<ArrayList<Usuari>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    usuaris = new ArrayList<>();
+                    usuaris.addAll(response.body());
+
+                    // Cercador d'usuaris
+                    ArrayList<String> noms = new ArrayList<>();
+
+                    for (Usuari usuari : usuaris) {
+                        noms.add(usuari.getNom());
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(ItemActivity.this, android.R.layout.simple_dropdown_item_1line, noms);
+                    aCTVCercarUsuaris.setAdapter(adapter);
+                } else {
+                    Log.d("ERROR_RESPONSE", response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Usuari>> call, Throwable t) {
+                Log.d("ERROR_FAILURE", t.getMessage());
+            }
+        });
+
+        aCTVCercarUsuaris.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                aCTVCercarUsuaris.showDropDown();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+        });
+
+        aCTVCercarUsuaris.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String seleccionat = parent.getItemAtPosition(position).toString();
+
+                // TODO afegir usuaris al recycler
+
+                for (Usuari usuari : usuaris) {
+                    if (usuari.getNom().equals(seleccionat) && !usuarisSeleccionats.contains(usuari)) {
+                        usuarisSeleccionats.add(usuari);
+                    }
+                }
+
+                recercaAdapterUsuaris.notifyDataSetChanged();
+                recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
+            }
+        });
+
+
+        btnGuardar.setOnClickListener(v -> {
+            // TODO guarda ítem en carpeta si es desitja
+            // TODO guardar usuaris
+            if (add_edit_view == 1) { // Mode visualitzar ítem existent
+
+            } else if (add_edit_view == 2) { // Mode afegir nou ítem
+
+            } else if (add_edit_view == 3) { // Mode editar ítem existent
+
+            }
+            alertDialog.dismiss();
+        });
+
+        btnCancelar.setOnClickListener(v -> {
+            alertDialog.dismiss();
+        });
+    }
+
+    private void compartirItem(Item item) throws Exception {
+        CompartitRequest compartitRequest = new CompartitRequest(item.getUuid(), TipusEntitat.ITEM, usuarisCompartitRequest);
+
+        Call<Void> call = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).compartir(compartitRequest);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.e("ITEM_COMPARTIT", "Item " + item.getTitol() + " compartit");
+                } else {
+                    Log.e("ERROR_RESPONSE", response.message());
+                    try {
+                        Log.e("ERROR_BODY_RESPONSE", response.errorBody().string());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e("ERROR_FAILURE", t.getMessage());
+            }
         });
     }
 }

@@ -8,7 +8,9 @@ import com.example.keyly_projecte_intermodular.config.TokenForEver;
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
 import com.example.keyly_projecte_intermodular.dao.Compartit;
 import com.example.keyly_projecte_intermodular.dao.Item;
+import com.example.keyly_projecte_intermodular.request.CompartitItemRequest;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
+import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -35,13 +37,13 @@ public class CompartitDTO {
         @GET("/api/compartit/get/all")
         Call<ArrayList<Compartit>> getAllCompartit();
 
-//        // Crear compartits amb múltiples usuaris
-//        @POST("/api/compartit/add")
-//        Call<Compartit> crearCompartit(@Body Compartit compartit);
+        // Crear compartits amb múltiples usuaris
+        @POST("/api/compartit/add")
+        Call<Void> compartir(@Body CompartitRequest compartitRequest);
 
         // Crea un ítem i el comparteix a múltiples usuaris
         @POST("/api/compartit/add/item")
-        Call<Compartit> compartirItem(@Body Item itemRequest, @Body CompartitRequest compartitRequest);
+        Call<CompartitRequest> compartirItem(@Body CompartitItemRequest compartitItemRequest);
 
         // Crea una carpeta i la comparteix a múltiples usuaris
         @POST("/api/compartit/add/carpeta")

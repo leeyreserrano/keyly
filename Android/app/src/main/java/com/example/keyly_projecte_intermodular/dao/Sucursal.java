@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Sucursal implements Serializable {
-    private UUID uuid; // Solo usar uuid (es random), para identificar el item
+    private UUID uuid; // Només s'utilitza la uuid (es random), per identificar l'ítem
     private String nom;
     private String direccio;
     private String ciutat;

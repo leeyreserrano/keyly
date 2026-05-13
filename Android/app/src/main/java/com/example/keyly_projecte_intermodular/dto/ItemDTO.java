@@ -58,7 +58,7 @@ public class ItemDTO {
 
         // Eliminar un item per UUID
         @DELETE("/api/item/delete/{uuid}")
-        Call<Item> deleteItem(@Path("uuid") String uuid);
+        Call<Void> deleteItem(@Path("uuid") String uuid);
     }
 
     public static Retrofit obtenirJSONItem() {

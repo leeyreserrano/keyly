@@ -1,5 +1,7 @@
 package com.example.keyly_projecte_intermodular.dao;
 
+import com.example.keyly_projecte_intermodular.utils.Elements;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -8,7 +10,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Item implements Serializable {
+public class Item extends Elements implements Serializable {
     private UUID uuid;
     private String titol;
     private String nomUsuari;

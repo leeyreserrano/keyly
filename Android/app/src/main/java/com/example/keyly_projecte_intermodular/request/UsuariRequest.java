@@ -15,5 +15,8 @@ public class UsuariRequest implements Serializable {
     private String nom;
     private String correu;
     private String contrasenya;
+    private String kdfSalt;
+    private String publicKey;
+    private String encryptedPrivateKey;
     private boolean potAdministrar;
 }

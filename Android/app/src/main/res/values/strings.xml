@@ -1,5 +1,72 @@
 <resources>
     <string name="app_name">Keyly_Projecte_Intermodular</string>
+
+    <!-- Global -->
+    <string name="cercador">Cercar</string>
+    <string name="btnCancelar">Cancel·lar</string>
+    <string name="etiquetaTots">Tots</string>
+    <string name="etiquetaUltimsUsats">Últims utilitzats</string>
+    <string name="etiquetaMesUsats">Més utilitzats</string>
+    <string name="etiquetaFavorits">Favorits</string>
+    <string name="hintCorreu">correu@domini.cat</string>
+    <string name="titolItems">Ítems</string>
+    <string name="titolCarpetes">Carpetes</string>
+
+    <!-- ActivtyLogin -->
+    <string name="btnLogin">Iniciar sessió</string>
+
+    <!-- ActivtyHome -->
+    <string name="titolResum">Resum</string>
+    <string name="etiquetaTotalItems">Totals</string>
+    <string name="etiquetaCompromesses">Compromesses</string>
+    <string name="etiquetaDebils">Dèbils</string>
+
+    <!-- ActivtyItemCarpetaSelector -->
+    <string name="titolItemCarpetaSelector">Ítems i carpetes</string>
+
+    <!-- ActivtyItem -->
+    <string name="hintNomItem">Nom ítem</string>
+    <string name="hintDomini">https://domini.cat</string>
+    <string name="hintContrasenya">Contrasenya</string>
+    <string name="hintNotes">Notes...</string>
+    <string name="btnCompartir">Compartir</string>
+    <string name="btnGuardar">Guardar</string>
+    <string name="btnEnrere">Enrere</string>
+
+    <!-- ActivityCompartits -->
+    <string name="titolCompartits">Compartits</string>
+
+    <!-- ActivityPerfil -->
+    <string name="hintNomUsuari">Nom usuari</string>
+
+    <!-- LayoutGenerarContrasenya -->
+    <string name="etiquetaComBaixa">Complexitat baixa</string>
+    <string name="etiquetaComMitjana">Complexitat mitjana</string>
+    <string name="etiquetaComAlta">Complexitat alta</string>
+    <string name="etiquetaPersonalitzada">Personalitzada</string>
+
+    <!-- LayoutConstrasenyaPersonalitzada -->
+    <string name="titolPersonalitzada">Personalitzar contrasenya</string>
+    <string name="etiquetaLongitud">Longitud</string>
+    <string name="etiquetaTipusCaracters">Tipus caràcters</string>
+    <string name="etiquetaMin">Minúscules (a-z)</string>
+    <string name="etiquetaMaj">Majúscules (A-Z)</string>
+    <string name="etiquetaNum">Números (0-9)</string>
+    <string name="etiquetaCaracEsp">Caràcters especials (!@#...)</string>
+    <string name="etiquetaPrevisualitzacio">Previsualització</string>
+    <string name="btnUtilitzar">Utilitzar</string>
+    <string name="btnGenerar">Generar</string>
+
+    <!-- LayoutEliminar -->
+    <string name="btnEliminar">Eliminar</string>
+
+    <!-- LayoutFiltres -->
+    <string name="titolFiltres">Filtrar per:</string>
+    <string name="btnFiltrar">Filtrar</string>
+
+    <!-- LayoutCompartirItems -->
+    <string name="titolCompartirItems">Compartir amb...</string>
+
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

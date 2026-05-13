@@ -29,7 +29,7 @@
         android:layout_marginTop="100px"
         android:padding="30px"
         android:background="@drawable/edit_text_enabled"
-        android:hint="email@domini.cat"
+        android:hint="@string/hintCorreu"
         android:inputType="textEmailAddress" />
 
     <EditText
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="50px"
-        android:text="Log In"
+        android:text="@string/btnLogin"
         android:textColor="@color/white"
         android:textSize="17dp"
         android:fontFamily="@font/airbnb_cereal_w_bd"

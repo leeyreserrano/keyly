@@ -39,6 +39,8 @@ public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.nameUserTextView.setVisibility(View.VISIBLE);
+
         Carpeta carpeta = carpetaList.get(position);
 
         holder.carpetaTextView.setText(carpeta.getNom());
@@ -66,8 +68,8 @@ public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHold
 
         public ViewHolder(@NonNull View carpetaView) {
             super(carpetaView);
-            carpetaTextView = carpetaView.findViewById(R.id.txtNameItemCarpeta);
-            nameUserTextView = carpetaView.findViewById(R.id.txtNameUser);
+            carpetaTextView = carpetaView.findViewById(R.id.txtNom);
+            nameUserTextView = carpetaView.findViewById(R.id.txtDescripcio);
         }
     }
 }

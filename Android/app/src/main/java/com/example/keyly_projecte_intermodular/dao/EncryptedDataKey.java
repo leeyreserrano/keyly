@@ -10,5 +10,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class EncryptedDataKey implements Serializable {
     UUID uuid;
-    String encryptedDatakey;
+    String encryptedDataKey;
 }

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="17dp"
+    android:paddingBottom="17dp"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:background="@drawable/background_dialog">
+
+    <TextView
+        android:id="@+id/txtNomSucursal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="Nombre sucursal"
+        android:fontFamily="sans-serif-black"
+        android:textSize="23dp"
+        android:textColor="@color/black"
+        android:background="@drawable/background_titol_gris"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/llSucursalView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        android:divider="?android:attr/listDivider"
+        android:showDividers="middle"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/llDireccionsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtDireccioSucursal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Direcció:"
+                android:fontFamily="sans-serif"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:id="@+id/txtCiutatSucursal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ciutat:"
+                android:fontFamily="sans-serif"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:id="@+id/txtPaisSucursal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pais:"
+                android:fontFamily="sans-serif"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llContacteView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtTlfSucursal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Telèfon:"
+                android:fontFamily="sans-serif"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:id="@+id/txtCorreuSucursal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Correu:"
+                android:fontFamily="sans-serif"
+                android:textSize="20dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llSucursalEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:orientation="vertical"
+        android:divider="?android:attr/listDivider"
+        android:showDividers="middle"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/llDireccionsEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/etDireccioSucursal"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:paddingStart="12dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="Carrer d'Osca, 95-105"
+                android:background="@drawable/background_text_notes"
+                android:visibility="visible"/>
+
+            <EditText
+                android:id="@+id/etCiutatSucursal"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:paddingStart="12dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="Barcelona"
+                android:background="@drawable/background_text_notes"
+                android:visibility="visible"/>
+
+            <EditText
+                android:id="@+id/etPaisSucursal"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:paddingStart="12dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="Espanya"
+                android:background="@drawable/background_text_notes"
+                android:visibility="visible"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llContacteEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/etTlfSucursal"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:paddingStart="12dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="936 56 00 00"
+                android:background="@drawable/background_text_notes"
+                android:visibility="visible"/>
+
+            <EditText
+                android:id="@+id/etCorreuSucursal"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:paddingStart="12dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:hint="@string/hintCorreu"
+                android:background="@drawable/background_text_notes"
+                android:visibility="visible"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

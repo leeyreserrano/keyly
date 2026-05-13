@@ -1,8 +1,10 @@
 package com.example.keyly_projecte_intermodular.request;
 
+import com.example.keyly_projecte_intermodular.dao.EncryptedDataKey;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -13,5 +15,5 @@ import lombok.Data;
 public class UsuariCompartitRequest implements Serializable {
     private UUID usuariUuid;
     private Permisos permis;
-    private String encryptedDataKey;
+    private ArrayList<EncryptedDataKey> encryptedDataKeys;
 }

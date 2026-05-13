@@ -75,6 +75,9 @@ public class ItemsActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (id == R.id.nav_profile) {
+                Intent intent = new Intent(this, PerfilActivity.class);
+                intent.putExtra("usuariPropi", true);
+                startActivity(intent);
                 return true;
             }
             return false;
@@ -130,7 +133,7 @@ public class ItemsActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
             LayoutInflater inflater = getLayoutInflater();
-            View view = inflater.inflate(R.layout.alert_dialog_filtre, null);
+            View view = inflater.inflate(R.layout.layout_filtres, null);
 
             builder.setView(view);
 
@@ -298,8 +301,8 @@ public class ItemsActivity extends AppCompatActivity {
             intent.putExtra("fav", item.isFavorit());
             intent.putExtra("add_edit", 0);
             intent.putExtra("iv", item.getIv());
-            intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDatakey());
-            Log.d("EDK_DEBUG", "edk: " + (item.getEncryptedDataKey() != null ? item.getEncryptedDataKey().getEncryptedDatakey() : "NULL"));
+            intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
+            Log.d("EDK_DEBUG", "edk: " + (item.getEncryptedDataKey() != null ? item.getEncryptedDataKey().getEncryptedDataKey() : "NULL"));
             Log.d("EDK_DEBUG", "item json: " + new Gson().toJson(item));
             startActivity(intent);
         });

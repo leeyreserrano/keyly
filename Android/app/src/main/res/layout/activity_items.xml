@@ -115,7 +115,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:background="@null"
-                    android:hint="Cercar"
+                    android:hint="@string/cercador"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:textColorHint="@color/dark_grey"

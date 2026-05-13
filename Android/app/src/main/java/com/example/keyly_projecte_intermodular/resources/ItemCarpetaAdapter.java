@@ -1,5 +1,6 @@
 package com.example.keyly_projecte_intermodular.resources;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.ViewHolder> {
 
-    private List<Compartit> CompartitList;
+    private List<Compartit> compartitList;
     //private List<Tot> totList;
     private ItemCarpetaAdapter.OnItemClickListener listener;
 
@@ -26,7 +27,7 @@ public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.
     }
 
     public ItemCarpetaAdapter(List<Compartit> compartitList, ItemCarpetaAdapter.OnItemClickListener listener) {
-        this.CompartitList = compartitList;
+        this.compartitList = compartitList;
         this.listener = listener;
     }
 
@@ -41,9 +42,16 @@ public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ItemCarpetaAdapter.ViewHolder holder, int position) {
-        Compartit compartit = CompartitList.get(position);
-        if (compartit.getEC() == TipusEntitat.CARPETA) {
-            holder.itemCarpetaTextView.setText(compartit.getCarpeta().getNom());
+        holder.nameUserTextView.setVisibility(View.VISIBLE);
+
+        Compartit compartit = compartitList.get(position);
+        if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
+            Log.d("CARPETA_COMPARTIDA", compartit.toString());
+            if (compartit.getCarpeta().getNom() != null) {
+                holder.itemCarpetaTextView.setText(compartit.getCarpeta().getNom());
+            } else {
+                holder.itemCarpetaTextView.setText("Sense nom");
+            }
 
             String propietari = compartit.getCarpeta().getBagul().getUsuari().getNom();
             holder.nameUserTextView.setText(propietari);
@@ -54,7 +62,7 @@ public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.
 //                    listener.onItemClick(compartit.getCarpeta());
 //                }
 //            });
-        } else if (compartit.getEC() == TipusEntitat.ITEM) {
+        } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             holder.itemCarpetaTextView.setText(compartit.getItem().getTitol());
 
             String propietari = compartit.getItem().getNomUsuari();
@@ -71,7 +79,7 @@ public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.
 
     @Override
     public int getItemCount() {
-        return CompartitList.size();
+        return compartitList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -82,8 +90,8 @@ public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.
 
         public ViewHolder(@NonNull View itemCarpetaView) {
             super(itemCarpetaView);
-            itemCarpetaTextView = itemCarpetaView.findViewById(R.id.txtNameItemCarpeta);
-            nameUserTextView = itemCarpetaView.findViewById(R.id.txtNameUser);
+            itemCarpetaTextView = itemCarpetaView.findViewById(R.id.txtNom);
+            nameUserTextView = itemCarpetaView.findViewById(R.id.txtDescripcio);
         }
     }
 }

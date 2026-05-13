@@ -16,6 +16,21 @@
         android:theme="@style/Theme.Keyly_Projecte_Intermodular"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".RolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DepartamentsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SucursalsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UsuarisActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PerfilActivity"
+            android:exported="false" />
+        <activity
             android:name=".CompartitActivity"
             android:exported="false" />
         <activity

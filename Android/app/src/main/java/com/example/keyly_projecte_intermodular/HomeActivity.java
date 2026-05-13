@@ -68,6 +68,9 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (id == R.id.nav_profile) {
+                Intent intent = new Intent(this, PerfilActivity.class);
+                intent.putExtra("usuariPropi", true);
+                startActivity(intent);
                 return true;
             }
             return false;

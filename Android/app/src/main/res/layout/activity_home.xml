@@ -58,8 +58,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
+                android:text="@string/titolResum"
                 android:fontFamily="@font/airbnb_cereal_w_bd"
-                android:text="Resum"
                 android:textColor="@color/black"
                 android:textSize="20dp" />
 
@@ -92,7 +92,7 @@
                         android:layout_marginTop="5dp"
                         android:fontFamily="@font/manrope_regular"
                         android:gravity="center"
-                        android:text="Fortes"
+                        android:text="@string/etiquetaTotalItems"
                         android:textColor="@color/light_grey"
                         android:textSize="15dp" />
 
@@ -132,7 +132,7 @@
                         android:layout_marginTop="5dp"
                         android:fontFamily="@font/manrope_regular"
                         android:gravity="center"
-                        android:text="Compromesses"
+                        android:text="@string/etiquetaCompromesses"
                         android:textColor="@color/light_grey"
                         android:textSize="15dp" />
 
@@ -169,7 +169,7 @@
                         android:layout_marginTop="5dp"
                         android:fontFamily="@font/manrope_regular"
                         android:gravity="center"
-                        android:text="Dèbils"
+                        android:text="@string/etiquetaDebils"
                         android:textColor="@color/light_grey"
                         android:textSize="15dp" />
 
@@ -203,7 +203,7 @@
                 android:layout_height="wrap_content"
                 android:minWidth="92dp"
                 android:minHeight="30dp"
-                android:text="Tot"
+                android:text="@string/etiquetaTots"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:background="@drawable/background_btn_filtres_home_selected"
@@ -215,13 +215,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
+                android:background="@drawable/background_btn_filtres_home"
                 android:minWidth="92dp"
                 android:minHeight="30dp"
-                android:text="Més usades"
+                android:text="@string/etiquetaMesUsats"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:background="@drawable/background_btn_filtres_home"
-                app:backgroundTint="@null"/>
+                app:backgroundTint="@null" />
 
             <Button
                 android:id="@+id/btn_filtre_favorites"
@@ -229,7 +229,7 @@
                 android:layout_height="wrap_content"
                 android:minWidth="92dp"
                 android:minHeight="30dp"
-                android:text="Favorites"
+                android:text="@string/etiquetaFavorits"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:background="@drawable/background_btn_filtres_home"

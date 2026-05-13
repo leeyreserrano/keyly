@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.keyly_projecte_intermodular.config.TokenForEver;
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
+import com.example.keyly_projecte_intermodular.dao.Item;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -38,7 +39,7 @@ public class CarpetaDTO {
 
         // Afegir ítem existent a una carpeta
         @POST("/api/carpeta/add/{carpetaUuid}/item/existing/{itemUuid}")
-        Call<Carpeta> afegirItemCarpeta(@Path("carpetaUuid") String carpetaUuid, @Path("itemUuid") String itemUuid);
+        Call<Item> afegirItemCarpeta(@Path("carpetaUuid") String carpetaUuid, @Path("itemUuid") String itemUuid);
 
         // Editar una carpeta
         @PUT("/api/carpeta/update/{uuid}")
