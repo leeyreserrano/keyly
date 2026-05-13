@@ -24,7 +24,7 @@ public interface UsuariRepo extends JpaRepository<Usuari, Long> {
     @Modifying
     @Transactional
     void deleteByUuid(UUID uuid);
-    
+
     boolean existsByCorreu(String correu);
 
 }

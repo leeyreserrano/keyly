@@ -233,7 +233,6 @@ export default ItemCard
 export async function decryptItem(item: any): Promise<Item> {
   try {
     const privateKeyB64 = localStorage.getItem("privateKey")
-      if (!privateKeyB64) throw new Error("No hay private key en localStorage")
 
     const privateKeyBytes = Uint8Array.from(atob(privateKeyB64), (c) =>
       c.charCodeAt(0)
@@ -247,9 +246,10 @@ export async function decryptItem(item: any): Promise<Item> {
     )
 
     const encryptedDataKeyBytes = Uint8Array.from(
-      atob(item.encryptedDataKey.encryptedDatakey),
+      atob(item.encryptedDataKey.encryptedDataKey),
       (c) => c.charCodeAt(0)
     )
+
     const dataKeyBuffer = await crypto.subtle.decrypt(
       { name: "RSA-OAEP" },
       privateKey,
@@ -265,9 +265,11 @@ export async function decryptItem(item: any): Promise<Item> {
     )
 
     const iv = Uint8Array.from(atob(item.iv), (c) => c.charCodeAt(0))
+
     const encryptedPswBytes = Uint8Array.from(atob(item.contrasenya), (c) =>
       c.charCodeAt(0)
     )
+
     const decryptedPswBuffer = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       dataKey,
@@ -276,11 +278,12 @@ export async function decryptItem(item: any): Promise<Item> {
 
     const contrasenya = new TextDecoder().decode(decryptedPswBuffer)
 
-    return {
+    const result = {
       ...item,
       contrasenya,
       encryptedDataKey: item.encryptedDataKey.uuid
     }
+    return result
   } catch (err) {
     console.error("Error desencriptando item:", item.uuid, err)
     return {
@@ -290,7 +293,6 @@ export async function decryptItem(item: any): Promise<Item> {
     }
   }
 }
-
 export async function decryptItemWithRawKey(
   item: any
 ): Promise<{ item: Item; rawDataKey: ArrayBuffer }> {
@@ -309,7 +311,7 @@ export async function decryptItemWithRawKey(
   )
 
   const encryptedDataKeyBytes = Uint8Array.from(
-    atob(item.encryptedDataKey.encryptedDatakey),
+    atob(item.encryptedDataKey.encryptedDataKey),
     (c) => c.charCodeAt(0)
   )
 
