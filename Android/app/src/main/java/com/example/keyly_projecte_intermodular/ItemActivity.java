@@ -3,7 +3,6 @@ package com.example.keyly_projecte_intermodular;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.dataKey;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.config.TokenForEver.publicKey;
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.usuariPropi;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.cypherIV;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarContrasenya2;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
@@ -53,7 +52,6 @@ import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.dto.UtilsDTO;
-import com.example.keyly_projecte_intermodular.request.CompartitItemRequest;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
@@ -67,7 +65,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -94,7 +91,7 @@ public class ItemActivity extends AppCompatActivity {
     private String uuid, contrasenyaGenerada;
     private boolean isPasswordVisible = false;
     private AtomicBoolean favActual;
-    private Item itemCreat;
+    private Item itemCreat, itemActual;
     private ArrayList<Usuari> usuaris = new ArrayList<>();
     private ArrayList<Usuari> usuarisSeleccionats = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
@@ -430,7 +427,11 @@ public class ItemActivity extends AppCompatActivity {
                 });
             } else if (add_edit == 2) {
                 // TODO compartir item
-                afegirUsuaris(3);
+                btnCompartir.setOnClickListener(v -> {
+                    // TODO compartir item
+                    afegirUsuaris(3);
+                });
+                //afegirUsuaris(3);
             }
 
             // Botó Guardar Eliminar Item
@@ -492,7 +493,7 @@ public class ItemActivity extends AppCompatActivity {
 
                 if (add_edit == 1) {
                     //Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).addItem(item);
-                    Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).addItem2(itemR);
+                    Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).addItem(itemR);
                     call.enqueue(new Callback<Item>() {
                         @Override
                         public void onResponse(Call<Item> call, Response<Item> response) {
@@ -526,7 +527,7 @@ public class ItemActivity extends AppCompatActivity {
                                     }
 
                                     try {
-                                        compartirItem(itemCreat);
+                                        compartirItem(itemCreat, false);
                                     } catch (Exception e) {
                                         throw new RuntimeException(e);
                                     }
@@ -546,12 +547,45 @@ public class ItemActivity extends AppCompatActivity {
                         }
                     });
                 } else if (add_edit == 2) {
-                    Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).updateItem2(uuid, itemR);
+                    Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).updateItem(uuid, itemR);
                     call.enqueue(new Callback<Item>() {
                         @Override
                         public void onResponse(Call<Item> call, Response<Item> response) {
                             if (response.isSuccessful()) {
+                                itemActual = response.body();
                                 Toast.makeText(ItemActivity.this, "Ítem actualitzat", Toast.LENGTH_SHORT).show();
+                                if (usuarisSeleccionats.size() > 0) {
+                                    ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
+                                    // TODO compartir item
+                                    for (Usuari usuari : usuarisSeleccionats) {
+                                        // TODO desencriptar datakey
+                                        byte[] dataKeyDecrypted = null;
+                                        byte[] dataKeyEncrypted = null;
+                                        try {
+                                            dataKeyDecrypted = desencriptarDataKey(privateKeyDecrypt, itemActual.getEncryptedDataKey().getEncryptedDataKey());
+                                            dataKeyEncrypted = encriptarDataKey(stringToPublicKey(usuari.getPublicKey()), dataKeyDecrypted);
+                                        } catch (Exception e) {
+                                            throw new RuntimeException(e);
+                                        }
+
+                                        String encryptedDataKeyBase64 = Base64.encodeToString(dataKeyEncrypted, Base64.DEFAULT);
+                                        EncryptedDataKey edk = new EncryptedDataKey(null, encryptedDataKeyBase64);
+                                        encryptedDataKeys.add(edk);
+                                    }
+
+                                    for (Usuari usuari : usuarisSeleccionats) {
+                                        usuarisCompartitRequest.add(new UsuariCompartitRequest(
+                                                usuari.getUuid(),
+                                                Permisos.LECTURA,
+                                                encryptedDataKeys));
+                                    }
+
+                                    try {
+                                        compartirItem(itemActual, false);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
                             } else {
                                 Toast.makeText(ItemActivity.this, "No s'ha pogut actualitzar l'ítem", Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
@@ -677,6 +711,11 @@ public class ItemActivity extends AppCompatActivity {
                         Log.d("ERROR_FAILURE", t.getMessage());
                     }
                 });
+            });
+
+            // Botó compartir ítem
+            btnCompartir.setOnClickListener(v -> {
+                afegirUsuaris(1);
             });
 
             // Botó Back
@@ -808,7 +847,56 @@ public class ItemActivity extends AppCompatActivity {
 
     }
 
-    private void afegirUsuaris(int add_edit_view) {
+    private void obtenirItemUUID(String uuid) {
+        Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).getItem(uuid);
+        call.enqueue(new Callback<Item>() {
+            @Override
+            public void onResponse(Call<Item> call, Response<Item> response) {
+                if (response.isSuccessful()) {
+                    itemActual = response.body();
+                    if (usuarisSeleccionats.size() > 0) {
+                        ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
+                        // TODO compartir item
+                        for (Usuari usuari : usuarisSeleccionats) {
+                            // TODO desencriptar datakey
+                            byte[] dataKeyDecrypted = null;
+                            byte[] dataKeyEncrypted = null;
+                            try {
+                                dataKeyDecrypted = desencriptarDataKey(privateKeyDecrypt, itemActual.getEncryptedDataKey().getEncryptedDataKey());
+                                dataKeyEncrypted = encriptarDataKey(stringToPublicKey(usuari.getPublicKey()), dataKeyDecrypted);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            String encryptedDataKeyBase64 = Base64.encodeToString(dataKeyEncrypted, Base64.DEFAULT);
+                            EncryptedDataKey edk = new EncryptedDataKey(null, encryptedDataKeyBase64);
+                            encryptedDataKeys.add(edk);
+                        }
+
+                        for (Usuari usuari : usuarisSeleccionats) {
+                            usuarisCompartitRequest.add(new UsuariCompartitRequest(
+                                    usuari.getUuid(),
+                                    Permisos.LECTURA,
+                                    encryptedDataKeys));
+                        }
+
+                        try {
+                            compartirItem(itemActual, true);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Item> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void afegirUsuaris(int view_add_edit) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_compartir_item, null);
@@ -896,12 +984,8 @@ public class ItemActivity extends AppCompatActivity {
         btnGuardar.setOnClickListener(v -> {
             // TODO guarda ítem en carpeta si es desitja
             // TODO guardar usuaris
-            if (add_edit_view == 1) { // Mode visualitzar ítem existent
-
-            } else if (add_edit_view == 2) { // Mode afegir nou ítem
-
-            } else if (add_edit_view == 3) { // Mode editar ítem existent
-
+            if (view_add_edit == 1) { // Mode visualitzar ítem existent
+                obtenirItemUUID(uuid);
             }
             alertDialog.dismiss();
         });
@@ -911,7 +995,7 @@ public class ItemActivity extends AppCompatActivity {
         });
     }
 
-    private void compartirItem(Item item) throws Exception {
+    private void compartirItem(Item item, boolean view) throws Exception {
         CompartitRequest compartitRequest = new CompartitRequest(item.getUuid(), TipusEntitat.ITEM, usuarisCompartitRequest);
 
         Call<Void> call = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).compartir(compartitRequest);
@@ -919,6 +1003,9 @@ public class ItemActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
+                    if (view) {
+                        Toast.makeText(ItemActivity.this, "Ítem " + item.getTitol() + " compartit", Toast.LENGTH_SHORT).show();
+                    }
                     Log.e("ITEM_COMPARTIT", "Item " + item.getTitol() + " compartit");
                 } else {
                     Log.e("ERROR_RESPONSE", response.message());

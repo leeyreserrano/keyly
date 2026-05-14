@@ -1,5 +1,7 @@
 package com.example.keyly_projecte_intermodular.request;
 
+import com.example.keyly_projecte_intermodular.utils.RolIntern;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,5 +20,6 @@ public class UsuariRequest implements Serializable {
     private String kdfSalt;
     private String publicKey;
     private String encryptedPrivateKey;
+    private RolIntern rolIntern;
     private boolean potAdministrar;
 }

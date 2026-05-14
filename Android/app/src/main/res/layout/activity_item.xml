@@ -212,8 +212,9 @@
 
                 <EditText
                     android:id="@+id/et_password"
-                    android:layout_width="267dp"
+                    android:layout_width="1dp"
                     android:layout_height="45dp"
+                    android:layout_weight="1"
                     android:paddingStart="15dp"
                     android:textColor="@color/not_enabled"
                     android:hint="@string/hintContrasenya"
