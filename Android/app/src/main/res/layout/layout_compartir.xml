@@ -9,32 +9,16 @@
     android:orientation="vertical"
     android:background="@drawable/background_dialog">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="visible">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="17dp"
-            android:layout_marginEnd="17dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Compartir amb:"
-                android:fontFamily="sans-serif-black"
-                android:textSize="23dp"
-                android:textColor="@color/black"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:text="Compartir items/carpetes:"
+        android:fontFamily="sans-serif-black"
+        android:textSize="23dp"
+        android:textColor="@color/black"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,7 +27,7 @@
         android:visibility="visible">
 
         <LinearLayout
-            android:id="@+id/llDesplegableItemsCarpetes"
+            android:id="@+id/llDesplegableItems"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -58,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Afegir ítems/carpetes"
+                android:text="Ítems"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/white"/>
@@ -73,7 +57,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llContigutItemsCarpetes"
+            android:id="@+id/llContigutItems"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -92,7 +76,7 @@
                 android:background="@drawable/background_text_notes">
 
                 <AutoCompleteTextView
-                    android:id="@+id/aCTVCercarItemsCarpetes"
+                    android:id="@+id/aCTVCercarItems"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
@@ -112,7 +96,7 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerItemsCarpetes"
+                android:id="@+id/recyclerItems"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="15dp"/>
@@ -123,6 +107,102 @@
 
     <View
         android:id="@+id/vSeparador1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:background="@color/grey"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/llDesplegableCarpetes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="5dp"
+            android:gravity="center"
+            android:background="@drawable/background_desplegable">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Carpetes"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20dp"
+                android:textColor="@color/white"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/desplegar"
+                android:backgroundTint="@color/transparent"
+                android:rotation="270"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llContigutCarpetes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="10dp"
+                android:orientation="horizontal"
+                android:background="@drawable/background_text_notes">
+
+                <AutoCompleteTextView
+                    android:id="@+id/aCTVCercarCarpetes"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@null"
+                    android:hint="Cercar"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:textColorHint="@color/dark_grey"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/lupa" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerCarpetes"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="15dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/vSeparador2"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="5dp"
@@ -216,7 +296,7 @@
         </LinearLayout>
 
         <View
-            android:id="@+id/vSeparador2"
+            android:id="@+id/vSeparador3"
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginTop="5dp"

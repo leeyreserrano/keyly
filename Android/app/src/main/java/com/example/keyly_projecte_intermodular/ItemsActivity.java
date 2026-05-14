@@ -302,8 +302,6 @@ public class ItemsActivity extends AppCompatActivity {
             intent.putExtra("add_edit", 0);
             intent.putExtra("iv", item.getIv());
             intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
-            Log.d("EDK_DEBUG", "edk: " + (item.getEncryptedDataKey() != null ? item.getEncryptedDataKey().getEncryptedDataKey() : "NULL"));
-            Log.d("EDK_DEBUG", "item json: " + new Gson().toJson(item));
             startActivity(intent);
         });
         recyclerView.setAdapter(itemAdapter);

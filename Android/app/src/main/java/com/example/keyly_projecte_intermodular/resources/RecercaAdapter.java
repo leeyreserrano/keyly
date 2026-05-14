@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.R;
+import com.example.keyly_projecte_intermodular.dao.Carpeta;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
@@ -23,11 +24,13 @@ import java.util.List;
 public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHolder> {
 
     private List<Item> itemList;
+    private List<Carpeta> carpetaList;
     private Context context;
-    private ArrayList<Usuari> usuariList;
+    private List<Usuari> usuariList;
 
-    public RecercaAdapter(List<Item> itemList, ArrayList<Usuari> usuariList, Context context) {
+    public RecercaAdapter(List<Item> itemList, List<Carpeta> carpetaList, List<Usuari> usuariList, Context context) {
         this.itemList = itemList;
+        this.carpetaList = carpetaList;
         this.context = context;
         this.usuariList = usuariList;
     }

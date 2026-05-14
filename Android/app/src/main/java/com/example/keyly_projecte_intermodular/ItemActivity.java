@@ -89,7 +89,7 @@ public class ItemActivity extends AppCompatActivity {
     private Button btnCompartir, btnGuardarEliminarItem, btnBack;
     private int edit = 0;
     private String uuid, contrasenyaGenerada;
-    private boolean isPasswordVisible = false;
+    private boolean isPasswordVisible = false, compartirObligatori = false;
     private AtomicBoolean favActual;
     private Item itemCreat, itemActual;
     private ArrayList<Usuari> usuaris = new ArrayList<>();
@@ -156,6 +156,9 @@ public class ItemActivity extends AppCompatActivity {
         // Notes/Descripció Item
         etNotes = findViewById(R.id.etNotes);
 
+        int add_edit = getIntent().getIntExtra("add_edit", 0);
+        compartirObligatori = getIntent().getBooleanExtra("compartirObligatori", false);
+
         try {
             carregarInfo();
         } catch (InvalidAlgorithmParameterException e) {
@@ -175,8 +178,6 @@ public class ItemActivity extends AppCompatActivity {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        int add_edit = getIntent().getIntExtra("add_edit", 0);
 
         // Actualitzar pantalla
         actualitzarPantalla(add_edit, favActual, uuid);
@@ -438,6 +439,12 @@ public class ItemActivity extends AppCompatActivity {
             btnGuardarEliminarItem.setText("Guardar");
             btnGuardarEliminarItem.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
             btnGuardarEliminarItem.setOnClickListener(v -> {
+
+                if (compartirObligatori && usuarisSeleccionats.size() <= 0){
+                    Toast.makeText(ItemActivity.this, "No s'han seleccionat usuaris", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String titol = etTitolItem.getText().toString();
                 String nou_NomUsuari = etNomUsuariItem.getText().toString();
                 String novaContrasenya = etPassword.getText().toString();
@@ -913,7 +920,7 @@ public class ItemActivity extends AppCompatActivity {
         Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
         recyclerUsuaris.setLayoutManager(new LinearLayoutManager(ItemActivity.this));
-        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, usuarisSeleccionats, this);
+        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, this);
         recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
         // Carregar usuaris
@@ -986,6 +993,11 @@ public class ItemActivity extends AppCompatActivity {
             // TODO guardar usuaris
             if (view_add_edit == 1) { // Mode visualitzar ítem existent
                 obtenirItemUUID(uuid);
+            }
+
+            if (compartirObligatori && usuarisSeleccionats.size() <= 0){
+                Toast.makeText(ItemActivity.this, "No s'han seleccionat usuaris", Toast.LENGTH_SHORT).show();
+                return;
             }
             alertDialog.dismiss();
         });

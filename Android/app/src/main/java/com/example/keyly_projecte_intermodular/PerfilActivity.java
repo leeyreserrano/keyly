@@ -655,17 +655,31 @@ public class PerfilActivity extends AppCompatActivity {
 
             btnGuardar.setOnClickListener(v -> {
                 // TODO poner obligación en nombre, contraseña y correo para rellenar
-                String nomUsuari = getIntent().getStringExtra("nomUsuari");
-                String correu = getIntent().getStringExtra("correu");
+                String nomUsuari = etNomUsuari.getText().toString().trim();
+                String correu = etCorreu.getText().toString().trim();
                 Sucursal sucursal = null;
                 Departament departament = null;
                 Rol rol = null;
+
+                if (nomUsuari.isEmpty()) {
+                    Toast.makeText(this, "Has d'omplir el nom d'usuari!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (correu.isEmpty()) {
+                    Toast.makeText(this, "Has d'omplir el correu!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 for (Sucursal sucursal1 : sucursals) {
                     if (sucursal1.getNom().equals(spSucursal.getSelectedItem().toString())) {
                         sucursal = sucursal1;
                         break;
                     }
+                }
+
+                if (sucursal == null) {
+                    Toast.makeText(this, "Has d'omplir la sucursal!", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 for (Departament departament1 : departaments) {
@@ -675,6 +689,11 @@ public class PerfilActivity extends AppCompatActivity {
                     }
                 }
 
+                if (departament == null) {
+                    Toast.makeText(this, "Has d'omplir el departament!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 for (Rol rol1 : rols) {
                     if (rol1.getNom().equals(spRol.getSelectedItem().toString())) {
                         rol = rol1;
@@ -682,9 +701,27 @@ public class PerfilActivity extends AppCompatActivity {
                     }
                 }
 
-                String novaClauMestra = etClauMestra.getText().toString();
+                if (rol == null) {
+                    Toast.makeText(this, "Has d'omplir el rol!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (spRolIntern.getSelectedItem().toString().equals("Sense rol intern")) {
+                    Toast.makeText(this, "Has d'omplir el rol intern!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 RolIntern rolIntern = RolIntern.valueOf(spRolIntern.getSelectedItem().toString());
+
                 boolean potAdministrar = cbAdministrar.isChecked();
+
+                String novaClauMestra = null;
+                if (etClauMestra.getText().toString().isEmpty()) {
+                    Toast.makeText(this, "Has d'omplir la clau mestra!", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    novaClauMestra = etClauMestra.getText().toString();
+                }
 
                 // TODO generar par claves
                 Encrypt.ParellClaus parellClaus = null;
@@ -745,6 +782,8 @@ public class PerfilActivity extends AppCompatActivity {
                         rolIntern, // Rol intern (ADMIN, CAP, USUARI)
                         potAdministrar // potAdministrar
                 );
+
+                Log.d("USUARI_REQUEST", usuariRequest.toString());
 
                 // Pujar-lo al servidor
                 pujarUsuari(usuariRequest);
@@ -885,7 +924,13 @@ public class PerfilActivity extends AppCompatActivity {
                         finish();
                     }
                 } else {
-                    Log.e("ERROR_RESPONSE", response.message());
+                    try {
+                        String errorBody = response.errorBody().string();
+                        Log.e("ERROR_RESPONSE", "Codi: " + response.code() + " | " + errorBody);
+                        Toast.makeText(PerfilActivity.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Log.e("ERROR_RESPONSE", "No s'ha pogut llegir l'error: " + e.getMessage());
+                    }
                 }
             }
 

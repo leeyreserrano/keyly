@@ -15,33 +15,33 @@ import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
 import java.util.List;
 
-public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.ViewHolder> {
+public class CompartitAdapter extends RecyclerView.Adapter<CompartitAdapter.ViewHolder> {
 
     private List<Compartit> compartitList;
     //private List<Tot> totList;
-    private ItemCarpetaAdapter.OnItemClickListener listener;
+    private OnItemClickListener listener;
 
     // Interfície per al click
     public interface OnItemClickListener {
         void onItemClick(Compartit compartitList);
     }
 
-    public ItemCarpetaAdapter(List<Compartit> compartitList, ItemCarpetaAdapter.OnItemClickListener listener) {
+    public CompartitAdapter(List<Compartit> compartitList, CompartitAdapter.OnItemClickListener listener) {
         this.compartitList = compartitList;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ItemCarpetaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CompartitAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Infla el layout de cada carpeta de la lista
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_item_carpeta, parent, false);
-        return new ItemCarpetaAdapter.ViewHolder(view);
+        return new CompartitAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ItemCarpetaAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CompartitAdapter.ViewHolder holder, int position) {
         holder.nameUserTextView.setVisibility(View.VISIBLE);
 
         Compartit compartit = compartitList.get(position);
@@ -55,26 +55,19 @@ public class ItemCarpetaAdapter extends RecyclerView.Adapter<ItemCarpetaAdapter.
 
             String propietari = compartit.getCarpeta().getBagul().getUsuari().getNom();
             holder.nameUserTextView.setText(propietari);
-
-            // Click Listener
-//            holder.itemView.setOnClickListener(v -> {
-//                if (listener != null) {
-//                    listener.onItemClick(compartit.getCarpeta());
-//                }
-//            });
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
             holder.itemCarpetaTextView.setText(compartit.getItem().getTitol());
 
             String propietari = compartit.getItem().getNomUsuari();
             holder.nameUserTextView.setText(propietari);
-
-            // Click Listener
-//            holder.itemView.setOnClickListener(v -> {
-//                if (listener != null) {
-//                    listener.onItemClick(compartit.getItem());
-//                }
-//            });
         }
+
+        // Click listener
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(compartit);
+            }
+        });
     }
 
     @Override

@@ -42,7 +42,6 @@ import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
-import com.example.keyly_projecte_intermodular.request.UsuariRequest;
 import com.example.keyly_projecte_intermodular.resources.CarpetaAdapter;
 import com.example.keyly_projecte_intermodular.resources.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
@@ -51,8 +50,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
@@ -71,9 +68,8 @@ public class CarpetesActivity extends AppCompatActivity {
     private Carpeta carpetaCreada;
     private ArrayList<Carpeta> carpetes = new ArrayList<>();
     private ArrayList<Item> items = new ArrayList<>();
-    private ArrayList<Item> itemSeleccionats = new ArrayList<>();
-    private ArrayList<Usuari> usuaris = new ArrayList<>();
-    private ArrayList<Usuari> usuarisSeleccionats = new ArrayList<>();
+    private ArrayList<Item> itemsSeleccionats = new ArrayList<>();
+    private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
 
     @Override
@@ -141,7 +137,7 @@ public class CarpetesActivity extends AppCompatActivity {
 
         btnAfegirCarpeta = findViewById(R.id.imgBtnAgefirCarpeta);
         btnAfegirCarpeta.setOnClickListener(v -> {
-            itemSeleccionats.clear();
+            itemsSeleccionats.clear();
             usuarisSeleccionats.clear();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -214,11 +210,11 @@ public class CarpetesActivity extends AppCompatActivity {
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
             recyclerItems.setLayoutManager(new LinearLayoutManager(CarpetesActivity.this));
-            RecercaAdapter recercaAdapterItems = new RecercaAdapter(itemSeleccionats, null, this);
+            RecercaAdapter recercaAdapterItems = new RecercaAdapter(itemsSeleccionats, null, null, this);
             recyclerItems.setAdapter(recercaAdapterItems);
 
             recyclerUsuaris.setLayoutManager(new LinearLayoutManager(CarpetesActivity.this));
-            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, usuarisSeleccionats, this);
+            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, this);
             recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
             AtomicBoolean favActual = new AtomicBoolean(false);
@@ -252,7 +248,6 @@ public class CarpetesActivity extends AppCompatActivity {
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(CarpetesActivity.this, android.R.layout.simple_dropdown_item_1line, titols);
                         aCTVCercarItems.setAdapter(adapter);
-                        aCTVCercarItems.setThreshold(1);
                     } else {
                         Log.d("ERROR_RESPONSE", response.message());
                     }
@@ -288,8 +283,8 @@ public class CarpetesActivity extends AppCompatActivity {
                     String seleccionat = parent.getItemAtPosition(position).toString();
 
                     for (Item item : items) {
-                        if (item.getTitol().equals(seleccionat) && !itemSeleccionats.contains(item)) {
-                            itemSeleccionats.add(item);
+                        if (item.getTitol().equals(seleccionat) && !itemsSeleccionats.contains(item)) {
+                            itemsSeleccionats.add(item);
                         }
                     }
 
@@ -352,16 +347,11 @@ public class CarpetesActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     String seleccionat = parent.getItemAtPosition(position).toString();
-
-                    // TODO afegir usuaris al recycler
-
                     for (Usuari usuari : usuaris) {
                         if (usuari.getNom().equals(seleccionat) && !usuarisSeleccionats.contains(usuari)) {
                             usuarisSeleccionats.add(usuari);
-                            //UsuariCompartitRequest usuariCompartitRequest = new UsuariCompartitRequest(usuari.getUuid(), Permisos.LECTURA);
                         }
                     }
-
                     recercaAdapterUsuaris.notifyDataSetChanged();
                     recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
                 }
@@ -370,7 +360,6 @@ public class CarpetesActivity extends AppCompatActivity {
 
             btnGuardarCarpeta.setText("Afegir carpeta");
             btnGuardarCarpeta.setOnClickListener(c -> {
-                // TODO que se guarde la carpeta
                 String nomCarpeta = etNomCarpeta.getText().toString();
                 boolean isFavorit = favActual.get();
 
@@ -383,8 +372,6 @@ public class CarpetesActivity extends AppCompatActivity {
                         if (response.isSuccessful()) {
                             carpetaCreada = response.body();
                             Toast.makeText(CarpetesActivity.this, "Carpeta " + nomCarpeta + " afegida", Toast.LENGTH_SHORT).show();
-
-                            // FUNCIONA
                             if (usuarisSeleccionats.size() > 0) {
                                 usuarisCompartitRequest.clear();
                                 ArrayList<EncryptedDataKey> encryptedDataKeysC = new ArrayList<>();
@@ -399,15 +386,15 @@ public class CarpetesActivity extends AppCompatActivity {
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
-                            } else if (itemSeleccionats.size() > 0) {
-                                for (int i = 0; i < itemSeleccionats.size(); i++) {
-                                    Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(carpetaCreada.getUuid().toString(), itemSeleccionats.get(i).getUuid().toString());
+                            } else if (itemsSeleccionats.size() > 0) {
+                                for (int i = 0; i < itemsSeleccionats.size(); i++) {
+                                    Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(carpetaCreada.getUuid().toString(), itemsSeleccionats.get(i).getUuid().toString());
                                     callAddItem.enqueue(new Callback<Item>() {
                                         @Override
                                         public void onResponse(Call<Item> callAddItem, Response<Item> response) {
                                             if (response.isSuccessful()) {
                                                 Log.e("ITEMS_AFEGIT_CARPETES", response.body().toString());
-                                                Log.d("ITEMS_AFEGITS", itemSeleccionats.toString());
+                                                Log.d("ITEMS_AFEGITS", itemsSeleccionats.toString());
 
                                             } else {
                                                 Log.d("ERROR_RESPONSE", response.message());
@@ -421,94 +408,6 @@ public class CarpetesActivity extends AppCompatActivity {
                                     });
                                 }
                             }
-
-//                            if (itemSeleccionats.size() > 0) {
-//                                for (int i = 0; i < itemSeleccionats.size(); i++) {
-//                                    Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(carpetaCreada.getUuid().toString(), itemSeleccionats.get(i).getUuid().toString());
-//                                    callAddItem.enqueue(new Callback<Item>() {
-//                                        @Override
-//                                        public void onResponse(Call<Item> callAddItem, Response<Item> response) {
-//                                            if (response.isSuccessful()) {
-////                                                ArrayList<Item> items = new ArrayList<>();
-////                                                items.add(response.body());
-//                                                try {
-//                                                    compartirCarpeta(carpetaCreada);
-//                                                } catch (Exception e) {
-//                                                    throw new RuntimeException(e);
-//                                                }
-//                                                Log.e("ITEMS_AFEGIT_CARPETES", response.body().toString());
-//                                                Log.d("ITEMS_AFEGITS", itemSeleccionats.toString());
-//
-//                                            } else {
-//                                                Log.d("ERROR_RESPONSE", response.message());
-//                                            }
-//                                        }
-//
-//                                        @Override
-//                                        public void onFailure(Call<Item> callAddItem, Throwable t) {
-//                                            Log.d("ERROR_FAILURE", t.getMessage());
-//                                        }
-//                                    });
-//                                }
-//
-//                                usuarisCompartitRequest.clear();
-//                                // TODO compartir items añadidos
-//                                if (usuarisSeleccionats.size() > 0) {
-//                                    ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
-//
-//                                    // TODO compartir item
-//                                    for (Item item : itemSeleccionats) {
-//                                        Log.d("ITEM_ACTUAL_CARPETA", item.toString());
-//                                        for (Usuari usuari : usuarisSeleccionats) {
-//                                            // TODO desencriptar datakey
-//                                            byte[] dataKeyDecrypted = null;
-//                                            byte[] dataKeyEncrypted = null;
-//                                            try {
-//                                                dataKeyDecrypted = desencriptarDataKey(privateKeyDecrypt, item.getEncryptedDataKey().getEncryptedDataKey());
-//                                                dataKeyEncrypted = encriptarDataKey(stringToPublicKey(usuari.getPublicKey()), dataKeyDecrypted);
-//                                            } catch (Exception e) {
-//                                                throw new RuntimeException(e);
-//                                            }
-//
-//                                            String encryptedDataKeyBase64 = Base64.encodeToString(dataKeyEncrypted, Base64.DEFAULT);
-//                                            EncryptedDataKey edk = new EncryptedDataKey(null, encryptedDataKeyBase64);
-//                                            encryptedDataKeys.add(edk);
-//                                        }
-//
-//                                        for (Usuari usuari : usuarisSeleccionats) {
-//                                            usuarisCompartitRequest.add(new UsuariCompartitRequest(
-//                                                    usuari.getUuid(),
-//                                                    Permisos.LECTURA,
-//                                                    encryptedDataKeys));
-//                                        }
-//
-//                                        try {
-//                                            compartirItem(item);
-//                                        } catch (Exception e) {
-//                                            throw new RuntimeException(e);
-//                                        }
-//                                    }
-//                                }
-//
-//                            } else {
-////                                // FUNCIONA
-////                                if (usuarisSeleccionats.size() > 0) {
-////                                    usuarisCompartitRequest.clear();
-////                                    ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
-////                                    for (Usuari usuari : usuarisSeleccionats) {
-////                                        usuarisCompartitRequest.add(new UsuariCompartitRequest(
-////                                                usuari.getUuid(),
-////                                                Permisos.LECTURA,
-////                                                encryptedDataKeys));
-////                                    }
-////                                    try {
-////                                        compartirCarpeta(carpetaCreada);
-////                                    } catch (Exception e) {
-////                                        throw new RuntimeException(e);
-////                                    }
-////                                }
-//                            }
-
                             alertDialog.dismiss();
                             obtenirDades();
                             actulitzarCarpetes(carpetes);
@@ -569,16 +468,16 @@ public class CarpetesActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Log.e("CARPETA_COMPARTIDA", "Carpeta " + carpeta.getNom() + " compartida");
-                    if (itemSeleccionats.size() > 0) {
+                    if (itemsSeleccionats.size() > 0) {
                         usuarisCompartitRequest.clear();
-                        for (Item item : itemSeleccionats) {
+                        for (Item item : itemsSeleccionats) {
                             Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(carpetaCreada.getUuid().toString(), item.getUuid().toString());
                             callAddItem.enqueue(new Callback<Item>() {
                                 @Override
                                 public void onResponse(Call<Item> callAddItem, Response<Item> response) {
                                     if (response.isSuccessful()) {
                                         Log.e("ITEMS_AFEGIT_CARPETES", response.body().toString());
-                                        Log.d("ITEMS_AFEGITS", itemSeleccionats.toString());
+                                        Log.d("ITEMS_AFEGITS", itemsSeleccionats.toString());
 
                                         ArrayList<EncryptedDataKey> encryptedDataKeysI = new ArrayList<>();
 
@@ -704,14 +603,12 @@ public class CarpetesActivity extends AppCompatActivity {
     private void actulitzarCarpetes(ArrayList<Carpeta> carpetes) {
         carpetesAdapter = new CarpetaAdapter(carpetes, carpeta -> {
             Intent intent = new Intent(this, CarpetaActivity.class);
+            intent.putExtra("carpeta", carpeta);
             intent.putExtra("uuid", carpeta.getUuid().toString());
             intent.putExtra("nom", carpeta.getNom());
             intent.putExtra("favorit", carpeta.isFavorit());
             intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
-            Log.e("ITEMS_ARRAYLIST", new ArrayList<>(carpeta.getItems()).toString());
-            Log.e("SIZE_ITEMS_CARPETA", String.valueOf(carpeta.getItems().size()));
             intent.putExtra("data_creacio", carpeta.getDataCreacio());
-            Log.d("DATA_CREACIO", carpeta.getDataCreacio());
             startActivity(intent);
         });
         recyclerView.setAdapter(carpetesAdapter);

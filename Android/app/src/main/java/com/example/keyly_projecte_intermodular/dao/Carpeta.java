@@ -23,4 +23,9 @@ public class Carpeta extends Elements implements Serializable {
         this.nom = nom;
         this.favorit = favorit;
     }
+
+    public Carpeta (UUID uuid, String nom) {
+        this.uuid = uuid;
+        this.nom = nom;
+    }
 }
