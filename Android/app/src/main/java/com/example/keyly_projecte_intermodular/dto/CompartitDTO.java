@@ -1,16 +1,14 @@
 package com.example.keyly_projecte_intermodular.dto;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.tokenNou;
+import static com.example.keyly_projecte_intermodular.resources.Varis.tokenNou;
 
 import android.util.Log;
 
-import com.example.keyly_projecte_intermodular.config.TokenForEver;
+import com.example.keyly_projecte_intermodular.resources.Varis;
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
 import com.example.keyly_projecte_intermodular.dao.Compartit;
-import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.request.CompartitItemRequest;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
-import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -75,7 +73,7 @@ public class CompartitDTO {
                     .create();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(TokenForEver.BASE_URL)
+                    .baseUrl(Varis.BASE_URL)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();

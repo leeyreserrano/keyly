@@ -2,7 +2,7 @@ package com.example.keyly_projecte_intermodular.dto;
 
 import android.util.Log;
 
-import com.example.keyly_projecte_intermodular.config.TokenForEver;
+import com.example.keyly_projecte_intermodular.resources.Varis;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.google.gson.Gson;
@@ -22,7 +22,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.*;
+import static com.example.keyly_projecte_intermodular.resources.Varis.*;
 
 public class ItemDTO {
 
@@ -74,7 +74,7 @@ public class ItemDTO {
                     .create();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(TokenForEver.BASE_URL)
+                    .baseUrl(Varis.BASE_URL)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();

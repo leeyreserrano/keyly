@@ -1,7 +1,10 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
@@ -14,10 +17,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ItemFolderSelectorActivity extends AppCompatActivity {
 
-    LinearLayout items_button, carpetes_button;
+    private LinearLayout items_button, carpetes_button;
+    private ImageButton imgBtnLogOut;
     private BottomNavigationView menu;
     private boolean afegir;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,11 @@ public class ItemFolderSelectorActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         afegir = getIntent().getBooleanExtra("afegir", false);

@@ -1,19 +1,33 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.clauMestra;
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.getImage;
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.usuariPropi;
+import static com.example.keyly_projecte_intermodular.resources.Varis.bitmapToBase64;
+import static com.example.keyly_projecte_intermodular.resources.Varis.clauMestra;
+import static com.example.keyly_projecte_intermodular.resources.Varis.getImage;
+import static com.example.keyly_projecte_intermodular.resources.Varis.getImatgeUUID;
+import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
+import static com.example.keyly_projecte_intermodular.resources.Varis.publicKey;
+import static com.example.keyly_projecte_intermodular.resources.Varis.pujarImatgeAPI;
+import static com.example.keyly_projecte_intermodular.resources.Varis.usuariPropi;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarClauPrivada;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.generarClauDerivada;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.generarKdfSalt;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.generarKeyPair;
+import static com.example.keyly_projecte_intermodular.utils.GestionsUsuaris.obtenirDepartamentUUID;
+import static com.example.keyly_projecte_intermodular.utils.GestionsUsuaris.obtenirRolUUID;
+import static com.example.keyly_projecte_intermodular.utils.GestionsUsuaris.obtenirSucursalUUID;
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
@@ -34,6 +48,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -42,7 +58,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
 import com.example.keyly_projecte_intermodular.dao.Contrasenya;
 import com.example.keyly_projecte_intermodular.dao.Departament;
 import com.example.keyly_projecte_intermodular.dao.GeneradorContrasenya;
@@ -56,6 +71,7 @@ import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.dto.UtilsDTO;
 import com.example.keyly_projecte_intermodular.request.UsuariRequest;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
+import com.example.keyly_projecte_intermodular.utils.LoginService;
 import com.example.keyly_projecte_intermodular.utils.RolIntern;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -63,7 +79,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +94,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PerfilActivity extends AppCompatActivity {
-
     private ImageView imgVPerfil;
     private LinearLayout llSucursal, llDepartament, llRol, llPassword, llActions, llGestions,
             llGestioUsuaris, llGestioSucursals, llGestioDepartaments, llGestioRols, llGestioDominis,
@@ -89,7 +103,7 @@ public class PerfilActivity extends AppCompatActivity {
     private EditText etNomUsuari, etCorreu, etClauMestra;
     private Spinner spRolIntern, spSucursal, spDepartament, spRol, spTempsExpItems;
     private CheckBox cbAdministrar;
-    private ImageButton imgBtnAddImg, imgBtnEditarUsuari, imgBtnCopy, imgBtnEye, imgBtnGenerate,
+    private ImageButton imgBtnLogOut, imgBtnAddImg, imgBtnEditarUsuari, imgBtnCopy, imgBtnEye, imgBtnGenerate,
             imgBtnGuardarTempsExpItems;
     private Button btnModificarGuardarContra, btnCancelarPass, btnGuardar, btnCancelar, btnEliminar;
     private BottomNavigationView menu;
@@ -101,6 +115,38 @@ public class PerfilActivity extends AppCompatActivity {
     private ArrayList<Sucursal> sucursals = new ArrayList<>();
     private ArrayList<Departament> departaments = new ArrayList<>(), departamentsFiltrats = new ArrayList<>();
     private ArrayList<Rol> rols = new ArrayList<>(), rolsFiltrats = new ArrayList<>();
+    private ActivityResultLauncher<Intent> launcher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+
+                            try {
+
+                                Uri uri = result.getData().getData();
+
+                                Bitmap bitmap =
+                                        MediaStore.Images.Media.getBitmap(
+                                                getContentResolver(),
+                                                uri
+                                        );
+
+                                // Mostrar preview
+                                imgVPerfil.setImageBitmap(bitmap);
+
+                                // Convertir a Base64
+                                String base64 = bitmapToBase64(bitmap);
+
+                                // Pujar imatge
+                                pujarImatgeAPI(base64, esCreant, PerfilActivity.this);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+            );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +157,11 @@ public class PerfilActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         /*CAMPS*/
@@ -178,14 +229,6 @@ public class PerfilActivity extends AppCompatActivity {
             return false;
         });
 
-        btnEliminar.setOnClickListener(v -> {
-            // TODO eliminar usuari
-        });
-
-        imgBtnEditarUsuari.setOnClickListener(v -> {
-            modeEdicio(false);
-        });
-
         imgBtnCopy.setOnClickListener(v -> {
             ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             ClipData clipData = ClipData.newPlainText("Clau maestra", etClauMestra.getText());
@@ -226,116 +269,139 @@ public class PerfilActivity extends AppCompatActivity {
         });
 
         llGestioRols.setOnClickListener(v -> {
-            // TODO mostrar pantalla de gestió de rols
             Intent intent = new Intent(this, RolsActivity.class);
             startActivity(intent);
         });
 
         llGestioDominis.setOnClickListener(v -> {
             // TODO mostrar pantalla de gestió de dominis
+            Intent intent = new Intent(this, DominisActivity.class);
+            startActivity(intent);
         });
 
         imgBtnGuardarTempsExpItems.setOnClickListener(v -> {
             // TODO guardar temps d'expedició d'items
         });
 
-        btnGuardar.setOnClickListener(v -> {
-            // TODO guardar usuari
-            //pujarUsuari(nouUsuari());
-        });
-
         btnCancelar.setOnClickListener(v -> {
             if (esCreant) {
                 finish();
             } else {
-                actualitzarPantalla(false);
+                if (usuariActual.getRolIntern().equals("ADMIN")) {
+                    actualitzarPantalla(true);
+                } else {
+                    actualitzarPantalla(false);
+                }
             }
         });
 
         boolean usuariP = getIntent().getBooleanExtra("usuariPropi", false);
         esCreant = getIntent().getBooleanExtra("esCreant", false);
 
+        if (usuariP) {
+            usuariActual = usuariPropi;
+            menu.setVisibility(View.VISIBLE);
+            btnEliminar.setVisibility(View.GONE);
+        } else {
+            usuariActual = (Usuari) getIntent().getSerializableExtra("usuari");
+            menu.setVisibility(View.GONE);
+            llGestions.setVisibility(View.GONE);
+            llTempsExpItems.setVisibility(View.GONE);
+        }
+
         if (esCreant) {
             menu.setVisibility(View.GONE);
             btnEliminar.setVisibility(View.GONE);
             modeEdicio(true);
             return;
-        } else {
+        } else if (usuariP) {
             // Obtenir la imatge de perfil
-            getImage(imatge -> {
+            getImage(body -> {
                 try {
-                    SVG svg = SVG.getFromString(imatge);
-                    Drawable drawable = new PictureDrawable(svg.renderToPicture());
-                    imgVPerfil.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                    imgVPerfil.setImageDrawable(drawable);
-                } catch (SVGParseException e) {
-                    Log.e("SVG_ERROR", e.getMessage());
+                    String contentType = body.contentType().toString();
+
+                    if (contentType.contains("svg")) { // SVG
+                        SVG svg = SVG.getFromInputStream(body.byteStream());
+                        Drawable drawable =
+                                new PictureDrawable(svg.renderToPicture());
+                        imgVPerfil.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                        imgVPerfil.setImageDrawable(drawable);
+                    } else { // PNG / JPG / JPEG
+                        Bitmap bitmap = BitmapFactory.decodeStream(body.byteStream());
+                        imgVPerfil.setImageBitmap(bitmap);
+                    }
+
+                } catch (Exception e) {
+                    Log.e("IMG_ERROR", e.getMessage());
+                }
+            });
+        } else {
+            getImatgeUUID(usuariActual, body -> {
+                try {
+                    String contentType = body.contentType().toString();
+
+                    if (contentType.contains("svg")) { // SVG
+                        SVG svg = SVG.getFromInputStream(body.byteStream());
+                        Drawable drawable =
+                                new PictureDrawable(svg.renderToPicture());
+                        imgVPerfil.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                        imgVPerfil.setImageDrawable(drawable);
+                    } else { // PNG / JPG / JPEG
+                        Bitmap bitmap = BitmapFactory.decodeStream(body.byteStream());
+                        imgVPerfil.setImageBitmap(bitmap);
+                    }
+
+                } catch (Exception e) {
+                    Log.e("IMG_ERROR", e.getMessage());
                 }
             });
         }
 
-        if (usuariP) {
-            usuariActual = usuariPropi;
-            menu.setVisibility(View.VISIBLE);
-        } else {
-            usuariActual = (Usuari) getIntent().getSerializableExtra("usuari");
-            menu.setVisibility(View.GONE);
+        if (!usuariP && !esCreant) {
+            btnEliminar.setVisibility(View.VISIBLE);
         }
-
-//        if (usuariActual == null) {
-////            Log.e("PerfilActivity", "usuariActual es null");
-////            finish();
-////            return;
-//            usuariActual = usuariPropi;
-//        }
-
-//        Log.d("USUARI_ACTUAL", usuariActual.toString());
-
-//        if (usuariActual.getRolIntern().equals("ADMIN") && !esCreant) {
-//
-//            Log.d("ROL_INTER", usuariActual.getRolIntern());
-//
-//            if (usuariP) {
-//                btnEliminar.setVisibility(View.GONE);
-//                actualitzarPantalla(true);
-//            } else {
-//                btnEliminar.setVisibility(View.VISIBLE);
-//                actualitzarPantalla(true);
-//            }
-//
-//        } else if (!esCreant) {
-//            actualitzarPantalla(false);
-//        }
 
         if (usuariActual != null) {
             if (usuariActual.getRolIntern().equals("ADMIN")) {
-                btnEliminar.setVisibility(usuariP ? View.GONE : View.VISIBLE);
                 actualitzarPantalla(true);
             } else {
-                btnEliminar.setVisibility(View.GONE);
                 actualitzarPantalla(false);
             }
         }
 
-//
-//        if (usuariPropi.isPotAdministrar()) {
-//            if (usuariP) {
-//                usuariActual = usuariPropi;
-//                // Actualitzar la pantalla segons si és usuari o administrador
-//                actualitzarPantalla(usuariActual.isPotAdministrar());
-//                btnEliminar.setVisibility(View.GONE);
-//            } else {
-//                if (esCreant) {
-//                    btnEliminar.setVisibility(View.GONE);
-//                    modeEdicio(true);
-//                } else {
-//                    btnEliminar.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        } else {
-//            usuariActual = (Usuari) getIntent().getSerializableExtra("usuari");
-//            actualitzarPantalla(false);
-//        }
+        imgBtnAddImg.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+
+            launcher.launch(intent);
+        });
+
+        imgBtnEditarUsuari.setOnClickListener(v -> {
+            modeEdicio(false);
+        });
+
+        btnEliminar.setOnClickListener(v -> {
+            // TODO eliminar usuari
+            Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).eliminarUsuari(usuariActual.getUuid().toString());
+            call.enqueue(new Callback<Usuari>() {
+                @Override
+                public void onResponse(Call<Usuari> call, Response<Usuari> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(PerfilActivity.this, "Usuari " + usuariActual.getNom() + " eliminat", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(PerfilActivity.this, "No s'ha pogut eliminar l'usuari " + usuariActual.getNom(), Toast.LENGTH_SHORT).show();
+                        Log.d("ERROR_RESPONSE", response.message());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Usuari> call, Throwable t) {
+                    Toast.makeText(PerfilActivity.this, "No s'ha pogut eliminar l'usuari " + usuariActual.getNom(), Toast.LENGTH_SHORT).show();
+                    Log.d("ERROR_RESPONSE", t.getMessage());
+                }
+            });
+        });
     }
 
     private void actualitzarPantalla(boolean admin) {
@@ -351,7 +417,6 @@ public class PerfilActivity extends AppCompatActivity {
         flRol.setVisibility(View.GONE);
 
         // Mostrar elements
-        imgBtnAddImg.setVisibility(View.VISIBLE);
         txtNomUsuari.setVisibility(View.VISIBLE);
         imgBtnEditarUsuari.setVisibility(View.VISIBLE);
         txtCorreu.setVisibility(View.VISIBLE);
@@ -360,6 +425,8 @@ public class PerfilActivity extends AppCompatActivity {
         txtRol.setVisibility(View.VISIBLE);
         llActions.setVisibility(View.VISIBLE);
 
+        Log.d("USUARI_ACTUAL", usuariActual.toString());
+
         // Nom usuari
         txtNomUsuari.setText(usuariActual.getNom());
 
@@ -367,27 +434,31 @@ public class PerfilActivity extends AppCompatActivity {
         txtCorreu.setText(usuariActual.getCorreu());
 
         // Sucursal usuari
-        if (usuariActual.getSucursal().getNom() != null && usuariActual.getSucursal().getNom() != "") {
-            llSucursal.setVisibility(View.VISIBLE);
-            txtSucursal.setText(usuariActual.getSucursal().getNom());
-        } else {
-            llSucursal.setVisibility(View.GONE);
+        if (usuariActual.getSucursal().getUuid() != null) {
+            if (!usuariActual.getRolIntern().equals("ADMIN")) {
+                txtSucursal.setText(usuariActual.getSucursal().getNom());
+            } else {
+                obtenirSucursalUUID(usuariActual.getSucursal().getUuid(), llSucursal, txtSucursal, spSucursal, sucursals);
+            }
         }
 
         // Departament usuari
-        if (usuariActual.getDepartament().getNom() != null && usuariActual.getDepartament().getNom() != "") {
-            llDepartament.setVisibility(View.VISIBLE);
-            txtDepartament.setText(usuariActual.getDepartament().getNom());
-        } else {
-            llDepartament.setVisibility(View.GONE);
+        if (usuariActual.getDepartament().getUuid() != null) {
+            if (!usuariActual.getRolIntern().equals("ADMIN")) {
+                Log.d("USUARI_ACTUAL", usuariActual.toString());
+                txtDepartament.setText(usuariActual.getDepartament().getNom());
+            } else {
+                obtenirDepartamentUUID(usuariActual.getDepartament().getUuid(), llDepartament, txtDepartament, spDepartament, departamentsFiltrats);
+            }
         }
 
         // Rol usuari
-        if (usuariActual.getRol().getNom() != null && usuariActual.getRol().getNom() != "") {
-            llRol.setVisibility(View.VISIBLE);
-            txtRol.setText(usuariActual.getRol().getNom());
-        } else {
-            llRol.setVisibility(View.GONE);
+        if (usuariActual.getRol().getUuid() != null) {
+            if (!usuariActual.getRolIntern().equals("ADMIN")) {
+                txtRol.setText(usuariActual.getRol().getNom());
+            } else {
+                obtenirRolUUID(usuariActual.getRol().getUuid(), llRol, txtRol, spRol, rolsFiltrats);
+            }
         }
 
         // Clau mestra usuari
@@ -437,14 +508,48 @@ public class PerfilActivity extends AppCompatActivity {
     }
 
     private void modeEdicio(boolean esCreant) {
+
+        if (!esCreant) {
+            if (usuariActual.getRolIntern().equals("ADMIN")) {
+                txtSucursal.setVisibility(View.GONE);
+                txtDepartament.setVisibility(View.GONE);
+                txtRol.setVisibility(View.GONE);
+
+                flRolIntern.setVisibility(View.VISIBLE);
+                spRolIntern.setVisibility(View.VISIBLE);
+                cbAdministrar.setVisibility(View.GONE); // TODO solo mostrar si es cap el rolintern
+                flSucursal.setVisibility(View.VISIBLE);
+                flDepartament.setVisibility(View.VISIBLE);
+                flRol.setVisibility(View.VISIBLE);
+            } else {
+                txtSucursal.setVisibility(View.VISIBLE);
+                txtDepartament.setVisibility(View.VISIBLE);
+                txtRol.setVisibility(View.VISIBLE);
+
+                flRolIntern.setVisibility(View.GONE);
+                spRolIntern.setVisibility(View.GONE);
+                cbAdministrar.setVisibility(View.GONE); // TODO solo mostrar si es cap el rolintern
+                flSucursal.setVisibility(View.GONE);
+                flDepartament.setVisibility(View.GONE);
+                flRol.setVisibility(View.GONE);
+            }
+        } else {
+            txtSucursal.setVisibility(View.GONE);
+            txtDepartament.setVisibility(View.GONE);
+            txtRol.setVisibility(View.GONE);
+
+            flRolIntern.setVisibility(View.VISIBLE);
+            spRolIntern.setVisibility(View.VISIBLE);
+            cbAdministrar.setVisibility(View.GONE); // TODO solo mostrar si es cap el rolintern
+            flSucursal.setVisibility(View.VISIBLE);
+            flDepartament.setVisibility(View.VISIBLE);
+            flRol.setVisibility(View.VISIBLE);
+        }
+
         // Ocultar elements
-        imgBtnAddImg.setVisibility(View.VISIBLE);
         txtNomUsuari.setVisibility(View.GONE);
         imgBtnEditarUsuari.setVisibility(View.GONE);
         txtCorreu.setVisibility(View.GONE);
-        txtSucursal.setVisibility(View.GONE);
-        txtDepartament.setVisibility(View.GONE);
-        txtRol.setVisibility(View.GONE);
         llActions.setVisibility(View.GONE);
         llGestions.setVisibility(View.GONE);
         llTempsExpItems.setVisibility(View.GONE);
@@ -452,15 +557,23 @@ public class PerfilActivity extends AppCompatActivity {
         // Mostrar elements
         etNomUsuari.setVisibility(View.VISIBLE);
         etCorreu.setVisibility(View.VISIBLE);
-        flRolIntern.setVisibility(View.VISIBLE);
-        spRolIntern.setVisibility(View.VISIBLE);
-        cbAdministrar.setVisibility(View.GONE); // TODO solo mostrar si es cap el rolintern
-        flSucursal.setVisibility(View.VISIBLE);
-        flDepartament.setVisibility(View.VISIBLE);
-        flRol.setVisibility(View.VISIBLE);
         imgBtnGenerate.setVisibility(View.VISIBLE);
         btnGuardar.setVisibility(View.VISIBLE);
         btnCancelar.setVisibility(View.VISIBLE);
+
+        if (esCreant) {
+            etNomUsuari.setText("");
+            etCorreu.setText("");
+            spSucursal.setSelection(0);
+            spDepartament.setSelection(0);
+            spRol.setSelection(0);
+            spRolIntern.setSelection(0);
+            cbAdministrar.setChecked(false);
+        } else if (!usuariActual.getRolIntern().equals("ADMIN")) {
+            txtSucursal.setText(usuariActual.getSucursal().getNom());
+            txtDepartament.setText(usuariActual.getDepartament().getNom());
+            txtRol.setText(usuariActual.getRol().getNom());
+        }
 
         imgVPerfil.setImageResource(R.drawable.foto_perfil);
 
@@ -531,245 +644,257 @@ public class PerfilActivity extends AppCompatActivity {
             });
         });
 
+        // Inserir els rols interns en l'spinner
+        ArrayList<String> rolsInterns = new ArrayList<>();
+        rolsInterns.add("Sense rol intern");
+        for (RolIntern rol : RolIntern.values()) {
+            rolsInterns.add(rol.name());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(PerfilActivity.this, android.R.layout.simple_spinner_item, rolsInterns);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spRolIntern.setAdapter(adapter);
+
+        spRolIntern.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (spRolIntern.getSelectedItem().toString().equals("CAP")) {
+                    cbAdministrar.setVisibility(View.VISIBLE);
+                } else {
+                    cbAdministrar.setVisibility(View.GONE);
+                    cbAdministrar.setChecked(false);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        obtenirSucursals(spSucursal, spDepartament, spRol);
+        spSucursal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Obtenir els altres
+                omplirSpDepartaments(spDepartament, spSucursal);
+                obtenirRols(spRol, spSucursal);
+                if (!esCreant && usuariActual.getRolIntern().equals("ADMIN")) {
+                    obtenirSucursalUUID(usuariActual.getSucursal().getUuid(), llSucursal, txtSucursal, spSucursal, sucursals);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spDepartament.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // TODO moverlo a un listener del spinner departamentos y que se haga cuando no sea "Sense departament"
+                if (!spDepartament.getSelectedItem().toString().equals("Sense departament")) {
+                    if (spSucursal.getSelectedItem().toString().equals("Sense sucursal")) {
+                        // TODO seleccionar sucursal por uuid
+                        int positionDepartament = spDepartament.getSelectedItemPosition();
+                        Departament departamentTriat = departaments.get(positionDepartament - 1);
+                        Sucursal sucursalTriada = departamentTriat.getSucursal();
+                        for (int i = 0; i < sucursals.size(); i++) {
+                            if (sucursals.get(i).getUuid().equals(sucursalTriada.getUuid())) {
+                                spSucursal.setSelection(i + 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!esCreant && usuariActual.getRolIntern().equals("ADMIN")) {
+                    obtenirDepartamentUUID(usuariActual.getDepartament().getUuid(), llDepartament, txtDepartament, spDepartament, departamentsFiltrats);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spRol.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // TODO moverlo a un listener del spinner departamentos y que se haga cuando no sea "Sense departament"
+                if (!spRol.getSelectedItem().toString().equals("Sense rol")) {
+                    if (spSucursal.getSelectedItem().toString().equals("Sense sucursal")) {
+                        // TODO seleccionar sucursal por uuid
+                        int positionDepartament = spRol.getSelectedItemPosition();
+                        Rol rolTriat = rols.get(positionDepartament - 1);
+                        Sucursal sucursalTriada = rolTriat.getSucursal();
+                        for (int i = 0; i < sucursals.size(); i++) {
+                            if (sucursals.get(i).getUuid().equals(sucursalTriada.getUuid())) {
+                                spSucursal.setSelection(i + 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!esCreant && usuariActual.getRolIntern().equals("ADMIN")) {
+                    obtenirRolUUID(usuariActual.getRol().getUuid(), llRol, txtRol, spRol, rolsFiltrats);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         if (!esCreant) {
             if (usuariActual.getNom() != null && usuariActual.getNom() != "")
-                txtNomUsuari.setText(usuariActual.getNom());
+                etNomUsuari.setText(usuariActual.getNom());
 
             if (usuariActual.getCorreu() != null && usuariActual.getCorreu() != "")
-                txtCorreu.setText(usuariActual.getCorreu());
-
-            if (usuariActual.getSucursal().getNom() != null && usuariActual.getSucursal().getNom() != "") {
-                txtSucursal.setText(usuariActual.getSucursal().getNom());
-            } else {
-                txtSucursal.setText("Sense sucursal");
-            }
-
-            if (usuariActual.getDepartament().getNom() != null && usuariActual.getDepartament().getNom() != "") {
-                txtDepartament.setText(usuariActual.getDepartament().getNom());
-            } else {
-                txtDepartament.setText("Sense departament");
-            }
-
-            if (usuariActual.getRol().getNom() != null && usuariActual.getRol().getNom() != "") {
-                txtRol.setText(usuariActual.getRol().getNom());
-            } else {
-                txtRol.setText("Sense rol");
-            }
+                etCorreu.setText(usuariActual.getCorreu());
 
             etClauMestra.setText(clauMestraActual);
-        } else {
-            // Inserir els rols interns en l'spinner
-            ArrayList<String> rolsInterns = new ArrayList<>();
-            rolsInterns.add("Sense rol intern");
-            for (RolIntern rol : RolIntern.values()) {
-                rolsInterns.add(rol.name());
+        }
+
+        btnGuardar.setOnClickListener(v -> {
+            // TODO poner obligación en nombre, contraseña y correo para rellenar
+            String nomUsuari = etNomUsuari.getText().toString().trim();
+            String correu = etCorreu.getText().toString().trim();
+            Sucursal sucursal = null;
+            Departament departament = null;
+            Rol rol = null;
+
+            if (nomUsuari.isEmpty()) {
+                Toast.makeText(this, "Has d'omplir el nom d'usuari!", Toast.LENGTH_SHORT).show();
+                return;
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(PerfilActivity.this, android.R.layout.simple_spinner_item, rolsInterns);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spRolIntern.setAdapter(adapter);
+            if (correu.isEmpty()) {
+                Toast.makeText(this, "Has d'omplir el correu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            spRolIntern.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (spRolIntern.getSelectedItem().toString().equals("CAP")) {
-                        cbAdministrar.setVisibility(View.VISIBLE);
-                    } else {
-                        cbAdministrar.setVisibility(View.GONE);
-                        cbAdministrar.setChecked(false);
-                    }
+            for (Sucursal sucursal1 : sucursals) {
+                if (sucursal1.getNom().equals(spSucursal.getSelectedItem().toString())) {
+                    sucursal = sucursal1;
+                    break;
                 }
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+            if (sucursal == null) {
+                Toast.makeText(this, "Has d'omplir la sucursal!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            for (Departament departament1 : departaments) {
+                if (departament1.getNom().equals(spDepartament.getSelectedItem().toString())) {
+                    departament = departament1;
+                    break;
                 }
-            });
+            }
 
-            obtenirSucursals(spSucursal, spDepartament, spRol);
-            spSucursal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    // Obtenir els altres
-                    omplirSpDepartaments(spDepartament, spSucursal);
-                    obtenirRols(spRol, spSucursal);
+            if (departament == null) {
+                Toast.makeText(this, "Has d'omplir el departament!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (Rol rol1 : rols) {
+                if (rol1.getNom().equals(spRol.getSelectedItem().toString())) {
+                    rol = rol1;
+                    break;
                 }
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+            if (rol == null) {
+                Toast.makeText(this, "Has d'omplir el rol!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            if (spRolIntern.getSelectedItem().toString().equals("Sense rol intern")) {
+                Toast.makeText(this, "Has d'omplir el rol intern!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            RolIntern rolIntern = RolIntern.valueOf(spRolIntern.getSelectedItem().toString());
+
+            boolean potAdministrar = cbAdministrar.isChecked();
+
+            String novaClauMestra = null;
+            if (etClauMestra.getText().toString().isEmpty()) {
+                Toast.makeText(this, "Has d'omplir la clau mestra!", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                novaClauMestra = etClauMestra.getText().toString();
+            }
+
+            // TODO generar par claves
+            Encrypt.ParellClaus parellClaus = null;
+            try {
+                parellClaus = generarKeyPair();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+
+            // TODO generar kdfSalt
+            byte[] kdfSalt = generarKdfSalt();
+            // Convertir a Base64 el kdfSalt
+            String kdfSaltB64 = Base64.encodeToString(kdfSalt, Base64.NO_WRAP);
+
+            // TODO obtenir clau pública
+            String publicKey = parellClaus.getPublicKeyB64();
+
+            // TODO generar clau derivada
+            SecretKey secretKey = null;
+            try {
+                secretKey = generarClauDerivada(novaClauMestra, kdfSaltB64);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidKeySpecException e) {
+                throw new RuntimeException(e);
+            }
+
+            // TODO cifrar privateKey
+            PrivateKey privateKey = parellClaus.getKeyPair().getPrivate();
+            String clauPrivadaEncriptada = null;
+            try {
+                clauPrivadaEncriptada = encriptarClauPrivada(secretKey, privateKey);
+            } catch (NoSuchPaddingException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalBlockSizeException e) {
+                throw new RuntimeException(e);
+            } catch (BadPaddingException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidAlgorithmParameterException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Crear usuari nou
+            UsuariRequest usuariRequest = null;
+            if (!esCreant) {
+                if (usuariActual.getUuid().equals(usuariPropi.getUuid()) &&
+                        !usuariActual.getRolIntern().equals("ADMIN")) {
+                    usuariRequest = new UsuariRequest(
+                            usuariActual.getSucursal().getUuid(), // UUID de sucursal
+                            usuariActual.getDepartament().getUuid(), // UUID de departament
+                            usuariActual.getRol().getUuid(), // UUID de rol
+                            nomUsuari, // Nom usuari
+                            correu, // Correu usuari
+                            clauMestraActual, // Clau mestra usuari
+                            kdfSaltB64, // kdfSalt
+                            publicKey, // publicKey
+                            clauPrivadaEncriptada, // encryptedPrivateKey
+                            rolIntern, // Rol intern (ADMIN, CAP, USUARI)
+                            potAdministrar // potAdministrar
+                    );
                 }
-            });
-
-            spDepartament.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    // TODO moverlo a un listener del spinner departamentos y que se haga cuando no sea "Sense departament"
-                    if (!spDepartament.getSelectedItem().toString().equals("Sense departament")) {
-                        if (spSucursal.getSelectedItem().toString().equals("Sense sucursal")) {
-                            // TODO seleccionar sucursal por uuid
-                            int positionDepartament = spDepartament.getSelectedItemPosition();
-                            Departament departamentTriat = departaments.get(positionDepartament - 1);
-                            Sucursal sucursalTriada = departamentTriat.getSucursal();
-                            for (int i = 0; i < sucursals.size(); i++) {
-                                if (sucursals.get(i).getUuid().equals(sucursalTriada.getUuid())) {
-                                    spSucursal.setSelection(i + 1);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            spRol.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    // TODO moverlo a un listener del spinner departamentos y que se haga cuando no sea "Sense departament"
-                    if (!spRol.getSelectedItem().toString().equals("Sense rol")) {
-                        if (spSucursal.getSelectedItem().toString().equals("Sense sucursal")) {
-                            // TODO seleccionar sucursal por uuid
-                            int positionDepartament = spRol.getSelectedItemPosition();
-                            Rol rolTriat = rols.get(positionDepartament - 1);
-                            Sucursal sucursalTriada = rolTriat.getSucursal();
-                            for (int i = 0; i < sucursals.size(); i++) {
-                                if (sucursals.get(i).getUuid().equals(sucursalTriada.getUuid())) {
-                                    spSucursal.setSelection(i + 1);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            btnGuardar.setOnClickListener(v -> {
-                // TODO poner obligación en nombre, contraseña y correo para rellenar
-                String nomUsuari = etNomUsuari.getText().toString().trim();
-                String correu = etCorreu.getText().toString().trim();
-                Sucursal sucursal = null;
-                Departament departament = null;
-                Rol rol = null;
-
-                if (nomUsuari.isEmpty()) {
-                    Toast.makeText(this, "Has d'omplir el nom d'usuari!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (correu.isEmpty()) {
-                    Toast.makeText(this, "Has d'omplir el correu!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                for (Sucursal sucursal1 : sucursals) {
-                    if (sucursal1.getNom().equals(spSucursal.getSelectedItem().toString())) {
-                        sucursal = sucursal1;
-                        break;
-                    }
-                }
-
-                if (sucursal == null) {
-                    Toast.makeText(this, "Has d'omplir la sucursal!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                for (Departament departament1 : departaments) {
-                    if (departament1.getNom().equals(spDepartament.getSelectedItem().toString())) {
-                        departament = departament1;
-                        break;
-                    }
-                }
-
-                if (departament == null) {
-                    Toast.makeText(this, "Has d'omplir el departament!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                for (Rol rol1 : rols) {
-                    if (rol1.getNom().equals(spRol.getSelectedItem().toString())) {
-                        rol = rol1;
-                        break;
-                    }
-                }
-
-                if (rol == null) {
-                    Toast.makeText(this, "Has d'omplir el rol!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (spRolIntern.getSelectedItem().toString().equals("Sense rol intern")) {
-                    Toast.makeText(this, "Has d'omplir el rol intern!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                RolIntern rolIntern = RolIntern.valueOf(spRolIntern.getSelectedItem().toString());
-
-                boolean potAdministrar = cbAdministrar.isChecked();
-
-                String novaClauMestra = null;
-                if (etClauMestra.getText().toString().isEmpty()) {
-                    Toast.makeText(this, "Has d'omplir la clau mestra!", Toast.LENGTH_SHORT).show();
-                    return;
-                } else {
-                    novaClauMestra = etClauMestra.getText().toString();
-                }
-
-                // TODO generar par claves
-                Encrypt.ParellClaus parellClaus = null;
-                try {
-                    parellClaus = generarKeyPair();
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // TODO generar kdfSalt
-                byte[] kdfSalt = generarKdfSalt();
-                // Convertir a Base64 el kdfSalt
-                String kdfSaltB64 = Base64.encodeToString(kdfSalt, Base64.NO_WRAP);
-
-                // TODO obtenir clau pública
-                String publicKey = parellClaus.getPublicKeyB64();
-
-                // TODO generar clau derivada
-                SecretKey secretKey = null;
-                try {
-                    secretKey = generarClauDerivada(novaClauMestra, kdfSaltB64);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                } catch (InvalidKeySpecException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // TODO cifrar privateKey
-                PrivateKey privateKey = parellClaus.getKeyPair().getPrivate();
-                String clauPrivadaEncriptada = null;
-                try {
-                    clauPrivadaEncriptada = encriptarClauPrivada(secretKey, privateKey);
-                } catch (NoSuchPaddingException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalBlockSizeException e) {
-                    throw new RuntimeException(e);
-                } catch (BadPaddingException e) {
-                    throw new RuntimeException(e);
-                } catch (InvalidAlgorithmParameterException e) {
-                    throw new RuntimeException(e);
-                } catch (InvalidKeyException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // Crear usuari nou
-                UsuariRequest usuariRequest = new UsuariRequest(
+            } else {
+                usuariRequest = new UsuariRequest(
                         sucursal.getUuid(), // UUID de sucursal
                         departament.getUuid(), // UUID de departament
                         rol.getUuid(), // UUID de rol
@@ -782,13 +907,21 @@ public class PerfilActivity extends AppCompatActivity {
                         rolIntern, // Rol intern (ADMIN, CAP, USUARI)
                         potAdministrar // potAdministrar
                 );
+            }
 
-                Log.d("USUARI_REQUEST", usuariRequest.toString());
+            if (!esCreant) {
 
-                // Pujar-lo al servidor
-                pujarUsuari(usuariRequest);
-            });
-        }
+                if (usuariRequest.getCorreu().equals(usuariActual.getCorreu())) {
+                    usuariRequest.setCorreu(null);
+                }
+            }
+
+            Log.d("USUARI_REQUEST", usuariRequest.toString());
+
+            // Pujar-lo al servidor
+            pujarUsuari(usuariRequest);
+            pujarUsuari(usuariRequest);
+        });
     }
 
     private void generarContrasenya(GeneradorContrasenya gPassword, EditText etPassword) {
@@ -847,13 +980,11 @@ public class PerfilActivity extends AppCompatActivity {
         });
 
         btnUsar.setOnClickListener(v -> {
-            // TODO guardar contrasenya
             etClauMestra.setText(etContrasenyaGenerada.getText());
             alertDialog.dismiss();
         });
 
         btnGenerar.setOnClickListener(v -> {
-            // TODO generar contrasenya
             int longitut = Integer.parseInt(txtLongitud.getText().toString());
             int longitutRestant = longitut;
             int qtyMin = 0, qtyMay = 0, qtyNum = 0, qtyEspcials = 0;
@@ -914,31 +1045,117 @@ public class PerfilActivity extends AppCompatActivity {
     }
 
     private void pujarUsuari(UsuariRequest usuariRequest) {
-        Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).crearUsuari(usuariRequest);
-        call.enqueue(new Callback<Usuari>() {
-            @Override
-            public void onResponse(Call<Usuari> call, Response<Usuari> response) {
-                if (response.isSuccessful()) {
-                    //usuariActual = response.body();
-                    if (esCreant) {
+        if (esCreant) { // Nou usuari
+            Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).crearUsuari(usuariRequest);
+            call.enqueue(new Callback<Usuari>() {
+                @Override
+                public void onResponse(Call<Usuari> call, Response<Usuari> response) {
+                    if (response.isSuccessful()) {
+                        //usuariActual = response.body();
                         finish();
-                    }
-                } else {
-                    try {
-                        String errorBody = response.errorBody().string();
-                        Log.e("ERROR_RESPONSE", "Codi: " + response.code() + " | " + errorBody);
-                        Toast.makeText(PerfilActivity.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        Log.e("ERROR_RESPONSE", "No s'ha pogut llegir l'error: " + e.getMessage());
+                    } else {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            Log.e("ERROR_RESPONSE", "Codi: " + response.code() + " | " + errorBody);
+                            Toast.makeText(PerfilActivity.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Log.e("ERROR_RESPONSE", "No s'ha pogut llegir l'error: " + e.getMessage());
+                        }
                     }
                 }
+
+                @Override
+                public void onFailure(Call<Usuari> call, Throwable t) {
+                    Log.e("ERROR_FAILURE", t.getMessage());
+                }
+            });
+        } else { // Actualitzar usuari
+            // TODO generar clau derivada
+            String clauMestra = etClauMestra.getText().toString();
+            String kdfSaltB64 = usuariRequest.getKdfSalt();
+            SecretKey secretKey = null;
+            try {
+                secretKey = generarClauDerivada(clauMestra, kdfSaltB64);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidKeySpecException e) {
+                throw new RuntimeException(e);
             }
 
-            @Override
-            public void onFailure(Call<Usuari> call, Throwable t) {
-                Log.e("ERROR_FAILURE", t.getMessage());
+            // TODO cifrar privateKey
+            PrivateKey privateKey = privateKeyDecrypt;
+            String clauPrivadaEncriptada = null;
+            try {
+                clauPrivadaEncriptada = encriptarClauPrivada(secretKey, privateKey);
+            } catch (NoSuchPaddingException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalBlockSizeException e) {
+                throw new RuntimeException(e);
+            } catch (BadPaddingException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidAlgorithmParameterException e) {
+                throw new RuntimeException(e);
+            } catch (InvalidKeyException e) {
+                throw new RuntimeException(e);
             }
-        });
+
+            // Guardar en bytes la clau pública
+            byte[] publicKeyBytes = publicKey.getEncoded();
+            // Convertir a Base64 la clau pública
+            String publicKeyB64 = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP);
+
+            usuariRequest.setPublicKey(publicKeyB64);
+            usuariRequest.setEncryptedPrivateKey(clauPrivadaEncriptada);
+
+            Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).actualitzarUsuari(usuariActual.getUuid().toString(), usuariRequest);
+            call.enqueue(new Callback<Usuari>() {
+                @Override
+                public void onResponse(Call<Usuari> call, Response<Usuari> response) {
+                    Log.d("UPDATE_USUARI", "Codi resposta: " + response.code());
+                    if (response.isSuccessful()) {
+                        Log.d("UPDATE_USUARI", "Èxit: " + response.body().toString());
+                        usuariActual = response.body();
+                        if (usuariActual.getUuid().equals(usuariPropi.getUuid())) {
+                            if (RolIntern.valueOf(usuariActual.getRolIntern()) == RolIntern.ADMIN) {
+                                actualitzarPantalla(true);
+                            } else {
+                                actualitzarPantalla(false);
+                            }
+                            LoginService.login(PerfilActivity.this, usuariActual.getCorreu(), clauMestraActual, false,
+                                    new LoginService.LoginCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Toast.makeText(PerfilActivity.this, "Usuari editat", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onFailure(String error) {
+                                            Toast.makeText(PerfilActivity.this, "Error relogueig: " + error, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            actualitzarPantalla(false);
+                        }
+                    } else {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            Log.e("UPDATE_USUARI", "Error body: " + errorBody);
+                            Toast.makeText(PerfilActivity.this, "Error " + response.code() + ": " + errorBody, Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Log.e("UPDATE_USUARI", "No s'ha pogut llegir error: " + e.getMessage());
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Usuari> call, Throwable t) {
+                    Log.e("UPDATE_USUARI", "Failure: " + t.getMessage());
+                    Toast.makeText(PerfilActivity.this, "Falla de xarxa: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     private void obtenirSucursals(Spinner spSucursals, Spinner spDepartaments, Spinner spRols) {
@@ -988,7 +1205,7 @@ public class PerfilActivity extends AppCompatActivity {
                 int posSucursalTriada = spSucursal.getSelectedItemPosition();
                 Sucursal sucursalTriada = null;
                 for (int i = 0; i < sucursals.size(); i++) {
-                    if (sucursals.get(i).getUuid().equals(sucursals.get(posSucursalTriada - 1).getUuid())) {
+                    if (sucursals.get(i).getUuid().equals(sucursals.get(posSucursalTriada).getUuid())) {
                         sucursalTriada = sucursals.get(i);
                         break;
                     }
@@ -1080,7 +1297,6 @@ public class PerfilActivity extends AppCompatActivity {
 
     private void obtenirRols (Spinner spRols, Spinner spSucursals) {
         if (rolsObtinguts && !spRols.getSelectedItem().toString().equals("Sense rol")) {
-            // TODO obtener rol para comprobar si es de sucursal o no
             // Obtenir rol triat d'abans
             int posRolTriat = spRols.getSelectedItemPosition();
             Rol rolTriat = null;
@@ -1095,7 +1311,7 @@ public class PerfilActivity extends AppCompatActivity {
             int posSucursalTriada = spSucursal.getSelectedItemPosition();
             Sucursal sucursalTriada = null;
             for (int i = 0; i < sucursals.size(); i++) {
-                if (sucursals.get(i).getUuid().equals(sucursals.get(posSucursalTriada - 1).getUuid())) {
+                if (sucursals.get(i).getUuid().equals(sucursals.get(posSucursalTriada).getUuid())) {
                     sucursalTriada = sucursals.get(i);
                     break;
                 }

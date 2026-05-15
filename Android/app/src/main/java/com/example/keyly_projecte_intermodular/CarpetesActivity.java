@@ -1,9 +1,10 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.privateKeyDecrypt;
+import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,8 +43,8 @@ import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
-import com.example.keyly_projecte_intermodular.resources.CarpetaAdapter;
-import com.example.keyly_projecte_intermodular.resources.RecercaAdapter;
+import com.example.keyly_projecte_intermodular.adapters.CarpetaAdapter;
+import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -63,7 +64,9 @@ public class CarpetesActivity extends AppCompatActivity {
     private CarpetaAdapter carpetesAdapter;
     private EditText etCercar;
     private ImageView btnFiltres, btnAfegirCarpeta;
+    private ImageButton imgBtnLogOut;
     private BottomNavigationView menu;
+    private int posItemCompartit = 0;
     private boolean filtrat = false;
     private Carpeta carpetaCreada;
     private ArrayList<Carpeta> carpetes = new ArrayList<>();
@@ -71,6 +74,7 @@ public class CarpetesActivity extends AppCompatActivity {
     private ArrayList<Item> itemsSeleccionats = new ArrayList<>();
     private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
+    private ArrayList<String> permisos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,11 @@ public class CarpetesActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         menu = findViewById(R.id.menu_app);
@@ -210,11 +219,11 @@ public class CarpetesActivity extends AppCompatActivity {
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
             recyclerItems.setLayoutManager(new LinearLayoutManager(CarpetesActivity.this));
-            RecercaAdapter recercaAdapterItems = new RecercaAdapter(itemsSeleccionats, null, null, this);
+            RecercaAdapter recercaAdapterItems = new RecercaAdapter(itemsSeleccionats, null, null, null, this);
             recyclerItems.setAdapter(recercaAdapterItems);
 
             recyclerUsuaris.setLayoutManager(new LinearLayoutManager(CarpetesActivity.this));
-            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, this);
+            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, permisos, this);
             recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
             AtomicBoolean favActual = new AtomicBoolean(false);
@@ -350,6 +359,8 @@ public class CarpetesActivity extends AppCompatActivity {
                     for (Usuari usuari : usuaris) {
                         if (usuari.getNom().equals(seleccionat) && !usuarisSeleccionats.contains(usuari)) {
                             usuarisSeleccionats.add(usuari);
+                            // Afegir permisos per defecte
+                            permisos.add(Permisos.LECTURA.toString());
                         }
                     }
                     recercaAdapterUsuaris.notifyDataSetChanged();
@@ -375,12 +386,14 @@ public class CarpetesActivity extends AppCompatActivity {
                             if (usuarisSeleccionats.size() > 0) {
                                 usuarisCompartitRequest.clear();
                                 ArrayList<EncryptedDataKey> encryptedDataKeysC = new ArrayList<>();
-                                for (Usuari usuari : usuarisSeleccionats) {
+                                for (int i = 0; i < usuarisSeleccionats.size(); i++) {
+                                    Permisos permis = Permisos.valueOf(permisos.get(i));
                                     usuarisCompartitRequest.add(new UsuariCompartitRequest(
-                                            usuari.getUuid(),
-                                            Permisos.LECTURA,
+                                            usuarisSeleccionats.get(i).getUuid(),
+                                            permis,
                                             encryptedDataKeysC));
                                 }
+                                Log.d("USUARIS_COMPARTITS_PERMISOS", usuarisCompartitRequest.toString());
                                 try {
                                     compartirCarpeta(carpetaCreada);
                                 } catch (Exception e) {
@@ -458,6 +471,8 @@ public class CarpetesActivity extends AppCompatActivity {
 
     private void compartirCarpeta(Carpeta carpeta) {
 
+        posItemCompartit = 0;
+
         Log.d("CARPETA_CREADA_COMPARTIR", carpeta.toString());
 
         CompartitRequest compartitRequestC = new CompartitRequest(carpeta.getUuid(), TipusEntitat.CARPETA, usuarisCompartitRequest);
@@ -497,10 +512,11 @@ public class CarpetesActivity extends AppCompatActivity {
                                             encryptedDataKeysI.add(edk);
                                         }
 
+                                        Permisos permis = Permisos.valueOf(permisos.get(posItemCompartit));
                                         for (Usuari usuari : usuarisSeleccionats) {
                                             usuarisCompartitRequest.add(new UsuariCompartitRequest(
                                                     usuari.getUuid(),
-                                                    Permisos.LECTURA,
+                                                    permis,
                                                     encryptedDataKeysI));
                                         }
 

@@ -28,11 +28,11 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.keyly_projecte_intermodular.dao.Rol;
+import com.example.keyly_projecte_intermodular.dao.Domini;
 import com.example.keyly_projecte_intermodular.dao.Sucursal;
-import com.example.keyly_projecte_intermodular.dto.RolDTO;
+import com.example.keyly_projecte_intermodular.dto.DominiDTO;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
-import com.example.keyly_projecte_intermodular.request.RolRequest;
+import com.example.keyly_projecte_intermodular.request.DominiRequest;
 import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
 
 import java.util.ArrayList;
@@ -42,23 +42,23 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RolsActivity extends AppCompatActivity {
+public class DominisActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerRols;
+    private RecyclerView recyclerDominis;
     private LinearLayout layoutError;
-    private SDRDAdapter rolAdapter;
+    private SDRDAdapter dominiAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirRol;
+    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirDomini;
     private UUID uuidSucursal = null;
-    private Sucursal sucursalRol = null;
-    private ArrayList<Rol> rols = new ArrayList<>();
+    private Sucursal sucursalDomini = null;
+    private ArrayList<Domini> dominis = new ArrayList<>();
     private ArrayList<Sucursal> sucursals = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_rols);
+        setContentView(R.layout.activity_dominis);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -70,12 +70,12 @@ public class RolsActivity extends AppCompatActivity {
             logOut(this);
         });
 
-        recyclerRols = findViewById(R.id.recyclerRols);
-        recyclerRols.setLayoutManager(new LinearLayoutManager(this));
+        recyclerDominis = findViewById(R.id.recyclerDominis);
+        recyclerDominis.setLayoutManager(new LinearLayoutManager(this));
 
-        carregarRols();
+        carregarDominis();
 
-        etCercar = findViewById(R.id.aCTVCercarRols);
+        etCercar = findViewById(R.id.aCTVCercarDominis);
         etCercar.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -86,9 +86,9 @@ public class RolsActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Filtrar departaments
-                String nomRol = s.toString();
-                resultatsCerca(nomRol);
+                // Filtrar dominis
+                String nomDominis = s.toString();
+                resultatsCerca(nomDominis);
             }
         });
 
@@ -97,45 +97,48 @@ public class RolsActivity extends AppCompatActivity {
             finish();
         });
 
-        imgBtnAfegirRol = findViewById(R.id.imgBtnAfegirRol);
-        imgBtnAfegirRol.setOnClickListener(v -> {
-            // TODO acceder como edición para añadir rol
-            veureCrearEditarRol(1, null);
+        imgBtnAfegirDomini = findViewById(R.id.imgBtnAfegirDomini);
+        imgBtnAfegirDomini.setOnClickListener(v -> {
+            // TODO acceder como edición para añadir domini
+            veureCrearEditarDomini(1, null);
         });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        carregarRols();
+        carregarDominis();
     }
 
-    private void resultatsCerca(String nomRol) {
-        ArrayList<Rol> llistaFiltradaRol = new ArrayList<>();
+    private void resultatsCerca(String nomDomini) {
+        ArrayList<Domini> llistaFiltradaDomini = new ArrayList<>();
 
-        for (Rol rol : rols) {
-            // Comporovar si coincideix algún nom amb el nom d'algún rol
-            if (rol.getNom().toLowerCase().contains(nomRol.toLowerCase())) {
-                llistaFiltradaRol.add(rol);
+        for (Domini domini : dominis) {
+            // Comporovar si coincideix algún nom amb el nom d'algún domini
+            if (domini.getDomini().toLowerCase().contains(nomDomini.toLowerCase())) {
+                llistaFiltradaDomini.add(domini);
             }
         }
 
-        actulitzarRols(llistaFiltradaRol);
+        actulitzarDominis(llistaFiltradaDomini);
     }
 
-    private void carregarRols() {
-        RolDTO.RequestRol requestRol = RolDTO.obtenirJSONRol().create(RolDTO.RequestRol.class);
-        requestRol.getAllRols().enqueue(new Callback<ArrayList<Rol>>() {
+    private void carregarDominis() {
+        DominiDTO.RequestDomini requestDomini = DominiDTO.obtenirJSONDomini().create(DominiDTO.RequestDomini.class);
+        requestDomini.getAllDominis().enqueue(new Callback<ArrayList<Domini>>() {
             @Override
-            public void onResponse(Call<ArrayList<Rol>> call, Response<ArrayList<Rol>> response) {
+            public void onResponse(Call<ArrayList<Domini>> call, Response<ArrayList<Domini>> response) {
+
+                Log.d("CODE", String.valueOf(response.code()));
+
                 if (response.isSuccessful() && response.body() != null) {
-                    rols.clear();
-                    rols.addAll(response.body());
-                    actulitzarRols(rols);
-                    recyclerRols.setVisibility(View.VISIBLE);
+                    dominis.clear();
+                    dominis.addAll(response.body());
+                    actulitzarDominis(dominis);
+                    recyclerDominis.setVisibility(View.VISIBLE);
                 } else {
                     // TODO mostrar error con layout
-                    recyclerRols.setVisibility(View.GONE);
+                    recyclerDominis.setVisibility(View.GONE);
                     Log.d("ERROR_RESPONSE", response.message());
 
                     try {
@@ -147,26 +150,26 @@ public class RolsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Rol>> call, Throwable t) {
-                recyclerRols.setVisibility(View.GONE);
+            public void onFailure(Call<ArrayList<Domini>> call, Throwable t) {
+                recyclerDominis.setVisibility(View.GONE);
                 Log.d("ERROR_FAILURE", t.getMessage());
                 Log.e("ERROR_FAILURE", "Error complet", t);
             }
         });
     }
 
-    private void actulitzarRols(ArrayList<Rol> rols) {
-        rolAdapter = new SDRDAdapter(rols, rol -> {
-            veureCrearEditarRol(0, rol);
-        }, RolsActivity.this);
+    private void actulitzarDominis(ArrayList<Domini> dominis) {
+        dominiAdapter = new SDRDAdapter(dominis, domini -> {
+            veureCrearEditarDomini(0, domini);
+        }, DominisActivity.this);
 
-        recyclerRols.setAdapter(rolAdapter);
+        recyclerDominis.setAdapter(dominiAdapter);
     }
 
-    private void veureCrearEditarRol(int view_add_edit, Rol rol) {
+    private void veureCrearEditarDomini(int view_add_edit, Domini domini) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(R.layout.layout_rol, null);
+        View view = inflater.inflate(R.layout.layout_domini, null);
 
         builder.setView(view);
 
@@ -174,8 +177,8 @@ public class RolsActivity extends AppCompatActivity {
         alertDialog.show();
 
         // Elements del AlertDialog
-        TextView txtNomRol = view.findViewById(R.id.txtNomRol);
-        EditText etNomRol = view.findViewById(R.id.etNomRol);
+        TextView txtNomDomini = view.findViewById(R.id.txtNomDomini);
+        EditText etNomDomini = view.findViewById(R.id.etNomDomini);
         ImageButton imgBtnEditar = view.findViewById(R.id.imgBtnEditar);
         LinearLayout llSucursalNormal = view.findViewById(R.id.llSucursal);
         View includeSurcursal = view.findViewById(R.id.includeSucursal);
@@ -189,7 +192,7 @@ public class RolsActivity extends AppCompatActivity {
         LinearLayout llSucursalEdit = includeSurcursal.findViewById(R.id.llSucursalEdit);
         TextView txtSucursals = view.findViewById(R.id.txtSucursals);
         Spinner spSucursals = view.findViewById(R.id.spSucursals);
-        Button btnGuardarEliminarRol = view.findViewById(R.id.btnGuardarEliminarRol);
+        Button btnGuardarEliminarDomini = view.findViewById(R.id.btnGuardarEliminarDomini);
         Button btnBackCancelar = view.findViewById(R.id.btnBackCancelar);
 
         txtSucursal.setVisibility(View.VISIBLE);
@@ -198,29 +201,29 @@ public class RolsActivity extends AppCompatActivity {
 
         imgBtnEditar.setOnClickListener(v -> {
             alertDialog.dismiss();
-            veureCrearEditarRol(2, rol);
+            veureCrearEditarDomini(2, domini);
         });
 
-        if (view_add_edit == 0) { // Veure rol
+        if (view_add_edit == 0) { // Veure domini
 
-            txtNomRol.setVisibility(View.VISIBLE);
+            txtNomDomini.setVisibility(View.VISIBLE);
             imgBtnEditar.setVisibility(View.VISIBLE);
-            etNomRol.setVisibility(View.GONE);
+            etNomDomini.setVisibility(View.GONE);
             txtSucursals.setVisibility(View.GONE);
             spSucursals.setVisibility(View.GONE);
 
-            // Nom rol
-            if (rol.getNom() != null && !rol.getNom().isEmpty()) {
-                txtNomRol.setText(rol.getNom());
+            // Nom domini
+            if (domini.getDomini() != null && !domini.getDomini().isEmpty()) {
+                txtNomDomini.setText(domini.getDomini());
             } else {
-                txtNomRol.setText("No té nom");
+                txtNomDomini.setText("No té nom");
             }
 
-            if (rol.getSucursal() != null) {
+            if (domini.getSucursal() != null) {
                 llSucursalNormal.setVisibility(View.VISIBLE);
                 includeSurcursal.setVisibility(View.VISIBLE);
 
-                Sucursal sucursal = rol.getSucursal();
+                Sucursal sucursal = domini.getSucursal();
 
                 // Obtenir la sucursal
                 Call<Sucursal> call = SucursalDTO.obtenirJSONSucursal().create(SucursalDTO.RequestSucursal.class).getSucursal(sucursal.getUuid().toString());
@@ -228,40 +231,40 @@ public class RolsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Sucursal> call, Response<Sucursal> response) {
                         if (response.isSuccessful()) {
-                            sucursalRol = response.body();
+                            sucursalDomini = response.body();
 
                             // Nom sucursal
-                            if (sucursalRol.getNom() != null && !sucursalRol.getNom().isEmpty()) {
-                                txtSucursal.setText(sucursalRol.getNom());
+                            if (sucursalDomini.getNom() != null && !sucursalDomini.getNom().isEmpty()) {
+                                txtSucursal.setText(sucursalDomini.getNom());
                             }
 
                             // Direcció sucursal
-                            if (sucursalRol.getDireccio() != null && !sucursalRol.getDireccio().isEmpty()) {
-                                String direccioSucursal = txtDireccioSucursal.getText().toString() + " " + sucursalRol.getDireccio();
+                            if (sucursalDomini.getDireccio() != null && !sucursalDomini.getDireccio().isEmpty()) {
+                                String direccioSucursal = txtDireccioSucursal.getText().toString() + " " + sucursalDomini.getDireccio();
                                 txtDireccioSucursal.setText(direccioSucursal);
                             }
 
                             // Ciutat sucursal
-                            if (sucursalRol.getCiutat() != null && !sucursalRol.getCiutat().isEmpty()) {
-                                String ciutatSucursal = txtCiutatSucursal.getText().toString() + " " + sucursalRol.getCiutat();
+                            if (sucursalDomini.getCiutat() != null && !sucursalDomini.getCiutat().isEmpty()) {
+                                String ciutatSucursal = txtCiutatSucursal.getText().toString() + " " + sucursalDomini.getCiutat();
                                 txtCiutatSucursal.setText(ciutatSucursal);
                             }
 
                             // Pais sucursal
-                            if (sucursalRol.getPais() != null && !sucursalRol.getPais().isEmpty()) {
-                                String paisSucursal = txtPaisSucursal.getText().toString() + " " + sucursalRol.getPais();
+                            if (sucursalDomini.getPais() != null && !sucursalDomini.getPais().isEmpty()) {
+                                String paisSucursal = txtPaisSucursal.getText().toString() + " " + sucursalDomini.getPais();
                                 txtPaisSucursal.setText(paisSucursal);
                             }
 
                             // Telèfon sucursal
-                            if (sucursalRol.getTelefon() != null && !sucursalRol.getTelefon().isEmpty()) {
-                                String tlfSucursal = txtTlfSucursal.getText().toString() + " " + sucursalRol.getTelefon();
+                            if (sucursalDomini.getTelefon() != null && !sucursalDomini.getTelefon().isEmpty()) {
+                                String tlfSucursal = txtTlfSucursal.getText().toString() + " " + sucursalDomini.getTelefon();
                                 txtTlfSucursal.setText(tlfSucursal);
                             }
 
                             // Correu sucursal
-                            if (sucursalRol.getCorreu() != null && !sucursalRol.getCorreu().isEmpty()) {
-                                String correuSucursal = txtCorreuSucursal.getText().toString() + " " + sucursalRol.getCorreu();
+                            if (sucursalDomini.getCorreu() != null && !sucursalDomini.getCorreu().isEmpty()) {
+                                String correuSucursal = txtCorreuSucursal.getText().toString() + " " + sucursalDomini.getCorreu();
                                 txtCorreuSucursal.setText(correuSucursal);
                             }
                         } else {
@@ -274,15 +277,16 @@ public class RolsActivity extends AppCompatActivity {
                         Log.d("ERROR_FAILURE", t.getMessage());
                     }
                 });
+
             } else {
                 llSucursalNormal.setVisibility(View.GONE);
                 includeSurcursal.setVisibility(View.GONE);
             }
 
-            btnGuardarEliminarRol.setText("Eliminar");
-            btnGuardarEliminarRol.setTextColor(ContextCompat.getColor(this, R.color.white));
-            btnGuardarEliminarRol.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
-            btnGuardarEliminarRol.setOnClickListener(v -> {
+            btnGuardarEliminarDomini.setText("Eliminar");
+            btnGuardarEliminarDomini.setTextColor(ContextCompat.getColor(this, R.color.white));
+            btnGuardarEliminarDomini.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
+            btnGuardarEliminarDomini.setOnClickListener(v -> {
                 alertDialog.dismiss();
 
                 AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
@@ -299,16 +303,16 @@ public class RolsActivity extends AppCompatActivity {
                 Button btnEliminar = view2.findViewById(R.id.btnEliminar);
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
-                txtPregunta.setText("Desitja eliminar el departament \"" + rol.getNom() + "\" ?");
+                txtPregunta.setText("Desitja eliminar el domini \"" + domini.getDomini() + "\" ?");
                 btnEliminar.setOnClickListener(c -> {
-                    eliminarRol(rol, alertDialog2);
+                    eliminarDomini(domini, alertDialog2);
                     alertDialog.dismiss();
                     alertDialog2.dismiss();
                 });
 
                 btnCancelar.setOnClickListener(c -> {
                     alertDialog2.dismiss();
-                    veureCrearEditarRol(0, rol);
+                    veureCrearEditarDomini(0, domini);
                 });
             });
 
@@ -317,31 +321,31 @@ public class RolsActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             });
 
-        } else { // Crear i/o editar rol
+        } else { // Crear o editar domini
             // Ocultar elements
-            txtNomRol.setVisibility(View.GONE);
+            txtNomDomini.setVisibility(View.GONE);
             imgBtnEditar.setVisibility(View.GONE);
             includeSurcursal.setVisibility(View.GONE);
 
             // Mostrar elements
-            etNomRol.setVisibility(View.VISIBLE);
+            etNomDomini.setVisibility(View.VISIBLE);
             txtSucursals.setVisibility(View.VISIBLE);
             spSucursals.setVisibility(View.VISIBLE);
 
-            // Botó guardar departament
-            btnGuardarEliminarRol.setText("Guardar");
-            btnGuardarEliminarRol.setTextColor(ContextCompat.getColor(this, R.color.white));
-            btnGuardarEliminarRol.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
+            // Botó guardar domini
+            btnGuardarEliminarDomini.setText("Guardar");
+            btnGuardarEliminarDomini.setTextColor(ContextCompat.getColor(this, R.color.white));
+            btnGuardarEliminarDomini.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
 
             // Obtenir totes les sucursals
             obtenirSucursals(spSucursals);
 
             if (view_add_edit == 2) {
-                if (rol.getNom() != null && !rol.getNom().isEmpty()) {
-                    etNomRol.setText(rol.getNom());
+                if (domini.getDomini() != null && !domini.getDomini().isEmpty()) {
+                    etNomDomini.setText(domini.getDomini());
                 }
-                if (rol.getSucursal() != null) {
-                    String uuidActual = rol.getSucursal().getUuid().toString();
+                if (domini.getSucursal() != null) {
+                    String uuidActual = domini.getSucursal().getUuid().toString();
                     for (int i = 0; i < sucursals.size(); i++) {
                         if (sucursals.get(i).getUuid().toString().equals(uuidActual)) {
                             spSucursals.setSelection(i);
@@ -364,17 +368,17 @@ public class RolsActivity extends AppCompatActivity {
                 }
             });
 
-            btnGuardarEliminarRol.setOnClickListener(v -> {
-                String nomRol = etNomRol.getText().toString().trim();
-                if (nomRol.isEmpty()) {
-                    etNomRol.setError("Nom rol obligatori");
+            btnGuardarEliminarDomini.setOnClickListener(v -> {
+                String nomDomini = etNomDomini.getText().toString().trim();
+                if (nomDomini.isEmpty()) {
+                    etNomDomini.setError("Nom domini obligatori");
                     return;
                 }
-                RolRequest rolRequest = new RolRequest(uuidSucursal, nomRol);
+                DominiRequest dominiRequest = new DominiRequest(uuidSucursal, nomDomini);
                 if (view_add_edit == 1) {
-                    afegirRol(rolRequest, alertDialog);
+                    afegirDomini(dominiRequest, alertDialog);
                 } else {
-                    editarRol(rolRequest, alertDialog, rol.getUuid().toString());
+                    editarDomini(dominiRequest, alertDialog, domini.getUuid().toString());
                 }
             });
 
@@ -383,78 +387,78 @@ public class RolsActivity extends AppCompatActivity {
         }
     }
 
-    private void afegirRol(RolRequest rolRequest, AlertDialog alertDialog) {
-        String nomRol = rolRequest.getNom();
-        Call<Rol> call = RolDTO.obtenirJSONRol().create(RolDTO.RequestRol.class).afegirRol(rolRequest);
-        call.enqueue(new Callback<Rol>() {
+    private void afegirDomini(DominiRequest dominiRequest, AlertDialog alertDialog){
+        String nomDomini = dominiRequest.getDomini();
+        Call<Domini> call = DominiDTO.obtenirJSONDomini().create(DominiDTO.RequestDomini.class).crearDomini(dominiRequest);
+        call.enqueue(new Callback<Domini>() {
             @Override
-            public void onResponse(Call<Rol> call, Response<Rol> response) {
+            public void onResponse(Call<Domini> call, Response<Domini> response) {
                 if (response.isSuccessful()) {
-                    rols.add(response.body());
-                    rolAdapter.notifyDataSetChanged();
-                    Toast.makeText(RolsActivity.this, "Rol " + nomRol + " afegit", Toast.LENGTH_SHORT).show();
+                    dominis.add(response.body());
+                    dominiAdapter.notifyDataSetChanged();
+                    Toast.makeText(DominisActivity.this, "Domini " + nomDomini + " afegit", Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(RolsActivity.this, "No s'ha pogut afegir el rol" + nomRol, Toast.LENGTH_SHORT).show();
-                    Log.e("ERROR_RESPONSE", response.message());
+                    Toast.makeText(DominisActivity.this, "No s'ha pogut afegir el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                    Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
-            public void onFailure(Call<Rol> call, Throwable t) {
-                Toast.makeText(RolsActivity.this, "No s'ha pogut afegir el rol" + nomRol, Toast.LENGTH_SHORT).show();
-                Log.e("ERROR_FAILURE", t.getMessage());
+            public void onFailure(Call<Domini> call, Throwable t) {
+                Toast.makeText(DominisActivity.this, "No s'ha pogut afegir el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
     }
 
-    private void editarRol(RolRequest rolRequest, AlertDialog alertDialog, String uuid) {
-        String nomRol = rolRequest.getNom();
-        Call<Rol> call = RolDTO.obtenirJSONRol().create(RolDTO.RequestRol.class).actualitzarRol(uuid, rolRequest);
-        call.enqueue(new Callback<Rol>() {
+    private void editarDomini(DominiRequest dominiRequest, AlertDialog alertDialog, String uuid) {
+        String nomDomini = dominiRequest.getDomini();
+        Call<Domini> call = DominiDTO.obtenirJSONDomini().create(DominiDTO.RequestDomini.class).actualitzaDomini(uuid, dominiRequest);
+        call.enqueue(new Callback<Domini>() {
             @Override
-            public void onResponse(Call<Rol> call, Response<Rol> response) {
+            public void onResponse(Call<Domini> call, Response<Domini> response) {
                 if (response.isSuccessful()) {
-                    rolAdapter.notifyDataSetChanged();
-                    Toast.makeText(RolsActivity.this, "Rol " + nomRol + " actualitzat", Toast.LENGTH_SHORT).show();
+                    dominiAdapter.notifyDataSetChanged();
+                    Toast.makeText(DominisActivity.this, "Domini " + nomDomini + " actualitzat", Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
-                    veureCrearEditarRol(0, response.body());
+                    veureCrearEditarDomini(0, response.body());
                 } else {
-                    Toast.makeText(RolsActivity.this, "No s'ha pogut actualitzar el rol" + nomRol, Toast.LENGTH_SHORT).show();
-                    Log.e("ERROR_RESPONSE", response.message());
+                    Toast.makeText(DominisActivity.this, "No s'ha pogut actualitzar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                    Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
-            public void onFailure(Call<Rol> call, Throwable t) {
-                Toast.makeText(RolsActivity.this, "No s'ha pogut actualitzar el rol" + nomRol, Toast.LENGTH_SHORT).show();
-                Log.e("ERROR_FAILURE", t.getMessage());
+            public void onFailure(Call<Domini> call, Throwable t) {
+                Toast.makeText(DominisActivity.this, "No s'ha pogut actualitzar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
     }
 
-    private void eliminarRol(Rol rol, AlertDialog alertDialog) {
-        String nomRol = rol.getNom();
-        Call<Rol> call = RolDTO.obtenirJSONRol().create(RolDTO.RequestRol.class).eliminarRol(rol.getUuid().toString());
-        call.enqueue(new Callback<Rol>() {
+    private void eliminarDomini(Domini domini, AlertDialog alertDialog) {
+        String nomDomini = domini.getDomini();
+        Call<Domini> call = DominiDTO.obtenirJSONDomini().create(DominiDTO.RequestDomini.class).eliminarDomini(domini.getUuid().toString());
+        call.enqueue(new Callback<Domini>() {
             @Override
-            public void onResponse(Call<Rol> call, Response<Rol> response) {
+            public void onResponse(Call<Domini> call, Response<Domini> response) {
                 if (response.isSuccessful()) {
-                    rols.remove(rol);
-                    rolAdapter.notifyDataSetChanged();
-                    Toast.makeText(RolsActivity.this, "Rol " + nomRol + " eliminat", Toast.LENGTH_SHORT).show();
+                    dominis.remove(domini);
+                    dominiAdapter.notifyDataSetChanged();
+                    Toast.makeText(DominisActivity.this, "Domini " + nomDomini + " eliminat", Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(RolsActivity.this, "No s'ha pogut eliminar el rol" + nomRol, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, "No s'ha pogut eliminar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
                     Log.e("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
-            public void onFailure(Call<Rol> call, Throwable t) {
-                Toast.makeText(RolsActivity.this, "No s'ha pogut eliminar el rol" + nomRol, Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<Domini> call, Throwable t) {
+                Toast.makeText(DominisActivity.this, "No s'ha pogut eliminar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
                 Log.e("ERROR_FAILURE", t.getMessage());
                 Log.e("ERROR_FAILURE", "Error complet", t);
             }
@@ -475,7 +479,7 @@ public class RolsActivity extends AppCompatActivity {
                         nomSucursals.add(s.getNom());
                     }
                     // Inserir les sucursals en l'spinner
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(RolsActivity.this, android.R.layout.simple_spinner_item, nomSucursals);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(DominisActivity.this, android.R.layout.simple_spinner_item, nomSucursals);
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spSucursals.setAdapter(adapter);
                 } else {

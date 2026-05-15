@@ -1,5 +1,8 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.utils.GestionsCarpetesCompartits.crearCarpeta;
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,8 +25,8 @@ import com.example.keyly_projecte_intermodular.dao.Compartit;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
-import com.example.keyly_projecte_intermodular.request.UsuariRequest;
-import com.example.keyly_projecte_intermodular.resources.CompartitAdapter;
+import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
+import com.example.keyly_projecte_intermodular.adapters.CompartitAdapter;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -37,7 +40,7 @@ public class CompartitActivity extends AppCompatActivity {
 
     private BottomNavigationView menu;
     private RecyclerView recyclerView;
-    private ImageButton imgBtnCompartir, imgBtnCompartirItems, imgBtnCompartirCarpetes;
+    private ImageButton imgBtnLogOut, imgBtnCompartir, imgBtnCompartirItems, imgBtnCompartirCarpetes;
     private CompartitAdapter compartitAdapter;
     private FrameLayout main;
     private Carpeta carpetaCreada;
@@ -47,7 +50,7 @@ public class CompartitActivity extends AppCompatActivity {
     private ArrayList<Carpeta> carpetes = new ArrayList<>();
     private ArrayList<Carpeta> carpetesSeleccionades = new ArrayList<>();
     private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>();
-    private ArrayList<UsuariRequest> usuarisRequest = new ArrayList<>();
+    private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
     private ArrayAdapter<String> adapterItemsCarpetes;
     private ArrayList<String> titolItems = new ArrayList<>(), nomsCarpetes = new ArrayList<>(), nomsUsuaris = new ArrayList<>();
 
@@ -60,6 +63,11 @@ public class CompartitActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         main = findViewById(R.id.main);
@@ -89,17 +97,6 @@ public class CompartitActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerItemsCarpetes);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        recyclerView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                if (imgBtnCompartirItems.getVisibility() == View.VISIBLE
-//                        && imgBtnCompartirCarpetes.getVisibility() == View.VISIBLE) {
-//                    imgBtnCompartirItems.setVisibility(View.GONE);
-//                    imgBtnCompartirCarpetes.setVisibility(View.GONE);
-//                }
-//                return true;
-//            }
-//        });
 
         // Mostrar ítems i carpetes compartits
         obtenirDades();
@@ -146,9 +143,21 @@ public class CompartitActivity extends AppCompatActivity {
         imgBtnCompartirCarpetes.setOnClickListener(v -> {
             // TODO hacer la ventana de carpeta
             imgBtnCompartirCarpetes.setVisibility(View.GONE);
+            crearCarpeta(
+                    itemsSeleccionats,
+                    usuarisSeleccionats,
+                    CompartitActivity.this,
+                    items,
+                    usuaris,
+                    usuarisCompartitRequest,
+                    carpetaCreada,
+                    carpetes,
+                    recyclerView,
+                    null,
+                    compartitAdapter,
+                    true
+            );
         });
-
-
     }
 
     private void obtenirDades() {
@@ -185,6 +194,7 @@ public class CompartitActivity extends AppCompatActivity {
                 intentCarpeta.putExtra("favorit", carpeta.isFavorit());
                 intentCarpeta.putExtra("items", new ArrayList<>(carpeta.getItems()));
                 intentCarpeta.putExtra("data_creacio", carpeta.getDataCreacio());
+                intentCarpeta.putExtra("esCompartit", true);
                 startActivity(intentCarpeta);
             } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
                 Item item = compartit.getItem();
@@ -199,6 +209,7 @@ public class CompartitActivity extends AppCompatActivity {
                 intentItem.putExtra("add_edit", 0);
                 intentItem.putExtra("iv", item.getIv());
                 intentItem.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
+                intentItem.putExtra("esCompartit", true);
                 startActivity(intentItem);
             }
         });

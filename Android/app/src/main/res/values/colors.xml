@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="light_red">#FF7777</color>
     <color name="red">#B81414</color>
     <color name="light_grey">#8F8F8F</color>
     <color name="grey">#E0E0E0</color>
@@ -10,6 +11,7 @@
     <color name="blue_selected">#3E92CC</color>
     <color name="purple_button">#AB3DF0</color>
     <color name="purple_light">#B17DDE</color>
+    <color name="purple_icons_item_folder">#9046CF</color>
     <color name="purple_extra_light">#F3EBFA</color>
     <color name="transparent">#00000000</color>
 </resources>

@@ -8,7 +8,6 @@
     tools:context=".HomeActivity"
     android:orientation="vertical">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,19 +35,13 @@
                     android:layout_marginEnd="270dp"
                     app:srcCompat="@drawable/logo_keyly_sin_letras" />
 
-                <ImageView
-                    android:id="@+id/icon_notification"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/icon_notification" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="horizontal">
-
-                </LinearLayout>
+                <ImageButton
+                    android:id="@+id/imgBtnLogOut"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:srcCompat="@drawable/logout"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
 
             </LinearLayout>
 
@@ -61,7 +54,7 @@
                 android:text="@string/titolResum"
                 android:fontFamily="@font/airbnb_cereal_w_bd"
                 android:textColor="@color/black"
-                android:textSize="20dp" />
+                android:textSize="20dp"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -237,49 +230,149 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerItems"
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="20dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <LinearLayout
-            android:id="@+id/layoutError"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center"
-            android:background="@drawable/background_error"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingStart="20dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ERROR"
-                android:fontFamily="@font/airbnb_cereal_w_bd"
-                android:textSize="25dp"/>
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No hi ha connexió"
-                android:fontFamily="@font/manrope_regular"
-                android:textSize="20dp"/>
+                <LinearLayout
+                    android:id="@+id/llItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/txtItems"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:text="@string/titolItems"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:textColor="@color/black"
+                        android:textSize="20dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerItems"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="gone"/>
+
+                    <include
+                        layout="@layout/layout_logs"
+                        android:id="@+id/includeLogsItems"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llCarpetes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/txtCarpetes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:text="@string/titolCarpetes"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:textColor="@color/black"
+                        android:textSize="20dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerCarpetes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="gone"/>
+
+                    <include
+                        layout="@layout/layout_logs"
+                        android:id="@+id/includeLogsCarpetes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llICompartits"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/txtCompartits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:text="@string/titolCompartits"
+                        android:fontFamily="@font/airbnb_cereal_w_bd"
+                        android:textColor="@color/black"
+                        android:textSize="20dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerCompartits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="gone"/>
+
+                    <include
+                        layout="@layout/layout_logs"
+                        android:id="@+id/includeLogsCompartits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/menu_app"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="60dp"
         android:background="@color/white"
         app:itemIconTint="#9046CF"
         app:labelVisibilityMode="unlabeled"

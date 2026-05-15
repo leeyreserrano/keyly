@@ -1,10 +1,10 @@
 package com.example.keyly_projecte_intermodular.dto;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.tokenNou;
+import static com.example.keyly_projecte_intermodular.resources.Varis.tokenNou;
 
 import android.util.Log;
 
-import com.example.keyly_projecte_intermodular.config.TokenForEver;
+import com.example.keyly_projecte_intermodular.resources.Varis;
 import com.example.keyly_projecte_intermodular.dao.GeneradorContrasenya;
 import com.example.keyly_projecte_intermodular.dao.Contrasenya;
 import com.google.gson.Gson;
@@ -47,7 +47,7 @@ public class UtilsDTO {
                     .create();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(TokenForEver.BASE_URL)
+                    .baseUrl(Varis.BASE_URL)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();

@@ -1,9 +1,10 @@
-package com.example.keyly_projecte_intermodular.resources;
+package com.example.keyly_projecte_intermodular.adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,10 +43,12 @@ public class CompartitAdapter extends RecyclerView.Adapter<CompartitAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull CompartitAdapter.ViewHolder holder, int position) {
+
         holder.nameUserTextView.setVisibility(View.VISIBLE);
 
         Compartit compartit = compartitList.get(position);
         if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
+            holder.imageView.setImageResource(R.drawable.carpeta_negra);
             Log.d("CARPETA_COMPARTIDA", compartit.toString());
             if (compartit.getCarpeta().getNom() != null) {
                 holder.itemCarpetaTextView.setText(compartit.getCarpeta().getNom());
@@ -56,8 +59,8 @@ public class CompartitAdapter extends RecyclerView.Adapter<CompartitAdapter.View
             String propietari = compartit.getCarpeta().getBagul().getUsuari().getNom();
             holder.nameUserTextView.setText(propietari);
         } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
+            holder.imageView.setImageResource(R.drawable.key_negra);
             holder.itemCarpetaTextView.setText(compartit.getItem().getTitol());
-
             String propietari = compartit.getItem().getNomUsuari();
             holder.nameUserTextView.setText(propietari);
         }
@@ -78,11 +81,13 @@ public class CompartitAdapter extends RecyclerView.Adapter<CompartitAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         //EntitatCompartit entitatCompartit;
+        ImageView imageView;
         TextView itemCarpetaTextView;
         TextView nameUserTextView;
 
         public ViewHolder(@NonNull View itemCarpetaView) {
             super(itemCarpetaView);
+            imageView = itemCarpetaView.findViewById(R.id.imgView);
             itemCarpetaTextView = itemCarpetaView.findViewById(R.id.txtNom);
             nameUserTextView = itemCarpetaView.findViewById(R.id.txtDescripcio);
         }

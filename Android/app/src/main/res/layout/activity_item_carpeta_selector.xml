@@ -29,11 +29,13 @@
                 android:layout_marginEnd="270dp"
                 app:srcCompat="@drawable/logo_keyly_sin_letras" />
 
-            <ImageView
-                android:id="@+id/icon_notification"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                app:srcCompat="@drawable/icon_notification" />
+            <ImageButton
+                android:id="@+id/imgBtnLogOut"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/logout"
+                android:scaleType="centerCrop"
+                android:backgroundTint="@color/transparent"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -76,7 +78,7 @@
                     android:padding="20dp"
                     android:layout_marginTop="25dp"
                     android:layout_marginBottom="15dp"
-                    android:src="@drawable/key"
+                    android:src="@drawable/key_violeta"
                     android:layout_gravity="center"
                     android:background="@drawable/background_items_folders_button"/>
 
@@ -109,7 +111,7 @@
                     android:padding="20dp"
                     android:layout_marginTop="25dp"
                     android:layout_marginBottom="15dp"
-                    android:src="@drawable/carpeta"
+                    android:src="@drawable/carpeta_violeta"
                     android:layout_gravity="center"
                     android:background="@drawable/background_items_folders_button"/>
 

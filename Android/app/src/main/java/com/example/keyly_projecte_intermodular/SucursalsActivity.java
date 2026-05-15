@@ -1,5 +1,7 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.keyly_projecte_intermodular.dao.Sucursal;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
 import com.example.keyly_projecte_intermodular.request.SucursalRequest;
-import com.example.keyly_projecte_intermodular.resources.SucursalDepartamentRolAdapter;
+import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
 
 import java.util.ArrayList;
 
@@ -38,9 +40,9 @@ public class SucursalsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerSucursals;
     private LinearLayout layoutError;
-    private SucursalDepartamentRolAdapter sucursalAdapter;
+    private SDRDAdapter sucursalAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnBack, imgBtnAfegirSucursal;
+    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirSucursal;
     private ArrayList<Sucursal> sucursals = new ArrayList<>();
 
     @Override
@@ -52,6 +54,11 @@ public class SucursalsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         recyclerSucursals = findViewById(R.id.recyclerSucursals);
@@ -139,7 +146,7 @@ public class SucursalsActivity extends AppCompatActivity {
     }
 
     private void actulitzarSucursals(ArrayList<Sucursal> sucursals) {
-        sucursalAdapter = new SucursalDepartamentRolAdapter(sucursals, sucursal -> {
+        sucursalAdapter = new SDRDAdapter(sucursals, sucursal -> {
             // TODO mostrar alert dialog amb la informació de la sucursal
             veureCrearEditarSucursal(0, sucursal);
         }, SucursalsActivity.this);

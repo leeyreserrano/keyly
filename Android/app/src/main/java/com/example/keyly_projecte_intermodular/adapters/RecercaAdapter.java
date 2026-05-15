@@ -1,10 +1,12 @@
-package com.example.keyly_projecte_intermodular.resources;
+package com.example.keyly_projecte_intermodular.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -18,7 +20,6 @@ import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHolder> {
@@ -27,12 +28,15 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
     private List<Carpeta> carpetaList;
     private Context context;
     private List<Usuari> usuariList;
+    private List<String> permisos;
 
-    public RecercaAdapter(List<Item> itemList, List<Carpeta> carpetaList, List<Usuari> usuariList, Context context) {
+    public RecercaAdapter(List<Item> itemList, List<Carpeta> carpetaList, List<Usuari> usuariList,
+                          List<String> permisos, Context context) {
         this.itemList = itemList;
         this.carpetaList = carpetaList;
         this.context = context;
         this.usuariList = usuariList;
+        this.permisos = permisos;
     }
 
     @NonNull
@@ -58,6 +62,7 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
         if (itemList != null) {
             Item item = itemList.get(position);
             holder.itemUsuariTextView.setText(item.getTitol());
+            holder.flPermisos.setVisibility(View.GONE);
             holder.imgBtnX.setOnClickListener(v -> {
                 // Eliminar ítem de la llista
                 itemList.remove(position);
@@ -66,10 +71,44 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
         } else if (usuariList != null) {
             Usuari usuari = usuariList.get(position);
             holder.itemUsuariTextView.setText(usuari.getNom());
+
+            // Permisos usuaris
+            holder.flPermisos.setVisibility(View.VISIBLE);
+            ArrayAdapter<Permisos> adapter =
+                    (ArrayAdapter<Permisos>) holder.spPermisos.getAdapter();
+
+            int spinnerPosition = adapter.getPosition(
+                    Permisos.valueOf(permisos.get(position))
+            );
+            holder.spPermisos.setSelection(spinnerPosition);
+            // Guardar cambios del spinner
+            holder.spPermisos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                    int adapterPosition = holder.getBindingAdapterPosition();
+
+                    if (adapterPosition != RecyclerView.NO_POSITION) {
+                        permisos.set(
+                                adapterPosition,
+                                parent.getItemAtPosition(pos).toString()
+                        );
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
             holder.imgBtnX.setOnClickListener(v -> {
                 // Eliminar ítem de la llista
-                usuariList.remove(position);
-                notifyItemRemoved(position);
+                int adapterPosition = holder.getBindingAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    usuariList.remove(adapterPosition);
+                    permisos.remove(adapterPosition);
+                    notifyItemRemoved(adapterPosition);
+                }
             });
         }
     }
@@ -86,12 +125,14 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView itemUsuariTextView;
+        FrameLayout flPermisos;
         Spinner spPermisos;
         ImageButton imgBtnX;
 
         public ViewHolder(@NonNull View recercaView) {
             super(recercaView);
             itemUsuariTextView = recercaView.findViewById(R.id.txtNom);
+            flPermisos = recercaView.findViewById(R.id.flPermisos);
             spPermisos = recercaView.findViewById(R.id.spPermisos);
             imgBtnX = recercaView.findViewById(R.id.imgBtnX);
 

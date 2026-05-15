@@ -1,8 +1,9 @@
-package com.example.keyly_projecte_intermodular.resources;
+package com.example.keyly_projecte_intermodular.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,8 @@ public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.imageView.setImageResource(R.drawable.carpeta_negra);
+
         holder.nameUserTextView.setVisibility(View.VISIBLE);
 
         Carpeta carpeta = carpetaList.get(position);
@@ -62,12 +65,13 @@ public class CarpetaAdapter extends RecyclerView.Adapter<CarpetaAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        //ImageView imageView;
+        ImageView imageView;
         TextView carpetaTextView;
         TextView nameUserTextView;
 
         public ViewHolder(@NonNull View carpetaView) {
             super(carpetaView);
+            imageView = carpetaView.findViewById(R.id.imgView);
             carpetaTextView = carpetaView.findViewById(R.id.txtNom);
             nameUserTextView = carpetaView.findViewById(R.id.txtDescripcio);
         }

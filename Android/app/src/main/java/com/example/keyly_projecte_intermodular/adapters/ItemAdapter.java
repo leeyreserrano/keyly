@@ -1,4 +1,4 @@
-package com.example.keyly_projecte_intermodular.resources;
+package com.example.keyly_projecte_intermodular.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +60,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.imageView.setImageResource(R.drawable.key_negra);
+
         holder.nameUserTextView.setVisibility(View.VISIBLE);
 
         Item item = itemList.get(position);
@@ -133,13 +136,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        //ImageView imageView;
+        ImageView imageView;
         TextView itemTextView;
         TextView nameUserTextView;
         ImageButton imgBtnEliminar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            imageView = itemView.findViewById(R.id.imgView);
             itemTextView = itemView.findViewById(R.id.txtNom);
             nameUserTextView = itemView.findViewById(R.id.txtDescripcio);
             imgBtnEliminar = itemView.findViewById(R.id.imgBtnEliminar);

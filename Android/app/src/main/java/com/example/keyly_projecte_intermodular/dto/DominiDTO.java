@@ -5,8 +5,8 @@ import static com.example.keyly_projecte_intermodular.resources.Varis.tokenNou;
 import android.util.Log;
 
 import com.example.keyly_projecte_intermodular.resources.Varis;
-import com.example.keyly_projecte_intermodular.dao.Rol;
-import com.example.keyly_projecte_intermodular.request.RolRequest;
+import com.example.keyly_projecte_intermodular.dao.Domini;
+import com.example.keyly_projecte_intermodular.request.DominiRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -24,33 +24,34 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
-public class RolDTO {
+public class DominiDTO {
 
     private static Retrofit retrofit = null;
 
-    public static interface RequestRol {
-        // Obté tots els rols
-        @GET("/api/rol/all/admin")
-        Call<ArrayList<Rol>> getAllRols();
+    public static interface RequestDomini {
+        // Obtenir tots els dominis
+        @GET("/api/domini/all/admin")
+        Call<ArrayList<Domini>> getAllDominis();
 
-        // Obté un rol per UUID
-        @GET("/api/rol/get/admin/{uuid}")
-        Call<Rol> getRol(@Path("uuid") String uuid);
+        // Obtenir domini per UUID
+        @GET("/api/domini/get/admin/{uuid}")
+        Call<Domini> getDomini(@Path("uuid") String uuid);
 
-        // Afegeix un rol nou
-        @POST("/api/rol/add/admin")
-        Call<Rol> afegirRol(@Body RolRequest rolRequest);
+        // Crear un domini
+        @POST("/api/domini/add/admin")
+        Call<Domini> crearDomini(@Body DominiRequest dominiRequest);
 
-        // Actualitza un rol per UUID
-        @PUT("/api/rol/update/admin/{uuid}")
-        Call<Rol> actualitzarRol(@Path("uuid") String uuid, @Body RolRequest rolRequest);
+        // Actualitzar un domini per UUID
+        @PUT("/api/domini/update/admin/{uuid}")
+        Call<Domini> actualitzaDomini(@Path("uuid") String uuid, @Body DominiRequest dominiRequest);
 
-        // Elimina un rol per UUID
-        @DELETE("/api/rol/delete/admin/{uuid}")
-        Call<Rol> eliminarRol(@Path("uuid") String uuid);
+
+        // Eliminar domini per UUID
+        @DELETE("/api/domini/delete/admin/{uuid}")
+        Call<Domini> eliminarDomini(@Path("uuid") String uuid);
     }
 
-    public static Retrofit obtenirJSONRol() {
+    public static Retrofit obtenirJSONDomini() {
 
         Log.d("TOKEN", tokenNou);
 

@@ -1,8 +1,6 @@
 package com.example.keyly_projecte_intermodular.rest_api;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.BASE_URL;
-
-import com.example.keyly_projecte_intermodular.config.TokenForEver;
+import com.example.keyly_projecte_intermodular.resources.Varis;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,7 +17,7 @@ public class APIUsuari {
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(chain -> {
                         Request newRequest = chain.request().newBuilder()
-                                .addHeader("Authorization", "Bearer " + TokenForEver.tokenFE)
+                                .addHeader("Authorization", "Bearer " + Varis.tokenFE)
                                 .build();
                         return chain.proceed(newRequest);
                     })
@@ -31,7 +29,7 @@ public class APIUsuari {
                     .create();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(TokenForEver.BASE_URL)
+                    .baseUrl(Varis.BASE_URL)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();

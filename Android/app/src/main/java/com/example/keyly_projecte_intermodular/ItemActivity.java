@@ -1,13 +1,14 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.dataKey;
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.privateKeyDecrypt;
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.publicKey;
+import static com.example.keyly_projecte_intermodular.resources.Varis.dataKey;
+import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
+import static com.example.keyly_projecte_intermodular.resources.Varis.publicKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.cypherIV;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarContrasenya2;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -48,6 +49,7 @@ import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.GeneradorContrasenya;
 import com.example.keyly_projecte_intermodular.dao.Contrasenya;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
+import com.example.keyly_projecte_intermodular.dto.CarpetaDTO;
 import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
@@ -55,7 +57,7 @@ import com.example.keyly_projecte_intermodular.dto.UtilsDTO;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
-import com.example.keyly_projecte_intermodular.resources.RecercaAdapter;
+import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
@@ -84,7 +86,7 @@ public class ItemActivity extends AppCompatActivity {
     private LinearLayout llNomItem, llPassword, llActions;
     private TextView txtTitle, txtUrl, txtNomUsuari, txtNotes;
     private EditText etTitolItem, etLlocItem, etNomUsuariItem, etPassword, etNotes;
-    private ImageButton imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
+    private ImageButton imgBtnLogOut, imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
     // TODO añadir botón de editar y eliminar
     private Button btnCompartir, btnGuardarEliminarItem, btnBack;
     private int edit = 0;
@@ -96,7 +98,6 @@ public class ItemActivity extends AppCompatActivity {
     private ArrayList<Usuari> usuarisSeleccionats = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +107,11 @@ public class ItemActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         /* Camps */
@@ -700,24 +706,47 @@ public class ItemActivity extends AppCompatActivity {
             btnGuardarEliminarItem.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
             btnGuardarEliminarItem.setOnClickListener(v -> {
                 String titolItem = txtTitle.getText().toString();
-                Call<Void> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).deleteItem(uuid);
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(ItemActivity.this, "Ítem " + titolItem + " eliminat", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
-                            Log.d("ERROR_RESPONSE", response.message());
+                boolean item_carpeta = getIntent().getBooleanExtra("item_carpeta", false);
+                if (item_carpeta) {
+                    String uuidCarpeta = getIntent().getStringExtra("uuidCarpeta");
+                    Call<Void> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).eliminarItemCarpeta(uuidCarpeta, uuid);
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(ItemActivity.this, "Ítem " + titolItem + " eliminat", Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
+                                Log.d("ERROR_RESPONSE", response.message());
+                            }
                         }
-                    }
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
-                        Log.d("ERROR_FAILURE", t.getMessage());
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
+                            Log.d("ERROR_FAILURE", t.getMessage());
+                        }
+                    });
+                } else {
+                    Call<Void> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).deleteItem(uuid);
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(ItemActivity.this, "Ítem " + titolItem + " eliminat", Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
+                                Log.d("ERROR_RESPONSE", response.message());
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
+                            Log.d("ERROR_FAILURE", t.getMessage());
+                        }
+                    });
+                }
             });
 
             // Botó compartir ítem
@@ -920,7 +949,7 @@ public class ItemActivity extends AppCompatActivity {
         Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
         recyclerUsuaris.setLayoutManager(new LinearLayoutManager(ItemActivity.this));
-        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, this);
+        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, null, this);
         recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
         // Carregar usuaris

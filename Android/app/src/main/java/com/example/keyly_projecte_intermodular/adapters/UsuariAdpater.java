@@ -1,8 +1,10 @@
-package com.example.keyly_projecte_intermodular.resources;
+package com.example.keyly_projecte_intermodular.adapters;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.getImatgeUUID;
+import static com.example.keyly_projecte_intermodular.resources.Varis.getImatgeUUID;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
 import android.util.Log;
@@ -18,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
 import com.example.keyly_projecte_intermodular.R;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
@@ -65,9 +66,8 @@ public class UsuariAdpater extends RecyclerView.Adapter<UsuariAdpater.ViewHolder
 
         String uuid = usuari.getUuid().toString();
 
-        // TODO mostrar foto perfil usuari
         // Imatge de perfil usuari
-        getImatgeUUID(usuari, imatge -> {
+        getImatgeUUID(usuari, body -> {
 
             ((android.app.Activity) context).runOnUiThread(() -> {
 
@@ -75,18 +75,22 @@ public class UsuariAdpater extends RecyclerView.Adapter<UsuariAdpater.ViewHolder
                 if (currentPosition == RecyclerView.NO_POSITION) return;
                 if (!usuariList.get(currentPosition).getUuid().toString().equals(uuid)) return;
 
-                if (imatge == null || imatge.isEmpty()) {
-                    Log.e("SVG_DEBUG", "Imagen vacía o nula");
-                    return;
-                }
-
                 try {
-                    SVG svg = SVG.getFromString(imatge);
-                    Drawable drawable = new PictureDrawable(svg.renderToPicture());
-                    holder.imgVFotoUsuari.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                    holder.imgVFotoUsuari.setImageDrawable(drawable);
-                } catch (SVGParseException e) {
-                    Log.e("SVG_ERROR", e.getMessage());
+                    String contentType = body.contentType().toString();
+
+                    if (contentType.contains("svg")) { // SVG
+                        SVG svg = SVG.getFromInputStream(body.byteStream());
+                        Drawable drawable =
+                                new PictureDrawable(svg.renderToPicture());
+                        holder.imgVFotoUsuari.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                        holder.imgVFotoUsuari.setImageDrawable(drawable);
+                    } else { // PNG / JPG / JPEG
+                        Bitmap bitmap = BitmapFactory.decodeStream(body.byteStream());
+                        holder.imgVFotoUsuari.setImageBitmap(bitmap);
+                    }
+
+                } catch (Exception e) {
+                    Log.e("IMG_ERROR", e.getMessage());
                 }
             });
         });
@@ -107,7 +111,6 @@ public class UsuariAdpater extends RecyclerView.Adapter<UsuariAdpater.ViewHolder
         int pos = holder.getBindingAdapterPosition();
 
         holder.imgBtnEliminar.setOnClickListener(v -> {
-            // TODO eliminar usuari + mirar si devuelve void o usuari
             Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).eliminarUsuari(usuari.getUuid().toString());
             call.enqueue(new Callback<Usuari>() {
                 @Override

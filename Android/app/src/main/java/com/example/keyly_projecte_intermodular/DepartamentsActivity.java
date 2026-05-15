@@ -1,5 +1,7 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,7 +33,7 @@ import com.example.keyly_projecte_intermodular.dao.Sucursal;
 import com.example.keyly_projecte_intermodular.dto.DepartamentDTO;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
 import com.example.keyly_projecte_intermodular.request.DepartamentRequest;
-import com.example.keyly_projecte_intermodular.resources.SucursalDepartamentRolAdapter;
+import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -44,9 +46,9 @@ public class DepartamentsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerDepartaments;
     private LinearLayout layoutError;
-    private SucursalDepartamentRolAdapter departamentAdapter;
+    private SDRDAdapter departamentAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnBack, imgBtnAfegirDepartament;
+    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirDepartament;
     private UUID uuidSucursal = null;
     private Sucursal sucursalDepartament = null;
     private ArrayList<Departament> departaments = new ArrayList<>();
@@ -61,6 +63,11 @@ public class DepartamentsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         recyclerDepartaments = findViewById(R.id.recyclerDepartaments);
@@ -92,7 +99,6 @@ public class DepartamentsActivity extends AppCompatActivity {
 
         imgBtnAfegirDepartament = findViewById(R.id.imgBtnAfegirDepartament);
         imgBtnAfegirDepartament.setOnClickListener(v -> {
-            // TODO acceder como edición para añadir departament
             veureCrearEditarDepartament(1, null);
         });
     }
@@ -152,7 +158,7 @@ public class DepartamentsActivity extends AppCompatActivity {
     }
 
     private void actulitzarDepartaments(ArrayList<Departament> departaments) {
-        departamentAdapter = new SucursalDepartamentRolAdapter(departaments, departament -> {
+        departamentAdapter = new SDRDAdapter(departaments, departament -> {
             veureCrearEditarDepartament(0, departament);
         }, DepartamentsActivity.this);
 

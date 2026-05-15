@@ -1,9 +1,10 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.privateKeyDecrypt;
+import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,8 +46,8 @@ import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
-import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
-import com.example.keyly_projecte_intermodular.resources.RecercaAdapter;
+import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
+import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
@@ -70,7 +71,7 @@ public class CarpetaActivity extends AppCompatActivity {
     private TextView nomCarpeta, dataCreacio;
     private EditText etCercar;
     private ImageView imgBtnFiltres;
-    private ImageButton imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
+    private ImageButton imgBtnLogOut, imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
     private int itemAfegit = 0;
     private String uuid;
     private boolean filtrat = false;
@@ -88,6 +89,11 @@ public class CarpetaActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         uuid = getIntent().getStringExtra("uuid");
@@ -357,11 +363,11 @@ public class CarpetaActivity extends AppCompatActivity {
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
             recyclerItems.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
-            RecercaAdapter recercaAdapterItems = new RecercaAdapter(itemsSeleccionats, null, null, this);
+            RecercaAdapter recercaAdapterItems = new RecercaAdapter(itemsSeleccionats, null, null, null, this);
             recyclerItems.setAdapter(recercaAdapterItems);
 
             recyclerUsuaris.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
-            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, this);
+            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, null, this);
             recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
             /* *************************************** Ítems *************************************** */
@@ -403,7 +409,7 @@ public class CarpetaActivity extends AppCompatActivity {
                             }
                         });
 
-                        // Actualiza el listener para usar todosLosItems
+                        // Actualitza el listener per utilitzar todosLosItems
                         aCTVCercarItems.setOnItemClickListener((parent, v, position, id) -> {
                             String seleccionat = parent.getItemAtPosition(position).toString();
                             for (Item item : todosLosItems) {
@@ -926,6 +932,8 @@ public class CarpetaActivity extends AppCompatActivity {
             intent.putExtra("add_edit", 0);
             intent.putExtra("iv", item.getIv());
             intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
+            intent.putExtra("item_carpeta", true);
+            intent.putExtra("uuidCarpeta", uuidCarpeta);
             startActivity(intent);
         }, CarpetaActivity.this);
         recyclerView.setAdapter(itemAdapter);

@@ -1,6 +1,7 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.imatgePerfil;
+import static com.example.keyly_projecte_intermodular.resources.Varis.usuariPropi;
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,16 +21,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
-import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
-import com.example.keyly_projecte_intermodular.resources.UsuariAdpater;
+import com.example.keyly_projecte_intermodular.adapters.UsuariAdpater;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,7 +37,7 @@ public class UsuarisActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private UsuariAdpater usuariAdpater;
     private EditText etCercar;
-    private ImageButton imgBtnBack, imgBtnAfegirUsuari;
+    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirUsuari;
     private ArrayList<Usuari> usuaris = new ArrayList<>(), totalUsuaris = new ArrayList<>(),
             usuarisSeleccionats = new ArrayList<>();
 
@@ -53,6 +50,11 @@ public class UsuarisActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         recyclerUsuaris = findViewById(R.id.recyclerUsuaris);
@@ -107,6 +109,13 @@ public class UsuarisActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     usuaris.clear();
                     usuaris.addAll(response.body());
+                    // Per no mostrar el usuari propi
+                    for (Usuari usuari : usuaris) {
+                        if (usuariPropi.getUuid().equals(usuari.getUuid())) {
+                            usuaris.remove(usuari);
+                            break;
+                        }
+                    }
                     actulitzarUsuaris(usuaris);
                     recyclerUsuaris.setVisibility(View.VISIBLE);
                 } else {

@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Keyly_Projecte_Intermodular"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".DominisActivity"
+            android:exported="false" />
+        <activity
             android:name=".RolsActivity"
             android:exported="false" />
         <activity

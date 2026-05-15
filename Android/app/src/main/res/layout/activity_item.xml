@@ -30,11 +30,13 @@
                 android:orientation="horizontal"
                 android:layout_gravity="right|center">
 
-                <ImageView
-                    android:id="@+id/icon_notification"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:srcCompat="@drawable/icon_notification" />
+                <ImageButton
+                    android:id="@+id/imgBtnLogOut"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:srcCompat="@drawable/logout"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
 
             </LinearLayout>
 

@@ -1,10 +1,10 @@
 package com.example.keyly_projecte_intermodular.dto;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.tokenNou;
+import static com.example.keyly_projecte_intermodular.resources.Varis.tokenNou;
 
 import android.util.Log;
 
-import com.example.keyly_projecte_intermodular.config.TokenForEver;
+import com.example.keyly_projecte_intermodular.resources.Varis;
 import com.example.keyly_projecte_intermodular.dao.Departament;
 import com.example.keyly_projecte_intermodular.request.DepartamentRequest;
 import com.google.gson.Gson;
@@ -32,6 +32,10 @@ public class DepartamentDTO {
         // Obtenir tots els departaments
         @GET("/api/departament/all/admin")
         Call<ArrayList<Departament>> getAllDepartaments();
+
+        // Obtenir departament per UUID
+        @GET("/api/departament/get/admin/{uuid}")
+        Call<Departament> getDepartament(@Path("uuid") String uuid);
 
         // Crear un departament
         @POST("/api/departament/add/admin")
@@ -66,7 +70,7 @@ public class DepartamentDTO {
                     .create();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(TokenForEver.BASE_URL)
+                    .baseUrl(Varis.BASE_URL)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();

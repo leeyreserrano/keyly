@@ -18,10 +18,10 @@ public class Usuari implements Serializable {
     private String publicKey;
     private String dataCreacio;
     private String ultimLogin;
-    private boolean potAdministrar;
-    private String rolIntern; // Rol app
+    private boolean potAdministrar; //Rol intern (CAP)
+    private String rolIntern; // Rol app (ADMIN, CAP, USUARI)
     private Sucursal sucursal;
     private Departament departament;
-    private Rol rol; // Puesto de trabajo
+    private Rol rol; // Lloc de treball
 
 }

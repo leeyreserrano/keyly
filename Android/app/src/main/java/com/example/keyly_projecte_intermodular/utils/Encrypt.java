@@ -1,6 +1,6 @@
 package com.example.keyly_projecte_intermodular.utils;
 
-import static com.example.keyly_projecte_intermodular.config.TokenForEver.dataKey;
+import static com.example.keyly_projecte_intermodular.resources.Varis.dataKey;
 
 import android.util.Base64;
 import android.util.Log;
@@ -20,8 +20,6 @@ import java.security.spec.KeySpec;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -100,20 +98,6 @@ public class Encrypt {
     // FUNCIONA
     public static byte[] desencriptarDataKey(PrivateKey privateKey, String edk) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
-//        Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
-//
-//        OAEPParameterSpec oaepParams = new OAEPParameterSpec(
-//                "SHA-256",           // Hash principal
-//                "MGF1",              // MGF algoritmo
-//                MGF1ParameterSpec.SHA256,  // Hash del MGF1 → SHA-256 explícito
-//                PSource.PSpecified.DEFAULT
-//        );
-//
-//        rsaCipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParams);
-//
-//        byte[] dataKeyRaw = rsaCipher.doFinal(Base64.decode(edk, Base64.DEFAULT));
-//        return dataKeyRaw;
-        // Limpiar posibles saltos de línea o espacios del Base64
         String edkClean = edk.replaceAll("\\s", "").trim();
 
         Log.d("EDK_CLEAN", edkClean);

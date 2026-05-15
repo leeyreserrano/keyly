@@ -1,5 +1,7 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
-import com.example.keyly_projecte_intermodular.resources.ItemAdapter;
+import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
@@ -42,7 +44,7 @@ public class ItemsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
     private EditText etCercar;
-    private ImageButton btnAddItem;
+    private ImageButton imgBtnLogOut, btnAddItem;
     private ImageView btnFiltres;
     private BottomNavigationView menu;
     private boolean filtrat = false;
@@ -57,6 +59,11 @@ public class ItemsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
+        imgBtnLogOut.setOnClickListener(v -> {
+            logOut(this);
         });
 
         menu = findViewById(R.id.menu_app);
