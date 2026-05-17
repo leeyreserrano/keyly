@@ -16,5 +16,11 @@
   "error.no_users": "Selecciona almenys un usuari",
   "error.crypto": "Sessió criptogràfica expirada, torna a iniciar sessió",
   "error.item_not_found": "No s'ha trobat l'item",
-  "error.share": "Error compartint"
+  "error.share": "Error compartint",
+  "tab.users": "Usuaris",
+  "tab.department": "Departament",
+  "search_department": "Cerca departament...",
+  "no_departments": "Cap departament trobat",
+  "users_count": "usuaris",
+  "department_users": "Usuaris del departament"
 }

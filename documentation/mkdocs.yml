@@ -1,7 +1,6 @@
-site_name: Keyly Documentation
-site_description: Documentación del proyecto Keyly
-site_author: Equipo Keyly
-
+site_name: Keyly — Documentació
+site_description: Documentació tècnica i guia d'usuari del gestor de credencials Keyly
+docs_dir: docs
 theme:
   name: material
   language: es
@@ -12,24 +11,58 @@ theme:
   favicon: assets/images/logo_keyly.png
 
 nav:
-  - Inicio: index.md
-  - 👤 Guía de Usuario:
-      - Inicio: usuario/inicio.md
-      - Cómo usar la app: usuario/como-usar.md
-      - Funcionalidades: usuario/funcionalidades.md
-      - FAQ: usuario/faq.md
+  - Inici: index.md
 
-  - 🎓 Documentación Técnica:
-      - Introducción: profesor/introduccion.md
-      - Arquitectura: profesor/arquitectura.md
-      - Base de datos: profesor/base-datos.md
-      - API: profesor/api.md
-      - Decisiones técnicas: profesor/decisiones-tecnicas.md
+  - Guia d'usuari (Web):
+    - Introducció: guia-usuari/introduccio.md
+    - Accés a l'aplicació: guia-usuari/acces.md
+    - Tauler principal: guia-usuari/tauler.md
+    - Ítems: guia-usuari/items.md
+    - Carpetes: guia-usuari/carpetes.md
+    - Compartits: guia-usuari/compartits.md
+    - Estadístiques de seguretat: guia-usuari/estadistiques.md
+    - Configuració i perfil: guia-usuari/configuracio.md
+    - Idioma i preferències: guia-usuari/idioma.md
 
-  - 🛠️ Desarrollo:
-      - Roadmap: desarrollo/roadmap.md
-      - Issues: desarrollo/issues.md
-      - Cambios: desarrollo/cambios.md
+  - Guia d'usuari (Android):
+    - Accés i idioma: guia-usuari-android/login.md
+    - Pantalla d'inici: guia-usuari-android/home.md
+    - Ítems: guia-usuari-android/items.md
+    - Carpetes: guia-usuari-android/carpetes.md
+    - Compartits: guia-usuari-android/compartits.md
+    - Perfil: guia-usuari-android/perfil.md
+    - Administració: guia-usuari-android/administracio.md
+    - Generador i diàlegs: guia-usuari-android/eines.md
+
+  - Documentació tècnica:
+    - Arquitectura i estructura:
+      - Estructura de directoris: tecnica/arquitectura/estructura.md
+      - Enrutament i navegació: tecnica/arquitectura/enrutament.md
+      - Internacionalització (i18n): tecnica/arquitectura/i18n.md
+    - Criptografia:
+      - Visió general: tecnica/crypto/visio-general.md
+      - cryptoService: tecnica/crypto/crypto-service.md
+      - CryptoContext: tecnica/crypto/crypto-context.md
+    - Capa API:
+      - client.ts: tecnica/api/client.md
+      - itemsapi.ts: tecnica/api/items.md
+      - carpetasapi.ts: tecnica/api/carpetes.md
+      - compartitsapi.ts: tecnica/api/compartits.md
+      - usuarisapi.ts: tecnica/api/usuaris.md
+      - loginapi.ts: tecnica/api/login.md
+    - Components principals:
+      - Layout i Sidebar: tecnica/components/layout-sidebar.md
+      - Header: tecnica/components/header.md
+      - CredentialCard: tecnica/components/credential-card.md
+      - ShareModal i ShareSelectorInline: tecnica/components/share-modal.md
+      - GeneratePasswordModal: tecnica/components/generate-password-modal.md
+      - Modals de confirmació: tecnica/components/modals-confirmacio.md
+      - Paginació: tecnica/components/paginacio.md
+    - Hooks i utilitats:
+      - useDashboardStats: tecnica/hooks/dashboard-stats.md
+      - useShareSelector: tecnica/hooks/share-selector.md
+      - useTimeRefresh i timeUtils: tecnica/hooks/time-refresh.md
+
 
 extra_css:
   - styles/extra.css

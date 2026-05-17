@@ -1,0 +1,11 @@
+{
+  "nav.home": "Home",
+  "nav.stats": "Estadisticas",
+  "nav.items": "Items",
+  "nav.folders": "Carpetas",
+  "nav.shared": "Compartidos",
+  "nav.settings": "Configuración",
+  "logout": "Cerrar sesión",
+  "share": "Compartir",
+  "back": "Volver"
+}

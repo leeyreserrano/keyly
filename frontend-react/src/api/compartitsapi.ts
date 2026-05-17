@@ -99,6 +99,14 @@ export type CompartitItem = {
   ultimAccess: string;
   comptadorAccess: number;
   dinsDeCarpeta: boolean;
+  carpeta: { uuid: string; nom: string }[];
+  bagul: {
+    uuid: string;
+    usuari: {
+      uuid: string;
+      nom: string;
+    };
+  };
 };
 
 export type CompartitCarpeta = {

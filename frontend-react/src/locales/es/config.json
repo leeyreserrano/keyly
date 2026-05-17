@@ -1,0 +1,10 @@
+{
+  "title": "Configuración",
+  "error.no_user": "No se pudo recuperar el usuario.",
+  "tabs.profile": "Perfil",
+  "tabs.items": "Gestión de elementos",
+  "tabs.folders": "Gestión de carpetas",
+  "tabs.users": "Gestión de usuarios",
+  "tabs.departments": "Gestión de departamentos",
+  "tabs.branches": "Gestión de sucursales"
+}

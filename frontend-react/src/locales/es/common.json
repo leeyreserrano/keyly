@@ -1,0 +1,17 @@
+{
+  "add_new": "+ Añadir Nuevo",
+  "save": "Guardar",
+  "saving": "Guardando...",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "close": "Cerrar",
+  "back": "Atrás",
+  "confirm": "Confirmar",
+  "search": "Buscar",
+  "loading": "Cargando...",
+  "error_loading": "Error al cargar los datos",
+  "no_results": "No hay resultados",
+  "delete_modal.title": "Confirmar eliminación",
+  "delete_modal.description": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer."
+}

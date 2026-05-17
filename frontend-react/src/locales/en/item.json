@@ -87,5 +87,17 @@
     "item.permission.write": "Write",
     "item.permission.read": "Read",
     "item.shared.with": "Shared with {{name}}",
-    "item.shared.from": "From {{name}}"
+    "item.shared.from": "From {{name}}",
+    "share.title": "Share with",
+    "share.search_placeholder": "Search by name or email...",
+    "share.no_users": "No users found",
+    "share.permissions": "Permissions",
+    "share.read": "Read",
+    "share.write": "Write",
+    "share.tab.users": "Users",
+    "share.tab.department": "Department",
+    "share.search_department": "Search department...",
+    "share.no_departments": "No departments found",
+    "share.users_count": "users",
+    "share.department_users": "Department users"
 }

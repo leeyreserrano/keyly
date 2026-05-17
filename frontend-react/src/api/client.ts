@@ -54,7 +54,7 @@ export async function apiRequest<T>(
     try {
       const data = await res.json();
       msg = data.message || msg;
-    } catch {}
+    } catch { }
     throw new Error(msg);
   }
 
@@ -87,12 +87,24 @@ export async function apiMultipartRequest<T>(
     try {
       const data = await res.json();
       msg = data.message || msg;
-    } catch {}
+    } catch { }
     throw new Error(msg);
   }
 
   const text = await res.text();
   return text ? JSON.parse(text) : null;
+}
+
+export function refreshTokenIfNeeded(): void {
+  const token = getToken();
+  if (!token) return;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expiresIn = payload.exp * 1000 - Date.now();
+    if (expiresIn < 60000) {
+      handleUnauthorized();
+    }
+  } catch { }
 }
 
 export async function apiImageRequest(path: string): Promise<string> {
