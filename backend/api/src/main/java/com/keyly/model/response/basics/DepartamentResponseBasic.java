@@ -6,7 +6,7 @@ import com.keyly.model.Departament;
 
 public record DepartamentResponseBasic(
         UUID uuid,
-        String departament) {
+        String nom) {
 
     public DepartamentResponseBasic(Departament d) {
         this(
