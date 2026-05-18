@@ -74,10 +74,9 @@ export class usuarisApi {
 
   static createUsuari(data: CreateUsuariData, isAdmin: boolean): Promise<unknown> {
     const endpoint = isAdmin ? '/usuari/add/admin' : '/usuari/add/admin/cap';
-    const { rolIntern, ...body } = data;
     return apiRequest<unknown>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(data),
     });
   }
 
@@ -93,7 +92,7 @@ export class usuarisApi {
       method: 'DELETE',
     }).then(() => { });
   }
-  
+
   static fetchAllAmbDepartament(): Promise<UsuariAmbDepartament[]> {
     return apiRequest<UsuariAmbDepartament[]>('/usuari/all/admin').then(r => r ?? []);
   }

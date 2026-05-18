@@ -99,5 +99,9 @@
     "share.search_department": "Search department...",
     "share.no_departments": "No departments found",
     "share.users_count": "users",
-    "share.department_users": "Department users"
+    "share.department_users": "Department users",
+    "item.password.expired": "The password has expired. You must change it.",
+    "item.password.expires_in": "The password expires in {{days}} days",
+    "item.pwned.label": "Pwned",
+    "item.pwned.alert": "This password has appeared in known data breaches. It is strongly recommended to change it as soon as possible."
 }

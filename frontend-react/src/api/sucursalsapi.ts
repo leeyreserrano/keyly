@@ -3,34 +3,47 @@ import { apiRequest } from './client';
 export type Sucursal = {
   uuid: string;
   nom: string;
+  direccio?: string;
+  ciutat?: string;
+  pais?: string;
+  telefon?: string;
+  correu?: string;
 };
 
-export class sucursalsApi {
-  static fetchAll(): Promise<Sucursal[]> {
-    return apiRequest<Sucursal[]>('/sucursal/all/admin').then(r => r ?? []);
-  }
+export type CreateSucursal = {
+  nom: string;
+  direccio: string;
+  ciutat: string;
+  pais: string;
+  telefon: string;
+  correu: string;
+};
 
-  static fetchOne(uuid: string): Promise<Sucursal | null> {
-    return apiRequest<Sucursal>(`/sucursal/get/admin/${uuid}`);
-  }
+export type UpdateSucursal = {
+  nom: string;
+  direccio: string;
+  ciutat: string;
+  pais: string;
+  telefon: string;
+  correu: string;
+};
 
-  static add(data: Partial<Sucursal>): Promise<Sucursal | null> {
-    return apiRequest<Sucursal>('/sucursal/add/admin', {
+export const sucursalsApi = {
+  fetchAll: () =>
+    apiRequest<Sucursal[]>('/sucursal/all/admin', { method: 'GET' }).then(r => r ?? []),
+
+  add: (data: CreateSucursal) =>
+    apiRequest<Sucursal>('/sucursal/add/admin', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
-  }
+    }),
 
-  static update(uuid: string, data: Partial<Sucursal>): Promise<Sucursal | null> {
-    return apiRequest<Sucursal>(`/sucursal/update/admin/${uuid}`, {
+  update: (uuid: string, data: UpdateSucursal) =>
+    apiRequest<Sucursal>(`/sucursal/update/admin/${uuid}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-    });
-  }
+    }),
 
-  static delete(uuid: string): Promise<void> {
-    return apiRequest<void>(`/sucursal/delete/admin/${uuid}`, {
-      method: 'DELETE',
-    }).then(() => {});
-  }
-}
+  delete: (uuid: string) =>
+    apiRequest<void>(`/sucursal/delete/admin/${uuid}`, { method: 'DELETE' }),
+};

@@ -187,7 +187,11 @@ export default function DepartamentsTab() {
                     <TableCell>{d.sucursal?.nom ?? '—'}</TableCell>
                     <TableCell align="right">
                       <IconButton
-                        color="error"
+                        sx={{
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'error.dark' },
+                          }}
                         onClick={() => handleDelete(d.uuid)}
                         disabled={deletingId === d.uuid}
                       >

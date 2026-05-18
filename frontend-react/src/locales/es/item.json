@@ -99,5 +99,9 @@
     "share.search_department": "Buscar departamento...",
     "share.no_departments": "No se encontraron departamentos",
     "share.users_count": "usuarios",
-    "share.department_users": "Usuarios del departamento"
+    "share.department_users": "Usuarios del departamento",
+    "item.password.expired": "La contraseña ha expirado. Debes cambiarla.",
+    "item.password.expires_in": "La contraseña expira en {{days}} días",
+    "item.pwned.label": "Pwned",
+    "item.pwned.alert": "Esta contraseña ha aparecido en filtraciones de datos conocidas. Se recomienda cambiarla lo antes posible."
 }

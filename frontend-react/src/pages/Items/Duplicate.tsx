@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import Stack from '@mui/material/Stack';
@@ -17,31 +17,38 @@ import CredentialCard from '../../components/CredentialCard';
 
 import { itemsApi, type Item } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
+import { useCrypto } from '../../context/CryptoContext';
+import { rsaDecrypt, decryptPasswordWithDataKey } from '../../crypto/cryptoService';
 import toast from 'react-hot-toast';
 
 const ITEMS_PER_PAGE = 12;
 
-function getDuplicatedItems(items: Item[]): Item[] {
+function getDuplicatedItems(items: Item[], decryptedPasswords: Map<string, string>): Item[] {
   const frequency: Record<string, number> = {};
 
-  items.forEach((i) => {
-    if (i.contrasenya) {
-      frequency[i.contrasenya] = (frequency[i.contrasenya] || 0) + 1;
+  items.forEach((item) => {
+    const plain = decryptedPasswords.get(item.uuid);
+    if (plain) {
+      frequency[plain] = (frequency[plain] || 0) + 1;
     }
   });
 
-  return items.filter(
-    (i) => i.contrasenya && frequency[i.contrasenya] > 1
-  );
+  return items.filter((item) => {
+    const plain = decryptedPasswords.get(item.uuid);
+    return plain && frequency[plain] > 1;
+  });
 }
 
 export default function Duplicats() {
   const navigate = useNavigate();
   const { t } = useTranslation('item');
+  const { privateKey } = useCrypto();
 
   const [items, setItems] = useState<Item[]>([]);
   const [carpetas, setCarpetas] = useState<Carpeta[]>([]);
   const [loading, setLoading] = useState(true);
+  const [decrypting, setDecrypting] = useState(false);
+  const [decryptedPasswords, setDecryptedPasswords] = useState<Map<string, string>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -51,21 +58,15 @@ export default function Duplicats() {
   useEffect(() => {
     const loadData = async () => {
       setError(null);
-
       try {
         const [itemsData, carpetasData] = await Promise.all([
           itemsApi.fetchItems(),
           carpetasApi.fetchItems(),
         ]);
-
         setItems(itemsData ?? []);
         setCarpetas(carpetasData ?? []);
       } catch (err: unknown) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : t('duplicates.error.load');
-
+        const message = err instanceof Error ? err.message : t('duplicates.error.load');
         setError(message);
       } finally {
         setLoading(false);
@@ -75,11 +76,53 @@ export default function Duplicats() {
     loadData();
   }, [t]);
 
+  const decryptAll = useCallback(async (allItems: Item[]) => {
+    if (!privateKey || allItems.length === 0) return;
+    setDecrypting(true);
+
+    const plainMap = new Map<string, string>();
+
+    await Promise.allSettled(
+      allItems.map(async (item) => {
+        try {
+          const hasEncryption =
+            item.encryptedDataKey?.encryptedDataKey && item.iv && item.contrasenya;
+
+          if (hasEncryption) {
+            const dataKeyBytes = await rsaDecrypt(
+              privateKey,
+              item.encryptedDataKey!.encryptedDataKey
+            );
+            const plain = await decryptPasswordWithDataKey(
+              dataKeyBytes,
+              item.contrasenya!,
+              item.iv!
+            );
+            plainMap.set(item.uuid, plain);
+          } else if (item.contrasenya) {
+            plainMap.set(item.uuid, item.contrasenya);
+          }
+        } catch {
+          // item individual ignorado
+        }
+      })
+    );
+
+    setDecryptedPasswords(new Map(plainMap));
+    setDecrypting(false);
+  }, [privateKey]);
+
+  useEffect(() => {
+    if (!loading && items.length > 0 && privateKey) {
+      decryptAll(items);
+    }
+  }, [loading, items, privateKey, decryptAll]);
+
   useEffect(() => {
     setPage(1);
   }, [search]);
 
-  const duplicats = getDuplicatedItems(items);
+  const duplicats = getDuplicatedItems(items, decryptedPasswords);
 
   const filteredItems = duplicats.filter(
     (item) =>
@@ -101,14 +144,9 @@ export default function Duplicats() {
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
-
     try {
       await itemsApi.deleteItem(deleteTarget.uuid);
-
-      setItems((prev) =>
-        prev.filter((i) => i.uuid !== deleteTarget.uuid)
-      );
-
+      setItems((prev) => prev.filter((i) => i.uuid !== deleteTarget.uuid));
       toast.success(t('duplicates.success.delete'));
       setOpenDeleteModal(false);
       setDeleteTarget(null);
@@ -118,7 +156,7 @@ export default function Duplicats() {
   };
 
   const renderContent = () => {
-    if (loading) {
+    if (loading || decrypting) {
       return (
         <Grid container spacing={2}>
           {Array.from({ length: 6 }).map((_, i) => (
@@ -138,13 +176,9 @@ export default function Duplicats() {
       return (
         <Stack sx={{ alignItems: 'center', py: 10, gap: 2, color: 'text.disabled' }}>
           <RepeatRoundedIcon sx={{ fontSize: 64 }} />
-
           <Typography variant="body1" sx={{ fontWeight: 600 }}>
-            {search
-              ? t('duplicates.empty.search')
-              : t('duplicates.empty.no')}
+            {search ? t('duplicates.empty.search') : t('duplicates.empty.no')}
           </Typography>
-
           {!search && (
             <Typography variant="body2" color="text.secondary">
               {t('duplicates.empty.subtitle')}
@@ -170,12 +204,8 @@ export default function Duplicats() {
                 dataEditat={item.dataEditat}
                 dinsCarpeta={estaEnCarpeta}
                 favorit={item.favorit}
-                onClick={() =>
-                  navigate('/Item', { state: { uuid: item.uuid } })
-                }
-                onEdit={() =>
-                  navigate('/EditItem', { state: { uuid: item.uuid } })
-                }
+                onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
+                onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid } })}
                 onDelete={() => handleDelete(item)}
               />
             </Grid>
@@ -200,7 +230,7 @@ export default function Duplicats() {
           {renderContent()}
         </Box>
 
-        {!loading && !error && filteredItems.length > 0 && (
+        {!loading && !decrypting && !error && filteredItems.length > 0 && (
           <CustomPagination
             count={totalPages}
             page={page}

@@ -211,7 +211,11 @@ export default function CarpetesTab() {
                     <TableCell align="right">
                       <Tooltip title="Eliminar compartit">
                         <IconButton
-                          color="error"
+                          sx={{
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'error.dark' },
+                          }}
                           size="small"
                           disabled={deletingId === c.uuid}
                           onClick={() => handleDelete(c.uuid)}

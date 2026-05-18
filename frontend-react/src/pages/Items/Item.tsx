@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Stack, Typography, Paper, IconButton, Divider,
-  Box, CircularProgress, Chip,
+  Box, CircularProgress, Chip, Alert,
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
@@ -13,6 +14,8 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import Header from '../../components/Header';
 import ActionButtons from '../../components/ActionButtons';
@@ -22,9 +25,11 @@ import { getTimeAgo, formatDate } from '../../utils/timeUtils';
 import { itemsApi, type Item } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
 import { compartitsApi, type Compartit, type CompartitItem } from '../../api/compartitsapi';
+import { configApi } from '../../api/configapi';
 import { useCrypto } from '../../context/CryptoContext';
 import { useAuth } from '../../context/AuthContext';
 import { rsaDecrypt, decryptPasswordWithDataKey } from '../../crypto/cryptoService';
+import { isPasswordPwned } from '../../utils/pwnedUtils';
 import toast from 'react-hot-toast';
 
 const getFavicon = (url?: string): string | null => {
@@ -36,6 +41,58 @@ const getFavicon = (url?: string): string | null => {
     return null;
   }
 };
+
+function PasswordExpiryBanner({
+  dataEditat,
+  dataCreacio,
+  diesExpiracio,
+  t,
+}: {
+  dataEditat: string;
+  dataCreacio: string;
+  diesExpiracio: number;
+  t: TFunction;
+}) {
+  if (diesExpiracio <= 0) return null;
+
+  const referenceDate = dataEditat || dataCreacio;
+  if (!referenceDate) return null;
+
+  const elapsed = Math.floor(
+    (Date.now() - new Date(referenceDate).getTime()) / 86400000
+  );
+  const remaining = diesExpiracio - elapsed;
+
+  if (remaining <= 0) {
+    return (
+      <Alert
+        severity="error"
+        icon={<WarningAmberRoundedIcon fontSize="small" />}
+        sx={{ borderRadius: 2, fontWeight: 600 }}
+      >
+        {t('item.password.expired')}
+      </Alert>
+    );
+  }
+
+  if (remaining <= 14) {
+    return (
+      <Alert
+        severity="warning"
+        icon={<WarningAmberRoundedIcon fontSize="small" />}
+        sx={{ borderRadius: 2, fontWeight: 600 }}
+      >
+        {t('item.password.expires_in', { days: remaining })}
+      </Alert>
+    );
+  }
+
+  return (
+    <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+      {t('item.password.expires_in', { days: remaining })}
+    </Typography>
+  );
+}
 
 export default function ItemPage() {
   const navigate = useNavigate();
@@ -57,6 +114,8 @@ export default function ItemPage() {
   const [openShareModal, setOpenShareModal] = useState(false);
   const [isFavorit, setIsFavorit] = useState(false);
   const [faviconError, setFaviconError] = useState(false);
+  const [diesExpiracio, setDiesExpiracio] = useState<number | null>(null);
+  const [isPwned, setIsPwned] = useState<boolean | null>(null);
 
   const now = useTimeRefresh(60000);
 
@@ -72,22 +131,32 @@ export default function ItemPage() {
           setFaviconError(false);
           if (!data) return;
           let targetItem: CompartitItem | null = data.item ?? null;
-          if (itemUuid && data.carpeta) targetItem = data.carpeta.items.find((i) => i.uuid === itemUuid) ?? null;
+          if (itemUuid && data.carpeta) {
+            targetItem = data.carpeta.items.find((i) => i.uuid === itemUuid) ?? null;
+          }
           setItem(targetItem);
           setIsFavorit(targetItem?.favorit ?? false);
           if (!targetItem || !privateKey) { setDecryptedPassword(null); return; }
           if (!targetItem.encryptedDataKey?.encryptedDataKey || !targetItem.iv || !targetItem.contrasenya) {
-            setDecryptedPassword(targetItem.contrasenya ?? null); return;
+            setDecryptedPassword(targetItem.contrasenya ?? null);
+            if (targetItem.contrasenya) {
+              isPasswordPwned(targetItem.contrasenya).then(setIsPwned).catch(() => {});
+            }
+            return;
           }
           try {
             const dataKeyBytes = await rsaDecrypt(privateKey, targetItem.encryptedDataKey.encryptedDataKey);
             const plain = await decryptPasswordWithDataKey(dataKeyBytes, targetItem.contrasenya, targetItem.iv);
             setDecryptedPassword(plain);
+            isPasswordPwned(plain).then(setIsPwned).catch(() => {});
           } catch {
             setDecryptedPassword(null);
           }
         } else {
-          const [allItems, allCarpetas] = await Promise.all([itemsApi.fetchItems(), carpetasApi.fetchItems()]);
+          const [allItems, allCarpetas] = await Promise.all([
+            itemsApi.fetchItems(),
+            carpetasApi.fetchItems(),
+          ]);
           const found = allItems?.find((i) => i.uuid === uuid) ?? null;
           setItem(found);
           setIsFavorit(found?.favorit ?? false);
@@ -95,12 +164,17 @@ export default function ItemPage() {
           setFaviconError(false);
           if (!found || !privateKey) { setDecryptedPassword(null); return; }
           if (!found.encryptedDataKey?.encryptedDataKey || !found.iv || !found.contrasenya) {
-            setDecryptedPassword(found.contrasenya ?? null); return;
+            setDecryptedPassword(found.contrasenya ?? null);
+            if (found.contrasenya) {
+              isPasswordPwned(found.contrasenya).then(setIsPwned).catch(() => {});
+            }
+            return;
           }
           try {
             const dataKeyBytes = await rsaDecrypt(privateKey, found.encryptedDataKey.encryptedDataKey);
             const plain = await decryptPasswordWithDataKey(dataKeyBytes, found.contrasenya, found.iv);
             setDecryptedPassword(plain);
+            isPasswordPwned(plain).then(setIsPwned).catch(() => {});
           } catch {
             setDecryptedPassword(null);
           }
@@ -111,8 +185,16 @@ export default function ItemPage() {
         setLoading(false);
       }
     };
+
     load();
   }, [uuid, compartitUuid, itemUuid, privateKey, esCompartit, t]);
+
+  useEffect(() => {
+    if (!usuari?.sucursal?.uuid) return;
+    configApi.getBySucursal(usuari.sucursal.uuid)
+      .then(cfg => setDiesExpiracio(cfg?.diesExpiracio ?? null))
+      .catch(() => {});
+  }, [usuari?.sucursal?.uuid]);
 
   const toggleFavorit = async () => {
     if (!item || esCompartit) return;
@@ -177,7 +259,12 @@ export default function ItemPage() {
   const faviconUrl = getFavicon(item?.url);
 
   const headerIcon = faviconUrl && !faviconError ? (
-    <img src={faviconUrl} alt="" style={{ width: 30, height: 30, objectFit: 'contain' }} onError={() => setFaviconError(true)} />
+    <img
+      src={faviconUrl}
+      alt=""
+      style={{ width: 30, height: 30, objectFit: 'contain' }}
+      onError={() => setFaviconError(true)}
+    />
   ) : (
     <KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />
   );
@@ -189,30 +276,69 @@ export default function ItemPage() {
       <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
         <Box sx={{ px: 4, py: 3 }}>
           {loading ? (
-            <Stack sx={{ alignItems: 'center', mt: 10 }}><CircularProgress /></Stack>
+            <Stack sx={{ alignItems: 'center', mt: 10 }}>
+              <CircularProgress />
+            </Stack>
           ) : !item ? (
-            <Typography color="error" sx={{ mt: 4 }}>{t('item.error.not_found')}</Typography>
+            <Typography color="error" sx={{ mt: 4 }}>
+              {t('item.error.not_found')}
+            </Typography>
           ) : (
-            <Paper variant="outlined" sx={{ p: 3, borderRadius: '12px', border: '1px solid', borderColor: 'divider', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 3,
+                borderRadius: '12px',
+                border: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+              }}
+            >
               <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
                   {estaEnCarpeta && <FolderOutlinedIcon />}
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>{item.titol}</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    {item.titol}
+                  </Typography>
+                  {isPwned && (
+                    <Chip
+                      icon={<BugReportOutlinedIcon sx={{ fontSize: 14 }} />}
+                      label={t('item.pwned.label')}
+                      size="small"
+                      sx={{
+                        bgcolor: '#E24B4A18',
+                        color: '#E24B4A',
+                        border: '1px solid #E24B4A40',
+                        fontWeight: 700,
+                        fontSize: '0.7rem',
+                      }}
+                    />
+                  )}
                 </Stack>
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
                   {esCompartit && compartit && (
                     <>
                       <Chip
-                        icon={esEscriptura ? <EditOutlinedIcon sx={{ fontSize: 14 }} /> : <LockOutlinedIcon sx={{ fontSize: 14 }} />}
+                        icon={esEscriptura
+                          ? <EditOutlinedIcon sx={{ fontSize: 14 }} />
+                          : <LockOutlinedIcon sx={{ fontSize: 14 }} />
+                        }
                         label={esEscriptura ? t('item.permission.write') : t('item.permission.read')}
-                        size="small" variant="outlined" sx={{ fontSize: '0.7rem' }}
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontSize: '0.7rem' }}
                       />
                       <Chip
                         icon={<ShareOutlinedIcon sx={{ fontSize: 14 }} />}
                         label={esPropietari
                           ? t('item.shared.with', { name: compartit.usuariReceptor.nom })
-                          : t('item.shared.from', { name: compartit.usuariCreador.nom })}
-                        size="small" variant="outlined" sx={{ fontSize: '0.7rem' }}
+                          : t('item.shared.from', { name: compartit.usuariCreador.nom })
+                        }
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontSize: '0.7rem' }}
                       />
                     </>
                   )}
@@ -223,33 +349,69 @@ export default function ItemPage() {
                       onEdit={() => navigate('/EditItem', { state: { uuid: (item as Item).uuid } })}
                       onDelete={() => setOpenDeleteModal(true)}
                       onShare={(e) => { e.stopPropagation(); setOpenShareModal(true); }}
-                      size="card" gap={0.5} showFolderIcon={false}
+                      size="card"
+                      gap={0.5}
+                      showFolderIcon={false}
                     />
                   ) : esEscriptura ? (
                     <ActionButtons
                       onEdit={() => navigate('/EditItem', { state: { uuid: item.uuid, compartitUuid, itemUuid } })}
-                      size="card" gap={0.5}
+                      size="card"
+                      gap={0.5}
                     />
                   ) : null}
                 </Stack>
               </Stack>
 
               <Divider />
+
+              {isPwned && (
+                <Alert
+                  severity="error"
+                  icon={<BugReportOutlinedIcon fontSize="small" />}
+                  sx={{ borderRadius: 2, fontWeight: 600 }}
+                >
+                  {t('item.pwned.alert')}
+                </Alert>
+              )}
+
               <Typography><strong>{t('item.field.user')}:</strong> {item.nomUsuari}</Typography>
               <Typography><strong>{t('item.field.notes')}:</strong> {item.notes ?? '—'}</Typography>
               <Typography><strong>{t('item.field.url')}:</strong> {item.url ?? '—'}</Typography>
 
               <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-                <Typography><strong>{t('item.field.password')}:</strong> {passwordDisplay()}</Typography>
+                <Typography>
+                  <strong>{t('item.field.password')}:</strong> {passwordDisplay()}
+                </Typography>
                 <Stack direction="row" spacing={1}>
-                  <IconButton onClick={handleCopy} disabled={!decryptedPassword} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'primary.main' }}>
+                  <IconButton
+                    onClick={handleCopy}
+                    disabled={!decryptedPassword}
+                    sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'primary.main' }}
+                  >
                     <ContentCopyOutlinedIcon fontSize="small" />
                   </IconButton>
-                  <IconButton onClick={() => setShowPassword((p) => !p)} disabled={!decryptedPassword} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}>
-                    {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
+                  <IconButton
+                    onClick={() => setShowPassword((p) => !p)}
+                    disabled={!decryptedPassword}
+                    sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', color: 'text.secondary' }}
+                  >
+                    {showPassword
+                      ? <VisibilityOffIcon fontSize="small" />
+                      : <VisibilityIcon fontSize="small" />
+                    }
                   </IconButton>
                 </Stack>
               </Stack>
+
+              {!esCompartit && diesExpiracio != null && (
+                <PasswordExpiryBanner
+                  dataEditat={(item as Item).dataEditat}
+                  dataCreacio={(item as Item).dataCreacio}
+                  diesExpiracio={diesExpiracio}
+                  t={t}
+                />
+              )}
 
               <Divider />
 
@@ -260,18 +422,36 @@ export default function ItemPage() {
                   <Typography><strong>{t('item.field.share_date')}:</strong> {formatDate(compartit.dataCreacio)}</Typography>
                 </>
               ) : (
-                <Typography><strong>{t('item.field.created')}:</strong> {formatDate((item as Item).dataCreacio)}</Typography>
+                <Typography>
+                  <strong>{t('item.field.created')}:</strong> {formatDate((item as Item).dataCreacio)}
+                </Typography>
               )}
-              <Typography><strong>{t('item.field.last_modified')}:</strong> {getTimeAgo(item.dataEditat, now)}</Typography>
-              {!esCompartit && <Typography><strong>{t('item.field.last_access')}:</strong> {getTimeAgo((item as Item).ultimAcces, now)}</Typography>}
+              <Typography>
+                <strong>{t('item.field.last_modified')}:</strong> {getTimeAgo(item.dataEditat, now)}
+              </Typography>
+              {!esCompartit && (
+                <Typography>
+                  <strong>{t('item.field.last_access')}:</strong> {getTimeAgo((item as Item).ultimAcces, now)}
+                </Typography>
+              )}
             </Paper>
           )}
         </Box>
       </Stack>
 
-      <DeleteConfirmationModal open={openDeleteModal} onClose={() => setOpenDeleteModal(false)} onConfirm={confirmDelete} />
+      <DeleteConfirmationModal
+        open={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onConfirm={confirmDelete}
+      />
       {!esCompartit && item && (
-        <ShareModal open={openShareModal} onClose={() => setOpenShareModal(false)} tipusEntitat="ITEM" entitatUuid={(item as Item).uuid} entitatNom={item.titol} />
+        <ShareModal
+          open={openShareModal}
+          onClose={() => setOpenShareModal(false)}
+          tipusEntitat="ITEM"
+          entitatUuid={(item as Item).uuid}
+          entitatNom={item.titol}
+        />
       )}
     </Stack>
   );

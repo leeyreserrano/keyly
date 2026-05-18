@@ -99,5 +99,9 @@
   "share.search_department": "Cerca departament...",
   "share.no_departments": "Cap departament trobat",
   "share.users_count": "usuaris",
-  "share.department_users": "Usuaris del departament"
+  "share.department_users": "Usuaris del departament",
+  "item.password.expired": "La contrasenya ha expirat. Has de canviar-la.",
+  "item.password.expires_in": "La contrasenya expira en {{days}} dies",
+  "item.pwned.label": "Vulnerada",
+  "item.pwned.alert": "Aquesta contrasenya ha aparegut en filtracions de dades conegudes. Es recomana canviar-la com més aviat millor."
 }

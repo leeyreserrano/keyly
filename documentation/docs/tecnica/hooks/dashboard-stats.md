@@ -2,32 +2,61 @@
 
 Fitxer: `src/hooks/useDashboardstats.ts`
 
-Hook que calcula les estadístiques de seguretat a partir de la llista d'ítems desxifrats. Tota la lògica és al client, dins d'un `useMemo`.
+Hook que calcula estadístiques de seguretat a partir dels ítems i de les contrasenyes desxifrades.
+
+La lògica es calcula dins d'un `useMemo`.
 
 ## Interfície `DashboardStats`
 
 | Camp | Tipus | Descripció |
 |---|---|---|
-| `totalItems` | `number` | Total d'ítems analitzats |
-| `compromisedCount` | `number` | Contrasenyes que coincideixen amb la llista de contrasenyes comunes |
-| `reusedCount` | `number` | Contrasenyes idèntiques usades en més d'un ítem |
-| `weakCount` | `number` | Contrasenyes amb puntuació inferior a 40 |
-| `secureCount` | `number` | Contrasenyes amb puntuació igual o superior a 70 |
-| `avgSecurityScore` | `number` | Puntuació mitjana (0–100) |
-| `recentItems` | `Item[]` | Darrers 5 ítems accedits |
+| `totalItems` | `number` | Total d'ítems |
+| `pwnedCount` | `number` | Nombre de contrasenyes compromeses |
+| `reusedCount` | `number` | Nombre de contrasenyes reutilitzades |
+| `weakCount` | `number` | Nombre de contrasenyes febles |
+| `secureCount` | `number` | Nombre de contrasenyes segures |
+| `avgSecurityScore` | `number` | Puntuació mitjana |
+| `recentItems` | `Item[]` | 5 ítems més recents |
 
-## Criteris de puntuació (`evaluatePasswordStrength`)
+## Funció `getPasswordStrengthScore(password)`
+
+Calcula una puntuació de seguretat entre 0 i 100.
+
+### Criteris
 
 | Criteri | Punts |
 |---|---|
-| Longitud ≥ 12 caràcters | +30 |
-| Longitud ≥ 8 caràcters | +15 |
-| Conté majúscules | +20 |
-| Conté números | +20 |
-| Conté símbols | +30 |
+| Longitud ≥ 8 | +20 |
+| Longitud ≥ 12 | +10 |
+| Longitud ≥ 16 | +10 |
+| Conté minúscules | +10 |
+| Conté majúscules | +10 |
+| Conté números | +15 |
+| Conté símbols | +25 |
 
-La puntuació màxima és 100. Les contrasenyes amb longitud inferior a 8 no sumen punts per longitud.
+La puntuació màxima és 100.
 
-## Detecció de contrasenyes comunes
+## Contrasenyes reutilitzades
 
-Es compara la contrasenya (en minúscules) contra una llista de 10 contrasenyes molt usades: `123456`, `password`, `qwerty`, `admin`, etc.
+Es crea un objecte `passwordFrequency` amb el nombre de vegades que apareix cada contrasenya.
+
+Una contrasenya es considera reutilitzada quan apareix més d'una vegada.
+
+## Contrasenyes segures i febles
+
+Durant el càlcul:
+
+- `secureCount` augmenta quan la puntuació és igual o superior a 70.
+- `weakCount` augmenta quan la puntuació és inferior a 70.
+
+## Puntuació mitjana
+
+La puntuació mitjana es calcula amb:
+
+```ts
+Math.round(totalScore / items.length)
+```
+
+## Ítems recents
+
+Els ítems es ordenen per dataEditat de forma descendent i es retornen els 5 primers.
