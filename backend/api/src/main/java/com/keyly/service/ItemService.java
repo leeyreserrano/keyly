@@ -37,6 +37,9 @@ public class ItemService {
     private UsuariService usuariService;
 
     @Autowired
+    private CompartitService compartitService;
+
+    @Autowired
     private ItemMapper mapper;
 
     @Autowired
@@ -128,7 +131,6 @@ public class ItemService {
 
         Item itemGuardat = repo.save(item);
 
-
         EncryptedDataKeys e = repoEncryptedDataKeys.findByUsuariUuidAndItemUuid(usuari.uuid(), item.getUuid());
 
         e.setEncryptedDataKey(request.encryptedDataKey());
@@ -144,6 +146,10 @@ public class ItemService {
 
         repo.deleteByUuid(uuid);
 
+        compartitService.getAllCompartits().stream()
+                .filter(c -> item.uuid().equals(c.item().uuid()))
+                .forEach(c -> compartitService.deleteCompartit(c.uuid()));
+
         return item;
     }
 
@@ -151,6 +157,11 @@ public class ItemService {
         Item item = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException(
                         "Item amb el uuid: " + uuid + " no trobat."));
+
+        compartitService.getAllCompartitsOfUser(usuari.getUuid())
+                .stream()
+                .filter(c -> item.getUuid().equals(c.item().uuid()))
+                .forEach(c -> compartitService.deleteCompartit(c.uuid()));
 
         repo.deleteByUuid(item.getUuid());
     }

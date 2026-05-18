@@ -39,6 +39,9 @@ public class CarpetaService {
     private ItemService itemService;
 
     @Autowired
+    private CompartitService compartitService;
+
+    @Autowired
     private CarpetaMapper mapper;
 
     public List<CarpetaResponse> getAllCarpetes() {
@@ -207,12 +210,20 @@ public class CarpetaService {
 
         repo.deleteByUuid(uuid);
 
+        compartitService.getAllCompartits().stream()
+                .filter(c -> c.uuid().equals(carpeta.uuid()))
+                .forEach(c -> compartitService.deleteCompartit(c.uuid()));
+
         return carpeta;
     }
 
     public void deleteUserCarpeta(Usuari usuari, UUID uuid) {
         Carpeta carpeta = repo.findByBagulPropietariAndUuid(usuari, uuid)
                 .orElseThrow(() -> new EntitatNoTrobadaException("Carpeta no trobada amb el uuid " + uuid));
+
+        compartitService.getAllCompartitsOfUser(usuari.getUuid()).stream()
+                .filter(c -> c.uuid().equals(carpeta.getUuid()))
+                .forEach(c -> compartitService.deleteCompartit(carpeta.getUuid()));
 
         repo.delete(carpeta);
     }
@@ -221,6 +232,7 @@ public class CarpetaService {
         Carpeta carpeta = getCarpetaEntityByUuid(carpetaUuid);
         Item itemRecuperat = itemService.getItemEntityByUuid(itemUuid);
         carpeta.removeItem(itemRecuperat);
+
         repo.save(carpeta);
     }
 
