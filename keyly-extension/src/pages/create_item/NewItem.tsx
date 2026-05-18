@@ -105,6 +105,8 @@ function NewItem() {
       dinsDeCarpeta: carpeta.length > 0
     }
 
+    console.log("Super item " + item)
+
     if (compartir.length > 0 && carpeta.length > 0) {
       const i: ItemResponse = await carpetasApi.createNewItemInCarpeta(
         carpeta,
@@ -113,7 +115,9 @@ function NewItem() {
 
       const selectedUsers = users.filter((u) => compartir.includes(u.uuid))
 
-      const usuaris = await usuarisCompartits(selectedUsers, rawDataKey)
+      const usuaris = await usuarisCompartits(selectedUsers, [
+        { itemUuid: i.uuid, rawDataKey }
+      ])
 
       const compartit: CompartitRequest = {
         entitatUuid: i.uuid,

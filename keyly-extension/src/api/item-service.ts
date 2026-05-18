@@ -1,9 +1,9 @@
-import type { Item } from "~models/Item"
+import type { Item, ItemResponse } from "~models/Item"
 
 const API_BASE = "https://10.147.17.250:8081/api"
 
 export class itemsApi {
-  static async fetchItems(): Promise<Item[]> {
+  static async fetchItems(): Promise<ItemResponse[]> {
     const token = localStorage.getItem("jwtToken")
     const response = await fetch(API_BASE + "/item/get/all", {
       headers: { Authorization: `Bearer ${token}` }

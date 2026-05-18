@@ -57,12 +57,14 @@ function EditItem() {
         const itemOriginalRes = await itemsApi.fetchItem(item.uuid)
         setItemOriginal(itemOriginalRes)
         const { rawDataKey: rdk } = await decryptItemWithRawKey(itemOriginalRes)
+        console.log("rawDataKey carregat:", rdk)
         setRawDataKey(rdk)
 
         const compartitsRes = await compartitApi.fetchCompartitsCreats()
         const filtrats = compartitsRes.filter(
           (c) => c.tipusEntitat === "ITEM" && c.item?.uuid === item.uuid
         )
+
         setUsuarisAmbAcces(filtrats)
 
         const usuaris = await userApi.fetchUsers()
@@ -90,10 +92,8 @@ function EditItem() {
     setUsuarisAmbAcces((prev) => prev.filter((c) => c.uuid !== compartitUuid))
 
     if (compartitUuid.startsWith("temp-")) {
-      // Era un usuario recién añadido, solo quitarlo de usuarisAAfegir
       setUsuarisAAfegir((prev) => prev.filter((u) => u.uuid !== usuariUuid))
     } else {
-      // Era un compartit real, marcar para borrar al guardar
       setUsuarisAEliminar((prev) => [...prev, compartitUuid])
     }
   }
@@ -112,6 +112,10 @@ function EditItem() {
 
   const handleSubmit = async () => {
     try {
+      if (!rawDataKey) {
+        console.error("rawDataKey és null, no es pot guardar")
+        return
+      }
       const { contrasenyaEncriptada, ivB64 } = await encryptItemPassword(
         formData.contrasenya,
         rawDataKey
@@ -122,7 +126,7 @@ function EditItem() {
         ...formData,
         contrasenya: contrasenyaEncriptada,
         iv: ivB64,
-        encryptedDataKey: itemOriginal.encryptedDataKey.encryptedDatakey
+        encryptedDataKey: itemOriginal.encryptedDataKey.encryptedDataKey
       })
 
       // Si la carpeta ha cambiado, mover el item
@@ -135,7 +139,9 @@ function EditItem() {
       )
 
       if (usuarisAAfegir.length > 0) {
-        const usuaris = await usuarisCompartits(usuarisAAfegir, rawDataKey)
+        const usuaris = await usuarisCompartits(usuarisAAfegir, [
+          { itemUuid: item.uuid, rawDataKey }
+        ])
         const compartit: CompartitRequest = {
           entitatUuid: item.uuid,
           tipusEntitat: TipusEntitat.ITEM,
@@ -149,8 +155,6 @@ function EditItem() {
       console.error("Error guardant:", err)
     }
   }
-
-  const onSave = (data) => {}
 
   const carpetesOrdenades = carpetaActual
     ? [

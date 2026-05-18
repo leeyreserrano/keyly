@@ -106,7 +106,7 @@ function CarpetCard({ search }: { search: string }) {
                       handleFavoriteCarpetaClick(carpetes)
                     }}
                     stroke={carpetes.favorit ? "#facc15" : "currentColor"}
-                    className={`size-6 hover:cursor-pointer transition-colors ${
+                    className={`size-6 hover:curscor-pointer transition-colors ${
                       carpetes.favorit
                         ? "text-yellow-400 hover:text-yellow-600"
                         : "hover:text-yellow-400"

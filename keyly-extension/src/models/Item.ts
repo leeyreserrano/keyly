@@ -4,10 +4,7 @@ export type Item = {
   nomUsuari: string
   contrasenya: string
   iv?: string
-  encryptedDataKey: {
-    uuid: string
-    encryptedDataKey: string
-  }
+  encryptedDataKey: string
   url: string
   notes: string
   favorit: boolean
@@ -18,5 +15,22 @@ export type Item = {
 }
 
 export type ItemResponse = {
+    uuid: string
+  titol: string
+  nomUsuari: string
+  contrasenya: string
+  iv?: string
+  encryptedDataKey: EncryptedDataKeyResponse
+  url: string
+  notes: string
+  favorit: boolean
+  dataCreacio: string
+  dataEditat: string
+  dinsDeCarpeta: boolean
+  ultimAccess: string
+}
+
+export type EncryptedDataKeyResponse = {
   uuid: string
+  encryptedDataKey: string
 }
