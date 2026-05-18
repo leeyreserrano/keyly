@@ -1,0 +1,14 @@
+{
+  "title": "Compartidos",
+  "tab.received": "Recibidos",
+  "tab.created": "Creados",
+
+  "empty.received": "No tienes ningún item compartido",
+  "empty.created": "No has compartido ningún item",
+
+  "error.load": "Error cargando items compartidos",
+  "error.delete": "Error eliminando item compartido",
+  "success.delete": "Item compartido eliminado correctamente",
+
+  "loading": "Cargando..."
+}

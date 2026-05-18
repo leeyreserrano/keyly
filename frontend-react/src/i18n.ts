@@ -30,6 +30,20 @@ import enToolbar from "./locales/en/toolbar.json";
 import enCard from "./locales/en/card.json";
 import enShare from "./locales/en/share.json";
 
+import esAuth from "./locales/es/auth.json";
+import esFolder from "./locales/es/folder.json";
+import esItem from "./locales/es/item.json";
+import esShared from "./locales/es/shared.json";
+import esCommon from "./locales/es/common.json";
+import esHome from "./locales/es/home.json";
+import esChoose from "./locales/es/choose.json";
+import esStats from "./locales/es/stats.json";
+import esConfig from "./locales/es/config.json";
+import esSidebar from "./locales/es/sidebar.json";
+import esToolbar from "./locales/es/toolbar.json";
+import esCard from "./locales/es/card.json";
+import esShare from "./locales/es/share.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -64,6 +78,21 @@ i18n
         toolbar: enToolbar,
         card: enCard,
         share: enShare,
+      },
+      es: {
+        auth: esAuth,
+        folder: esFolder,
+        item: esItem,
+        shared: esShared,
+        common: esCommon,
+        home: esHome,
+        choose: esChoose,
+        stats: esStats,
+        config: esConfig,
+        sidebar: esSidebar,
+        toolbar: esToolbar,
+        card: esCard,
+        share: esShare,
       },
     },
     fallbackLng: "ca",

@@ -23,6 +23,17 @@ export type CreateUsuariData = {
   potAdministrar: boolean;
 };
 
+export type UsuariAmbDepartament = {
+  uuid: string;
+  nom: string;
+  correu: string;
+  imatge: string;
+  publicKey: string;
+  departament?: {
+    uuid: string;
+    departament: string;
+  } | null;
+};
 export type UpdateUsuariAdminData = {
   nom?: string;
   correu?: string;
@@ -50,7 +61,7 @@ export class usuarisApi {
     return apiRequest<void>('/usuari/update', {
       method: 'PUT',
       body: JSON.stringify(data),
-    }).then(() => {});
+    }).then(() => { });
   }
 
   static fetchAll(): Promise<unknown[]> {
@@ -63,10 +74,9 @@ export class usuarisApi {
 
   static createUsuari(data: CreateUsuariData, isAdmin: boolean): Promise<unknown> {
     const endpoint = isAdmin ? '/usuari/add/admin' : '/usuari/add/admin/cap';
-    const { rolIntern, ...body } = data;
     return apiRequest<unknown>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(data),
     });
   }
 
@@ -80,6 +90,10 @@ export class usuarisApi {
   static deleteUsuari(uuid: string): Promise<void> {
     return apiRequest<void>(`/usuari/delete/admin/cap/${uuid}`, {
       method: 'DELETE',
-    }).then(() => {});
+    }).then(() => { });
+  }
+
+  static fetchAllAmbDepartament(): Promise<UsuariAmbDepartament[]> {
+    return apiRequest<UsuariAmbDepartament[]>('/usuari/all/admin').then(r => r ?? []);
   }
 }

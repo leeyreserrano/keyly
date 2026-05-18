@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Stack,
@@ -20,12 +21,20 @@ import {
   DialogContent,
   DialogActions,
   Divider,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import toast from 'react-hot-toast';
+import { sucursalsApi, type Sucursal, type UpdateSucursal } from '../api/sucursalsapi';
+import { configApi, type Config } from '../api/configapi';
 
-import { sucursalsApi, type Sucursal } from '../api/sucursalsapi';
+type SucursalWithConfig = Sucursal & {
+  config: Config | null;
+  loadingConfig: boolean;
+};
 
 type CreateSucursal = {
   nom: string;
@@ -34,6 +43,11 @@ type CreateSucursal = {
   pais: string;
   telefon: string;
   correu: string;
+};
+
+type EditSucursalData = UpdateSucursal & {
+  permetreTotsDominis: boolean;
+  diesExpiracio: number;
 };
 
 const EMPTY_CREATE: CreateSucursal = {
@@ -45,7 +59,7 @@ const EMPTY_CREATE: CreateSucursal = {
   correu: '',
 };
 
-function FieldLabel({ children }: { children: string }) {
+function FieldLabel({ children }: { children: ReactNode }) {
   return (
     <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
       {children}
@@ -54,21 +68,48 @@ function FieldLabel({ children }: { children: string }) {
 }
 
 export default function SucursalsTab() {
-  const [data, setData] = useState<Sucursal[]>([]);
+  const { t } = useTranslation('config');
+
+  const [data, setData] = useState<SucursalWithConfig[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [openCreate, setOpenCreate] = useState(false);
   const [createData, setCreateData] = useState<CreateSucursal>(EMPTY_CREATE);
   const [savingCreate, setSavingCreate] = useState(false);
 
+  const [openEdit, setOpenEdit] = useState(false);
+  const [editTarget, setEditTarget] = useState<SucursalWithConfig | null>(null);
+  const [editData, setEditData] = useState<EditSucursalData>({
+    nom: '', direccio: '', ciutat: '', pais: '', telefon: '', correu: '',
+    permetreTotsDominis: false, diesExpiracio: 0,
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
     try {
-      setData(await sucursalsApi.fetchAll());
+      const sucursals = await sucursalsApi.fetchAll();
+      const withConfig: SucursalWithConfig[] = sucursals.map(s => ({
+        ...s,
+        config: null,
+        loadingConfig: true,
+      }));
+      setData(withConfig);
+
+      const configs = await Promise.allSettled(
+        sucursals.map(s => configApi.getBySucursal(s.uuid))
+      );
+
+      setData(sucursals.map((s, i) => ({
+        ...s,
+        config: configs[i].status === 'fulfilled' ? configs[i].value : null,
+        loadingConfig: false,
+      })));
     } catch {
-      toast.error('Error carregant sucursals');
+      toast.error(t('branches.load_error'));
     } finally {
       setLoading(false);
     }
@@ -78,23 +119,89 @@ export default function SucursalsTab() {
     load();
   }, []);
 
+  const handleToggleDominis = async (s: SucursalWithConfig) => {
+    if (!s.config) return;
+    setTogglingId(s.uuid);
+    const newValue = !s.config.permetreTotsDominis;
+    try {
+      await configApi.updateBySucursal(s.uuid, {
+        permetreTotsDominis: newValue,
+        diesExpiracio: s.config.diesExpiracio,
+      });
+      setData(prev =>
+        prev.map(item =>
+          item.uuid === s.uuid
+            ? { ...item, config: { ...item.config!, permetreTotsDominis: newValue } }
+            : item
+        )
+      );
+      toast.success(t('branches.domains_updated'));
+    } catch {
+      toast.error(t('branches.domains_error'));
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const handleOpenEdit = (s: SucursalWithConfig) => {
+    setEditTarget(s);
+    setEditData({
+      nom: s.nom,
+      direccio: s.direccio ?? '',
+      ciutat: s.ciutat ?? '',
+      pais: s.pais ?? '',
+      telefon: s.telefon ?? '',
+      correu: s.correu ?? '',
+      permetreTotsDominis: s.config?.permetreTotsDominis ?? false,
+      diesExpiracio: s.config?.diesExpiracio ?? 0,
+    });
+    setOpenEdit(true);
+  };
+
+  const handleEdit = async () => {
+    if (!editTarget) return;
+    setSavingEdit(true);
+    try {
+      await sucursalsApi.update(editTarget.uuid, {
+        nom: editData.nom,
+        direccio: editData.direccio,
+        ciutat: editData.ciutat,
+        pais: editData.pais,
+        telefon: editData.telefon,
+        correu: editData.correu,
+      });
+
+      if (editTarget.config) {
+        await configApi.updateBySucursal(editTarget.uuid, {
+          permetreTotsDominis: editData.permetreTotsDominis,
+          diesExpiracio: editData.diesExpiracio,
+        });
+      }
+
+      toast.success(t('branches.edit.success'));
+      setOpenEdit(false);
+      load();
+    } catch {
+      toast.error(t('branches.edit.error'));
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   const handleCreate = async () => {
     if (!createData.nom) {
-      toast.error('El nom és obligatori');
+      toast.error(t('branches.create.name_required'));
       return;
     }
-
     setSavingCreate(true);
     try {
       await sucursalsApi.add(createData);
-
       setCreateData(EMPTY_CREATE);
       setOpenCreate(false);
       load();
-
-      toast.success('Sucursal creada');
+      toast.success(t('branches.create.success'));
     } catch {
-      toast.error('Error creant sucursal');
+      toast.error(t('branches.create.error'));
     } finally {
       setSavingCreate(false);
     }
@@ -102,13 +209,12 @@ export default function SucursalsTab() {
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
-
     try {
       await sucursalsApi.delete(id);
       setData(prev => prev.filter(s => s.uuid !== id));
-      toast.success('Sucursal eliminada');
+      toast.success(t('branches.delete.success'));
     } catch {
-      toast.error('Error eliminant sucursal');
+      toast.error(t('branches.delete.error'));
     } finally {
       setDeletingId(null);
     }
@@ -117,21 +223,15 @@ export default function SucursalsTab() {
   return (
     <>
       <Box>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mb: 2 }}
-        >
-          <Typography sx={{ fontWeight: 700 }}>Sucursals</Typography>
-
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+          <Typography sx={{ fontWeight: 700 }}>{t('tabs.branches')}</Typography>
           <Button
             variant="contained"
             startIcon={<AddOutlinedIcon />}
             onClick={() => setOpenCreate(true)}
             sx={{ textTransform: 'none', fontWeight: 700 }}
           >
-            Afegir sucursal
+            {t('branches.add')}
           </Button>
         </Stack>
 
@@ -144,48 +244,83 @@ export default function SucursalsTab() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700 }}>Nom</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Ciutat</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>País</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Telèfon</TableCell>
-                  <TableCell sx={{ fontWeight: 700 }}>Correu</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700 }}>
-                    Accions
-                  </TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.name')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.city')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.country')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.phone')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.email')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.all_domains')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('branches.col.expiry_days')}</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>{t('branches.col.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-
               <TableBody>
                 {data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                      No hi ha sucursals
+                    <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                      {t('branches.empty')}
                     </TableCell>
                   </TableRow>
                 ) : (
                   data.map(s => (
                     <TableRow key={s.uuid} hover>
                       <TableCell>{s.nom}</TableCell>
-                      <TableCell>{(s as any).ciutat ?? '—'}</TableCell>
-                      <TableCell>{(s as any).pais ?? '—'}</TableCell>
-                      <TableCell>{(s as any).telefon ?? '—'}</TableCell>
-                      <TableCell>{(s as any).correu ?? '—'}</TableCell>
-
+                      <TableCell>{s.ciutat ?? '—'}</TableCell>
+                      <TableCell>{s.pais ?? '—'}</TableCell>
+                      <TableCell>{s.telefon ?? '—'}</TableCell>
+                      <TableCell>{s.correu ?? '—'}</TableCell>
+                      <TableCell>
+                        {s.loadingConfig ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <Tooltip title={s.config?.permetreTotsDominis
+                            ? t('branches.domains.disable')
+                            : t('branches.domains.enable')
+                          }>
+                            <Switch
+                              size="small"
+                              checked={s.config?.permetreTotsDominis ?? false}
+                              disabled={togglingId === s.uuid || !s.config}
+                              onChange={() => handleToggleDominis(s)}
+                            />
+                          </Tooltip>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {s.loadingConfig ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          s.config?.diesExpiracio != null
+                            ? `${s.config.diesExpiracio}d`
+                            : '—'
+                        )}
+                      </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Eliminar">
-                          <IconButton
-                            color="error"
-                            size="small"
-                            onClick={() => handleDelete(s.uuid)}
-                            disabled={deletingId === s.uuid}
-                          >
-                            {deletingId === s.uuid ? (
-                              <CircularProgress size={16} color="inherit" />
-                            ) : (
-                              <DeleteOutlineIcon fontSize="small" />
-                            )}
-                          </IconButton>
-                        </Tooltip>
+                        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                          <Tooltip title={t('common.actions.edit')}>
+                            <IconButton size="small" onClick={() => handleOpenEdit(s)}>
+                              <EditOutlinedIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.actions.delete')}>
+                            <IconButton
+                              sx={{
+                                bgcolor: 'error.main',
+                                color: 'white',
+                                '&:hover': { bgcolor: 'error.dark' },
+                              }}
+                              size="small"
+                              onClick={() => handleDelete(s.uuid)}
+                              disabled={deletingId === s.uuid}
+                            >
+                              {deletingId === s.uuid ? (
+                                <CircularProgress size={16} color="inherit" />
+                              ) : (
+                                <DeleteOutlineIcon fontSize="small" />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
                       </TableCell>
                     </TableRow>
                   ))
@@ -197,85 +332,93 @@ export default function SucursalsTab() {
       </Box>
 
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 700 }}>Nova sucursal</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('branches.create.title')}</DialogTitle>
         <Divider />
-
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
-            <Stack spacing={0.5}>
-              <FieldLabel>Nom *</FieldLabel>
-              <TextField
-                fullWidth
-                value={createData.nom}
-                onChange={e => setCreateData(p => ({ ...p, nom: e.target.value }))}
-              />
-            </Stack>
+            {(['nom', 'direccio', 'ciutat', 'pais', 'telefon', 'correu'] as const).map(field => (
+              <Stack key={field} spacing={0.5}>
+                <FieldLabel>
+                  {t(`branches.field.${field}`)}
+                  {field === 'nom' ? ' *' : ''}
+                </FieldLabel>
+                <TextField
+                  fullWidth
+                  value={createData[field]}
+                  onChange={e => setCreateData(p => ({ ...p, [field]: e.target.value }))}
+                />
+              </Stack>
+            ))}
+          </Stack>
+        </DialogContent>
+        <Divider />
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setOpenCreate(false)} variant="outlined" sx={{ textTransform: 'none', fontWeight: 600 }}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="contained" onClick={handleCreate} disabled={savingCreate} sx={{ textTransform: 'none', fontWeight: 600 }}>
+            {savingCreate ? <CircularProgress size={18} color="inherit" /> : t('common.create')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('branches.edit.title')}</DialogTitle>
+        <Divider />
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            {(['nom', 'direccio', 'ciutat', 'pais', 'telefon', 'correu'] as const).map(field => (
+              <Stack key={field} spacing={0.5}>
+                <FieldLabel>{t(`branches.field.${field}`)}</FieldLabel>
+                <TextField
+                  fullWidth
+                  value={editData[field]}
+                  onChange={e => setEditData(p => ({ ...p, [field]: e.target.value }))}
+                />
+              </Stack>
+            ))}
+
+            <Divider />
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={editData.permetreTotsDominis}
+                  onChange={e => setEditData(p => ({ ...p, permetreTotsDominis: e.target.checked }))}
+                />
+              }
+              label={
+                <Stack spacing={0}>
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                    {t('branches.field.all_domains')}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                    {t('branches.field.all_domains_hint')}
+                  </Typography>
+                </Stack>
+              }
+            />
 
             <Stack spacing={0.5}>
-              <FieldLabel>Direcció</FieldLabel>
+              <FieldLabel>{t('branches.field.expiry_days')}</FieldLabel>
               <TextField
                 fullWidth
-                value={createData.direccio}
-                onChange={e => setCreateData(p => ({ ...p, direccio: e.target.value }))}
-              />
-            </Stack>
-
-            <Stack spacing={0.5}>
-              <FieldLabel>Ciutat</FieldLabel>
-              <TextField
-                fullWidth
-                value={createData.ciutat}
-                onChange={e => setCreateData(p => ({ ...p, ciutat: e.target.value }))}
-              />
-            </Stack>
-
-            <Stack spacing={0.5}>
-              <FieldLabel>País</FieldLabel>
-              <TextField
-                fullWidth
-                value={createData.pais}
-                onChange={e => setCreateData(p => ({ ...p, pais: e.target.value }))}
-              />
-            </Stack>
-
-            <Stack spacing={0.5}>
-              <FieldLabel>Telèfon</FieldLabel>
-              <TextField
-                fullWidth
-                value={createData.telefon}
-                onChange={e => setCreateData(p => ({ ...p, telefon: e.target.value }))}
-              />
-            </Stack>
-
-            <Stack spacing={0.5}>
-              <FieldLabel>Correu</FieldLabel>
-              <TextField
-                fullWidth
-                value={createData.correu}
-                onChange={e => setCreateData(p => ({ ...p, correu: e.target.value }))}
+                type="number"
+                inputProps={{ min: 0 }}
+                value={editData.diesExpiracio}
+                onChange={e => setEditData(p => ({ ...p, diesExpiracio: Math.max(0, Number(e.target.value)) }))}
+                helperText={t('branches.field.expiry_days_hint')}
               />
             </Stack>
           </Stack>
         </DialogContent>
-
         <Divider />
-
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button
-            onClick={() => setOpenCreate(false)}
-            variant="outlined"
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            Cancel·lar
+          <Button onClick={() => setOpenEdit(false)} variant="outlined" sx={{ textTransform: 'none', fontWeight: 600 }}>
+            {t('common.cancel')}
           </Button>
-
-          <Button
-            variant="contained"
-            onClick={handleCreate}
-            disabled={savingCreate}
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            {savingCreate ? <CircularProgress size={18} color="inherit" /> : 'Crear'}
+          <Button variant="contained" onClick={handleEdit} disabled={savingEdit} sx={{ textTransform: 'none', fontWeight: 600 }}>
+            {savingEdit ? <CircularProgress size={18} color="inherit" /> : t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

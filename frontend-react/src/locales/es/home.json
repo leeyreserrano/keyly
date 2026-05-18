@@ -1,0 +1,21 @@
+{
+  "title": "Inicio",
+  "add_new": "+ Añadir Nuevo",
+  "tabs": {
+    "latest": "Usados recientemente",
+    "most_used": "Más usados",
+    "favorites": "Favoritos"
+  },
+  "empty": {
+    "favorites": "No tienes favoritos",
+    "no_items": "No tienes elementos guardados",
+    "add_first": "+ Añade el primero"
+  },
+  "error": {
+    "loading": "Error al cargar los datos"
+  },
+  "toast": {
+    "delete_success": "Eliminado exitosamente",
+    "delete_error": "Error al eliminar"
+  }
+}

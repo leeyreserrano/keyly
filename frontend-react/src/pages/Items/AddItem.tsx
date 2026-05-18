@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Stack, Typography, Paper, Button, TextField,
   IconButton, Box, Divider, InputAdornment, MenuItem, Select,
-  FormControl, Menu,
+  FormControl, Menu
 } from '@mui/material';
 import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -14,26 +14,18 @@ import Header from '../../components/Header';
 import GeneratePasswordModal from '../../components/GeneratePasswordModal';
 import { itemsApi } from '../../api/itemsapi';
 import { carpetasApi, type Carpeta } from '../../api/carpetasapi';
-import { compartitsApi, type Permisos } from '../../api/compartitsapi';
 import { utilsApi } from '../../api/utilsapi';
 import toast from 'react-hot-toast';
 import { useCrypto } from '../../context/CryptoContext';
 import {
   generateDataKey, encryptPasswordWithDataKey,
-  rsaEncrypt, importPublicKey,
+  rsaEncrypt
 } from '../../crypto/cryptoService';
+import { useShareSelector } from '../../hooks/useShareSelector';
+import ShareSelectorInline from '../../components/ShareSelectorInline';
 
 const NOVA_CARPETA_VALUE = '__nova__';
 const SENSE_CARPETA_VALUE = '__cap__';
-
-type LocationState = {
-  carpetaUuid?: string;
-  compartitUuid?: string;
-  carpetaCompartitUuid?: string;
-  usuariCreadorUuid?: string;
-  usuariCreadorPublicKey?: string;
-  permisos?: Permisos;
-};
 
 export default function AddItem() {
   const navigate = useNavigate();
@@ -41,16 +33,7 @@ export default function AddItem() {
   const { t } = useTranslation('item');
   const { publicKey } = useCrypto();
 
-  const {
-    carpetaUuid,
-    compartitUuid,
-    carpetaCompartitUuid,
-    usuariCreadorUuid,
-    usuariCreadorPublicKey,
-    permisos,
-  } = (location.state as LocationState) ?? {};
-
-  const esCompartit = !!compartitUuid;
+  const { carpetaUuid } = (location.state as { carpetaUuid?: string }) ?? {};
 
   const [titol, setTitol] = useState('');
   const [nomUsuari, setNomUsuari] = useState('');
@@ -67,20 +50,22 @@ export default function AddItem() {
   const [novaCarpetaNom, setNovaCarpetaNom] = useState('');
   const [novaCarpetaError, setNovaCarpetaError] = useState<string | undefined>();
 
+
   useEffect(() => {
-    if (esCompartit) return;
     carpetasApi.fetchItems().then((data) => {
       setCarpetes(data);
       if (carpetaUuid) setCarpetaSeleccionada(carpetaUuid);
-    }).catch(() => {});
-  }, [carpetaUuid, esCompartit]);
+    }).catch(() => { });
+  }, [carpetaUuid]);
 
+
+  const shareSelector = useShareSelector();
   const validate = (): boolean => {
     const newErrors: { titol?: string; contrasenya?: string } = {};
     if (!titol.trim()) newErrors.titol = t('required.title');
     if (!contrasenya.trim()) newErrors.contrasenya = t('required.password');
     setErrors(newErrors);
-    if (!esCompartit && carpetaSeleccionada === NOVA_CARPETA_VALUE && !novaCarpetaNom.trim()) {
+    if (carpetaSeleccionada === NOVA_CARPETA_VALUE && !novaCarpetaNom.trim()) {
       setNovaCarpetaError(t('required.folder_name'));
       return false;
     }
@@ -100,48 +85,18 @@ export default function AddItem() {
       const { encrypted: encryptedPassword, iv } = await encryptPasswordWithDataKey(dataKeyBytes, contrasenya);
       const encryptedDataKeyPropi = await rsaEncrypt(publicKey, dataKeyBytes);
 
-      if (esCompartit) {
-        if (!usuariCreadorPublicKey || !usuariCreadorUuid || !carpetaCompartitUuid) {
-          throw new Error('Falten dades del compartit');
-        }
-        const pubKeyCreador = await importPublicKey(usuariCreadorPublicKey);
-        const encryptedDataKeyCreador = await rsaEncrypt(pubKeyCreador, dataKeyBytes);
+      const newItem = await itemsApi.addItem({
+        titol, nomUsuari, notes, url,
+        contrasenya: encryptedPassword, iv,
+        encryptedDataKey: encryptedDataKeyPropi,
+      });
+      if (!newItem) throw new Error(t('toast.error.create'));
 
-        await compartitsApi.addItemCompartit({
-          itemRequest: {
-            titol, nomUsuari, notes, url,
-            contrasenya: encryptedPassword,
-            iv,
-            encryptedDataKey: encryptedDataKeyPropi,
-            favorit: false,
-          },
-          compartitRequest: {
-            entitatUuid: carpetaCompartitUuid,
-            tipusEntitat: 'CARPETA',
-            usuaris: [{
-              usuariUuid: usuariCreadorUuid,
-              permis: permisos ?? 'LECTURA',
-              encryptedDataKeys: [{
-                itemUuid: '',
-                encryptedDataKey: encryptedDataKeyCreador,
-              }],
-            }],
-          },
-        });
-      } else {
-        const newItem = await itemsApi.addItem({
-          titol, nomUsuari, notes, url,
-          contrasenya: encryptedPassword,
-          iv,
-          encryptedDataKey: encryptedDataKeyPropi,
-        });
-        if (!newItem) throw new Error(t('toast.error.create'));
-        if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
-          const novaCarpeta = await carpetasApi.addCarpeta({ nom: novaCarpetaNom });
-          await carpetasApi.addExistingItem(novaCarpeta.uuid, newItem.uuid);
-        } else if (carpetaSeleccionada !== SENSE_CARPETA_VALUE) {
-          await carpetasApi.addExistingItem(carpetaSeleccionada, newItem.uuid);
-        }
+      if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
+        const novaCarpeta = await carpetasApi.addCarpeta({ nom: novaCarpetaNom });
+        await carpetasApi.addExistingItem(novaCarpeta.uuid, newItem.uuid);
+      } else if (carpetaSeleccionada !== SENSE_CARPETA_VALUE) {
+        await carpetasApi.addExistingItem(carpetaSeleccionada, newItem.uuid);
       }
 
       toast.success(t('toast.success.create'));
@@ -176,7 +131,6 @@ export default function AddItem() {
         icon={<KeyRoundedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
         showBackButton
       />
-
       <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
         <Box sx={{ px: 4, py: 3, display: 'flex', justifyContent: 'center' }}>
           <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, width: '70%', maxWidth: 500, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -238,26 +192,44 @@ export default function AddItem() {
 
             <GeneratePasswordModal open={openGenerateModal} onClose={() => setOpenGenerateModal(false)} onConfirm={(password) => setContrasenya(password)} />
 
-            {!esCompartit && (
-              <>
-                <Stack spacing={0.5}>
-                  <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.folder')}</Typography>
-                  <FormControl fullWidth>
-                    <Select value={carpetaSeleccionada} onChange={(e) => setCarpetaSeleccionada(e.target.value)} displayEmpty>
-                      <MenuItem value={SENSE_CARPETA_VALUE}>{t('placeholder.folder')}</MenuItem>
-                      {carpetes.map((c) => <MenuItem key={c.uuid} value={c.uuid}>{c.nom}</MenuItem>)}
-                      <MenuItem value={NOVA_CARPETA_VALUE}>+ {t('field.new_folder_name')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Stack>
-                {carpetaSeleccionada === NOVA_CARPETA_VALUE && (
-                  <Stack spacing={0.5}>
-                    <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.new_folder_name')} *</Typography>
-                    <TextField fullWidth value={novaCarpetaNom} onChange={(e) => setNovaCarpetaNom(e.target.value)} error={!!novaCarpetaError} helperText={novaCarpetaError} placeholder={t('placeholder.new_folder')} />
-                  </Stack>
-                )}
-              </>
+            <Stack spacing={0.5}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.folder')}</Typography>
+              <FormControl fullWidth>
+                <Select value={carpetaSeleccionada} onChange={(e) => setCarpetaSeleccionada(e.target.value)} displayEmpty>
+                  <MenuItem value={SENSE_CARPETA_VALUE}>{t('placeholder.folder')}</MenuItem>
+                  {carpetes.map((c) => <MenuItem key={c.uuid} value={c.uuid}>{c.nom}</MenuItem>)}
+                  <MenuItem value={NOVA_CARPETA_VALUE}>+ {t('field.new_folder_name')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Stack>
+
+            {carpetaSeleccionada === NOVA_CARPETA_VALUE && (
+              <Stack spacing={0.5}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>{t('field.new_folder_name')} *</Typography>
+                <TextField fullWidth value={novaCarpetaNom} onChange={(e) => setNovaCarpetaNom(e.target.value)} error={!!novaCarpetaError} helperText={novaCarpetaError} placeholder={t('placeholder.new_folder')} />
+              </Stack>
             )}
+
+            <ShareSelectorInline
+              t={t}
+              esAdmin={shareSelector.esAdmin}
+              tab={shareSelector.tab}
+              onTabChange={(v) => { shareSelector.setTab(v); shareSelector.setSeleccionats([]); shareSelector.handleSelectDepartament?.(''); } }
+              filtrats={shareSelector.filtrats}
+              departamentsFiltrats={shareSelector.departamentsFiltrats}
+              usuarisDepartament={shareSelector.usuarisDepartament}
+              seleccionats={shareSelector.seleccionats}
+              departamentSeleccionat={shareSelector.departamentSeleccionat}
+              searchUsuaris={shareSelector.searchUsuaris}
+              onSearchUsuaris={shareSelector.setSearchUsuaris}
+              searchDept={shareSelector.searchDept}
+              onSearchDept={shareSelector.setSearchDept}
+              permisCompartir={shareSelector.permisCompartir}
+              onPermisChange={shareSelector.setPermisCompartir}
+              onToggleSeleccio={shareSelector.toggleSeleccio}
+              onSelectDepartament={shareSelector.handleSelectDepartament} 
+              allUsuarisAmbDept={[]}           
+               />
 
             <Divider />
             <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>

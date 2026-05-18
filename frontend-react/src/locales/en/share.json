@@ -16,5 +16,11 @@
   "error.no_users": "Select at least one user",
   "error.crypto": "Crypto session expired, please log in again",
   "error.item_not_found": "Item not found",
-  "error.share": "Error sharing"
+  "error.share": "Error sharing",
+  "tab.users": "Users",
+  "tab.department": "Department",
+  "search_department": "Search department...",
+  "no_departments": "No departments found",
+  "users_count": "users",
+  "department_users": "Department users"
 }

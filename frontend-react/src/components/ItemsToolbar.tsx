@@ -53,7 +53,7 @@ export default function ItemsToolbar({ search, setSearch, filter, setFilter, onA
         <Button
           variant="contained"
           onClick={onAdd}
-          sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+          sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600, width: { xs: '100%', sm: '110px' } }}
         >
           {t('add_new')}
         </Button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import Stack from '@mui/material/Stack';
@@ -15,12 +15,12 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
-import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import {
   PieChart, Pie, Cell,
   Tooltip as ReTooltip, Legend, ResponsiveContainer,
@@ -32,6 +32,9 @@ import type { Item } from '../api/itemsapi';
 import Header from '../components/Header';
 import { getTimeAgo } from '../utils/timeUtils';
 import { useTimeRefresh } from '../components/UseTimeRefresh';
+import { useCrypto } from '../context/CryptoContext';
+import { rsaDecrypt, decryptPasswordWithDataKey } from '../crypto/cryptoService';
+import { isPasswordPwned } from '../utils/pwnedUtils';
 
 const LAVENDER = '#EEE5FF';
 
@@ -105,10 +108,16 @@ function StatCard({ icon, label, value, color, loading, tooltip }: StatCardProps
 export default function Stadistics() {
   const navigate = useNavigate();
   const { t } = useTranslation('stats');
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { privateKey } = useCrypto();
 
-  const stats = useDashboardStats(items);
+  const [items, setItems] = useState<Item[]>([]);
+  const [loadingItems, setLoadingItems] = useState(true);
+
+  const [decryptedPasswords, setDecryptedPasswords] = useState<Map<string, string>>(new Map());
+  const [pwnedUuids, setPwnedUuids] = useState<Set<string>>(new Set());
+  const [processingCrypto, setProcessingCrypto] = useState(false);
+
+  const stats = useDashboardStats(items, decryptedPasswords, pwnedUuids);
   const now = useTimeRefresh(60000);
 
   useEffect(() => {
@@ -116,21 +125,76 @@ export default function Stadistics() {
       .fetchItems()
       .then((result) => setItems(result ?? []))
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingItems(false));
   }, []);
+
+  const processPasswords = useCallback(async (allItems: Item[]) => {
+    if (!privateKey || allItems.length === 0) return;
+    setProcessingCrypto(true);
+
+    const plainMap = new Map<string, string>();
+    const pwned = new Set<string>();
+
+    await Promise.allSettled(
+      allItems.map(async (item) => {
+        try {
+          let plain: string | null = null;
+
+          const hasEncryption =
+            item.encryptedDataKey?.encryptedDataKey && item.iv && item.contrasenya;
+
+          if (hasEncryption) {
+            const dataKeyBytes = await rsaDecrypt(
+              privateKey,
+              item.encryptedDataKey!.encryptedDataKey
+            );
+            plain = await decryptPasswordWithDataKey(
+              dataKeyBytes,
+              item.contrasenya!,
+              item.iv!
+            );
+          } else if (item.contrasenya) {
+            plain = item.contrasenya;
+          }
+
+          if (plain) {
+            plainMap.set(item.uuid, plain);
+            const compromised = await isPasswordPwned(plain);
+            if (compromised) pwned.add(item.uuid);
+          }
+        } catch {
+          // Si falla el descifrado de un item individual, se ignora
+        }
+      })
+    );
+
+    setDecryptedPasswords(new Map(plainMap));
+    setPwnedUuids(new Set(pwned));
+    setProcessingCrypto(false);
+  }, [privateKey]);
+
+  useEffect(() => {
+    if (!loadingItems && items.length > 0 && privateKey) {
+      processPasswords(items);
+    }
+  }, [loadingItems, items, privateKey, processPasswords]);
+
+  const loading = loadingItems;
+  const checkingPwned = processingCrypto;
 
   const chartData = [
     { name: t('chart.secure'), value: stats.secureCount, color: CHART_COLORS.secure },
     { name: t('chart.weak'), value: stats.weakCount, color: CHART_COLORS.weak },
-    { name: t('chart.compromised'), value: stats.compromisedCount, color: CHART_COLORS.compromised },
+    { name: t('chart.compromised'), value: stats.pwnedCount, color: CHART_COLORS.compromised },
   ].filter((d) => d.value > 0);
 
   const scoreColor = getScoreColor(stats.avgSecurityScore);
-  const scoreLabel = stats.avgSecurityScore >= 70
-    ? t('score.good')
-    : stats.avgSecurityScore >= 40
-    ? t('score.regular')
-    : t('score.weak');
+  const scoreLabel =
+    stats.avgSecurityScore >= 70
+      ? t('score.good')
+      : stats.avgSecurityScore >= 40
+      ? t('score.regular')
+      : t('score.weak');
 
   return (
     <Stack sx={{ height: '100%', overflow: 'hidden' }}>
@@ -163,19 +227,19 @@ export default function Stadistics() {
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <StatCard
-                icon={<WarningAmberRoundedIcon fontSize="small" />}
-                label={t('cards.compromised')}
-                value={stats.compromisedCount}
-                color={stats.compromisedCount > 0 ? '#E24B4A' : undefined}
+                icon={<BugReportOutlinedIcon fontSize="small" />}
+                label={t('cards.pwned')}
+                value={checkingPwned ? '…' : stats.pwnedCount}
+                color={stats.pwnedCount > 0 ? '#E24B4A' : undefined}
                 loading={loading}
-                tooltip={t('cards.compromised_tooltip')}
+                tooltip={t('cards.pwned_tooltip')}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <StatCard
                 icon={<RepeatRoundedIcon fontSize="small" />}
                 label={t('cards.reused')}
-                value={stats.reusedCount}
+                value={checkingPwned ? '…' : stats.reusedCount}
                 color={stats.reusedCount > 0 ? '#7E0FC2' : undefined}
                 loading={loading}
                 tooltip={t('cards.reused_tooltip')}
@@ -185,7 +249,7 @@ export default function Stadistics() {
               <StatCard
                 icon={<TrendingUpRoundedIcon fontSize="small" />}
                 label={t('cards.avg_score')}
-                value={loading ? '—' : `${stats.avgSecurityScore} / 100`}
+                value={loading || checkingPwned ? '…' : `${stats.avgSecurityScore} / 100`}
                 color={scoreColor}
                 loading={loading}
                 tooltip={t('cards.avg_score_tooltip')}
@@ -216,8 +280,10 @@ export default function Stadistics() {
                 ) : (
                   <>
                     <Stack alignItems="center" gap={1} py={1}>
-                      <Typography sx={{ fontSize: '4rem', fontWeight: 900, lineHeight: 1, color: scoreColor }}>
-                        {stats.avgSecurityScore}
+                      <Typography
+                        sx={{ fontSize: '4rem', fontWeight: 900, lineHeight: 1, color: scoreColor }}
+                      >
+                        {checkingPwned ? '…' : stats.avgSecurityScore}
                       </Typography>
                       <Chip
                         label={scoreLabel}
@@ -233,7 +299,7 @@ export default function Stadistics() {
 
                     <Box>
                       <LinearProgress
-                        variant="determinate"
+                        variant={checkingPwned ? 'indeterminate' : 'determinate'}
                         value={stats.avgSecurityScore}
                         sx={{
                           height: 10, borderRadius: 5,
@@ -251,16 +317,28 @@ export default function Stadistics() {
 
                     <Stack spacing={0.75}>
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{t('score.secure')}</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: CHART_COLORS.secure }}>{stats.secureCount}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          {t('score.secure')}
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: CHART_COLORS.secure }}>
+                          {checkingPwned ? '…' : stats.secureCount}
+                        </Typography>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{t('score.weak')}</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: CHART_COLORS.weak }}>{stats.weakCount}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          {t('score.weak_label')}
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: CHART_COLORS.weak }}>
+                          {checkingPwned ? '…' : stats.weakCount}
+                        </Typography>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{t('score.compromised')}</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: CHART_COLORS.compromised }}>{stats.compromisedCount}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          {t('score.compromised')}
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: CHART_COLORS.compromised }}>
+                          {checkingPwned ? '…' : stats.pwnedCount}
+                        </Typography>
                       </Stack>
                     </Stack>
                   </>
@@ -305,13 +383,22 @@ export default function Stadistics() {
                         ))}
                       </Pie>
                       <ReTooltip
-                        formatter={(value) => (typeof value === 'number' ? value.toString() : value)}
-                        contentStyle={{ borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 13 }}
+                        formatter={(value) =>
+                          typeof value === 'number' ? value.toString() : value
+                        }
+                        contentStyle={{
+                          borderRadius: 8,
+                          border: '1px solid #e0e0e0',
+                          fontSize: 13,
+                        }}
                       />
                       <Legend
-                        iconType="circle" iconSize={10}
+                        iconType="circle"
+                        iconSize={10}
                         formatter={(value) => (
-                          <span style={{ fontSize: 13, color: 'var(--mui-palette-text-secondary)' }}>{value}</span>
+                          <span style={{ fontSize: 13, color: 'var(--mui-palette-text-secondary)' }}>
+                            {value}
+                          </span>
                         )}
                       />
                     </PieChart>
@@ -321,23 +408,33 @@ export default function Stadistics() {
             </Grid>
           </Grid>
 
-          {!loading && (stats.compromisedCount > 0 || stats.reusedCount > 0) && (
+          {!loading && !checkingPwned && (stats.pwnedCount > 0 || stats.reusedCount > 0) && (
             <Stack spacing={1.5} mb={4}>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
                 {t('alerts.title')}
               </Typography>
-              {stats.compromisedCount > 0 && (
-                <SecurityAlert type="compromised" count={stats.compromisedCount} onReview={() => navigate('/Items')} />
+              {stats.pwnedCount > 0 && (
+                <SecurityAlert
+                  type="compromised"
+                  count={stats.pwnedCount}
+                  onReview={() => navigate('/Items')}
+                />
               )}
               {stats.reusedCount > 0 && (
-                <SecurityAlert type="reused" count={stats.reusedCount} onReview={() => navigate('/Duplicats')} />
+                <SecurityAlert
+                  type="reused"
+                  count={stats.reusedCount}
+                  onReview={() => navigate('/Duplicats')}
+                />
               )}
             </Stack>
           )}
 
           <Paper variant="outlined" sx={{ borderRadius: 3, overflow: 'hidden' }}>
             <Stack
-              direction="row" justifyContent="space-between" alignItems="center"
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
               sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}
             >
               <Stack direction="row" alignItems="center" gap={1}>
@@ -359,7 +456,10 @@ export default function Stadistics() {
             {loading ? (
               <Stack spacing={0}>
                 {[...Array(4)].map((_, i) => (
-                  <Box key={i} sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                  <Box
+                    key={i}
+                    sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}
+                  >
                     <Skeleton variant="text" width="40%" />
                     <Skeleton variant="text" width="25%" />
                   </Box>
@@ -382,12 +482,16 @@ export default function Stadistics() {
               stats.recentItems.map((item, i) => (
                 <Stack
                   key={item.uuid}
-                  direction="row" justifyContent="space-between" alignItems="center"
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
                   onClick={() => navigate('/Item', { state: { uuid: item.uuid } })}
                   sx={{
                     px: 3, py: 1.75,
-                    borderBottom: i < stats.recentItems.length - 1 ? '1px solid' : 'none',
-                    borderColor: 'divider', cursor: 'pointer',
+                    borderBottom:
+                      i < stats.recentItems.length - 1 ? '1px solid' : 'none',
+                    borderColor: 'divider',
+                    cursor: 'pointer',
                     transition: 'background 120ms ease',
                     '&:hover': { bgcolor: 'action.hover' },
                   }}
@@ -403,13 +507,44 @@ export default function Stadistics() {
                       {item.titol.charAt(0).toUpperCase()}
                     </Avatar>
                     <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{item.titol}</Typography>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>{item.nomUsuari}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {item.titol}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                        {item.nomUsuari}
+                      </Typography>
                     </Box>
                   </Stack>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    {t('recent.modified')} {getTimeAgo(item.dataEditat, now)}
-                  </Typography>
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    {!checkingPwned && pwnedUuids.has(item.uuid) && (
+                      <Chip
+                        icon={<BugReportOutlinedIcon sx={{ fontSize: 12 }} />}
+                        label={t('recent.pwned')}
+                        size="small"
+                        sx={{
+                          bgcolor: '#E24B4A18',
+                          color: '#E24B4A',
+                          border: '1px solid #E24B4A40',
+                          fontWeight: 700,
+                          fontSize: '0.7rem',
+                        }}
+                      />
+                    )}
+                    {checkingPwned && (
+                      <Chip
+                        label="…"
+                        size="small"
+                        sx={{
+                          bgcolor: 'action.hover',
+                          color: 'text.disabled',
+                          fontSize: '0.7rem',
+                        }}
+                      />
+                    )}
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      {t('recent.modified')} {getTimeAgo(item.dataEditat, now)}
+                    </Typography>
+                  </Stack>
                 </Stack>
               ))
             )}

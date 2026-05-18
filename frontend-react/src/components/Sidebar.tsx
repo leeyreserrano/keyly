@@ -114,7 +114,7 @@ export default function Sidebar() {
 
       <Stack sx={{ px: 2, py: 2, alignItems: open ? 'flex-start' : 'center' }}>
         <Select
-          value={i18n.language === 'en' ? 'en' : 'ca'}
+          value={i18n.language === 'en' ? 'en' : i18n.language === 'es' ? 'es' : 'ca'}
           onChange={(e) => handleLanguageChange(e.target.value)}
           size="small"
           sx={{
@@ -127,6 +127,7 @@ export default function Sidebar() {
         >
           <MenuItem value="ca">🇨🇦 CAT</MenuItem>
           <MenuItem value="en">🇬🇧 EN</MenuItem>
+          <MenuItem value="es">🇪🇸 ES</MenuItem>
         </Select>
       </Stack>
     </Stack>

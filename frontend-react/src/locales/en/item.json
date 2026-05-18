@@ -87,5 +87,21 @@
     "item.permission.write": "Write",
     "item.permission.read": "Read",
     "item.shared.with": "Shared with {{name}}",
-    "item.shared.from": "From {{name}}"
+    "item.shared.from": "From {{name}}",
+    "share.title": "Share with",
+    "share.search_placeholder": "Search by name or email...",
+    "share.no_users": "No users found",
+    "share.permissions": "Permissions",
+    "share.read": "Read",
+    "share.write": "Write",
+    "share.tab.users": "Users",
+    "share.tab.department": "Department",
+    "share.search_department": "Search department...",
+    "share.no_departments": "No departments found",
+    "share.users_count": "users",
+    "share.department_users": "Department users",
+    "item.password.expired": "The password has expired. You must change it.",
+    "item.password.expires_in": "The password expires in {{days}} days",
+    "item.pwned.label": "Pwned",
+    "item.pwned.alert": "This password has appeared in known data breaches. It is strongly recommended to change it as soon as possible."
 }

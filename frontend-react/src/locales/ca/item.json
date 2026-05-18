@@ -87,5 +87,21 @@
   "item.permission.write": "Escriptura",
   "item.permission.read": "Lectura",
   "item.shared.with": "Compartit amb {{name}}",
-  "item.shared.from": "De {{name}}"
+  "item.shared.from": "De {{name}}",
+  "share.title": "Compartir amb",
+  "share.search_placeholder": "Cerca per nom o correu...",
+  "share.no_users": "Cap usuari trobat",
+  "share.permissions": "Permisos",
+  "share.read": "Lectura",
+  "share.write": "Escriptura",
+  "share.tab.users": "Usuaris",
+  "share.tab.department": "Departament",
+  "share.search_department": "Cerca departament...",
+  "share.no_departments": "Cap departament trobat",
+  "share.users_count": "usuaris",
+  "share.department_users": "Usuaris del departament",
+  "item.password.expired": "La contrasenya ha expirat. Has de canviar-la.",
+  "item.password.expires_in": "La contrasenya expira en {{days}} dies",
+  "item.pwned.label": "Vulnerada",
+  "item.pwned.alert": "Aquesta contrasenya ha aparegut en filtracions de dades conegudes. Es recomana canviar-la com més aviat millor."
 }
