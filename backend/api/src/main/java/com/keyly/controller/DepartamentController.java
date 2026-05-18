@@ -40,7 +40,7 @@ public class DepartamentController {
         description = "ADMIN",
         security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP')")
     @GetMapping("all/admin")
     public ResponseEntity<List<DepartamentResponse>> getAllDepartaments() {
         return ResponseEntity.ok(service.getAllDepartaments());
@@ -55,7 +55,7 @@ public class DepartamentController {
         @ApiResponse(responseCode = "200", description = "Departament trobat"),
         @ApiResponse(responseCode = "404", description = "Departament no trobat")
     })
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CAP')")
     @GetMapping("get/admin/{uuid}")
     public ResponseEntity<DepartamentResponse> getDepartament(@PathVariable UUID uuid) {
         DepartamentResponse departament = service.getByUuid(uuid);
