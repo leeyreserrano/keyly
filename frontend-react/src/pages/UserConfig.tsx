@@ -11,6 +11,7 @@ import CarpetesTab from '../components/CarpetesTab';
 import DepartamentsTab from '../components/DepartamentsTab';
 import SucursalsTab from '../components/SucursalsTab';
 import DominiTab from '../components/DominiTab';
+import RolsTab from '../components/RolsTab';
 
 type TabValue =
   | 'perfil'
@@ -19,7 +20,8 @@ type TabValue =
   | 'usuaris'
   | 'departaments'
   | 'sucursals'
-  | 'dominis';
+  | 'dominis'
+  | 'rols';
 
 export default function UserConfig() {
   const { usuari } = useAuth();
@@ -43,6 +45,7 @@ export default function UserConfig() {
       ? [
           { value: 'sucursals' as TabValue, label: t('tabs.branches') },
           { value: 'dominis' as TabValue, label: t('tabs.domains') },
+          { value: 'rols' as TabValue, label: t('tabs.roles') },
         ]
       : []),
   ];
@@ -78,6 +81,7 @@ export default function UserConfig() {
               {tab === 'departaments' && isCapOrAdmin && <DepartamentsTab />}
               {tab === 'sucursals' && isAdmin && <SucursalsTab />}
               {tab === 'dominis' && isAdmin && <DominiTab />}
+              {tab === 'rols' && isAdmin && <RolsTab />}
             </>
           )}
         </Box>
