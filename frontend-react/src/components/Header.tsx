@@ -7,6 +7,7 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import type { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
+import HelpIcon from '@mui/icons-material/Help';
 
 type HeaderProps = {
   title: string;
@@ -60,9 +61,16 @@ export default function Header({
 
       <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
         <Tooltip title={tooltipText} arrow>
-          <div>
+          <div onClick={() => navigate('/settings')} style={{ cursor: 'pointer' }}>
             <UserAvatar />
           </div>
+        </Tooltip>
+        <Tooltip title={t('Help')} arrow>
+          <IconButton
+            onClick={() => window.open('https://10.147.17.250:8081/docs/', '_blank')}
+          >
+            <HelpIcon />
+          </IconButton>
         </Tooltip>
 
         <Tooltip title={t('logout')} arrow>
