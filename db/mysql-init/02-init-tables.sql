@@ -16,7 +16,7 @@ CREATE TABLE `Dominis` (
   `id` BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
   `uuid` BINARY(16) NOT NULL UNIQUE,
   `sucursal_id` BIGINT NOT NULL,
-  `domini` VARCHAR(255) NOT NULL UNIQUE,
+  `domini` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_dominis_sucursals` FOREIGN KEY (`sucursal_id`) REFERENCES `Sucursals` (`id`) ON DELETE CASCADE
 );

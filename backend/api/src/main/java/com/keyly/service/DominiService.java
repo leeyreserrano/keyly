@@ -54,7 +54,8 @@ public class DominiService {
      * @return Dominis de la sucursal
      */
     public List<DominiResponse> getDominisBySucursalUuid(UUID uuid) {
-        List<Domini> dominis = repo.findBySucursalUuid(uuid).orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el uuid: " + uuid));
+        List<Domini> dominis = repo.findBySucursalUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el uuid: " + uuid));
 
         return dominis.stream().map(domini -> new DominiResponse(domini)).toList();
     }
@@ -63,10 +64,10 @@ public class DominiService {
         if (!esDominiValid(d.domini()))
             throw new DominiInvalidException("El domini " + d.domini() + " no és un domini válid.");
 
-        if (repo.existsByDomini(d.domini()))
-            throw new DominiInvalidException("El domini " + d.domini() + " ja existeix.");
-
         Sucursal s = sucursalService.getSucursalEntityByUuid(d.sucursalUuid());
+
+        if (repo.existsByDominiAndSucursalUuid(d.domini(), s.getUuid()))
+            throw new DominiInvalidException("El domini " + d.domini() + " ja existeix.");
 
         Domini domini = new Domini();
 
