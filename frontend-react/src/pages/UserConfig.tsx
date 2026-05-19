@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Stack, Typography, Box, Tabs, Tab } from '@mui/material';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import Header from '../components/Header';
 import { useAuth } from '../context/AuthContext';
 import PerfilTab from '../components/PerfilTab';
@@ -37,12 +37,12 @@ export default function UserConfig() {
       ? [
           { value: 'items' as TabValue, label: t('tabs.items') },
           { value: 'carpetes' as TabValue, label: t('tabs.folders') },
-          { value: 'usuaris' as TabValue, label: t('tabs.users') },
-          { value: 'departaments' as TabValue, label: t('tabs.departments') },
         ]
       : []),
     ...(isAdmin
       ? [
+          { value: 'usuaris' as TabValue, label: t('tabs.users') },
+          { value: 'departaments' as TabValue, label: t('tabs.departments') },
           { value: 'sucursals' as TabValue, label: t('tabs.branches') },
           { value: 'dominis' as TabValue, label: t('tabs.domains') },
           { value: 'rols' as TabValue, label: t('tabs.roles') },
@@ -54,7 +54,7 @@ export default function UserConfig() {
     <Stack sx={{ height: '100%', overflow: 'hidden' }}>
       <Header
         title={t('title')}
-        icon={<SettingsOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
+        icon={<EditNoteOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
         showBackButton={false}
       />
 

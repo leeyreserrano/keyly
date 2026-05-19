@@ -26,6 +26,7 @@ import {
 } from '@mui/material';
 
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -35,6 +36,11 @@ import { departamentsApi, type Departament } from '../api/departamentsapi';
 import { sucursalsApi, type Sucursal } from '../api/sucursalsapi';
 
 type CreateDepartament = {
+  nom: string;
+  sucursalUuid: string;
+};
+
+type EditDepartament = {
   nom: string;
   sucursalUuid: string;
 };
@@ -62,6 +68,10 @@ export default function DepartamentsTab() {
   const [openCreate, setOpenCreate] = useState(false);
   const [createData, setCreateData] = useState<CreateDepartament>(EMPTY_CREATE);
   const [savingCreate, setSavingCreate] = useState(false);
+
+  const [editTarget, setEditTarget] = useState<Departament | null>(null);
+  const [editData, setEditData] = useState<EditDepartament>({ nom: '', sucursalUuid: '' });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -98,14 +108,12 @@ export default function DepartamentsTab() {
       toast.error('Omple tots els camps');
       return;
     }
-
     setSavingCreate(true);
     try {
       await departamentsApi.add({
         nom: createData.nom,
         sucursalUuid: createData.sucursalUuid,
       });
-
       toast.success('Departament creat');
       setOpenCreate(false);
       setCreateData(EMPTY_CREATE);
@@ -114,6 +122,36 @@ export default function DepartamentsTab() {
       toast.error('Error creant departament');
     } finally {
       setSavingCreate(false);
+    }
+  };
+
+  const handleOpenEdit = (d: Departament) => {
+    setEditTarget(d);
+    setEditData({
+      nom: d.nom,
+      sucursalUuid: d.sucursal?.uuid ?? '',
+    });
+  };
+
+  const handleEdit = async () => {
+    if (!editTarget) return;
+    if (!editData.nom || !editData.sucursalUuid) {
+      toast.error('Omple tots els camps');
+      return;
+    }
+    setSavingEdit(true);
+    try {
+      await departamentsApi.update(editTarget.uuid, {
+        nom: editData.nom,
+        sucursalUuid: editData.sucursalUuid,
+      });
+      toast.success('Departament actualitzat');
+      setEditTarget(null);
+      load();
+    } catch {
+      toast.error('Error actualitzant departament');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -186,21 +224,29 @@ export default function DepartamentsTab() {
                     <TableCell>{d.nom}</TableCell>
                     <TableCell>{d.sucursal?.nom ?? '—'}</TableCell>
                     <TableCell align="right">
-                      <IconButton
-                        sx={{
+                      <Stack direction="row" justifyContent="flex-end" gap={0.5}>
+                        <IconButton size='small'
+                          onClick={() => handleOpenEdit(d)}
+                        >
+                          <EditOutlinedIcon />
+                        </IconButton>
+                        <IconButton size='small'
+                          sx={{
                             bgcolor: 'error.main',
                             color: 'white',
                             '&:hover': { bgcolor: 'error.dark' },
-                          }}
-                        onClick={() => handleDelete(d.uuid)}
-                        disabled={deletingId === d.uuid}
-                      >
-                        {deletingId === d.uuid ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          <DeleteOutlineIcon />
-                        )}
-                      </IconButton>
+                            
+                          }} 
+                          onClick={() => handleDelete(d.uuid)}
+                          disabled={deletingId === d.uuid}
+                        >
+                          {deletingId === d.uuid ? (
+                            <CircularProgress size={16} />
+                          ) : (
+                            <DeleteOutlineIcon />
+                          )}
+                        </IconButton>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 ))
@@ -213,7 +259,6 @@ export default function DepartamentsTab() {
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 700 }}>Nou departament</DialogTitle>
         <Divider />
-
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Stack spacing={0.5}>
@@ -224,40 +269,67 @@ export default function DepartamentsTab() {
                 onChange={e => setCreateData(p => ({ ...p, nom: e.target.value }))}
               />
             </Stack>
-
             <Stack spacing={0.5}>
               <FieldLabel>Sucursal</FieldLabel>
               <FormControl fullWidth>
                 <Select
                   value={createData.sucursalUuid}
-                  onChange={e =>
-                    setCreateData(p => ({ ...p, sucursalUuid: e.target.value }))
-                  }
+                  onChange={e => setCreateData(p => ({ ...p, sucursalUuid: e.target.value }))}
                   displayEmpty
                 >
                   <MenuItem value=""><em>Selecciona sucursal</em></MenuItem>
                   {sucursals.map(s => (
-                    <MenuItem key={s.uuid} value={s.uuid}>
-                      {s.nom}
-                    </MenuItem>
+                    <MenuItem key={s.uuid} value={s.uuid}>{s.nom}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Stack>
           </Stack>
         </DialogContent>
-
         <Divider />
-
         <DialogActions sx={{ px: 3, py: 2 }}>
           <Button onClick={() => setOpenCreate(false)}>Cancelar</Button>
-
-          <Button
-            variant="contained"
-            onClick={handleCreate}
-            disabled={savingCreate}
-          >
+          <Button variant="contained" onClick={handleCreate} disabled={savingCreate}>
             {savingCreate ? <CircularProgress size={18} /> : 'Crear'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={!!editTarget} onClose={() => setEditTarget(null)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: 700 }}>Editar departament</DialogTitle>
+        <Divider />
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Stack spacing={0.5}>
+              <FieldLabel>Nom</FieldLabel>
+              <TextField
+                fullWidth
+                value={editData.nom}
+                onChange={e => setEditData(p => ({ ...p, nom: e.target.value }))}
+              />
+            </Stack>
+            <Stack spacing={0.5}>
+              <FieldLabel>Sucursal</FieldLabel>
+              <FormControl fullWidth>
+                <Select
+                  value={editData.sucursalUuid}
+                  onChange={e => setEditData(p => ({ ...p, sucursalUuid: e.target.value }))}
+                  displayEmpty
+                >
+                  <MenuItem value=""><em>Selecciona sucursal</em></MenuItem>
+                  {sucursals.map(s => (
+                    <MenuItem key={s.uuid} value={s.uuid}>{s.nom}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <Divider />
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setEditTarget(null)}>Cancelar</Button>
+          <Button variant="contained" onClick={handleEdit} disabled={savingEdit}>
+            {savingEdit ? <CircularProgress size={18} /> : 'Guardar'}
           </Button>
         </DialogActions>
       </Dialog>

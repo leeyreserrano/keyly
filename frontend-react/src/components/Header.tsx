@@ -4,6 +4,10 @@ import { Stack, Typography, IconButton, Button, Tooltip } from '@mui/material';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import type { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
@@ -15,6 +19,10 @@ type HeaderProps = {
   showBackButton?: boolean;
   onBack?: () => void;
   onShare?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  isFavorit?: boolean;
+  onToggleFavorit?: () => void;
 };
 
 export default function Header({
@@ -23,6 +31,10 @@ export default function Header({
   showBackButton = false,
   onBack,
   onShare,
+  onEdit,
+  onDelete,
+  isFavorit = false,
+  onToggleFavorit,
 }: HeaderProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('sidebar');
@@ -34,6 +46,11 @@ export default function Header({
   };
 
   const tooltipText = usuari ? `${usuari.nom} · ${usuari.rolIntern}` : '';
+
+  const btnSx = {
+    border: '1px solid',
+    borderColor: 'divider',
+  };
 
   return (
     <Stack
@@ -79,13 +96,48 @@ export default function Header({
           </IconButton>
         </Tooltip>
 
+        {onToggleFavorit && (
+          <Tooltip title={isFavorit ? t('unfavorite') : t('favorite')} arrow>
+            <IconButton
+              onClick={onToggleFavorit}
+              sx={{
+                ...btnSx,
+                bgcolor: isFavorit ? 'yellow.100' : 'transparent',
+                color: isFavorit ? 'gold' : 'text.primary',
+                '&:hover': { bgcolor: isFavorit ? 'yellow.200' : 'action.hover' },
+              }}
+            >
+              {isFavorit ? <StarIcon /> : <StarBorderIcon />}
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {onEdit && (
+          <Tooltip title={t('edit')} arrow>
+            <IconButton onClick={onEdit} sx={{ ...btnSx }}>
+              <EditOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+
         {onShare && (
           <Tooltip title={t('share')} arrow>
             <IconButton
               onClick={onShare}
-              sx={{ border: '1px solid', borderColor: 'divider', color: 'primary.main' }}
+              sx={{ ...btnSx, color: 'primary.main' }}
             >
               <ShareOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {onDelete && (
+          <Tooltip title={t('delete')} arrow>
+            <IconButton
+              onClick={onDelete}
+              sx={{ ...btnSx, bgcolor: 'error.main', color: 'white', '&:hover': { bgcolor: 'error.dark' } }}
+            >
+              <DeleteOutlinedIcon />
             </IconButton>
           </Tooltip>
         )}

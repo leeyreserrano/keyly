@@ -23,6 +23,9 @@ import {
   Divider,
   Switch,
   FormControlLabel,
+  Checkbox,
+  FormGroup,
+  Alert,
 } from '@mui/material';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -30,6 +33,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import toast from 'react-hot-toast';
 import { sucursalsApi, type Sucursal, type UpdateSucursal } from '../api/sucursalsapi';
 import { configApi, type Config } from '../api/configapi';
+import { dominiApi, type Domini } from '../api/dominiapi';
 
 type SucursalWithConfig = Sucursal & {
   config: Config | null;
@@ -81,9 +85,13 @@ export default function SucursalsTab() {
   const [editTarget, setEditTarget] = useState<SucursalWithConfig | null>(null);
   const [editData, setEditData] = useState<EditSucursalData>({
     nom: '', direccio: '', ciutat: '', pais: '', telefon: '', correu: '',
-    permetreTotsDominis: false, diesExpiracio: 0,
+    permetreTotsDominis: true, diesExpiracio: 0,
   });
   const [savingEdit, setSavingEdit] = useState(false);
+
+  const [allDominis, setAllDominis] = useState<Domini[]>([]);
+  const [sucursalDominis, setSucursalDominis] = useState<string[]>([]);
+  const [loadingDominis, setLoadingDominis] = useState(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
@@ -143,7 +151,7 @@ export default function SucursalsTab() {
     }
   };
 
-  const handleOpenEdit = (s: SucursalWithConfig) => {
+  const handleOpenEdit = async (s: SucursalWithConfig) => {
     setEditTarget(s);
     setEditData({
       nom: s.nom,
@@ -152,10 +160,23 @@ export default function SucursalsTab() {
       pais: s.pais ?? '',
       telefon: s.telefon ?? '',
       correu: s.correu ?? '',
-      permetreTotsDominis: s.config?.permetreTotsDominis ?? false,
+      permetreTotsDominis: s.config?.permetreTotsDominis ?? true,
       diesExpiracio: s.config?.diesExpiracio ?? 0,
     });
     setOpenEdit(true);
+
+    setLoadingDominis(true);
+    try {
+      const tots = await dominiApi.fetchAll() ?? [];
+      const deSucursal = tots.filter(d => d.sucursal?.uuid === s.uuid);
+      setAllDominis(tots);
+      setSucursalDominis(deSucursal.map(d => d.uuid));
+    } catch {
+      setAllDominis([]);
+      setSucursalDominis([]);
+    } finally {
+      setLoadingDominis(false);
+    }
   };
 
   const handleEdit = async () => {
@@ -218,6 +239,16 @@ export default function SucursalsTab() {
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const dominisPerSucursal = allDominis.filter(
+    d => (d as any).sucursalUuid === editTarget?.uuid || (d as any).sucursal?.uuid === editTarget?.uuid
+  );
+
+  const handleToggleDominiSeleccio = (uuid: string, checked: boolean) => {
+    setSucursalDominis(prev =>
+      checked ? [...prev, uuid] : prev.filter(id => id !== uuid)
+    );
   };
 
   return (
@@ -398,6 +429,39 @@ export default function SucursalsTab() {
                 </Stack>
               }
             />
+
+            {!editData.permetreTotsDominis && (
+              <Stack spacing={1}>
+                <FieldLabel>{t('branches.field.allowed_domains')}</FieldLabel>
+                {loadingDominis ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                    <CircularProgress size={20} />
+                  </Box>
+                ) : dominisPerSucursal.length === 0 ? (
+                  <Alert severity="info" sx={{ fontSize: '0.8rem' }}>
+                    {t('branches.field.no_domains_available')}
+                  </Alert>
+                ) : (
+                  <Paper variant="outlined" sx={{ px: 2, py: 1, borderRadius: 1.5, maxHeight: 180, overflowY: 'auto' }}>
+                    <FormGroup>
+                      {dominisPerSucursal.map(d => (
+                        <FormControlLabel
+                          key={d.uuid}
+                          control={
+                            <Checkbox
+                              size="small"
+                              checked={sucursalDominis.includes(d.uuid)}
+                              onChange={e => handleToggleDominiSeleccio(d.uuid, e.target.checked)}
+                            />
+                          }
+                          label={<Typography sx={{ fontSize: '0.85rem' }}>{d.domini}</Typography>}
+                        />
+                      ))}
+                    </FormGroup>
+                  </Paper>
+                )}
+              </Stack>
+            )}
 
             <Stack spacing={0.5}>
               <FieldLabel>{t('branches.field.expiry_days')}</FieldLabel>

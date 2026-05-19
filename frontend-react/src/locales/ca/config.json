@@ -8,6 +8,7 @@
   "tabs.departments": "Gestió de departaments",
   "tabs.branches": "Gestió de sucursals",
   "tabs.domains": "Gestió de dominis",
+  "tabs.roles": "Gestió de rols",
   "users.search": "Cerca per nom, email o departament...",
   "users.add": "Afegir usuari",
   "users.col.avatar": "",
@@ -108,5 +109,48 @@
   "branches.field.all_domains": "Permetre tots els dominis",
   "branches.field.all_domains_hint": "Si s'activa, no es restringeix el domini del correu dels usuaris",
   "branches.field.expiry_days": "Dies d'expiració de contrasenya",
-  "branches.field.expiry_days_hint": "0 significa que no expira mai"
+  "branches.field.expiry_days_hint": "0 significa que no expira mai",
+  "rols": {
+    "title": "Rols",
+    "search": "Cerca rol o sucursal...",
+    "new": "Nou rol",
+    "empty": "No hi ha rols",
+    "fields": {
+      "name": "Nom",
+      "branch": "Sucursal",
+      "selectBranch": "Selecciona sucursal"
+    },
+    "dialog": {
+      "title": "Nou rol",
+      "cancel": "Cancel·lar",
+      "create": "Crear"
+    },
+    "messages": {
+      "fillAll": "Omple tots els camps",
+      "created": "Rol creat",
+      "deleted": "Rol eliminat",
+      "loadError": "Error carregant rols",
+      "createError": "Error creant rol",
+      "deleteError": "Error eliminant rol"
+    }
+  },
+  "toast": {
+    "error": {
+      "generate_password": "Error generant la contrasenya"
+    }
+  },
+  "generate": {
+    "button": "Generar",
+    "low": "Baixa complexitat",
+    "medium": "Mitjana complexitat",
+    "high": "Alta complexitat",
+    "custom": "Personalitzat"
+  },
+  "branches.field.allowed_domains": "Dominis permesos",
+  "branches.field.no_domains_available": "No hi ha dominis registrats per aquesta sucursal. Afegeix-los des de la pestanya de dominis.",
+  "domains.col.branch": "Sucursal",
+  "domains.field.branch": "Sucursal",
+  "domains.field.branch_required": "La sucursal és obligatòria",
+  "domains.create.error_conflict": "El domini no és vàlid o ja existeix per aquesta sucursal",
+  "domains.edit.error_conflict": "El domini no és vàlid o ja existeix per aquesta sucursal"
 }

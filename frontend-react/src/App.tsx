@@ -19,6 +19,7 @@ import EditCarpeta from './pages/Carpetes/EditFolder';
 import Compartits from './pages/Compartit/Compartits';
 import Stadistics from './pages/Stadistics';
 import Duplicats from './pages/Items/Duplicate';
+import Pwned from './pages/Items/Pwned';
 import './App.css';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
                       <Route path="/Compartits"  element={<Compartits />} />
                       <Route path="/Stadistics"  element={<Stadistics />} />
                       <Route path="/Duplicats"   element={<Duplicats />} />
+                      <Route path="/Pwned"       element={<Pwned />} />
                       <Route path="*"            element={<Navigate to="/home" replace />} />
                     </Routes>
                   </Layout>

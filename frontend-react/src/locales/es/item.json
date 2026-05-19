@@ -103,5 +103,12 @@
     "item.password.expired": "La contraseña ha expirado. Debes cambiarla.",
     "item.password.expires_in": "La contraseña expira en {{days}} días",
     "item.pwned.label": "Pwned",
-    "item.pwned.alert": "Esta contraseña ha aparecido en filtraciones de datos conocidas. Se recomienda cambiarla lo antes posible."
+    "item.pwned.alert": "Esta contraseña ha aparecido en filtraciones de datos conocidas. Se recomienda cambiarla lo antes posible.",
+    "pwned.title": "Contraseñas vulneradas",
+    "pwned.error.load": "Error cargando las contraseñas vulneradas",
+    "pwned.error.delete": "Error al eliminar el elemento",
+    "pwned.success.delete": "Elemento eliminado correctamente",
+    "pwned.empty.search": "Sin resultados para tu búsqueda",
+    "pwned.empty.no": "No se han encontrado contraseñas vulneradas",
+    "pwned.empty.subtitle": "Ninguna de tus contraseñas ha aparecido en filtraciones de datos."
 }

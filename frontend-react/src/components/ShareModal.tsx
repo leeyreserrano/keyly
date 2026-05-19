@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, Stack, Typography, TextField, Checkbox, Avatar,
-  CircularProgress, Chip, FormControl, InputLabel, Select,
+  CircularProgress, Chip, FormControl, Select,
   MenuItem, Divider, Box, Tabs, Tab,
 } from '@mui/material';
-import { compartitsApi, type Permisos } from '../api/compartitsapi';
+import { compartitsApi, type Compartit, type Permisos } from '../api/compartitsapi';
 import { usuarisApi, type UsuariPublic, type UsuariAmbDepartament } from '../api/usuarisapi';
 import { departamentsApi, type Departament } from '../api/departamentsapi';
 import { itemsApi } from '../api/itemsapi';
@@ -47,31 +47,55 @@ export default function ShareModal({
   const [permisos, setPermisos] = useState<Permisos>('LECTURA');
   const [sharing, setSharing] = useState(false);
 
+  const [compartitsExistents, setCompartitsExistents] = useState<Compartit[]>([]);
+  const [revocats, setRevocats] = useState<string[]>([]);
+
   useEffect(() => {
     if (!open) return;
+
     setSearch('');
     setSearchDept('');
     setSeleccionats([]);
     setDepartamentSeleccionat('');
     setPermisos('LECTURA');
     setTab('usuaris');
+    setRevocats([]);
+    setCompartitsExistents([]);
 
     const load = async () => {
       setLoadingUsuaris(true);
       try {
+        const promises: Promise<unknown>[] = [
+          usuarisApi.fetchAllPublic(),
+          compartitsApi.fetchCompartitsCreats(),
+        ];
         if (esAdmin) {
-          const [tots, totsAmbDept, depts] = await Promise.all([
-            usuarisApi.fetchAllPublic(),
-            usuarisApi.fetchAllAmbDepartament(),
-            departamentsApi.fetchAll(),
-          ]);
-          setUsuaris(tots.filter((u) => u.uuid !== usuari?.uuid));
-          setUsuarisAmbDept(totsAmbDept.filter((u) => u.uuid !== usuari?.uuid));
-          setDepartaments(depts);
-        } else {
-          const tots = await usuarisApi.fetchAllPublic();
-          setUsuaris(tots.filter((u) => u.uuid !== usuari?.uuid));
+          promises.push(usuarisApi.fetchAllAmbDepartament());
+          promises.push(departamentsApi.fetchAll());
         }
+
+        const results = await Promise.all(promises);
+        const totsUsuaris = results[0] as UsuariPublic[];
+        const totsCreats = results[1] as Compartit[];
+
+        if (esAdmin) {
+          setUsuarisAmbDept((results[2] as UsuariAmbDepartament[]).filter((u) => u.uuid !== usuari?.uuid));
+          setDepartaments(results[3] as Departament[]);
+        }
+
+        const filteredUsuaris = totsUsuaris.filter((u) => u.uuid !== usuari?.uuid);
+        setUsuaris(filteredUsuaris);
+
+        const compartitsEntitat = totsCreats.filter(
+          (c) =>
+            c.tipusEntitat === tipusEntitat &&
+            (tipusEntitat === 'ITEM' ? c.item?.uuid === entitatUuid : c.carpeta?.uuid === entitatUuid)
+        );
+        setCompartitsExistents(compartitsEntitat);
+
+        const uuidsCompartits = new Set(compartitsEntitat.map((c) => c.usuariReceptor?.uuid).filter(Boolean));
+        const preseleccionats = filteredUsuaris.filter((u) => uuidsCompartits.has(u.uuid));
+        setSeleccionats(preseleccionats);
       } catch {
         toast.error(t('error.load_users'));
       } finally {
@@ -79,7 +103,7 @@ export default function ShareModal({
       }
     };
     load();
-  }, [open, usuari?.uuid, esAdmin, t]);
+  }, [open, usuari?.uuid, esAdmin, tipusEntitat, entitatUuid, t]);
 
   const filtrats = usuaris.filter(
     (u) =>
@@ -95,36 +119,58 @@ export default function ShareModal({
     ? usuarisAmbDept.filter((u) => u.departament?.uuid === departamentSeleccionat)
     : [];
 
+  const esExistent = (uuid: string) =>
+    compartitsExistents.some((c) => c.usuariReceptor?.uuid === uuid);
+
+  const esRevocat = (uuid: string) => {
+    const compartit = compartitsExistents.find((c) => c.usuariReceptor?.uuid === uuid);
+    return compartit ? revocats.includes(compartit.uuid) : false;
+  };
+
   const toggleSeleccio = (u: UsuariPublic) => {
-    setSeleccionats((prev) =>
-      prev.some((s) => s.uuid === u.uuid)
-        ? prev.filter((s) => s.uuid !== u.uuid)
-        : [...prev, u]
-    );
+    const compartitExistent = compartitsExistents.find((c) => c.usuariReceptor?.uuid === u.uuid);
+
+    if (compartitExistent) {
+      setRevocats((prev) =>
+        prev.includes(compartitExistent.uuid)
+          ? prev.filter((id) => id !== compartitExistent.uuid)
+          : [...prev, compartitExistent.uuid]
+      );
+      setSeleccionats((prev) =>
+        prev.some((s) => s.uuid === u.uuid)
+          ? prev.filter((s) => s.uuid !== u.uuid)
+          : [...prev, u]
+      );
+    } else {
+      setSeleccionats((prev) =>
+        prev.some((s) => s.uuid === u.uuid)
+          ? prev.filter((s) => s.uuid !== u.uuid)
+          : [...prev, u]
+      );
+    }
   };
 
   const handleSelectDepartament = (deptUuid: string) => {
     if (departamentSeleccionat === deptUuid) {
       setDepartamentSeleccionat('');
-      setSeleccionats([]);
+      const uuidsExistents = new Set(compartitsExistents.map((c) => c.usuariReceptor?.uuid));
+      setSeleccionats((prev) => prev.filter((u) => uuidsExistents.has(u.uuid)));
       return;
     }
     setDepartamentSeleccionat(deptUuid);
-    const usuarisDelDept = usuarisAmbDept
+    const membresDept = usuarisAmbDept
       .filter((u) => u.departament?.uuid === deptUuid)
-      .map((u) => ({
-        uuid: u.uuid,
-        nom: u.nom,
-        correu: u.correu,
-        imatge: u.imatge,
-        publicKey: u.publicKey,
-      }));
-    setSeleccionats(usuarisDelDept);
+      .map((u) => ({ uuid: u.uuid, nom: u.nom, correu: u.correu, imatge: u.imatge, publicKey: u.publicKey }));
+
+    setSeleccionats((prev) => {
+      const uuidsActuals = new Set(prev.map((u) => u.uuid));
+      const nous = membresDept.filter((u) => !uuidsActuals.has(u.uuid));
+      return [...prev, ...nous];
+    });
   };
 
   const handleTabChange = (_: React.SyntheticEvent, v: TabValue) => {
     setTab(v);
-    setSeleccionats([]);
     setDepartamentSeleccionat('');
   };
 
@@ -171,49 +217,54 @@ export default function ShareModal({
   };
 
   const handleShare = async () => {
-    if (seleccionats.length === 0) {
-      toast.error(t('error.no_users'));
+    const uuidsExistents = new Set(
+      compartitsExistents
+        .filter((c) => !revocats.includes(c.uuid))
+        .map((c) => c.usuariReceptor?.uuid)
+    );
+    const nouUsuaris = seleccionats.filter((u) => !uuidsExistents.has(u.uuid) && !esRevocat(u.uuid));
+
+    if (revocats.length === 0 && nouUsuaris.length === 0) {
+      toast.error(t('error.no_changes'));
       return;
     }
 
     setSharing(true);
     try {
-      if (tipusEntitat === 'ITEM') {
+      for (const compartitUuid of revocats) {
+        await compartitsApi.deleteCompartit(compartitUuid);
+      }
+
+      if (nouUsuaris.length > 0) {
         if (!privateKey) {
           toast.error(t('error.crypto'));
           return;
         }
 
-        const item = await itemsApi.getItem(entitatUuid);
-        if (!item) throw new Error(t('error.item_not_found'));
+        if (tipusEntitat === 'ITEM') {
+          const item = await itemsApi.getItem(entitatUuid);
+          if (!item) throw new Error(t('error.item_not_found'));
 
-        let dataKeyBytes: Uint8Array | null = null;
-        if (item.encryptedDataKey?.encryptedDataKey && item.iv && item.contrasenya) {
-          dataKeyBytes = await rsaDecrypt(privateKey, item.encryptedDataKey.encryptedDataKey);
+          let dataKeyBytes: Uint8Array | null = null;
+          if (item.encryptedDataKey?.encryptedDataKey && item.iv && item.contrasenya) {
+            dataKeyBytes = await rsaDecrypt(privateKey, item.encryptedDataKey.encryptedDataKey);
+          }
+
+          const usuarisPayload = await buildUsuarisPayloadItem(nouUsuaris, dataKeyBytes, entitatUuid);
+          await compartitsApi.addCompartit({ entitatUuid, tipusEntitat: 'ITEM', usuaris: usuarisPayload });
+        } else {
+          const carpeta = await carpetasApi.fetchItemsFromCarpeta(entitatUuid);
+          const itemsAmbDataKey = await Promise.all(
+            carpeta
+              .filter((item) => item.encryptedDataKey?.encryptedDataKey)
+              .map(async (item) => {
+                const dataKeyBytes = await rsaDecrypt(privateKey, item.encryptedDataKey!.encryptedDataKey);
+                return { uuid: item.uuid, dataKeyBytes };
+              })
+          );
+          const usuarisPayload = await buildUsuarisPayloadCarpeta(nouUsuaris, itemsAmbDataKey);
+          await compartitsApi.addCompartit({ entitatUuid, tipusEntitat: 'CARPETA', usuaris: usuarisPayload });
         }
-
-        const usuarisPayload = await buildUsuarisPayloadItem(seleccionats, dataKeyBytes, entitatUuid);
-        await compartitsApi.addCompartit({ entitatUuid, tipusEntitat: 'ITEM', usuaris: usuarisPayload });
-
-      } else {
-        if (!privateKey) {
-          toast.error(t('error.crypto'));
-          return;
-        }
-
-        const carpeta = await carpetasApi.fetchItemsFromCarpeta(entitatUuid);
-
-        const itemsAmbDataKey = await Promise.all(
-          carpeta
-            .filter((item) => item.encryptedDataKey?.encryptedDataKey)
-            .map(async (item) => {
-              const dataKeyBytes = await rsaDecrypt(privateKey, item.encryptedDataKey!.encryptedDataKey);
-              return { uuid: item.uuid, dataKeyBytes };
-            })
-        );
-
-        const usuarisPayload = await buildUsuarisPayloadCarpeta(seleccionats, itemsAmbDataKey);
-        await compartitsApi.addCompartit({ entitatUuid, tipusEntitat: 'CARPETA', usuaris: usuarisPayload });
       }
 
       toast.success(t('success', { nom: entitatNom }));
@@ -225,6 +276,9 @@ export default function ShareModal({
       setSharing(false);
     }
   };
+
+  const seleccionatsActius = seleccionats.filter((u) => !esRevocat(u.uuid));
+  const totalCambis = revocats.length + seleccionatsActius.filter((u) => !esExistent(u.uuid)).length;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -240,10 +294,8 @@ export default function ShareModal({
 
           {tipusEntitat === 'ITEM' && (
             <FormControl size="small" fullWidth>
-              <InputLabel>{t('permissions.label')}</InputLabel>
               <Select
                 value={permisos}
-                label={t('permissions.label')}
                 onChange={(e) => setPermisos(e.target.value as Permisos)}
               >
                 <MenuItem value="LECTURA">{t('permissions.read')}</MenuItem>
@@ -253,12 +305,7 @@ export default function ShareModal({
           )}
 
           {esAdmin && (
-            <Tabs
-              value={tab}
-              onChange={handleTabChange}
-              textColor="primary"
-              indicatorColor="primary"
-            >
+            <Tabs value={tab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
               <Tab label={t('tab.users')} value="usuaris" />
               <Tab label={t('tab.department')} value="departament" />
             </Tabs>
@@ -266,14 +313,20 @@ export default function ShareModal({
 
           {seleccionats.length > 0 && (
             <Stack direction="row" flexWrap="wrap" gap={0.75}>
-              {seleccionats.map((u) => (
-                <Chip
-                  key={u.uuid}
-                  label={u.nom}
-                  onDelete={tab === 'usuaris' ? () => toggleSeleccio(u) : undefined}
-                  size="small"
-                />
-              ))}
+              {seleccionats.map((u) => {
+                const revocat = esRevocat(u.uuid);
+                const existent = esExistent(u.uuid);
+                return (
+                  <Chip
+                    key={u.uuid}
+                    label={u.nom}
+                    onDelete={() => toggleSeleccio(u)}
+                    size="small"
+                    color={revocat ? 'error' : existent ? 'primary' : 'default'}
+                    variant={revocat ? 'outlined' : 'filled'}
+                  />
+                );
+              })}
             </Stack>
           )}
 
@@ -292,32 +345,47 @@ export default function ShareModal({
                     <CircularProgress size={24} />
                   </Stack>
                 ) : filtrats.length === 0 ? (
-                  <Typography sx={{ py: 3, textAlign: 'center', color: 'text.disabled', fontSize: '0.875rem' }}>
+                  <Typography sx={{ py: 2, textAlign: 'center', color: 'text.disabled', fontSize: '0.875rem' }}>
                     {t('no_users')}
                   </Typography>
                 ) : (
                   filtrats.map((u, i) => {
                     const seleccionat = seleccionats.some((s) => s.uuid === u.uuid);
+                    const revocat = esRevocat(u.uuid);
+                    const existent = esExistent(u.uuid);
                     return (
                       <Box key={u.uuid}>
                         <Stack
                           direction="row"
                           sx={{
                             alignItems: 'center', px: 1.5, py: 1, gap: 1.5, cursor: 'pointer',
-                            bgcolor: seleccionat ? 'action.selected' : 'transparent',
-                            '&:hover': { bgcolor: 'action.hover' },
+                            bgcolor: revocat ? 'error.light' : seleccionat ? 'action.selected' : 'transparent',
+                            opacity: revocat ? 0.6 : 1,
+                            '&:hover': { bgcolor: revocat ? 'error.light' : 'action.hover' },
                             transition: 'background-color 150ms ease',
                           }}
                           onClick={() => toggleSeleccio(u)}
                         >
-                          <Checkbox checked={seleccionat} size="small" sx={{ p: 0 }} onClick={(e) => e.stopPropagation()} onChange={() => toggleSeleccio(u)} />
-                          <Avatar src={u.imatge} sx={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                          <Checkbox
+                            checked={seleccionat && !revocat}
+                            size="small"
+                            sx={{ p: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={() => toggleSeleccio(u)}
+                          />
+                          <Avatar src={u.imatge} sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
                             {u.nom.charAt(0).toUpperCase()}
                           </Avatar>
-                          <Stack sx={{ minWidth: 0 }}>
-                            <Typography sx={{ fontWeight: 600, fontSize: '0.875rem' }}>{u.nom}</Typography>
-                            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{u.correu}</Typography>
+                          <Stack sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{u.nom}</Typography>
+                            <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>{u.correu}</Typography>
                           </Stack>
+                          {existent && !revocat && (
+                            <Chip label={t('already_shared')} size="small" color="primary" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                          )}
+                          {revocat && (
+                            <Chip label={t('will_revoke')} size="small" color="error" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                          )}
                         </Stack>
                         {i < filtrats.length - 1 && <Divider />}
                       </Box>
@@ -341,13 +409,15 @@ export default function ShareModal({
                     <CircularProgress size={24} />
                   </Stack>
                 ) : departamentsFiltrats.length === 0 ? (
-                  <Typography sx={{ py: 3, textAlign: 'center', color: 'text.disabled', fontSize: '0.875rem' }}>
+                  <Typography sx={{ py: 2, textAlign: 'center', color: 'text.disabled', fontSize: '0.875rem' }}>
                     {t('no_departments')}
                   </Typography>
                 ) : (
                   departamentsFiltrats.map((d, i) => {
                     const seleccionat = departamentSeleccionat === d.uuid;
-                    const count = usuarisAmbDept.filter((u) => u.departament?.uuid === d.uuid).length;
+                    const membres = usuarisAmbDept.filter((u) => u.departament?.uuid === d.uuid);
+                    const count = membres.length;
+                    const jaCompartits = membres.filter((u) => esExistent(u.uuid)).length;
                     return (
                       <Box key={d.uuid}>
                         <Stack
@@ -360,11 +430,21 @@ export default function ShareModal({
                           }}
                           onClick={() => handleSelectDepartament(d.uuid)}
                         >
-                          <Checkbox checked={seleccionat} size="small" sx={{ p: 0 }} onClick={(e) => e.stopPropagation()} onChange={() => handleSelectDepartament(d.uuid)} />
+                          <Checkbox
+                            checked={seleccionat}
+                            size="small"
+                            sx={{ p: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={() => handleSelectDepartament(d.uuid)}
+                          />
                           <Stack sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography sx={{ fontWeight: 600, fontSize: '0.875rem' }}>{d.nom}</Typography>
-                            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                              {d.sucursal?.nom}{count > 0 ? ` · ${count} ${t('users_count')}` : ''}
+                            <Typography sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{d.nom}</Typography>
+                            <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
+                              {count > 0
+                                ? jaCompartits > 0
+                                  ? `${count} ${t('users_count')} · ${jaCompartits} ${t('already_shared_count')}`
+                                  : `${count} ${t('users_count')}`
+                                : ''}
                             </Typography>
                           </Stack>
                         </Stack>
@@ -387,7 +467,8 @@ export default function ShareModal({
                         avatar={<Avatar src={u.imatge}>{u.nom.charAt(0)}</Avatar>}
                         label={u.nom}
                         size="small"
-                        variant="outlined"
+                        color={esExistent(u.uuid) ? 'primary' : 'default'}
+                        variant={esExistent(u.uuid) ? 'filled' : 'outlined'}
                       />
                     ))}
                   </Stack>
@@ -405,7 +486,7 @@ export default function ShareModal({
         <Button
           onClick={handleShare}
           variant="contained"
-          disabled={sharing || seleccionats.length === 0}
+          disabled={sharing || totalCambis === 0}
           sx={{
             textTransform: 'none', fontWeight: 600,
             bgcolor: 'white', color: 'primary.main',
@@ -413,11 +494,7 @@ export default function ShareModal({
             '&.Mui-disabled': { bgcolor: 'grey.300', color: 'grey.500' },
           }}
         >
-          {sharing
-            ? t('sharing')
-            : seleccionats.length > 0
-              ? t('share_with_count', { count: seleccionats.length })
-              : t('share')}
+          {sharing ? t('sharing') : totalCambis > 0 ? t('save_changes_count', { count: totalCambis }) : t('share')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,4 +1,3 @@
-// src/components/MainLayout.tsx
 import { Stack, CssBaseline } from '@mui/material';
 import AppTheme from '../theme/AppTheme';
 import Sidebar from './Sidebar';

@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import type { UsuariPublic, UsuariAmbDepartament } from '../api/usuarisapi';
 import type { Departament } from '../api/departamentsapi';
-import type { Permisos } from '../api/compartitsapi';
+import type { Compartit, Permisos } from '../api/compartitsapi';
 
 interface ShareSelectorInlineProps {
   t: (key: string, opts?: Record<string, unknown>) => string;
@@ -26,6 +26,8 @@ interface ShareSelectorInlineProps {
   onToggleSeleccio: (u: UsuariPublic) => void;
   onSelectDepartament: (uuid: string) => void;
   showPermisos?: boolean;
+  revocats?: string[];
+  compartitsExistents?: Compartit[];
 }
 
 export default function ShareSelectorInline({
@@ -37,7 +39,15 @@ export default function ShareSelectorInline({
   permisCompartir, onPermisChange,
   onToggleSeleccio, onSelectDepartament,
   showPermisos = true,
+  revocats = [],
+  compartitsExistents = [],
 }: ShareSelectorInlineProps) {
+  const esExistent = (uuid: string) => compartitsExistents.some((c) => c.usuariReceptor?.uuid === uuid);
+  const esRevocat = (uuid: string) => {
+    const compartit = compartitsExistents.find((c) => c.usuariReceptor?.uuid === uuid);
+    return compartit ? revocats.includes(compartit.uuid) : false;
+  };
+
   return (
     <Stack spacing={1}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -69,14 +79,20 @@ export default function ShareSelectorInline({
 
       {seleccionats.length > 0 && (
         <Stack direction="row" flexWrap="wrap" gap={0.75}>
-          {seleccionats.map((u) => (
-            <Chip
-              key={u.uuid}
-              label={u.nom}
-              onDelete={tab === 'usuaris' ? () => onToggleSeleccio(u) : undefined}
-              size="small"
-            />
-          ))}
+          {seleccionats.map((u) => {
+            const revocat = esRevocat(u.uuid);
+            const existent = esExistent(u.uuid);
+            return (
+              <Chip
+                key={u.uuid}
+                label={u.nom}
+                onDelete={tab === 'usuaris' ? () => onToggleSeleccio(u) : undefined}
+                size="small"
+                color={revocat ? 'error' : existent ? 'primary' : 'default'}
+                variant={revocat ? 'outlined' : 'filled'}
+              />
+            );
+          })}
         </Stack>
       )}
 
@@ -97,26 +113,41 @@ export default function ShareSelectorInline({
             ) : (
               filtrats.map((u, i) => {
                 const seleccionat = seleccionats.some((s) => s.uuid === u.uuid);
+                const revocat = esRevocat(u.uuid);
+                const existent = esExistent(u.uuid);
                 return (
                   <Box key={u.uuid}>
                     <Stack
                       direction="row"
                       sx={{
                         alignItems: 'center', px: 1.5, py: 1, gap: 1.5, cursor: 'pointer',
-                        bgcolor: seleccionat ? 'action.selected' : 'transparent',
-                        '&:hover': { bgcolor: 'action.hover' },
+                        bgcolor: revocat ? 'error.light' : seleccionat ? 'action.selected' : 'transparent',
+                        opacity: revocat ? 0.6 : 1,
+                        '&:hover': { bgcolor: revocat ? 'error.light' : 'action.hover' },
                         transition: 'background-color 150ms ease',
                       }}
                       onClick={() => onToggleSeleccio(u)}
                     >
-                      <Checkbox checked={seleccionat} size="small" sx={{ p: 0 }} onClick={(e) => e.stopPropagation()} onChange={() => onToggleSeleccio(u)} />
+                      <Checkbox
+                        checked={seleccionat && !revocat}
+                        size="small"
+                        sx={{ p: 0 }}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => onToggleSeleccio(u)}
+                      />
                       <Avatar src={u.imatge} sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
                         {u.nom.charAt(0).toUpperCase()}
                       </Avatar>
-                      <Stack sx={{ minWidth: 0 }}>
+                      <Stack sx={{ minWidth: 0, flex: 1 }}>
                         <Typography sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{u.nom}</Typography>
                         <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>{u.correu}</Typography>
                       </Stack>
+                      {existent && !revocat && (
+                        <Chip label={t('share.already_shared')} size="small" color="primary" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                      )}
+                      {revocat && (
+                        <Chip label={t('share.will_revoke')} size="small" color="error" variant="outlined" sx={{ fontSize: '0.65rem' }} />
+                      )}
                     </Stack>
                     {i < filtrats.length - 1 && <Divider />}
                   </Box>
@@ -159,7 +190,7 @@ export default function ShareSelectorInline({
                       <Stack sx={{ minWidth: 0, flex: 1 }}>
                         <Typography sx={{ fontWeight: 600, fontSize: '0.8rem' }}>{d.nom}</Typography>
                         <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
-                          {d.sucursal?.nom}{count > 0 ? ` · ${count} ${t('share.users_count')}` : ''}
+                          {count > 0 ? `${count} ${t('share.users_count')}` : ''}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -170,7 +201,7 @@ export default function ShareSelectorInline({
             )}
           </Box>
 
-          {departamentSeleccionat && usuarisDepartament.length > 0 && (
+          {usuarisDepartament.length > 0 && (
             <Stack spacing={0.5}>
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>
                 {t('share.department_users')}

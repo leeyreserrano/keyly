@@ -31,7 +31,7 @@ export type UsuariAmbDepartament = {
   publicKey: string;
   departament?: {
     uuid: string;
-    departament: string;
+    nom: string;
   } | null;
 };
 export type UpdateUsuariAdminData = {

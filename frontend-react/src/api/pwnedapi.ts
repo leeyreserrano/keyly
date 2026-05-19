@@ -8,6 +8,6 @@ export interface PwnedHash {
 export const pwnedApi = {
   checkPassword: (prefix: string, suffix: string): Promise<PwnedHash[] | null> =>
     apiRequest<PwnedHash[]>(`/utils/pwned/password/${prefix}/${suffix}`, {
-      method: 'POST',
+      method: 'GET',
     }),
 };
