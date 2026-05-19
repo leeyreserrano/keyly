@@ -13,6 +13,8 @@ export function useShareSelector() {
   const { usuari } = useAuth();
   const { privateKey } = useCrypto();
   const esAdmin = usuari?.rolIntern === 'ADMIN';
+  const esCap = usuari?.rolIntern === 'CAP';
+  const potVeureDepartaments = esAdmin || esCap;
 
   const [usuaris, setUsuaris] = useState<UsuariPublic[]>([]);
   const [usuarisAmbDept, setUsuarisAmbDept] = useState<UsuariAmbDepartament[]>([]);
@@ -29,7 +31,7 @@ export function useShareSelector() {
     const load = async () => {
       setLoadingUsuaris(true);
       try {
-        if (esAdmin) {
+        if (potVeureDepartaments) {
           const [tots, totsAmbDept, depts] = await Promise.all([
             usuarisApi.fetchAllPublic(),
             usuarisApi.fetchAllAmbDepartament(),
@@ -48,7 +50,7 @@ export function useShareSelector() {
       }
     };
     load();
-  }, [usuari?.uuid, esAdmin]);
+  }, [usuari?.uuid, potVeureDepartaments]);
 
   const filtrats = usuaris.filter(
     (u) =>
@@ -174,6 +176,8 @@ export function useShareSelector() {
 
   return {
     esAdmin,
+    esCap,
+    potVeureDepartaments,
     usuaris,
     usuarisAmbDept,
     departaments,

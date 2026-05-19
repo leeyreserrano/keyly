@@ -1,4 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   Box,
   Stack,
@@ -53,6 +55,8 @@ function FieldLabel({ children }: { children: string }) {
 }
 
 export default function RolsTab() {
+  const { t } = useTranslation('config');
+
   const [data, setData] = useState<Rol[]>([]);
   const [sucursals, setSucursals] = useState<Sucursal[]>([]);
   const [loading, setLoading] = useState(false);
@@ -75,11 +79,11 @@ export default function RolsTab() {
       setData(r);
       setSucursals(s);
     } catch {
-      toast.error('Error carregant rols');
+      toast.error(t('rols.messages.loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();
@@ -95,7 +99,7 @@ export default function RolsTab() {
 
   const handleCreate = async () => {
     if (!createData.nom || !createData.sucursalUuid) {
-      toast.error('Omple tots els camps');
+      toast.error(t('rols.messages.fillAll'));
       return;
     }
 
@@ -106,12 +110,12 @@ export default function RolsTab() {
         sucursalUuid: createData.sucursalUuid,
       });
 
-      toast.success('Rol creat');
+      toast.success(t('rols.messages.created'));
       setOpenCreate(false);
       setCreateData(EMPTY_CREATE);
       load();
     } catch {
-      toast.error('Error creant rol');
+      toast.error(t('rols.messages.createError'));
     } finally {
       setSavingCreate(false);
     }
@@ -122,9 +126,9 @@ export default function RolsTab() {
     try {
       await rolsApi.delete(uuid);
       setData(prev => prev.filter(r => r.uuid !== uuid));
-      toast.success('Rol eliminat');
+      toast.success(t('rols.messages.deleted'));
     } catch {
-      toast.error('Error eliminant rol');
+      toast.error(t('rols.messages.deleteError'));
     } finally {
       setDeletingId(null);
     }
@@ -134,7 +138,7 @@ export default function RolsTab() {
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
         <TextField
-          placeholder="Cerca rol o sucursal..."
+          placeholder={t('rols.search')}
           size="small"
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -154,7 +158,7 @@ export default function RolsTab() {
           onClick={() => setOpenCreate(true)}
           sx={{ textTransform: 'none', fontWeight: 700 }}
         >
-          Nou rol
+          {t('rols.new')}
         </Button>
       </Stack>
 
@@ -167,9 +171,15 @@ export default function RolsTab() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Nom</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Sucursal</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700 }}>Accions</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>
+                  {t('rols.fields.name')}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>
+                  {t('rols.fields.branch')}
+                </TableCell>
+                <TableCell align="right" sx={{ fontWeight: 700 }}>
+                  Accions
+                </TableCell>
               </TableRow>
             </TableHead>
 
@@ -177,7 +187,7 @@ export default function RolsTab() {
               {visible.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={3} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                    No hi ha rols
+                    {t('rols.empty')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -186,7 +196,7 @@ export default function RolsTab() {
                     <TableCell>{r.nom}</TableCell>
                     <TableCell>{r.sucursal?.nom ?? '—'}</TableCell>
                     <TableCell align="right">
-                      <IconButton
+                      <IconButton size='small'
                         sx={{
                           bgcolor: 'error.main',
                           color: 'white',
@@ -211,13 +221,16 @@ export default function RolsTab() {
       )}
 
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ fontWeight: 700 }}>Nou rol</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {t('rols.dialog.title')}
+        </DialogTitle>
+
         <Divider />
 
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Stack spacing={0.5}>
-              <FieldLabel>Nom</FieldLabel>
+              <FieldLabel>{t('rols.fields.name')}</FieldLabel>
               <TextField
                 fullWidth
                 value={createData.nom}
@@ -226,7 +239,7 @@ export default function RolsTab() {
             </Stack>
 
             <Stack spacing={0.5}>
-              <FieldLabel>Sucursal</FieldLabel>
+              <FieldLabel>{t('rols.fields.branch')}</FieldLabel>
               <FormControl fullWidth>
                 <Select
                   value={createData.sucursalUuid}
@@ -235,7 +248,10 @@ export default function RolsTab() {
                   }
                   displayEmpty
                 >
-                  <MenuItem value=""><em>Selecciona sucursal</em></MenuItem>
+                  <MenuItem value="">
+                    <em>{t('rols.fields.selectBranch')}</em>
+                  </MenuItem>
+
                   {sucursals.map(s => (
                     <MenuItem key={s.uuid} value={s.uuid}>
                       {s.nom}
@@ -250,14 +266,16 @@ export default function RolsTab() {
         <Divider />
 
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <Button onClick={() => setOpenCreate(false)}>Cancelar</Button>
+          <Button onClick={() => setOpenCreate(false)}>
+            {t('rols.dialog.cancel')}
+          </Button>
 
           <Button
             variant="contained"
             onClick={handleCreate}
             disabled={savingCreate}
           >
-            {savingCreate ? <CircularProgress size={18} /> : 'Crear'}
+            {savingCreate ? <CircularProgress size={18} /> : t('rols.dialog.create')}
           </Button>
         </DialogActions>
       </Dialog>

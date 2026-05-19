@@ -40,6 +40,12 @@ import { departamentsApi, type Departament } from '../api/departamentsapi';
 import { rolsApi, type Rol } from '../api/rolsapi';
 import { configApi } from '../api/configapi';
 import { dominiApi } from '../api/dominiapi';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import Menu from '@mui/material/Menu';
+import GeneratePasswordModal from '../components/GeneratePasswordModal';
+import { utilsApi } from '../api/utilsapi';
 import {
   deriveKey,
   generateKeyPair,
@@ -118,6 +124,7 @@ function FieldLabel({ children }: { children: string }) {
 function UserAvatarCell({ usuari }: { usuari: UsuariAdmin }) {
   const [src, setSrc] = useState<string | null>(null);
   const objectUrlRef = useRef<string | null>(null);
+
 
   useEffect(() => {
     if (!usuari.imatge) return;
@@ -199,6 +206,9 @@ export default function UsuarisTab() {
   const [openDelete, setOpenDelete] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<UsuariAdmin | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openGenerateModal, setOpenGenerateModal] = useState(false);
 
   const deptsByCreate = departaments.filter(
     d => !createData.sucursalUuid || d.sucursal?.uuid === createData.sucursalUuid
@@ -285,13 +295,60 @@ export default function UsuarisTab() {
         u =>
           u.nom.toLowerCase().includes(q) ||
           u.correu.toLowerCase().includes(q) ||
-          u.departament?.departament?.toLowerCase().includes(q) ||
+          u.departament?.nom?.toLowerCase().includes(q) ||
           u.sucursal?.nom?.toLowerCase().includes(q)
       );
     }
     return list;
   })();
+  const handleComplexitat = async (nivell: string) => {
+    setAnchorEl(null);
 
+    const configs = {
+      baixa: {
+        longitud: 8,
+        may: true,
+        quantitatMay: 0,
+        numeros: false,
+        quantitatNumeros: 0,
+        caractersEspecials: false,
+        quantitatCaractersEspecials: 0,
+      },
+      mitjana: {
+        longitud: 12,
+        may: true,
+        quantitatMay: 3,
+        numeros: true,
+        quantitatNumeros: 3,
+        caractersEspecials: false,
+        quantitatCaractersEspecials: 0,
+      },
+      alta: {
+        longitud: 20,
+        may: true,
+        quantitatMay: 5,
+        numeros: true,
+        quantitatNumeros: 4,
+        caractersEspecials: true,
+        quantitatCaractersEspecials: 3,
+      },
+    };
+
+    try {
+      const result = await utilsApi.generatePassword(
+        configs[nivell as keyof typeof configs]
+      );
+
+      if (result) {
+        setCreateData(p => ({
+          ...p,
+          contrasenya: result,
+        }));
+      }
+    } catch {
+      toast.error(t('toast.error.generate_password'));
+    }
+  };
   const handleOpenCreate = () => {
     const base: CreateFormData = { ...EMPTY_CREATE };
     if (!isAdmin && usuari) {
@@ -362,29 +419,6 @@ export default function UsuarisTab() {
     setOpenEdit(true);
   };
 
-  const handleEdit = async () => {
-    if (!editTarget) return;
-    setSavingEdit(true);
-    try {
-      const payload: UpdateUsuariData = {};
-      if (editData.nom !== editTarget.nom) payload.nom = editData.nom;
-      if (editData.correu !== editTarget.correu) payload.correu = editData.correu;
-      if (editData.rolIntern !== editTarget.rolIntern) payload.rolIntern = editData.rolIntern;
-      if (editData.rolUuid !== (editTarget.rol?.uuid ?? '')) payload.rolUuid = editData.rolUuid;
-      if (editData.sucursalUuid !== (editTarget.sucursal?.uuid ?? '')) payload.sucursalUuid = editData.sucursalUuid;
-      if (editData.departamentUuid !== (editTarget.departament?.uuid ?? '')) payload.departamentUuid = editData.departamentUuid;
-
-      await usuarisApi.updateUsuariAdmin(editTarget.uuid, payload);
-      toast.success(t('users.edit.success'));
-      setOpenEdit(false);
-      loadUsuaris();
-    } catch {
-      toast.error(t('users.edit.error'));
-    } finally {
-      setSavingEdit(false);
-    }
-  };
-
   const handleOpenDelete = (u: UsuariAdmin) => {
     setDeleteTarget(u);
     setOpenDelete(true);
@@ -407,6 +441,28 @@ export default function UsuarisTab() {
   };
 
   const formFieldSx = { spacing: 0.5 };
+
+  const handleEdit = async () => {
+    if (!editTarget) return;
+    setSavingEdit(true);
+    try {
+      const payload: UpdateUsuariData = {};
+      if (editData.nom !== editTarget.nom) payload.nom = editData.nom;
+      if (editData.correu !== editTarget.correu) payload.correu = editData.correu;
+      if (editData.rolIntern !== editTarget.rolIntern) payload.rolIntern = editData.rolIntern;
+      if (editData.rolUuid !== (editTarget.rol?.uuid ?? '')) payload.rolUuid = editData.rolUuid;
+      if (editData.sucursalUuid !== (editTarget.sucursal?.uuid ?? '')) payload.sucursalUuid = editData.sucursalUuid;
+      if (editData.departamentUuid !== (editTarget.departament?.uuid ?? '')) payload.departamentUuid = editData.departamentUuid;
+      await usuarisApi.updateUsuariAdmin(editTarget.uuid, payload);
+      toast.success(t('users.edit.success'));
+      setOpenEdit(false);
+      loadUsuaris();
+    } catch {
+      toast.error(t('users.edit.error'));
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   return (
     <>
@@ -473,7 +529,7 @@ export default function UsuarisTab() {
                       </TableCell>
                       <TableCell>{u.nom}</TableCell>
                       <TableCell>{u.correu}</TableCell>
-                      <TableCell>{u.departament?.departament ?? '—'}</TableCell>
+                      <TableCell>{u.departament?.nom ?? '—'}</TableCell>
                       {isAdmin && <TableCell>{u.sucursal?.nom ?? '—'}</TableCell>}
                       <TableCell>
                         <Chip
@@ -564,15 +620,98 @@ export default function UsuarisTab() {
             </Stack>
 
             <Stack {...formFieldSx}>
-              <FieldLabel>{t('users.field.password')}</FieldLabel>
+              <Stack
+                direction="row"
+                sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <FieldLabel>{t('users.field.password')}</FieldLabel>
+
+                <Button
+                  size="small"
+                  startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 15 }} />}
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {t('generate.button')}
+                </Button>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem onClick={() => handleComplexitat('baixa')}>
+                    {t('generate.low')}
+                  </MenuItem>
+
+                  <MenuItem onClick={() => handleComplexitat('mitjana')}>
+                    {t('generate.medium')}
+                  </MenuItem>
+
+                  <MenuItem onClick={() => handleComplexitat('alta')}>
+                    {t('generate.high')}
+                  </MenuItem>
+
+                  <Divider />
+
+                  <MenuItem
+                    onClick={() => {
+                      setAnchorEl(null);
+                      setOpenGenerateModal(true);
+                    }}
+                  >
+                    {t('generate.custom')}
+                  </MenuItem>
+                </Menu>
+              </Stack>
+
               <TextField
                 fullWidth
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={createData.contrasenya}
-                onChange={e => setCreateData(p => ({ ...p, contrasenya: e.target.value }))}
+                onChange={e =>
+                  setCreateData(p => ({
+                    ...p,
+                    contrasenya: e.target.value,
+                  }))
+                }
                 placeholder={t('users.placeholder.password')}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword((p) => !p)}
+                        sx={{
+                          borderRadius: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          color: 'text.secondary',
+                        }}
+                      >
+                        {showPassword
+                          ? <VisibilityOffIcon fontSize="small" />
+                          : <VisibilityIcon fontSize="small" />
+                        }
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Stack>
+            <GeneratePasswordModal
+              open={openGenerateModal}
+              onClose={() => setOpenGenerateModal(false)}
+              onConfirm={(password) =>
+                setCreateData(p => ({
+                  ...p,
+                  contrasenya: password,
+                }))
+              }
+            />
 
             <Stack {...formFieldSx}>
               <FieldLabel>{t('users.field.role_intern')}</FieldLabel>

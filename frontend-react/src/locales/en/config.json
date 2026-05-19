@@ -8,6 +8,7 @@
   "tabs.departments": "Department management",
   "tabs.branches": "Branch management",
   "tabs.domains": "Domain management",
+  "tabs.roles": "Role management",
   "users.search": "Search by name, email or department...",
   "users.add": "Add user",
   "users.col.avatar": "",
@@ -108,5 +109,48 @@
   "branches.field.all_domains": "Permitir todos los dominios",
   "branches.field.all_domains_hint": "Si se activa, no se restringe el dominio del correo de los usuarios",
   "branches.field.expiry_days": "Días de expiración de contraseña",
-  "branches.field.expiry_days_hint": "0 significa que nunca expira"
+  "branches.field.expiry_days_hint": "0 significa que nunca expira",
+  "rols": {
+    "title": "Roles",
+    "search": "Search role or branch...",
+    "new": "New role",
+    "empty": "No roles available",
+    "fields": {
+      "name": "Name",
+      "branch": "Branch",
+      "selectBranch": "Select branch"
+    },
+    "dialog": {
+      "title": "New role",
+      "cancel": "Cancel",
+      "create": "Create"
+    },
+    "messages": {
+      "fillAll": "Fill all fields",
+      "created": "Role created",
+      "deleted": "Role deleted",
+      "loadError": "Error loading roles",
+      "createError": "Error creating role",
+      "deleteError": "Error deleting role"
+    }
+  },
+  "toast": {
+    "error": {
+      "generate_password": "Error generating password"
+    }
+  },
+  "generate": {
+    "button": "Generate",
+    "low": "Low complexity",
+    "medium": "Medium complexity",
+    "high": "High complexity",
+    "custom": "Custom"
+  },
+  "branches.field.allowed_domains": "Allowed domains",
+  "branches.field.no_domains_available": "No domains registered for this branch. Add them from the domains tab.",
+  "domains.col.branch": "Branch",
+  "domains.field.branch": "Branch",
+  "domains.field.branch_required": "The branch is required",
+  "domains.create.error_conflict": "The domain is not valid or already exists for this branch",
+  "domains.edit.error_conflict": "The domain is not valid or already exists for this branch"
 }

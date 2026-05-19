@@ -417,7 +417,7 @@ export default function Stadistics() {
                 <SecurityAlert
                   type="compromised"
                   count={stats.pwnedCount}
-                  onReview={() => navigate('/Items')}
+                  onReview={() => navigate('/Pwned')}
                 />
               )}
               {stats.reusedCount > 0 && (

@@ -1,41 +1,76 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Box,
-  Chip,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
+  Box, Stack, Typography, Paper, Chip, Avatar, IconButton,
+  Tooltip, TextField, InputAdornment, CircularProgress,
+  Select, MenuItem, Dialog, DialogTitle, DialogContent,
+  DialogContentText, DialogActions, Button,
 } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import KeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 import SearchIcon from '@mui/icons-material/Search';
-
 import toast from 'react-hot-toast';
 
 import { useAuth } from '../context/AuthContext';
-import {
-  compartitsApi,
-  type Compartit,
-  type Permisos,
-} from '../api/compartitsapi';
+import { compartitsApi, type Compartit, type Permisos } from '../api/compartitsapi';
+import { useShareSelector } from '../hooks/useShareSelector';
+import ShareSelectorInline from './ShareSelectorInline';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import { formatDate } from '../utils/timeUtils';
 
-const PERMIS_COLOR: Record<Permisos, 'default' | 'primary' | 'error'> = {
-  LECTURA: 'default',
-  ESCRIPTURA: 'primary',
-  ADMINISTRADOR: 'error',
+type EntitatAgrupada = {
+  entitatUuid: string;
+  nom: string;
+  dataCreacio: string;
+  compartits: Compartit[];
 };
 
-const permisosOptions: Permisos[] = ['LECTURA', 'ESCRIPTURA', 'ADMINISTRADOR'];
+type FilaReceptor =
+  | { tipus: 'usuari'; compartit: Compartit }
+  | { tipus: 'departament'; departamentUuid: string; departamentNom: string; compartits: Compartit[] };
+
+function agruparReceptors(compartits: Compartit[]): FilaReceptor[] {
+  const perDept = new Map<string, Compartit[]>();
+  const sense: Compartit[] = [];
+  for (const c of compartits) {
+    const deptUuid = c.usuariReceptor?.departament?.uuid;
+    if (deptUuid) {
+      if (!perDept.has(deptUuid)) perDept.set(deptUuid, []);
+      perDept.get(deptUuid)!.push(c);
+    } else {
+      sense.push(c);
+    }
+  }
+  const resultat: FilaReceptor[] = [];
+  for (const [deptUuid, membres] of perDept.entries()) {
+    if (membres.length >= 2) {
+      resultat.push({
+        tipus: 'departament',
+        departamentUuid: deptUuid,
+        departamentNom: membres[0].usuariReceptor?.departament?.nom ?? deptUuid,
+        compartits: membres,
+      });
+    } else {
+      sense.push(...membres);
+    }
+  }
+  for (const c of sense) resultat.push({ tipus: 'usuari', compartit: c });
+  return resultat;
+}
+
+function groupByEntitat(compartits: Compartit[]): EntitatAgrupada[] {
+  const map = new Map<string, EntitatAgrupada>();
+  for (const c of compartits) {
+    const uuid = c.item?.uuid ?? c.uuid;
+    const nom = c.item?.titol ?? '—';
+    if (!map.has(uuid)) map.set(uuid, { entitatUuid: uuid, nom, dataCreacio: c.dataCreacio, compartits: [] });
+    map.get(uuid)!.compartits.push(c);
+  }
+  return Array.from(map.values()).sort(
+    (a, b) => new Date(b.dataCreacio).getTime() - new Date(a.dataCreacio).getTime()
+  );
+}
 
 export default function ItemsTab() {
   const { usuari } = useAuth();
@@ -44,29 +79,30 @@ export default function ItemsTab() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [items, setItems] = useState<Compartit[]>([]);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const [filterPermisos, setFilterPermisos] = useState<Permisos | 'ALL'>('ALL');
-  const [filterDepartament, setFilterDepartament] = useState<string | 'ALL'>('ALL');
-  const [filterMode, setFilterMode] = useState<'RECEPTOR' | 'CREADOR'>('RECEPTOR');
+  const [deleteTargets, setDeleteTargets] = useState<Compartit[]>([]);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const [editTarget, setEditTarget] = useState<Compartit | null>(null);
+  const [editPermisos, setEditPermisos] = useState<Permisos>('LECTURA');
+  const [savingPermisos, setSavingPermisos] = useState(false);
+
+  const [addToGrup, setAddToGrup] = useState<EntitatAgrupada | null>(null);
+  const [addingShare, setAddingShare] = useState(false);
+  const shareSelector = useShareSelector();
 
   const loadItems = useCallback(async () => {
     setLoading(true);
-
     try {
       const data = isAdmin
         ? await compartitsApi.fetchAllAdmin()
         : await compartitsApi.fetchCompartitsCreats();
 
-      let filtered = (data ?? []).filter(
-        c => c.tipusEntitat === 'ITEM'
-      );
+      let filtered = (data ?? []).filter((c) => c.tipusEntitat === 'ITEM');
 
       if (!isAdmin && usuari?.departament?.uuid) {
         filtered = filtered.filter(
-          c =>
-            c.usuariReceptor.departament?.uuid ===
-            usuari.departament?.uuid
+          (c) => c.usuariReceptor?.departament?.uuid === usuari.departament?.uuid
         );
       }
 
@@ -78,186 +114,293 @@ export default function ItemsTab() {
     }
   }, [isAdmin, usuari]);
 
-  useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+  useEffect(() => { loadItems(); }, [loadItems]);
 
-  const visibleItems = items.filter(c => {
-    const q = search.toLowerCase();
+  const agrupats = groupByEntitat(items).filter((g) =>
+    g.nom.toLowerCase().includes(search.toLowerCase()) ||
+    g.compartits.some(
+      (c) =>
+        c.usuariReceptor?.nom?.toLowerCase().includes(search.toLowerCase()) ||
+        c.usuariReceptor?.departament?.nom?.toLowerCase().includes(search.toLowerCase())
+    )
+  );
 
-    const matchesSearch =
-      c.item?.titol?.toLowerCase().includes(q) ||
-      c.usuariCreador.nom.toLowerCase().includes(q) ||
-      c.usuariReceptor.nom.toLowerCase().includes(q);
+  const handleDelete = (compartit: Compartit) => {
+    setDeleteTargets([compartit]);
+    setOpenDeleteModal(true);
+  };
 
-    const matchesPermisos =
-      filterPermisos === 'ALL' || c.permisos === filterPermisos;
+  const handleDeleteDepartament = (compartitsGrup: Compartit[]) => {
+    setDeleteTargets(compartitsGrup);
+    setOpenDeleteModal(true);
+  };
 
-    const dep =
-      filterMode === 'RECEPTOR'
-        ? c.usuariReceptor.departament?.uuid
-        : c.usuariCreador.departament?.uuid;
-
-    const matchesDepartament =
-      filterDepartament === 'ALL' || dep === filterDepartament;
-
-    return matchesSearch && matchesPermisos && matchesDepartament;
-  });
-
-  const handleDelete = async (uuid: string) => {
-    setDeletingId(uuid);
-
+  const confirmDelete = async () => {
+    if (deleteTargets.length === 0) return;
     try {
-      await compartitsApi.deleteCompartit(uuid);
-
-      setItems(prev => prev.filter(i => i.uuid !== uuid));
-
+      for (const c of deleteTargets) await compartitsApi.deleteCompartit(c.uuid);
+      const uuids = new Set(deleteTargets.map((c) => c.uuid));
+      setItems((prev) => prev.filter((c) => !uuids.has(c.uuid)));
       toast.success('Compartit eliminat');
     } catch {
       toast.error('Error eliminant compartit');
     } finally {
-      setDeletingId(null);
+      setOpenDeleteModal(false);
+      setDeleteTargets([]);
     }
   };
 
-  const departamentsDisponibles = Array.from(
-    new Map(
-      items
-        .flatMap(i => [i.usuariReceptor, i.usuariCreador])
-        .filter(u => u?.departament?.uuid)
-        .map(u => [u.departament!.uuid, u.departament!.departament])
-    )
-  ).map(([uuid, nom]) => ({ uuid, nom }));
+  const handleOpenEdit = (compartit: Compartit) => {
+    setEditTarget(compartit);
+    setEditPermisos(compartit.permisos);
+  };
+
+  const handleSavePermisos = async () => {
+    if (!editTarget) return;
+    setSavingPermisos(true);
+    try {
+      await compartitsApi.updatePermisos(editTarget.uuid, editPermisos);
+      setItems((prev) => prev.map((c) => (c.uuid === editTarget.uuid ? { ...c, permisos: editPermisos } : c)));
+      toast.success('Permisos actualitzats');
+      setEditTarget(null);
+    } catch {
+      toast.error('Error actualitzant permisos');
+    } finally {
+      setSavingPermisos(false);
+    }
+  };
+
+  const handleOpenAdd = (grup: EntitatAgrupada) => {
+    shareSelector.resetShare();
+    setAddToGrup(grup);
+  };
+
+  const handleConfirmAdd = async () => {
+    if (!addToGrup || shareSelector.seleccionats.length === 0) return;
+    setAddingShare(true);
+    try {
+      await shareSelector.compartirItem(addToGrup.entitatUuid);
+      toast.success('Compartit correctament');
+      setAddToGrup(null);
+      await loadItems();
+    } catch {
+      toast.error('Error compartint');
+    } finally {
+      setAddingShare(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box>
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={1}
-        sx={{ mb: 2, alignItems: 'center' }}
-      >
-        <TextField
-          placeholder="Cerca item compartit..."
-          size="small"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          sx={{ width: { xs: '100%', sm: 320 } }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
-        />
+      <TextField
+        placeholder="Cerca per item, usuari o departament..."
+        size="small"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        sx={{ mb: 3, width: 360 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-        <TextField
-          select
-          size="small"
-          value={filterPermisos}
-          onChange={e => setFilterPermisos(e.target.value as any)}
-          sx={{ width: { xs: '100%', sm: 200 } }}
-        >
-          <MenuItem value="ALL">Tots els permisos</MenuItem>
-          {permisosOptions.map(p => (
-            <MenuItem key={p} value={p}>
-              {p}
-            </MenuItem>
-          ))}
-        </TextField>
+      <Stack spacing={2}>
+        {agrupats.length === 0 ? (
+          <Typography sx={{ color: 'text.secondary', py: 4, textAlign: 'center' }}>
+            No hi ha items compartits
+          </Typography>
+        ) : (
+          agrupats.map((grup) => {
+            const receptors = agruparReceptors(grup.compartits);
+            return (
+              <Paper key={grup.entitatUuid} variant="outlined" sx={{ p: 2.5, borderRadius: '10px' }}>
+                <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
+                  <KeyRoundedIcon sx={{ fontSize: 18, color: 'text.primary' }} />
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
+                    {grup.nom}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', ml: 'auto' }}>
+                    {formatDate(grup.dataCreacio)}
+                  </Typography>
+                  <Tooltip title="Afegir usuari">
+                    <IconButton size="small" onClick={() => handleOpenAdd(grup)}>
+                      <PersonAddOutlinedIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
 
-        <TextField
-          select
-          size="small"
-          value={filterMode}
-          onChange={e => setFilterMode(e.target.value as any)}
-          sx={{ width: { xs: '100%', sm: 200 } }}
-        >
-          <MenuItem value="RECEPTOR">Departament receptor</MenuItem>
-          <MenuItem value="CREADOR">Departament creador</MenuItem>
-        </TextField>
-
-        <TextField
-          select
-          size="small"
-          value={filterDepartament}
-          onChange={e => setFilterDepartament(e.target.value as any)}
-          sx={{ width: { xs: '100%', sm: 220 } }}
-        >
-          <MenuItem value="ALL">Tots els departaments</MenuItem>
-          {departamentsDisponibles.map(d => (
-            <MenuItem key={d.uuid} value={d.uuid}>
-              {d.nom}
-            </MenuItem>
-          ))}
-        </TextField>
+                <Stack spacing={1}>
+                  {receptors.map((fila) => {
+                    if (fila.tipus === 'departament') {
+                      return (
+                        <Stack
+                          key={`dept-${fila.departamentUuid}`}
+                          direction="row"
+                          sx={{ alignItems: 'center', gap: 1.5, py: 0.75, px: 1, borderRadius: '8px', bgcolor: 'action.hover' }}
+                        >
+                          <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.main' }}>
+                            <GroupsOutlinedIcon sx={{ fontSize: 16 }} />
+                          </Avatar>
+                          <Stack sx={{ minWidth: 0, flex: 1 }}>
+                            <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                              {fila.departamentNom}
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                              {fila.compartits.length} usuaris
+                            </Typography>
+                          </Stack>
+                          <Chip
+                            label={fila.compartits[0].permisos}
+                            size="small"
+                            sx={{ fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}
+                            onClick={() => handleOpenEdit(fila.compartits[0])}
+                          />
+                          <Tooltip title="Revocar accés">
+                            <IconButton size="small" sx={{
+                              bgcolor: 'error.main',
+                              color: 'white',
+                              '&:hover': { bgcolor: 'error.dark' }
+                            }} onClick={() => handleDeleteDepartament(fila.compartits)}>
+                              <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      );
+                    }
+                    const c = fila.compartit;
+                    return (
+                      <Stack
+                        key={c.uuid}
+                        direction="row"
+                        sx={{ alignItems: 'center', gap: 1.5, py: 0.75, px: 1, borderRadius: '8px', bgcolor: 'action.hover' }}
+                      >
+                        <Avatar src={c.usuariReceptor?.imatge} sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
+                          {c.usuariReceptor?.nom?.charAt(0) ?? '?'}
+                        </Avatar>
+                        <Stack sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                            {c.usuariReceptor?.nom ?? '—'}
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {c.usuariReceptor?.correu ?? ''}
+                          </Typography>
+                        </Stack>
+                        <Chip
+                          label={c.permisos}
+                          size="small"
+                          sx={{ fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}
+                          onClick={() => handleOpenEdit(c)}
+                        />
+                        <Tooltip title="Revocar accés">
+                          <IconButton size="small" sx={{
+                            bgcolor: 'error.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'error.dark' }
+                          }} onClick={() => handleDelete(c)}>
+                            <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    );
+                  })}
+                </Stack>
+              </Paper>
+            );
+          })
+        )}
       </Stack>
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Item</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Creador</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Receptor</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Departament</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Permisos</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700 }}>
-                  Accions
-                </TableCell>
-              </TableRow>
-            </TableHead>
+      <DeleteConfirmationModal
+        open={openDeleteModal}
+        onClose={() => { setOpenDeleteModal(false); setDeleteTargets([]); }}
+        onConfirm={confirmDelete}
+      />
 
-            <TableBody>
-              {visibleItems.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4, color: 'text.secondary' }}>
-                    No hi ha items compartits
-                  </TableCell>
-                </TableRow>
-              ) : (
-                visibleItems.map(c => (
-                  <TableRow key={c.uuid} hover>
-                    <TableCell>{c.item?.titol ?? '—'}</TableCell>
-                    <TableCell>{c.usuariCreador.nom}</TableCell>
-                    <TableCell>{c.usuariReceptor.nom}</TableCell>
-                    <TableCell>{c.usuariReceptor.departament?.departament ?? '—'}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={c.permisos}
-                        size="small"
-                        color={PERMIS_COLOR[c.permisos]}
-                        sx={{ fontWeight: 600 }}
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="Eliminar compartit">
-                        <IconButton
-                          color="error"
-                          size="small"
-                          disabled={deletingId === c.uuid}
-                          onClick={() => handleDelete(c.uuid)}
-                        >
-                          {deletingId === c.uuid ? (
-                            <CircularProgress size={16} color="inherit" />
-                          ) : (
-                            <DeleteOutlineIcon fontSize="small" />
-                          )}
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
+      <Dialog open={!!editTarget} onClose={() => setEditTarget(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>Editar permisos</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2, fontSize: '0.9rem' }}>
+            Canvia els permisos de {editTarget?.usuariReceptor?.nom ?? ''}
+          </DialogContentText>
+          <Select size="small" fullWidth value={editPermisos} onChange={(e) => setEditPermisos(e.target.value as Permisos)}>
+            <MenuItem value="LECTURA">Lectura</MenuItem>
+            <MenuItem value="ESCRIPTURA">Escriptura</MenuItem>
+          </Select>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEditTarget(null)} sx={{ textTransform: 'none', fontWeight: 600, color: 'white' }}>
+            Cancel·lar
+          </Button>
+          <Button
+            onClick={handleSavePermisos}
+            variant="contained"
+            disabled={savingPermisos}
+            sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
+          >
+            {savingPermisos ? 'Guardant...' : 'Guardar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={!!addToGrup} onClose={() => setAddToGrup(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          Afegir usuaris a "{addToGrup?.nom ?? ''}"
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <ShareSelectorInline
+              t={(key) => key}
+              esAdmin={shareSelector.esAdmin}
+              tab={shareSelector.tab}
+              onTabChange={(v) => { shareSelector.setTab(v); shareSelector.setSeleccionats([]); shareSelector.handleSelectDepartament(''); }}
+              filtrats={shareSelector.filtrats.filter(
+                (u) => !addToGrup?.compartits.some((c) => c.usuariReceptor?.uuid === u.uuid)
               )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              departamentsFiltrats={shareSelector.departamentsFiltrats}
+              usuarisDepartament={shareSelector.usuarisDepartament}
+              allUsuarisAmbDept={shareSelector.usuarisAmbDept}
+              seleccionats={shareSelector.seleccionats}
+              departamentSeleccionat={shareSelector.departamentSeleccionat}
+              searchUsuaris={shareSelector.searchUsuaris}
+              onSearchUsuaris={shareSelector.setSearchUsuaris}
+              searchDept={shareSelector.searchDept}
+              onSearchDept={shareSelector.setSearchDept}
+              permisCompartir={shareSelector.permisCompartir}
+              onPermisChange={shareSelector.setPermisCompartir}
+              onToggleSeleccio={shareSelector.toggleSeleccio}
+              onSelectDepartament={shareSelector.handleSelectDepartament}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setAddToGrup(null)} sx={{ textTransform: 'none', fontWeight: 600, color: 'white' }}>
+            Cancel·lar
+          </Button>
+          <Button
+            onClick={handleConfirmAdd}
+            variant="contained"
+            disabled={addingShare || shareSelector.seleccionats.length === 0}
+            sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, '&.Mui-disabled': { bgcolor: 'grey.300', color: 'grey.500' } }}
+          >
+            {addingShare
+              ? 'Compartint...'
+              : shareSelector.seleccionats.length > 0
+                ? `Compartir (${shareSelector.seleccionats.length})`
+                : 'Compartir'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

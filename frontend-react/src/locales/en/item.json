@@ -103,5 +103,12 @@
     "item.password.expired": "The password has expired. You must change it.",
     "item.password.expires_in": "The password expires in {{days}} days",
     "item.pwned.label": "Pwned",
-    "item.pwned.alert": "This password has appeared in known data breaches. It is strongly recommended to change it as soon as possible."
+    "item.pwned.alert": "This password has appeared in known data breaches. It is strongly recommended to change it as soon as possible.",
+    "pwned.title": "Pwned passwords",
+    "pwned.error.load": "Error loading pwned passwords",
+    "pwned.error.delete": "Error deleting item",
+    "pwned.success.delete": "Item deleted successfully",
+    "pwned.empty.search": "No results for your search",
+    "pwned.empty.no": "No pwned passwords found",
+    "pwned.empty.subtitle": "None of your passwords have appeared in known data breaches."
 }

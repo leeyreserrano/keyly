@@ -103,5 +103,12 @@
   "item.password.expired": "La contrasenya ha expirat. Has de canviar-la.",
   "item.password.expires_in": "La contrasenya expira en {{days}} dies",
   "item.pwned.label": "Vulnerada",
-  "item.pwned.alert": "Aquesta contrasenya ha aparegut en filtracions de dades conegudes. Es recomana canviar-la com més aviat millor."
+  "item.pwned.alert": "Aquesta contrasenya ha aparegut en filtracions de dades conegudes. Es recomana canviar-la com més aviat millor.",
+  "pwned.title": "Contrasenyes vulnerades",
+  "pwned.error.load": "Error carregant les contrasenyes vulnerades",
+  "pwned.error.delete": "Error eliminant l'element",
+  "pwned.success.delete": "Element eliminat correctament",
+  "pwned.empty.search": "Sense resultats per a la teva cerca",
+  "pwned.empty.no": "No s'han trobat contrasenyes vulnerades",
+  "pwned.empty.subtitle": "Cap de les teves contrasenyes ha aparegut en filtracions de dades."
 }

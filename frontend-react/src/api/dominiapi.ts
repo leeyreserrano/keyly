@@ -3,14 +3,20 @@ import { apiRequest } from './client';
 export type Domini = {
   uuid: string;
   domini: string;
+  sucursal?: {
+    uuid: string;
+    nom: string;
+  } | null;
 };
 
 export type CreateDomini = {
   domini: string;
+  sucursalUuid: string;
 };
 
 export type UpdateDomini = {
   domini: string;
+  sucursalUuid: string;
 };
 
 export const dominiApi = {
