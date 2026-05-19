@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +38,7 @@ public class UtilsController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'CAP', 'USUARI')")
-    @PostMapping("pwned/password/{prefix}/{suffix}")
+    @GetMapping("pwned/password/{prefix}/{suffix}")
     public ResponseEntity<List<PawnedPasswordResponse>> pawnedPasswords(@PathVariable String prefix, @PathVariable String suffix) {
         return ResponseEntity.ok(service.pawnedPassword(prefix, suffix));
     }
