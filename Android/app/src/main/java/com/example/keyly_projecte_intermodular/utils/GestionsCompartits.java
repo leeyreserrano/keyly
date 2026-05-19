@@ -19,6 +19,9 @@ import android.widget.AutoCompleteTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.CarpetaActivity;
+import com.example.keyly_projecte_intermodular.CompartitActivity;
+import com.example.keyly_projecte_intermodular.ItemActivity;
+import com.example.keyly_projecte_intermodular.adapters.CompartitAdapter;
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
 import com.example.keyly_projecte_intermodular.dao.Compartit;
 import com.example.keyly_projecte_intermodular.dao.EncryptedDataKey;
@@ -51,7 +54,8 @@ public class GestionsCompartits {
     private static int posItemCompartit = 0;
 
     public static void obtenirCompartits(Context context, ArrayList<Compartit> compartits,
-                                         int filtre, boolean fav, RecyclerView recyclerView) {
+                                         int filtre, boolean fav, CompartitAdapter compartitAdapter,
+                                         RecyclerView recyclerView, boolean view) {
         CompartitDTO.RequestCompartit  resquestCompartit = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class);
         resquestCompartit.getAllCompartit().enqueue(new Callback<ArrayList<Compartit>>() {
             @Override
@@ -72,7 +76,9 @@ public class GestionsCompartits {
                     ArrayList<Compartit> compartitsF = new ArrayList<>();
                     if (filtre == 0) { // Mostrar tots els compartits
                         compartitsF = compartits;
-                        //actualitzarCompartits(compartitsF);
+                        if (view) {
+                            actualitzarCompartits(context, compartitsF, compartitAdapter, recyclerView);
+                        }
                     } else if (filtre == 1) { // Mostrar els útltims compartits usats
                         for (Compartit compartit : compartits) {
                             if (compartit.getUltimAccess() != null) {
@@ -85,11 +91,15 @@ public class GestionsCompartits {
                                                 LocalDateTime.parse(c.getUltimAccess())
                                 ).reversed()
                         );
-                        //actualitzarCompartits(compartitsF);
+                        if (view) {
+                            actualitzarCompartits(context, compartitsF, compartitAdapter, recyclerView);
+                        }
                     } else if (filtre == 2) { // Mostrar els compartits utilitzats
                         compartitsF = compartits;
                         compartitsF.sort(Comparator.comparing(Compartit::getComptadorAccess).reversed());
-                        //actualitzarCompartits(compartitsF);
+                        if (view) {
+                            actualitzarCompartits(context, compartitsF, compartitAdapter, recyclerView);
+                        }
                     }
                     if (fav) { // Mostrar els compartits favorits
                         ArrayList<Compartit> compartitsFavorits = new ArrayList<>();
@@ -104,7 +114,9 @@ public class GestionsCompartits {
                                 }
                             }
                         }
-                        //actualitzarCompartits(compartitsFavorits);
+                        if (view) {
+                            actualitzarCompartits(context, compartitsFavorits, compartitAdapter, recyclerView);
+                        }
                     }
                     recyclerView.setVisibility(View.VISIBLE);
                 } else {
@@ -117,6 +129,44 @@ public class GestionsCompartits {
                 Log.d("ERROR_FAILURE_COMPARTITS", t.getMessage());
             }
         });
+    }
+
+    public static void actualitzarCompartits(Context context, ArrayList<Compartit> compartits,
+                                       CompartitAdapter compartitAdapter,
+                                       RecyclerView recyclerView) {
+        compartitAdapter = new CompartitAdapter(compartits, compartit -> {
+            if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
+                Carpeta carpeta = compartit.getCarpeta();
+                Intent intentCarpeta = new Intent(context, CarpetaActivity.class);
+                intentCarpeta.putExtra("carpeta", carpeta);
+                intentCarpeta.putExtra("uuid", carpeta.getUuid().toString());
+                intentCarpeta.putExtra("nom", carpeta.getNom());
+                intentCarpeta.putExtra("favorit", carpeta.isFavorit());
+                intentCarpeta.putExtra("items", new ArrayList<>(carpeta.getItems()));
+                intentCarpeta.putExtra("data_creacio", carpeta.getDataCreacio());
+                intentCarpeta.putExtra("esCompartit", true);
+                intentCarpeta.putExtra("uuidCompartit", compartit.getUuid().toString());
+                context.startActivity(intentCarpeta);
+            } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
+                Log.d("ITEM_COMPARTIT_RECEPTOR", compartit.toString());
+                Item item = compartit.getItem();
+                Intent intentItem = new Intent(context, ItemActivity.class);
+                intentItem.putExtra("uuid", item.getUuid().toString());
+                intentItem.putExtra("title", item.getTitol());
+                intentItem.putExtra("url", item.getUrl());
+                intentItem.putExtra("nom_usuari", item.getNomUsuari());
+                intentItem.putExtra("password", item.getContrasenya());
+                intentItem.putExtra("notes", item.getNotes());
+                intentItem.putExtra("fav", item.isFavorit());
+                intentItem.putExtra("add_edit", 0);
+                intentItem.putExtra("iv", item.getIv());
+                intentItem.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
+                intentItem.putExtra("esCompartit", true);
+                intentItem.putExtra("uuidCompartit", compartit.getUuid().toString());
+                context.startActivity(intentItem);
+            }
+        }, context);
+        recyclerView.setAdapter(compartitAdapter);
     }
 
     public static void obtenirUsuaris(ArrayList<Usuari> usuaris, ArrayList<Usuari> usuarisSeleccionats,
