@@ -1,12 +1,14 @@
 import { apiRequest } from './client';
 
 export class compartitsApi {
-  static fetchCompartitsRebuts(): Promise<Compartit[] | null> {
-    return apiRequest<Compartit[]>('/compartit/get/all');
-  }
-
   static fetchCompartitsCreats(): Promise<Compartit[] | null> {
     return apiRequest<Compartit[]>('/compartit/get/all/creats');
+  }
+
+  static fetchCompartitsRebuts(): Promise<Compartit[]> {
+    return apiRequest<Compartit[]>('/compartit/get/all')
+      .then(r => r ?? [])
+      .catch(() => []);
   }
 
   static getCompartit(uuid: string): Promise<Compartit | null> {
@@ -36,23 +38,9 @@ export class compartitsApi {
       body: JSON.stringify(data),
     });
   }
-  static fetchCompartitsByCarpeta(carpetaUuid: string): Promise<Compartit[]> {
-    return Promise.all([
-      compartitsApi.fetchCompartitsRebuts(),
-      compartitsApi.fetchCompartitsCreats(),
-    ]).then(([rebuts, creats]) => {
-      const tots = [...(rebuts ?? []), ...(creats ?? [])];
-      return tots.filter(
-        (c) =>
-          c.tipusEntitat === 'ITEM' &&
-          c.item?.dinsDeCarpeta === true &&
-          c.carpeta?.uuid === carpetaUuid
-      );
-    });
-  }
+
   static fetchAllAdmin(): Promise<Compartit[]> {
-    return apiRequest<Compartit[]>('/compartit/all/admin')
-      .then(result => result ?? []);
+    return apiRequest<Compartit[]>('/compartit/all/admin').then((result) => result ?? []);
   }
 }
 
@@ -65,18 +53,9 @@ export type CompartitUsuari = {
   correu: string;
   imatge: string;
   publicKey: string;
-
   rolIntern?: 'ADMIN' | 'CAP' | 'USUARI';
-
-  sucursal?: {
-    uuid: string;
-    nom: string;
-  } | null;
-
-  departament?: {
-    uuid: string;
-    departament: string;
-  } | null;
+  sucursal?: { uuid: string; nom: string } | null;
+  departament?: { uuid: string; nom: string } | null;
 };
 
 export type CompartitDataKey = {
@@ -102,10 +81,7 @@ export type CompartitItem = {
   carpeta: { uuid: string; nom: string }[];
   bagul: {
     uuid: string;
-    usuari: {
-      uuid: string;
-      nom: string;
-    };
+    usuari: { uuid: string; nom: string };
   };
 };
 
@@ -121,7 +97,6 @@ export type CompartitCarpeta = {
 };
 
 export type Compartit = {
-  usuari: any;
   uuid: string;
   usuariCreador: CompartitUsuari;
   usuariReceptor: CompartitUsuari;

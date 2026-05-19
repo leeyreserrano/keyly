@@ -13,7 +13,7 @@ export type SucursalObj = {
 
 export type DepartamentObj = {
   uuid: string;
-  departament: string;
+  nom: string;
 };
 
 export type Usuari = {

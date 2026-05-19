@@ -56,6 +56,9 @@ export default function Carpeta() {
   const [openShareModal, setOpenShareModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openDeleteCarpetaModal, setOpenDeleteCarpetaModal] = useState(false);
+  const [deletingCarpeta, setDeletingCarpeta] = useState(false);
+  const [isFavorit, setIsFavorit] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -117,6 +120,10 @@ export default function Carpeta() {
     } catch {}
   };
 
+  const handleToggleFavorit = () => {
+    setIsFavorit((prev) => !prev);
+  };
+
   const handleDeleteClick = (item: Item) => {
     setDeleteTarget(item);
     setOpenDeleteModal(true);
@@ -150,6 +157,20 @@ export default function Carpeta() {
       toast.error(t('item.deleted_error'));
     } finally {
       handleCloseDeleteModal();
+    }
+  };
+
+  const handleDeleteCarpeta = async () => {
+    setDeletingCarpeta(true);
+    try {
+      await carpetasApi.deleteCarpeta(uuid);
+      toast.success(t('success.delete_list'));
+      navigate(-1);
+    } catch {
+      toast.error(t('error.delete_list'));
+    } finally {
+      setDeletingCarpeta(false);
+      setOpenDeleteCarpetaModal(false);
     }
   };
 
@@ -246,9 +267,12 @@ export default function Carpeta() {
         title={nomCarpeta}
         icon={<FolderOutlinedIcon sx={{ fontSize: 30, color: 'text.primary' }} />}
         showBackButton
+        isFavorit={isFavorit}
+        onToggleFavorit={!esCompartit ? handleToggleFavorit : undefined}
+        onEdit={!esCompartit ? () => navigate('/EditCarpeta', { state: { uuid } }) : undefined}
         onShare={!esCompartit ? () => setOpenShareModal(true) : undefined}
+        onDelete={!esCompartit ? () => setOpenDeleteCarpetaModal(true) : undefined}
       />
-
       <Stack sx={{ flex: 1, overflow: 'auto', minWidth: 0 }}>
         {esCompartit && compartit && (
           <Stack direction="row" sx={{ px: 4, pt: 2, gap: 1 }}>
@@ -296,6 +320,32 @@ export default function Carpeta() {
           </Button>
           <Button
             onClick={handleDeleteDefinitiu}
+            sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'error.main', color: 'white', '&:hover': { bgcolor: 'error.dark' } }}
+          >
+            {t('delete_modal.delete_permanently')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openDeleteCarpetaModal} onClose={() => setOpenDeleteCarpetaModal(false)}>
+        <DialogTitle sx={{ fontWeight: 700, color: 'text.primary' }}>
+          {t('delete_modal.title')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'text.secondary' }}>
+            {t('delete_modal.description', { titol: nomCarpeta })}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenDeleteCarpetaModal(false)}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          >
+            {t('delete_modal.cancel')}
+          </Button>
+          <Button
+            onClick={handleDeleteCarpeta}
+            disabled={deletingCarpeta}
             sx={{ textTransform: 'none', fontWeight: 600, bgcolor: 'error.main', color: 'white', '&:hover': { bgcolor: 'error.dark' } }}
           >
             {t('delete_modal.delete_permanently')}

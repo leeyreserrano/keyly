@@ -50,7 +50,6 @@ export default function AddItem() {
   const [novaCarpetaNom, setNovaCarpetaNom] = useState('');
   const [novaCarpetaError, setNovaCarpetaError] = useState<string | undefined>();
 
-
   useEffect(() => {
     carpetasApi.fetchItems().then((data) => {
       setCarpetes(data);
@@ -58,8 +57,8 @@ export default function AddItem() {
     }).catch(() => { });
   }, [carpetaUuid]);
 
-
   const shareSelector = useShareSelector();
+
   const validate = (): boolean => {
     const newErrors: { titol?: string; contrasenya?: string } = {};
     if (!titol.trim()) newErrors.titol = t('required.title');
@@ -91,6 +90,10 @@ export default function AddItem() {
         encryptedDataKey: encryptedDataKeyPropi,
       });
       if (!newItem) throw new Error(t('toast.error.create'));
+
+      if (shareSelector.seleccionats.length > 0) {
+        await shareSelector.compartirItem(newItem.uuid);
+      }
 
       if (carpetaSeleccionada === NOVA_CARPETA_VALUE) {
         const novaCarpeta = await carpetasApi.addCarpeta({ nom: novaCarpetaNom });
@@ -212,9 +215,9 @@ export default function AddItem() {
 
             <ShareSelectorInline
               t={t}
-              esAdmin={shareSelector.esAdmin}
+              esAdmin={shareSelector.potVeureDepartaments}
               tab={shareSelector.tab}
-              onTabChange={(v) => { shareSelector.setTab(v); shareSelector.setSeleccionats([]); shareSelector.handleSelectDepartament?.(''); } }
+              onTabChange={(v) => { shareSelector.setTab(v); shareSelector.setSeleccionats([]); shareSelector.handleSelectDepartament?.(''); }}
               filtrats={shareSelector.filtrats}
               departamentsFiltrats={shareSelector.departamentsFiltrats}
               usuarisDepartament={shareSelector.usuarisDepartament}
@@ -227,9 +230,9 @@ export default function AddItem() {
               permisCompartir={shareSelector.permisCompartir}
               onPermisChange={shareSelector.setPermisCompartir}
               onToggleSeleccio={shareSelector.toggleSeleccio}
-              onSelectDepartament={shareSelector.handleSelectDepartament} 
-              allUsuarisAmbDept={[]}           
-               />
+              onSelectDepartament={shareSelector.handleSelectDepartament}
+              allUsuarisAmbDept={shareSelector.usuarisAmbDept}
+            />
 
             <Divider />
             <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>

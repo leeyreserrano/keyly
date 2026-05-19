@@ -1,7 +1,7 @@
 {
   "title.folder": "Compartir carpeta",
   "title.item": "Compartir item",
-  "subtitle": "Comparteix \"{{nom}}\" amb altres usuaris.",
+  "subtitle": "Gestiona amb qui comparteixes \"{{nom}}\".",
   "permissions.label": "Permisos",
   "permissions.read": "Lectura",
   "permissions.write": "Escriptura",
@@ -9,11 +9,11 @@
   "no_users": "Cap usuari trobat",
   "cancel": "Cancel·lar",
   "share": "Compartir",
-  "share_with_count": "Compartir ({{count}})",
-  "sharing": "Compartint...",
-  "success": "\"{{nom}}\" compartit correctament",
+  "save_changes_count": "Guardar canvis ({{count}})",
+  "sharing": "Guardant...",
+  "success": "\"{{nom}}\" actualitzat correctament",
   "error.load_users": "Error carregant usuaris",
-  "error.no_users": "Selecciona almenys un usuari",
+  "error.no_changes": "No hi ha canvis per guardar",
   "error.crypto": "Sessió criptogràfica expirada, torna a iniciar sessió",
   "error.item_not_found": "No s'ha trobat l'item",
   "error.share": "Error compartint",
@@ -22,5 +22,8 @@
   "search_department": "Cerca departament...",
   "no_departments": "Cap departament trobat",
   "users_count": "usuaris",
-  "department_users": "Usuaris del departament"
+  "already_shared_count": "ja compartits",
+  "department_users": "Usuaris del departament",
+  "already_shared": "Ja compartit",
+  "will_revoke": "Es revocarà"
 }

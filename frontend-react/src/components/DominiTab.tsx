@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -22,6 +22,9 @@ import {
   DialogActions,
   Divider,
   InputAdornment,
+  FormControl,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -29,8 +32,15 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import toast from 'react-hot-toast';
 import { dominiApi, type Domini } from '../api/dominiapi';
+import { sucursalsApi, type Sucursal } from '../api/sucursalsapi';
 
-function FieldLabel({ children }: { children: string }) {
+type DominiGroup = {
+  domini: string;
+  registres: Domini[];
+  selectedUuid: string;
+};
+
+function FieldLabel({ children }: { children: ReactNode }) {
   return (
     <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'text.secondary' }}>
       {children}
@@ -38,20 +48,32 @@ function FieldLabel({ children }: { children: string }) {
   );
 }
 
+function buildGroups(data: Domini[]): DominiGroup[] {
+  return data.map((d) => ({
+    domini: d.domini,
+    registres: [d],
+    selectedUuid: d.uuid,
+  }));
+}
+
 export default function DominiTab() {
   const { t } = useTranslation('config');
 
   const [data, setData] = useState<Domini[]>([]);
+  const [sucursals, setSucursals] = useState<Sucursal[]>([]);
+  const [groups, setGroups] = useState<DominiGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
 
   const [openCreate, setOpenCreate] = useState(false);
   const [createValue, setCreateValue] = useState('');
+  const [createSucursalUuid, setCreateSucursalUuid] = useState('');
   const [savingCreate, setSavingCreate] = useState(false);
 
   const [openEdit, setOpenEdit] = useState(false);
   const [editTarget, setEditTarget] = useState<Domini | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [editSucursalUuid, setEditSucursalUuid] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -61,7 +83,14 @@ export default function DominiTab() {
   const load = async () => {
     setLoading(true);
     try {
-      setData((await dominiApi.fetchAll()) ?? []);
+      const [dominis, sucursalsList] = await Promise.all([
+        dominiApi.fetchAll(),
+        sucursalsApi.fetchAll(),
+      ]);
+      const d = dominis ?? [];
+      setData(d);
+      setSucursals(sucursalsList ?? []);
+      setGroups(buildGroups(d));
     } catch {
       toast.error(t('domains.load_error'));
     } finally {
@@ -73,32 +102,51 @@ export default function DominiTab() {
     load();
   }, []);
 
-  const visible = data.filter(d =>
-    d.domini.toLowerCase().includes(search.toLowerCase())
+  const visible = groups.filter(g =>
+    g.domini.toLowerCase().includes(search.toLowerCase()) ||
+    g.registres.some(r => (r.sucursal?.nom ?? '').toLowerCase().includes(search.toLowerCase()))
   );
+
+  const getSelected = (g: DominiGroup): Domini => g.registres[0];
+
+  const handleOpenCreate = () => {
+    setCreateValue('');
+    setCreateSucursalUuid(sucursals[0]?.uuid ?? '');
+    setOpenCreate(true);
+  };
 
   const handleCreate = async () => {
     if (!createValue.trim()) {
       toast.error(t('domains.field.domain'));
       return;
     }
+    if (!createSucursalUuid) {
+      toast.error(t('domains.field.branch_required'));
+      return;
+    }
     setSavingCreate(true);
     try {
-      await dominiApi.add({ domini: createValue.trim() });
+      await dominiApi.add({ domini: createValue.trim(), sucursalUuid: createSucursalUuid });
       toast.success(t('domains.create.success'));
       setOpenCreate(false);
-      setCreateValue('');
       load();
-    } catch {
-      toast.error(t('domains.create.error'));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('409') || msg.toLowerCase().includes('conflict')) {
+        toast.error(t('domains.create.error_conflict'));
+      } else {
+        toast.error(t('domains.create.error'));
+      }
     } finally {
       setSavingCreate(false);
     }
   };
 
-  const handleOpenEdit = (d: Domini) => {
-    setEditTarget(d);
-    setEditValue(d.domini);
+  const handleOpenEdit = (g: DominiGroup) => {
+    const selected = getSelected(g);
+    setEditTarget(selected);
+    setEditValue(selected.domini);
+    setEditSucursalUuid(selected.sucursal?.uuid ?? '');
     setOpenEdit(true);
   };
 
@@ -107,21 +155,33 @@ export default function DominiTab() {
       toast.error(t('domains.field.domain'));
       return;
     }
+    if (!editSucursalUuid) {
+      toast.error(t('domains.field.branch_required'));
+      return;
+    }
     setSavingEdit(true);
     try {
-      await dominiApi.update(editTarget.uuid, { domini: editValue.trim() });
+      await dominiApi.update(editTarget.uuid, {
+        domini: editValue.trim(),
+        sucursalUuid: editSucursalUuid,
+      });
       toast.success(t('domains.edit.success'));
       setOpenEdit(false);
       load();
-    } catch {
-      toast.error(t('domains.edit.error'));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('409') || msg.toLowerCase().includes('conflict')) {
+        toast.error(t('domains.edit.error_conflict'));
+      } else {
+        toast.error(t('domains.edit.error'));
+      }
     } finally {
       setSavingEdit(false);
     }
   };
 
-  const handleOpenDelete = (d: Domini) => {
-    setDeleteTarget(d);
+  const handleOpenDelete = (g: DominiGroup) => {
+    setDeleteTarget(getSelected(g));
     setOpenDelete(true);
   };
 
@@ -131,7 +191,9 @@ export default function DominiTab() {
     setOpenDelete(false);
     try {
       await dominiApi.delete(deleteTarget.uuid);
-      setData(prev => prev.filter(d => d.uuid !== deleteTarget.uuid));
+      const newData = data.filter(d => d.uuid !== deleteTarget.uuid);
+      setData(newData);
+      setGroups(buildGroups(newData));
       toast.success(t('domains.delete.success'));
     } catch {
       toast.error(t('domains.delete.error'));
@@ -162,7 +224,7 @@ export default function DominiTab() {
           <Button
             variant="contained"
             startIcon={<AddOutlinedIcon />}
-            onClick={() => { setCreateValue(''); setOpenCreate(true); }}
+            onClick={handleOpenCreate}
             sx={{ textTransform: 'none', fontWeight: 700 }}
           >
             {t('domains.add')}
@@ -179,24 +241,30 @@ export default function DominiTab() {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 700 }}>{t('domains.col.domain')}</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>{t('domains.col.branch')}</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 700 }}>{t('domains.col.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={2} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                    <TableCell colSpan={3} align="center" sx={{ py: 4, color: 'text.secondary' }}>
                       {t('domains.empty')}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  visible.map(d => (
-                    <TableRow key={d.uuid} hover>
-                      <TableCell>{d.domini}</TableCell>
+                  visible.map(g => (
+                    <TableRow key={g.selectedUuid} hover>
+                      <TableCell>{g.domini}</TableCell>
+                      <TableCell>
+                        <Typography sx={{ fontSize: '0.85rem' }}>
+                          {g.registres[0].sucursal?.nom ?? '—'}
+                        </Typography>
+                      </TableCell>
                       <TableCell align="right">
                         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                           <Tooltip title={t('common.actions.edit')}>
-                            <IconButton size="small" onClick={() => handleOpenEdit(d)}>
+                            <IconButton size="small" onClick={() => handleOpenEdit(g)}>
                               <EditOutlinedIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
@@ -208,10 +276,10 @@ export default function DominiTab() {
                                 color: 'white',
                                 '&:hover': { bgcolor: 'error.dark' },
                               }}
-                              onClick={() => handleOpenDelete(d)}
-                              disabled={deletingId === d.uuid}
+                              onClick={() => handleOpenDelete(g)}
+                              disabled={deletingId === getSelected(g).uuid}
                             >
-                              {deletingId === d.uuid
+                              {deletingId === getSelected(g).uuid
                                 ? <CircularProgress size={16} color="inherit" />
                                 : <DeleteOutlineIcon fontSize="small" />
                               }
@@ -232,15 +300,31 @@ export default function DominiTab() {
         <DialogTitle sx={{ fontWeight: 700 }}>{t('domains.create.title')}</DialogTitle>
         <Divider />
         <DialogContent>
-          <Stack spacing={0.5} sx={{ pt: 1 }}>
-            <FieldLabel>{t('domains.field.domain')}</FieldLabel>
-            <TextField
-              fullWidth
-              placeholder={t('domains.placeholder.domain')}
-              value={createValue}
-              onChange={e => setCreateValue(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }}
-            />
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Stack spacing={0.5}>
+              <FieldLabel>{t('domains.field.domain')} *</FieldLabel>
+              <TextField
+                fullWidth
+                placeholder={t('domains.placeholder.domain')}
+                value={createValue}
+                onChange={e => setCreateValue(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }}
+              />
+            </Stack>
+            <Stack spacing={0.5}>
+              <FieldLabel>{t('domains.field.branch')} *</FieldLabel>
+              <FormControl fullWidth size="small">
+                <Select
+                  value={createSucursalUuid}
+                  onChange={e => setCreateSucursalUuid(e.target.value)}
+                  displayEmpty
+                >
+                  {sucursals.map(s => (
+                    <MenuItem key={s.uuid} value={s.uuid}>{s.nom}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
           </Stack>
         </DialogContent>
         <Divider />
@@ -267,14 +351,29 @@ export default function DominiTab() {
         <DialogTitle sx={{ fontWeight: 700 }}>{t('domains.edit.title')}</DialogTitle>
         <Divider />
         <DialogContent>
-          <Stack spacing={0.5} sx={{ pt: 1 }}>
-            <FieldLabel>{t('domains.field.domain')}</FieldLabel>
-            <TextField
-              fullWidth
-              value={editValue}
-              onChange={e => setEditValue(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleEdit(); }}
-            />
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Stack spacing={0.5}>
+              <FieldLabel>{t('domains.field.domain')}</FieldLabel>
+              <TextField
+                fullWidth
+                value={editValue}
+                onChange={e => setEditValue(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleEdit(); }}
+              />
+            </Stack>
+            <Stack spacing={0.5}>
+              <FieldLabel>{t('domains.field.branch')} *</FieldLabel>
+              <FormControl fullWidth size="small">
+                <Select
+                  value={editSucursalUuid}
+                  onChange={e => setEditSucursalUuid(e.target.value)}
+                >
+                  {sucursals.map(s => (
+                    <MenuItem key={s.uuid} value={s.uuid}>{s.nom}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
           </Stack>
         </DialogContent>
         <Divider />
