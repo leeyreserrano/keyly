@@ -2,6 +2,7 @@ package com.example.keyly_projecte_intermodular;
 
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,6 +17,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -29,10 +32,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,11 +51,16 @@ public class ItemsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnLogOut, btnAddItem;
+    private ImageButton imgBtnIdioma, imgBtnLogOut, btnAddItem;
     private ImageView btnFiltres;
     private BottomNavigationView menu;
     private boolean filtrat = false;
     private ArrayList<Item> items = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +71,52 @@ public class ItemsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            android.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
@@ -116,7 +174,7 @@ public class ItemsActivity extends AppCompatActivity {
 
         Log.d("ITEMS_JSON", new Gson().toJson(items));
 
-        actulitzarItems(items);
+        actualitzarItems(items);
 
         etCercar = findViewById(R.id.aCTVCercarItems);
         etCercar.addTextChangedListener(new TextWatcher() {
@@ -148,64 +206,68 @@ public class ItemsActivity extends AppCompatActivity {
             alertDialog.show();
 
             // Elements del AlertDialog
-            CheckBox cbTots = view.findViewById(R.id.cbTots);
-            CheckBox cbUltimsUsats = view.findViewById(R.id.cbUltimsUsats);
-            CheckBox cbMesUsats = view.findViewById(R.id.cbMesUsats);
+            RadioButton cbTots = view.findViewById(R.id.cbTots);
+            RadioButton cbUltimsUsats = view.findViewById(R.id.cbUltimsUsats);
+            RadioButton cbMesUsats = view.findViewById(R.id.cbMesUsats);
             CheckBox cbFavorits = view.findViewById(R.id.cbFavorits);
             Button btnFiltrar = view.findViewById(R.id.btnFiltrar);
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
-            // Marcar i descarmar tots els filtres a l'hora
-            cbTots.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (filtrat) return;
-                filtrat = true;
-
-                cbUltimsUsats.setChecked(isChecked);
-                cbMesUsats.setChecked(isChecked);
-                cbFavorits.setChecked(isChecked);
-
-                filtrat = false;
-            });
-
-            // Marcar i desmarcar l'opció Tots, segons els filtres marcats
-            CompoundButton.OnCheckedChangeListener listener = (buttonView, isChecked) -> {
-                if (filtrat) return;
-                filtrat = true;
-
-                // Si alguno se desmarca → quitar "Todos"
-                if (!cbUltimsUsats.isChecked() || !cbMesUsats.isChecked() || !cbFavorits.isChecked()) {
-                    cbTots.setChecked(false);
-                }
-
-                // Si los 3 están marcados → activar "Todos"
-                if (cbUltimsUsats.isChecked() && cbMesUsats.isChecked() && cbFavorits.isChecked()) {
-                    cbTots.setChecked(true);
-                }
-
-                filtrat = false;
-            };
-
-            cbUltimsUsats.setOnCheckedChangeListener(listener);
-            cbMesUsats.setOnCheckedChangeListener(listener);
-            cbFavorits.setOnCheckedChangeListener(listener);
-
             // Obtenir resultats
             btnFiltrar.setOnClickListener(f -> {
-                ArrayList<Integer> filtres = new ArrayList<>();
+                ArrayList<Item> filtres = new ArrayList<>();
 
                 if (cbTots.isChecked()) {
-                    filtres.add(0);
-                } else if (cbUltimsUsats.isChecked()) {
-                    filtres.add(1);
-                } else if (cbMesUsats.isChecked()) {
-                    filtres.add(2);
-                } else if (cbFavorits.isChecked()) {
-                    filtres.add(3);
+                    filtres = items;
+                    if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
+                        ArrayList<Item> itemsFav = new ArrayList<>();
+                        for (Item item : filtres) {
+                            if (item.isFavorit()) {
+                                itemsFav.add(item);
+                            }
+                        }
+                        actualitzarItems(itemsFav);
+                    } else {
+                        actualitzarItems(filtres);
+                    }
+                } else if (cbUltimsUsats.isChecked()) { // Mostrar els últims ítems utilitzats
+                    for (Item item : items) {
+                        if (item.getUltimAccess() != null) {
+                            filtres.add(item);
+                        }
+                    }
+                    filtres.sort(
+                            Comparator.comparing(
+                                    (Item i) ->
+                                            LocalDateTime.parse(i.getUltimAccess())
+                            ).reversed()
+                    );
+                    if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
+                        ArrayList<Item> itemsFav = new ArrayList<>();
+                        for (Item item : filtres) {
+                            if (item.isFavorit()) {
+                                itemsFav.add(item);
+                            }
+                        }
+                        actualitzarItems(itemsFav);
+                    } else {
+                        actualitzarItems(filtres);
+                    }
+                } else if (cbMesUsats.isChecked()) { // Mostrar els ítems més usats
+                    filtres = items;
+                    filtres.sort(Comparator.comparing(Item::getComptadorAccess).reversed());
+                    if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
+                        ArrayList<Item> itemsFav = new ArrayList<>();
+                        for (Item item : filtres) {
+                            if (item.isFavorit()) {
+                                itemsFav.add(item);
+                            }
+                        }
+                        actualitzarItems(itemsFav);
+                    } else {
+                        actualitzarItems(filtres);
+                    }
                 }
-
-                ArrayList<Item> itemsFiltrats = filtrarItems(filtres);
-
-                actulitzarItems(itemsFiltrats);
 
                 alertDialog.dismiss();
             });
@@ -214,7 +276,6 @@ public class ItemsActivity extends AppCompatActivity {
             btnCancelar.setOnClickListener(c -> {
                 alertDialog.dismiss();
             });
-
         });
 
         btnAddItem = findViewById(R.id.add_item);
@@ -237,7 +298,7 @@ public class ItemsActivity extends AppCompatActivity {
                     items.clear();
                     items.addAll(response.body());
                     itemAdapter.notifyDataSetChanged();
-                    actulitzarItems(items);
+                    actualitzarItems(items);
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
                 } else {
                     recyclerView.setVisibility(View.GONE);
@@ -263,40 +324,10 @@ public class ItemsActivity extends AppCompatActivity {
             }
         }
 
-        actulitzarItems(llistaFiltradaItems);
+        actualitzarItems(llistaFiltradaItems);
     }
 
-    private ArrayList<Item> filtrarItems(ArrayList<Integer> filtres) {
-        ArrayList<Item> llistaFiltradaItems = new ArrayList<>();
-
-        for (int i = 0; i < filtres.size(); i++) {
-            for (int j = 0; j < items.size(); j++) {
-                switch (filtres.get(i)) {
-                    case 0:
-                        return items;
-                    case 1:
-                        Log.d("Filtre 1", "Últims usats");
-                        break;
-                    case 2:
-                        Log.d("Filtre 2", "Més usats");
-                        break;
-                    case 3:
-                        Log.d("Filtre 3", "Favorits");
-                        if (items.get(j).isFavorit()) {
-                            llistaFiltradaItems.add(items.get(j));
-                        }
-                        break;
-                    default:
-                        Log.e("ERROR", "No existeix aquesta opció");
-
-                }
-            }
-        }
-
-        return llistaFiltradaItems;
-    }
-
-    private void actulitzarItems(ArrayList<Item> items) {
+    private void actualitzarItems(ArrayList<Item> items) {
         itemAdapter = new ItemAdapter(items, item -> {
             Intent intent = new Intent(this, ItemActivity.class);
             intent.putExtra("uuid", item.getUuid().toString());
@@ -310,7 +341,7 @@ public class ItemsActivity extends AppCompatActivity {
             intent.putExtra("iv", item.getIv());
             intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
             startActivity(intent);
-        });
+        }, ItemsActivity.this);
         recyclerView.setAdapter(itemAdapter);
     }
 }

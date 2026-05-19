@@ -14,21 +14,47 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp">
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/logo_keyly"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/logo_keyly_sin_letras"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/logo_keyly_sin_letras"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="right|center">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/imgBtnAjuda"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ajuda"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/imgBtnIdioma"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/idioma"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
 
                 <ImageButton
                     android:id="@+id/imgBtnLogOut"
@@ -40,14 +66,45 @@
 
             </LinearLayout>
 
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="30dp"
-            android:src="@drawable/icon_notification"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:src="@drawable/key_violeta"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include
+                    layout="@layout/layout_avis_item_vulneracio"
+                    android:id="@+id/includeAvisVulnerada"
+                    android:layout_width="160dp"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="7dp"
+                    android:visibility="gone"/>
+
+                <include
+                    layout="@layout/layout_avis_item_vulneracio"
+                    android:id="@+id/includeAvisRepetida"
+                    android:layout_width="160dp"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="7dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
 
     </LinearLayout>
 
@@ -150,7 +207,7 @@
                         android:paddingStart="12dp"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
-                        android:hint="@string/hintDomini"
+                        android:hint="@string/hintLlocWeb"
                         android:background="@drawable/background_text_notes"
                         android:visibility="visible"/>
 

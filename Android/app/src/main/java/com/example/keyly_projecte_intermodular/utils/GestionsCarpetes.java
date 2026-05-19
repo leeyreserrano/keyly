@@ -1,15 +1,11 @@
 package com.example.keyly_projecte_intermodular.utils;
 
-import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
-import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
-import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
-import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
+import static com.example.keyly_projecte_intermodular.utils.GestionsCompartits.compartirCarpeta;
 
 import android.content.Context;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,48 +15,54 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.CarpetaActivity;
+import com.example.keyly_projecte_intermodular.CarpetesActivity;
 import com.example.keyly_projecte_intermodular.R;
+import com.example.keyly_projecte_intermodular.adapters.CarpetaAdapter;
+import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
-import com.example.keyly_projecte_intermodular.dao.EncryptedDataKey;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.dto.CarpetaDTO;
-import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
-import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
-import com.example.keyly_projecte_intermodular.adapters.CarpetaAdapter;
-import com.example.keyly_projecte_intermodular.adapters.CompartitAdapter;
-import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GestionsCarpetesCompartits {
+public class GestionsCarpetes {
+
     private static ArrayList<Item> itemsG;
     private static ArrayList<Carpeta> carpetesG;
     private static ArrayList<Usuari> usuarisG;
+    private static ArrayList<String> permisosG = new ArrayList<>();
     private static Carpeta carpetaCreadaG;
     public static void crearCarpeta(ArrayList<Item> itemsSeleccionats, ArrayList<Usuari> usuarisSeleccionats,
                                     Context context, ArrayList<Item> items, ArrayList<Usuari> usuaris,
                                     ArrayList<UsuariCompartitRequest> usuarisCompartitRequest, Carpeta carpetaCreada,
                                     ArrayList<Carpeta> carpetes, RecyclerView recyclerView,
-                                    CarpetaAdapter carpetesAdapter, CompartitAdapter compartitAdapter,
-                                    boolean isCompartint) {
+                                    CarpetaAdapter carpetesAdapter, boolean esCompartint,
+                                    Runnable onSuccess, LinearLayout layoutError,
+                                    TextView txtTitolError, TextView txtDescripcioError,
+                                    ImageView imgVError) {
         itemsSeleccionats.clear();
         usuarisSeleccionats.clear();
         itemsG = items;
@@ -94,7 +96,7 @@ public class GestionsCarpetesCompartits {
 
         LinearLayout llAfegirUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
         llAfegirUsuaris.setVisibility(View.VISIBLE);
-        LinearLayout llContingutUsuaris = view.findViewById(R.id.llContigutUsuaris);
+        LinearLayout llContingutUsuaris = view.findViewById(R.id.llContigutCompartir);
         llContingutUsuaris.setVisibility(View.GONE);
 
         View vSeparador3 = view.findViewById(R.id.vSeparador3);
@@ -131,9 +133,9 @@ public class GestionsCarpetesCompartits {
         ImageButton imgBtnStarEdit = view.findViewById(R.id.imgBtnStar);
         EditText etNomCarpeta = view.findViewById(R.id.etNomCarpeta);
         AutoCompleteTextView aCTVCercarItems = view.findViewById(R.id.aCTVCercarItems);
-        AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarUsuaris);
+        AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarCompartir);
         RecyclerView recyclerItems = view.findViewById(R.id.recyclerItems);
-        RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerUsuaris);
+        RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerCompartir);
         Button btnGuardarCarpeta = view.findViewById(R.id.btnGuardarCarpeta);
         Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
@@ -142,7 +144,7 @@ public class GestionsCarpetesCompartits {
         recyclerItems.setAdapter(recercaAdapterItems);
 
         recyclerUsuaris.setLayoutManager(new LinearLayoutManager(context));
-        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, null, context);
+        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, permisosG, context);
         recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
         AtomicBoolean favActual = new AtomicBoolean(false);
@@ -278,6 +280,7 @@ public class GestionsCarpetesCompartits {
                 for (Usuari usuari : usuarisG) {
                     if (usuari.getNom().equals(seleccionat) && !usuarisSeleccionats.contains(usuari)) {
                         usuarisSeleccionats.add(usuari);
+                        permisosG.add(Permisos.LECTURA.name());
                     }
                 }
                 recercaAdapterUsuaris.notifyDataSetChanged();
@@ -286,8 +289,14 @@ public class GestionsCarpetesCompartits {
         });
         /* ************************************************************************************* */
 
-        btnGuardarCarpeta.setText("Afegir carpeta");
+        btnGuardarCarpeta.setText(context.getString(R.string.btnAfegirCarpetes));
         btnGuardarCarpeta.setOnClickListener(c -> {
+
+            if (esCompartint && usuarisSeleccionats.isEmpty()) {
+                Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String nomCarpeta = etNomCarpeta.getText().toString();
             boolean isFavorit = favActual.get();
 
@@ -299,23 +308,34 @@ public class GestionsCarpetesCompartits {
                 public void onResponse(Call<Carpeta> call, Response<Carpeta> response) {
                     if (response.isSuccessful()) {
                         carpetaCreadaG = response.body();
-                        Toast.makeText(context, "Carpeta " + nomCarpeta + " afegida", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, context.getString(R.string.toastCarpetaCreada, nomCarpeta), Toast.LENGTH_SHORT).show();
                         if (usuarisSeleccionats.size() > 0) {
                             usuarisCompartitRequest.clear();
-                            ArrayList<EncryptedDataKey> encryptedDataKeysC = new ArrayList<>();
-                            for (Usuari usuari : usuarisSeleccionats) {
+                            for (int i = 0; i < usuarisSeleccionats.size(); i++) {
+                                Permisos permis = (!permisosG.isEmpty() && i < permisosG.size())
+                                        ? Permisos.valueOf(permisosG.get(i))
+                                        : Permisos.LECTURA;
+
                                 usuarisCompartitRequest.add(new UsuariCompartitRequest(
-                                        usuari.getUuid(),
-                                        Permisos.LECTURA,
-                                        encryptedDataKeysC));
+                                        usuarisSeleccionats.get(i).getUuid(),
+                                        permis,
+                                        new ArrayList<>()   // carpeta sin dataKey propia
+                                ));
                             }
                             try {
+//                                compartirCarpeta(
+//                                        itemsSeleccionats,
+//                                        usuarisCompartitRequest,
+//                                        usuarisSeleccionats,
+//                                        carpetaCreadaG,
+//                                        recyclerView
+//                                );
                                 compartirCarpeta(
                                         carpetaCreadaG,
-                                        itemsSeleccionats,
                                         usuarisCompartitRequest,
+                                        itemsSeleccionats,
                                         usuarisSeleccionats,
-                                        carpetaCreada,
+                                        permisosG,
                                         recyclerView
                                 );
                             } catch (Exception e) {
@@ -344,17 +364,31 @@ public class GestionsCarpetesCompartits {
                             }
                         }
                         alertDialog.dismiss();
-                        obtenirDades(carpetesG, recyclerView);
-                        actulitzarCarpetes(carpetesG, carpetesAdapter, context, recyclerView);
+                        if (!esCompartint) {
+                            obtenirCarpetes(
+                                    carpetesG,
+                                    recyclerView,
+                                    0,
+                                    false,
+                                    layoutError,
+                                    txtTitolError,
+                                    txtDescripcioError,
+                                    imgVError,
+                                    carpetesAdapter,
+                                    context
+                            );
+                            actualitzarCarpetes(carpetesG, carpetesAdapter, context, recyclerView);
+                        }
+                        if (onSuccess != null) onSuccess.run();
                     } else {
-                        Toast.makeText(context, "No s'ha pogut afegir la carpeta " + nomCarpeta , Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, context.getString(R.string.toastCarpetaNoCreada, nomCarpeta), Toast.LENGTH_SHORT).show();
                         Log.d("ERROR_RESPONSE", response.message());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Carpeta> call, Throwable t) {
-                    Toast.makeText(context, "No s'ha pogut eliminar la carpeta " + nomCarpeta, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getString(R.string.toastCarpetaNoCreada, nomCarpeta), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_FAILURE", t.getMessage());
                 }
             });
@@ -365,7 +399,11 @@ public class GestionsCarpetesCompartits {
         });
     }
 
-    private static void obtenirDades(ArrayList<Carpeta> carpetes, RecyclerView recyclerView) {
+    public static void obtenirCarpetes(ArrayList<Carpeta> carpetes, RecyclerView recyclerView,
+                                        int filtre, boolean fav, LinearLayout layoutError,
+                                        TextView txtTitolError, TextView txtDescripcioError,
+                                        ImageView imgVError, CarpetaAdapter carpetesAdapter,
+                                       Context context) {
         CarpetaDTO.RequestCarpeta resquestCarpeta = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class);
         resquestCarpeta.getAllCarpetes().enqueue(new Callback<ArrayList<Carpeta>>() {
 
@@ -374,12 +412,64 @@ public class GestionsCarpetesCompartits {
                 if (response.isSuccessful() && response.body() != null) {
                     carpetes.clear();
                     carpetes.addAll(response.body());
-                    //carpetesAdapter.notifyDataSetChanged();
-                    recyclerView.setVisibility(View.VISIBLE);
+                    if (carpetes.size() > 0) {
+                        ArrayList<Carpeta> carpetesF = new ArrayList<>();
+                        if (filtre == 0) {
+                            carpetesF = carpetes;
+                            actualitzarCarpetes(carpetesF, carpetesAdapter, context, recyclerView);
+                        } else if (filtre == 1) { // Mostrar les carpetes més utilitzades
+                            carpetesF = carpetes;
+                            carpetesF.sort(Comparator.comparing(Carpeta::getComptadorAccess).reversed());
+                            actualitzarCarpetes(carpetesF, carpetesAdapter, context, recyclerView);
+                        } else if (filtre == 2) { // Mostrar les carpetes últimes accedides
+                            DateTimeFormatter formatter =
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                            for (Carpeta carpeta : carpetes) {
+                                if (carpeta.getUltimAccess() != null) {
+                                    carpetesF.add(carpeta);
+                                }
+                            }
+                            carpetesF.sort(
+                                    Comparator.comparing(
+                                            (Carpeta c) ->
+                                                    LocalDateTime.parse(c.getUltimAccess(), formatter)
+                                    ).reversed()
+                            );
+                            actualitzarCarpetes(carpetesF, carpetesAdapter, context, recyclerView);
+                        }
+
+                        if (fav) { // Mostrar les carpetes favorites
+                            ArrayList<Carpeta> carpetesFav = new ArrayList<>();
+                            for (Carpeta carpeta : carpetesF) {
+                                if (carpeta.isFavorit()) {
+                                    carpetesFav.add(carpeta);
+                                }
+                            }
+                            actualitzarCarpetes(carpetesFav, carpetesAdapter, context, recyclerView);
+                        }
+                        //carpetesAdapter.notifyDataSetChanged();
+                        recyclerView.setVisibility(RecyclerView.VISIBLE);
+                        layoutError.setVisibility(View.GONE);
+                    } else {
+                        recyclerView.setVisibility(RecyclerView.GONE);
+                        layoutError.setVisibility(View.VISIBLE);
+                        layoutError.setBackground(ContextCompat.getDrawable(
+                                context, R.drawable.background_log_empty));
+                        txtTitolError.setText(context.getString(R.string.titolCarpetesBuides));
+                        txtDescripcioError.setText(context.getString(R.string.etiquetaCarpetesBuides));
+                        imgVError.setImageResource(R.drawable.carpeta_negra);
+                    }
                 } else {
+                    recyclerView.setVisibility(View.GONE);
+                    layoutError.setVisibility(View.VISIBLE);
+                    layoutError.setBackground(ContextCompat.getDrawable(
+                            context, R.drawable.background_log_error));
+                    txtTitolError.setText("ERROR");
+                    txtDescripcioError.setText(context.getString(R.string.etiquetaCarpetesError));
+                    imgVError.setImageResource(R.drawable.error);
                     Log.d("ERROR_RESPONSE", response.message());
                 }
-
             }
 
             @Override
@@ -389,8 +479,8 @@ public class GestionsCarpetesCompartits {
         });
     }
 
-    private static void actulitzarCarpetes(ArrayList<Carpeta> carpetes, CarpetaAdapter carpetesAdapter,
-                                           Context context, RecyclerView recyclerView){
+    public static void actualitzarCarpetes(ArrayList<Carpeta> carpetes, CarpetaAdapter carpetesAdapter,
+                                            Context context, RecyclerView recyclerView){
         carpetesAdapter = new CarpetaAdapter(carpetes, carpeta -> {
             Intent intent = new Intent(context, CarpetaActivity.class);
             intent.putExtra("carpeta", carpeta);
@@ -400,116 +490,7 @@ public class GestionsCarpetesCompartits {
             intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
             intent.putExtra("data_creacio", carpeta.getDataCreacio());
             context.startActivity(intent);
-        });
+        }, context);
         recyclerView.setAdapter(carpetesAdapter);
-    }
-
-    private static void compartirCarpeta(Carpeta carpeta, ArrayList<Item> itemsSeleccionats,
-                                         ArrayList<UsuariCompartitRequest> usuarisCompartitRequest,
-                                         ArrayList<Usuari> usuarisSeleccionats, Carpeta carpetaCreada,
-                                         RecyclerView recyclerView) {
-        Log.d("CARPETA_CREADA_COMPARTIR", carpeta.toString());
-
-        CompartitRequest compartitRequestC = new CompartitRequest(carpeta.getUuid(), TipusEntitat.CARPETA, usuarisCompartitRequest);
-
-        Call<Void> callC = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).compartir(compartitRequestC);
-        callC.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Log.e("CARPETA_COMPARTIDA", "Carpeta " + carpeta.getNom() + " compartida");
-                    if (itemsSeleccionats.size() > 0) {
-                        usuarisCompartitRequest.clear();
-                        for (Item item : itemsSeleccionats) {
-                            Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(carpetaCreada.getUuid().toString(), item.getUuid().toString());
-                            callAddItem.enqueue(new Callback<Item>() {
-                                @Override
-                                public void onResponse(Call<Item> callAddItem, Response<Item> response) {
-                                    if (response.isSuccessful()) {
-                                        Log.e("ITEMS_AFEGIT_CARPETES", response.body().toString());
-                                        Log.d("ITEMS_AFEGITS", itemsSeleccionats.toString());
-
-                                        ArrayList<EncryptedDataKey> encryptedDataKeysI = new ArrayList<>();
-
-                                        for (Usuari usuari : usuarisSeleccionats) {
-                                            // TODO desencriptar datakey
-                                            byte[] dataKeyDecrypted = null;
-                                            byte[] dataKeyEncrypted = null;
-                                            try {
-                                                dataKeyDecrypted = desencriptarDataKey(privateKeyDecrypt, item.getEncryptedDataKey().getEncryptedDataKey());
-                                                dataKeyEncrypted = encriptarDataKey(stringToPublicKey(usuari.getPublicKey()), dataKeyDecrypted);
-                                            } catch (Exception e) {
-                                                throw new RuntimeException(e);
-                                            }
-
-                                            String encryptedDataKeyBase64 = Base64.encodeToString(dataKeyEncrypted, Base64.DEFAULT);
-                                            EncryptedDataKey edk = new EncryptedDataKey(null, encryptedDataKeyBase64);
-                                            encryptedDataKeysI.add(edk);
-                                        }
-
-                                        for (Usuari usuari : usuarisSeleccionats) {
-                                            usuarisCompartitRequest.add(new UsuariCompartitRequest(
-                                                    usuari.getUuid(),
-                                                    Permisos.LECTURA,
-                                                    encryptedDataKeysI));
-                                        }
-
-                                        try {
-                                            compartirItem(item, usuarisCompartitRequest, recyclerView);
-                                        } catch (Exception e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    } else {
-                                        Log.d("ERROR_RESPONSE", response.message());
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<Item> callAddItem, Throwable t) {
-                                    Log.d("ERROR_FAILURE", t.getMessage());
-                                }
-                            });
-                        }
-                    }
-                } else {
-                    Log.e("ERROR_RESPONSE", response.message());
-                    try {
-                        Log.e("ERROR_BODY_RESPONSE", response.errorBody().string());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.e("ERROR_FAILURE", t.getMessage());
-            }
-        });
-    }
-
-    private static void compartirItem(Item item, ArrayList<UsuariCompartitRequest> usuarisCompartitRequest, RecyclerView recyclerView) {
-        CompartitRequest compartitRequestI = new CompartitRequest(item.getUuid(), TipusEntitat.ITEM, usuarisCompartitRequest);
-        Call<Void> callI = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).compartir(compartitRequestI);
-        callI.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> callI, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Log.e("CARPETA_COMPARTIDA", "Ítem " + item.getTitol() + " compartit");
-                } else {
-                    Log.e("ERROR_RESPONSE", response.message());
-                    try {
-                        Log.e("ERROR_BODY_RESPONSE", response.errorBody().string());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> callI, Throwable t) {
-                Log.e("ERROR_FAILURE", t.getMessage());
-            }
-        });
     }
 }

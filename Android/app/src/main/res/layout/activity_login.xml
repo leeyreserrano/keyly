@@ -8,11 +8,47 @@
     tools:context=".LoginActivity"
     android:orientation="vertical">
 
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="387dp"
         android:background="@drawable/section_logo_login">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/imgBtnAjuda"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ajuda"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/imgBtnIdioma"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/idioma"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/imageView"
@@ -40,7 +76,7 @@
         android:layout_marginTop="50px"
         android:padding="30px"
         android:background="@drawable/edit_text_enabled"
-        android:hint="································"
+        android:hint="@string/hintContrasenya"
         android:inputType="textPassword" />
 
     <Button

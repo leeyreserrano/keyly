@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.keyly_projecte_intermodular.HomeActivity;
+import com.example.keyly_projecte_intermodular.R;
 import com.example.keyly_projecte_intermodular.dao.LoginDto;
 import com.example.keyly_projecte_intermodular.rest_api.APIUsuari;
 import com.example.keyly_projecte_intermodular.rest_api.ApiService;
@@ -85,19 +86,19 @@ public class LoginService {
 
                     } catch (Exception e) {
                         Log.e("LOGIN_ERROR", e.getMessage());
-                        Toast.makeText(ctx, "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, ctx.getString(R.string.toastNoLogin), Toast.LENGTH_SHORT).show();
                         if (callback != null) callback.onFailure(e.getMessage());
                     }
                 } else {
                     if (callback != null) callback.onFailure("Credencials incorrectes");
-                    Toast.makeText(ctx, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, ctx.getString(R.string.toastNoUsuariNoContrasenya), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 if (callback != null) callback.onFailure(t.getMessage());
-                Toast.makeText(ctx, "Error conexión", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, ctx.getString(R.string.toastErrorConnexio), Toast.LENGTH_SHORT).show();
             }
         });
     }

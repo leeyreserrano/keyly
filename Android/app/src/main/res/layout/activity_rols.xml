@@ -13,11 +13,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -25,26 +26,46 @@
                 android:id="@+id/logo_keyly"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginEnd="270dp"
-                app:srcCompat="@drawable/logo_keyly_sin_letras" />
-
-            <ImageButton
-                android:id="@+id/imgBtnLogOut"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:srcCompat="@drawable/logout"
-                android:scaleType="centerCrop"
-                android:backgroundTint="@color/transparent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/logo_keyly_sin_letras"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/imgBtnAjuda"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ajuda"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/imgBtnIdioma"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/idioma"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/imgBtnLogOut"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:srcCompat="@drawable/logout"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,7 +81,7 @@
                 android:layout_width="1dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Rols"
+                android:text="@string/titolRols"
                 android:textSize="25dp"
                 android:textColor="@color/black"
                 android:fontFamily="@font/airbnb_cereal_w_bd"/>

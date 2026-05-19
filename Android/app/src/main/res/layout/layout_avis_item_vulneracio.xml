@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutError"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    android:background="@drawable/background_avisos"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="20dp"
+    android:gravity="center"
+    android:visibility="visible">
+
+    <ImageView
+        android:id="@+id/imgVAvis"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginEnd="20dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="7dp"
+        android:paddingStart="7dp"
+        android:paddingEnd="7dp"
+        android:layout_gravity="center"
+        android:src="@drawable/avis_blanc"
+        android:scaleType="centerCrop"
+        android:background="@drawable/background_icon_avis"/>
+
+    <TextView
+        android:id="@+id/txtTitolAvis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Error"
+        android:textColor="@color/black"
+        android:fontFamily="@font/airbnb_cereal_w_bd"
+        android:textSize="23dp"/>
+
+</LinearLayout>

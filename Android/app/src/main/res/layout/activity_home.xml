@@ -20,11 +20,12 @@
             android:background="@drawable/section_logo_login"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginTop="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -32,18 +33,46 @@
                     android:id="@+id/logo_keyly"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:layout_marginEnd="270dp"
-                    app:srcCompat="@drawable/logo_keyly_sin_letras" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:srcCompat="@drawable/logo_keyly_sin_letras"/>
 
-                <ImageButton
-                    android:id="@+id/imgBtnLogOut"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    app:srcCompat="@drawable/logout"
-                    android:scaleType="centerCrop"
-                    android:backgroundTint="@color/transparent"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
 
-            </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/imgBtnAjuda"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ajuda"
+                        android:scaleType="centerCrop"
+                        android:backgroundTint="@color/transparent"/>
+
+                    <ImageButton
+                        android:id="@+id/imgBtnIdioma"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/idioma"
+                        android:scaleType="centerCrop"
+                        android:backgroundTint="@color/transparent"/>
+
+                    <ImageButton
+                        android:id="@+id/imgBtnLogOut"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        app:srcCompat="@drawable/logout"
+                        android:scaleType="centerCrop"
+                        android:backgroundTint="@color/transparent"/>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/txtVResum"
@@ -75,10 +104,10 @@
                         android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="10dp"
-                        android:src="@drawable/icon_notification" />
+                        android:src="@drawable/key_violeta" />
 
                     <TextView
-                        android:id="@+id/txtVFortes"
+                        android:id="@+id/txtTotalsItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -90,7 +119,7 @@
                         android:textSize="15dp" />
 
                     <TextView
-                        android:id="@+id/txtVFortesQty"
+                        android:id="@+id/txtTotalsQty"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -115,22 +144,22 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/icon_notification" />
+                        android:src="@drawable/avis_negre" />
 
                     <TextView
-                        android:id="@+id/txtVCompromeses"
+                        android:id="@+id/txtItemsVulnerats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="5dp"
                         android:fontFamily="@font/manrope_regular"
                         android:gravity="center"
-                        android:text="@string/etiquetaCompromesses"
+                        android:text="@string/etiquetaVulnerades"
                         android:textColor="@color/light_grey"
                         android:textSize="15dp" />
 
                     <TextView
-                        android:id="@+id/txtVCompromessesQty"
+                        android:id="@+id/txtVulneradesQty"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -152,22 +181,22 @@
                         android:layout_height="50dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="10dp"
-                        android:src="@drawable/icon_notification" />
+                        android:src="@drawable/copy" />
 
                     <TextView
-                        android:id="@+id/txtVDebils"
+                        android:id="@+id/txtRepetides"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="5dp"
                         android:fontFamily="@font/manrope_regular"
                         android:gravity="center"
-                        android:text="@string/etiquetaDebils"
+                        android:text="@string/etiquetaRepetides"
                         android:textColor="@color/light_grey"
                         android:textSize="15dp" />
 
                     <TextView
-                        android:id="@+id/txtVDebilsQty"
+                        android:id="@+id/txtRepetidesQty"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -188,10 +217,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
             android:layout_gravity="center">
 
             <Button
-                android:id="@+id/btn_filtre_tot"
+                android:id="@+id/btnFiltrarTot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="92dp"
@@ -203,7 +233,7 @@
                 app:backgroundTint="@null"/>
 
             <Button
-                android:id="@+id/btn_filtre_usades"
+                android:id="@+id/btnFiltrarMesUsats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
@@ -217,7 +247,7 @@
                 app:backgroundTint="@null" />
 
             <Button
-                android:id="@+id/btn_filtre_favorites"
+                android:id="@+id/btnFiltrarFavorits"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="92dp"
@@ -277,7 +307,7 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
-                        android:visibility="visible"/>
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 
@@ -318,7 +348,7 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
-                        android:visibility="visible"/>
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 
@@ -359,7 +389,7 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
-                        android:visibility="visible"/>
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 

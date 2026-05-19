@@ -2,6 +2,7 @@ package com.example.keyly_projecte_intermodular;
 
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +32,7 @@ import com.example.keyly_projecte_intermodular.dao.Sucursal;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
 import com.example.keyly_projecte_intermodular.request.SucursalRequest;
 import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 
 import java.util.ArrayList;
 
@@ -42,8 +46,13 @@ public class SucursalsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private SDRDAdapter sucursalAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirSucursal;
+    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirSucursal;
     private ArrayList<Sucursal> sucursals = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +63,52 @@ public class SucursalsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            android.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
@@ -205,41 +260,49 @@ public class SucursalsActivity extends AppCompatActivity {
             // Nom sucursal
             if (sucursal.getNom() != null && !sucursal.getNom().isEmpty()) {
                 txtNomSucursal.setText(sucursal.getNom());
-            } else {
-                txtNomSucursal.setText("No té nom");
             }
 
             // Direcció sucursal
             if (sucursal.getDireccio() != null && !sucursal.getDireccio().isEmpty()) {
-                String direccioSucursal = txtDireccioSucursal.getText().toString() + " " + sucursal.getDireccio();
+                String direccioSucursal = getString(R.string.etiquetaAdrecaOmplerta) + " " + sucursal.getDireccio();
                 txtDireccioSucursal.setText(direccioSucursal);
+            } else {
+                txtDireccioSucursal.setText(getString(R.string.etiquetaAdrecaBuida));
             }
 
             // Ciutat sucursal
             if (sucursal.getCiutat() != null && !sucursal.getCiutat().isEmpty()) {
-                String ciutatSucursal = txtCiutatSucursal.getText().toString() + " " + sucursal.getCiutat();
+                String ciutatSucursal = getString(R.string.etiquetaCiutatOmplerta) + " " + sucursal.getCiutat();
                 txtCiutatSucursal.setText(ciutatSucursal);
+            } else {
+                txtCiutatSucursal.setText(getString(R.string.etiquetaCiutatBuida));
             }
 
             // Pais sucursal
             if (sucursal.getPais() != null && !sucursal.getPais().isEmpty()) {
-                String paisSucursal = txtPaisSucursal.getText().toString() + " " + sucursal.getPais();
+                String paisSucursal = getString(R.string.etiquetaPaisOmplert) + " " + sucursal.getPais();
                 txtPaisSucursal.setText(paisSucursal);
+            } else {
+                txtPaisSucursal.setText(getString(R.string.etiquetaPaisBuit));
             }
 
             // Telèfon sucursal
             if (sucursal.getTelefon() != null && !sucursal.getTelefon().isEmpty()) {
-                String tlfSucursal = txtTlfSucursal.getText().toString() + " " + sucursal.getTelefon();
+                String tlfSucursal = getString(R.string.etiquetaTlfOmplert) + " " + sucursal.getTelefon();
                 txtTlfSucursal.setText(tlfSucursal);
+            } else {
+                txtTlfSucursal.setText(getString(R.string.etiquetaTlfBuit));
             }
 
             // Correu sucursal
             if (sucursal.getCorreu() != null && !sucursal.getCorreu().isEmpty()) {
-                String correuSucursal = txtCorreuSucursal.getText().toString() + " " + sucursal.getCorreu();
+                String correuSucursal = getString(R.string.etiquetaCorreuOmplert) + " " + sucursal.getCorreu();
                 txtCorreuSucursal.setText(correuSucursal);
+            } else {
+                txtCorreuSucursal.setText(getString(R.string.etiquetaCorreuBuit));
             }
 
-            btnGuardarEliminarSucursal.setText("Eliminar");
+            btnGuardarEliminarSucursal.setText(getString(R.string.btnEliminar));
             btnGuardarEliminarSucursal.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnGuardarEliminarSucursal.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
             btnGuardarEliminarSucursal.setOnClickListener(v -> {
@@ -259,7 +322,7 @@ public class SucursalsActivity extends AppCompatActivity {
                 Button btnEliminar = view2.findViewById(R.id.btnEliminar);
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
-                txtPregunta.setText("Desitja eliminar el departament \"" + sucursal.getNom() + "\" ?");
+                txtPregunta.setText(getString(R.string.etiquetaEliminarSucursal) + " " + sucursal.getNom() + "\" ?");
                 btnEliminar.setOnClickListener(c -> {
                     eliminarSucursal(sucursal, alertDialog2);
                     alertDialog.dismiss();
@@ -272,7 +335,7 @@ public class SucursalsActivity extends AppCompatActivity {
                 });
             });
 
-            btnBackCancelar.setText("Enrere");
+            btnBackCancelar.setText(getString(R.string.btnEnrere));
             btnBackCancelar.setOnClickListener(v -> {
                 alertDialog.dismiss();
             });
@@ -314,13 +377,13 @@ public class SucursalsActivity extends AppCompatActivity {
             }
 
             // Botó guardar sucursal
-            btnGuardarEliminarSucursal.setText("Guardar");
+            btnGuardarEliminarSucursal.setText(getString(R.string.btnGuardar));
             btnGuardarEliminarSucursal.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnGuardarEliminarSucursal.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
             btnGuardarEliminarSucursal.setOnClickListener(v -> {
                 String nomSurcursal = etNomSucursal.getText().toString().trim();
                 if (nomSurcursal.isEmpty()) {
-                    etNomSucursal.setError("Nom sucursal obligatori");
+                    etNomSucursal.setError(getString(R.string.setErrorNomSucursal));
                     return;
                 }
 
@@ -340,7 +403,7 @@ public class SucursalsActivity extends AppCompatActivity {
                 }
             });
 
-            btnBackCancelar.setText("Cancel·lar");
+            btnBackCancelar.setText(getString(R.string.btnCancelar));
             btnBackCancelar.setOnClickListener(v -> alertDialog.dismiss());
         }
     }
@@ -354,18 +417,18 @@ public class SucursalsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     sucursals.add(response.body());
                     sucursalAdapter.notifyDataSetChanged();
-                    Toast.makeText(SucursalsActivity.this, "Sucursal " + nomSucursal + " afegida", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalCreada, nomSucursal), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(SucursalsActivity.this, "No s'ha pogut afegir la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalNoCreada, nomSucursal), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Sucursal> call, Throwable t) {
-                Toast.makeText(SucursalsActivity.this, "No s'ha pogut afegir la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalNoCreada, nomSucursal), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
@@ -379,18 +442,18 @@ public class SucursalsActivity extends AppCompatActivity {
             public void onResponse(Call<Sucursal> call, Response<Sucursal> response) {
                 if (response.isSuccessful()) {
                     sucursalAdapter.notifyDataSetChanged();
-                    Toast.makeText(SucursalsActivity.this, "Sucursal " + nomSucursal + " actualitzada", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalEditada, nomSucursal), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     veureCrearEditarSucursal(0, response.body());
                 } else {
-                    Toast.makeText(SucursalsActivity.this, "No s'ha pogut actualitzar la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalNoEditada, nomSucursal), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Sucursal> call, Throwable t) {
-                Toast.makeText(SucursalsActivity.this, "No s'ha pogut actualitzar la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalNoEditada, nomSucursal), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
@@ -405,18 +468,18 @@ public class SucursalsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     sucursals.remove(sucursal);
                     sucursalAdapter.notifyDataSetChanged();
-                    Toast.makeText(SucursalsActivity.this, "Sucursal " + nomSucursal + " eliminada", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalEliminada, nomSucursal), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(SucursalsActivity.this, "No s'ha pogut eliminar la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalNoEliminada, nomSucursal), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Sucursal> call, Throwable t) {
-                Toast.makeText(SucursalsActivity.this, "No s'ha pogut eliminar la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SucursalsActivity.this, getString(R.string.toastSucursalNoEliminada, nomSucursal), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });

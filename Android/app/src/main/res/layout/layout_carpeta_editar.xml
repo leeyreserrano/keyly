@@ -50,7 +50,7 @@
             android:layout_marginEnd="17dp"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"
-            android:hint="Nom de la carpeta"
+            android:hint="@string/hintNomCarpeta"
             android:textColor="@color/black"
             android:textColorHint="@color/grey"
             android:background="@drawable/background_text_notes"/>
@@ -90,7 +90,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Afegir ítems"
+                android:text="@string/llItems"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/white"/>
@@ -130,7 +130,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:background="@null"
-                    android:hint="Cercar"
+                    android:hint="@string/cercador"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:textColorHint="@color/dark_grey"
@@ -186,7 +186,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Afegir usuaris"
+                android:text="@string/llUsuaris"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/white"/>
@@ -201,7 +201,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llContigutUsuaris"
+            android:id="@+id/llContigutCompartir"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -220,13 +220,13 @@
                 android:background="@drawable/background_text_notes">
 
                 <AutoCompleteTextView
-                    android:id="@+id/aCTVCercarUsuaris"
+                    android:id="@+id/aCTVCercarCompartir"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:background="@null"
-                    android:hint="Cercar"
+                    android:hint="@string/cercador"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:textColorHint="@color/dark_grey"
@@ -240,7 +240,7 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerUsuaris"
+                android:id="@+id/recyclerCompartir"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="15dp"/>
@@ -267,7 +267,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="Guardar"
+        android:text="@string/btnGuardar"
         android:fontFamily="sans-serif-medium"
         android:textAllCaps="false"
         android:textColor="@color/white"
@@ -282,7 +282,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="Cancelar"
+        android:text="@string/btnCancelar"
         android:fontFamily="sans-serif-medium"
         android:textAllCaps="false"
         android:textColor="@color/black"

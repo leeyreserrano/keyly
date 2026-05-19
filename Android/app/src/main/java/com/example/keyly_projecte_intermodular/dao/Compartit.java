@@ -12,12 +12,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Compartit implements Serializable {
-    UUID uuid;
-    Usuari usuariCreador;
-    Usuari usuariReceptor;
-    TipusEntitat tipusEntitat;
-    Permisos permisos;
-    Carpeta carpeta;
-    Item item;
-    String dataCreacio;
+    private UUID uuid;
+    private Usuari usuariCreador;
+    private Usuari usuariReceptor;
+    private TipusEntitat tipusEntitat;
+    private Permisos permisos;
+    private Carpeta carpeta;
+    private Item item;
+    private String dataCreacio;
+    private int comptadorAccess;
+    private String ultimAccess;
 }

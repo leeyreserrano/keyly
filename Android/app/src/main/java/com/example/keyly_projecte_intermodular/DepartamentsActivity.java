@@ -2,6 +2,7 @@ package com.example.keyly_projecte_intermodular;
 
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +37,7 @@ import com.example.keyly_projecte_intermodular.dto.DepartamentDTO;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
 import com.example.keyly_projecte_intermodular.request.DepartamentRequest;
 import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -48,11 +52,16 @@ public class DepartamentsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private SDRDAdapter departamentAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirDepartament;
+    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirDepartament;
     private UUID uuidSucursal = null;
     private Sucursal sucursalDepartament = null;
     private ArrayList<Departament> departaments = new ArrayList<>();
     private ArrayList<Sucursal> sucursals = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +72,52 @@ public class DepartamentsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            android.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
@@ -214,8 +269,6 @@ public class DepartamentsActivity extends AppCompatActivity {
             // Nom departament
             if (departament.getNom() != null && !departament.getNom().isEmpty()) {
                 txtNomDepartament.setText(departament.getNom());
-            } else {
-                txtNomDepartament.setText("No té nom");
             }
 
             if (departament.getSucursal() != null) {
@@ -239,32 +292,42 @@ public class DepartamentsActivity extends AppCompatActivity {
 
                             // Direcció sucursal
                             if (sucursalDepartament.getDireccio() != null && !sucursalDepartament.getDireccio().isEmpty()) {
-                                String direccioSucursal = txtDireccioSucursal.getText().toString() + " " + sucursalDepartament.getDireccio();
+                                String direccioSucursal = getString(R.string.etiquetaAdrecaOmplerta) + " " + sucursalDepartament.getDireccio();
                                 txtDireccioSucursal.setText(direccioSucursal);
+                            } else {
+                                txtDireccioSucursal.setText(getString(R.string.etiquetaAdrecaBuida));
                             }
 
                             // Ciutat sucursal
                             if (sucursalDepartament.getCiutat() != null && !sucursalDepartament.getCiutat().isEmpty()) {
-                                String ciutatSucursal = txtCiutatSucursal.getText().toString() + " " + sucursalDepartament.getCiutat();
+                                String ciutatSucursal = getString(R.string.etiquetaCiutatOmplerta) + " " + sucursalDepartament.getCiutat();
                                 txtCiutatSucursal.setText(ciutatSucursal);
+                            } else {
+                                txtCiutatSucursal.setText(getString(R.string.etiquetaCiutatBuida));
                             }
 
                             // Pais sucursal
                             if (sucursalDepartament.getPais() != null && !sucursalDepartament.getPais().isEmpty()) {
-                                String paisSucursal = txtPaisSucursal.getText().toString() + " " + sucursalDepartament.getPais();
+                                String paisSucursal = getString(R.string.etiquetaPaisOmplert) + " " + sucursalDepartament.getPais();
                                 txtPaisSucursal.setText(paisSucursal);
+                            } else {
+                                txtPaisSucursal.setText(getString(R.string.etiquetaPaisBuit));
                             }
 
                             // Telèfon sucursal
                             if (sucursalDepartament.getTelefon() != null && !sucursalDepartament.getTelefon().isEmpty()) {
-                                String tlfSucursal = txtTlfSucursal.getText().toString() + " " + sucursalDepartament.getTelefon();
+                                String tlfSucursal = getString(R.string.etiquetaTlfOmplert) + " " + sucursalDepartament.getTelefon();
                                 txtTlfSucursal.setText(tlfSucursal);
+                            } else {
+                                txtTlfSucursal.setText(getString(R.string.etiquetaTlfBuit));
                             }
 
                             // Correu sucursal
                             if (sucursalDepartament.getCorreu() != null && !sucursalDepartament.getCorreu().isEmpty()) {
-                                String correuSucursal = txtCorreuSucursal.getText().toString() + " " + sucursalDepartament.getCorreu();
+                                String correuSucursal = getString(R.string.etiquetaCorreuOmplert) + " " + sucursalDepartament.getCorreu();
                                 txtCorreuSucursal.setText(correuSucursal);
+                            } else {
+                                txtCorreuSucursal.setText(getString(R.string.etiquetaCorreuBuit));
                             }
                         } else {
                             Log.d("ERROR_RESPONSE", response.message());
@@ -282,7 +345,7 @@ public class DepartamentsActivity extends AppCompatActivity {
                 includeSurcursal.setVisibility(View.GONE);
             }
 
-            btnGuardarEliminarDepartament.setText("Eliminar");
+            btnGuardarEliminarDepartament.setText(getString(R.string.btnEliminar));
             btnGuardarEliminarDepartament.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnGuardarEliminarDepartament.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
             btnGuardarEliminarDepartament.setOnClickListener(v -> {
@@ -302,7 +365,7 @@ public class DepartamentsActivity extends AppCompatActivity {
                 Button btnEliminar = view2.findViewById(R.id.btnEliminar);
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
-                txtPregunta.setText("Desitja eliminar el departament \"" + departament.getNom() + "\" ?");
+                txtPregunta.setText(getString(R.string.etiquetaEliminarDepartament) + " " + departament.getNom() + "\" ?");
                 btnEliminar.setOnClickListener(c -> {
                     eliminarDepartament(departament, alertDialog2);
                     alertDialog.dismiss();
@@ -315,7 +378,7 @@ public class DepartamentsActivity extends AppCompatActivity {
                 });
             });
 
-            btnBackCancelar.setText("Enrere");
+            btnBackCancelar.setText(getString(R.string.btnEnrere));
             btnBackCancelar.setOnClickListener(v -> {
                 alertDialog.dismiss();
             });
@@ -332,7 +395,7 @@ public class DepartamentsActivity extends AppCompatActivity {
             spSucursals.setVisibility(View.VISIBLE);
 
             // Botó guardar departament
-            btnGuardarEliminarDepartament.setText("Guardar");
+            btnGuardarEliminarDepartament.setText(getString(R.string.btnGuardar));
             btnGuardarEliminarDepartament.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnGuardarEliminarDepartament.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
 
@@ -381,7 +444,7 @@ public class DepartamentsActivity extends AppCompatActivity {
                 }
             });
 
-            btnBackCancelar.setText("Cancel·lar");
+            btnBackCancelar.setText(getString(R.string.btnCancelar));
             btnBackCancelar.setOnClickListener(v -> alertDialog.dismiss());
         }
     }
@@ -395,18 +458,18 @@ public class DepartamentsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     departaments.add(response.body());
                     departamentAdapter.notifyDataSetChanged();
-                    Toast.makeText(DepartamentsActivity.this, "Departament " + nomDepartament + " afegit", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentCreat, nomDepartament), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(DepartamentsActivity.this, "No s'ha pogut afegir el departament" + nomDepartament, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentNoCreat, nomDepartament), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Departament> call, Throwable t) {
-                Toast.makeText(DepartamentsActivity.this, "No s'ha pogut afegir el departament" + nomDepartament, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentNoCreat, nomDepartament), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
@@ -420,18 +483,18 @@ public class DepartamentsActivity extends AppCompatActivity {
             public void onResponse(Call<Departament> call, Response<Departament> response) {
                 if (response.isSuccessful()) {
                     departamentAdapter.notifyDataSetChanged();
-                    Toast.makeText(DepartamentsActivity.this, "Departament " + nomDepartament + " actualitzat", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentEditat, nomDepartament), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     veureCrearEditarDepartament(0, response.body());
                 } else {
-                    Toast.makeText(DepartamentsActivity.this, "No s'ha pogut actualitzar el departament" + nomDepartament, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentNoEditat, nomDepartament), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Departament> call, Throwable t) {
-                Toast.makeText(DepartamentsActivity.this, "No s'ha pogut actualitzar el departament" + nomDepartament, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentNoEditat, nomDepartament), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
@@ -446,18 +509,18 @@ public class DepartamentsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     departaments.remove(departament);
                     departamentAdapter.notifyDataSetChanged();
-                    Toast.makeText(DepartamentsActivity.this, "Departament " + nomDepartament + " eliminat", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentEliminat, nomDepartament), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(DepartamentsActivity.this, "No s'ha pogut eliminar el departament" + nomDepartament, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentNoEliminat, nomDepartament), Toast.LENGTH_SHORT).show();
                     Log.e("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Departament> call, Throwable t) {
-                Toast.makeText(DepartamentsActivity.this, "No s'ha pogut eliminar el departament" + nomDepartament, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DepartamentsActivity.this, getString(R.string.toastDepartamentNoEliminat, nomDepartament), Toast.LENGTH_SHORT).show();
                 Log.e("ERROR_FAILURE", t.getMessage());
                 Log.e("ERROR_FAILURE", "Error complet", t);
             }

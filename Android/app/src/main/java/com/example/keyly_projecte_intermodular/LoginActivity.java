@@ -1,12 +1,18 @@
 package com.example.keyly_projecte_intermodular;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Base64;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -16,6 +22,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.keyly_projecte_intermodular.dao.Usuari;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.LoginService;
 
 import java.security.KeyFactory;
@@ -32,8 +39,14 @@ public class LoginActivity extends AppCompatActivity {
     private Context context;
     private EditText txtUsuari, txtContrasenya;
     private Button btnLogin;
+    private ImageButton imgBtnIdioma;
     private String json, nomUsuari = null, password = null;
     private ArrayList<Usuari> usuaris = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +57,52 @@ public class LoginActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         context = this;
@@ -82,76 +141,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(String error) {
-                        Toast.makeText(LoginActivity.this, "Error relogueig: " + error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.toastErrorRelogueig, error), Toast.LENGTH_SHORT).show();
                     }
-                });
-
-//        ApiService service = APIUsuari.getUsuari().create(ApiService.class);
-//        Call<ResponseBody> srvLogin = service.getToken(new LoginDto(usuari, password));
-
-//        srvLogin.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                if (response.isSuccessful()) {
-//                    try {
-//                        String ResponseJSON = response.body().string();
-//                        Log.d("DATA", ResponseJSON);
-//
-//                        Gson gson = new Gson();
-//                        KdfResponse kdf = gson.fromJson(ResponseJSON, KdfResponse.class);
-//                        TokenResponse token = gson.fromJson(ResponseJSON, TokenResponse.class);
-//                        PrivateKeyResponse privateKeyResponse = gson.fromJson(ResponseJSON, PrivateKeyResponse.class);
-//                        UsuariResponse usuariResponse = gson.fromJson(ResponseJSON, UsuariResponse.class);
-//
-//                        usuariPropi = usuariResponse.getUsuari();
-//                        Log.d("USUARI", usuariPropi.toString());
-//
-//                        clauMestra = password;
-//
-//                        Log.d("TOKEN", token.getToken());
-//                        tokenNou = token.getToken();
-//
-//                        Encrypt.clauDerivada = Encrypt.generarClauDerivada(password, kdf.getKdf());
-//                        Log.d("CLAU_DERIVADA", Encrypt.clauDerivada.toString());
-//                        Log.d("KDF_SALT", kdf.getKdf());
-//                        Log.d("CLAU_DERIVADA_B64", Base64.encodeToString(Encrypt.clauDerivada.getEncoded(), Base64.DEFAULT));
-//
-//                        privateKeyEncrypt = privateKeyResponse.getPrivateKey();
-//
-//                        byte[] privateKeyBytes = Encrypt.desencriptarContrasenya2(privateKeyEncrypt, Encrypt.clauDerivada.getEncoded());
-//                        Log.d("PK_BYTES_LENGTH", String.valueOf(privateKeyBytes.length));
-//                        Log.d("PK_BYTES_B64", Base64.encodeToString(privateKeyBytes, Base64.DEFAULT));
-//                        Log.d("PK_BYTES_STRING", new String(privateKeyBytes, "UTF-8"));
-//                        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-//                        privateKeyDecrypt = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
-//                        Log.d("PRIVATE_KEY", privateKeyDecrypt.toString());
-//
-//                        publicKey = getPublicKey(usuariPropi.getPublicKey());
-//                        Log.d("PUBLIC_KEY", publicKey.toString());
-//
-//                        Toast.makeText(context, "Login correcto", Toast.LENGTH_SHORT).show();
-//
-//                        if (login) {
-//                            Intent intent = new Intent(context, HomeActivity.class);
-//                            startActivity(intent);
-//                        }
-//
-//                    } catch (Exception e) {
-//                        Log.e("ERROR_1", e.getMessage());
-//                        Toast.makeText(context, "Error procesando respuesta", Toast.LENGTH_SHORT).show();
-//                    }
-//                } else {
-//                    Toast.makeText(context, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
-//                    Log.e("ERROR_2", "HTTP Code: " + response.code());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                Toast.makeText(context, "Error conexión", Toast.LENGTH_SHORT).show();
-//                Log.e("ERROR", t.toString());
-//            }
-//        });
+        });
     }
 
     private PublicKey getPublicKey(String publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException {

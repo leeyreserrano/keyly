@@ -1,5 +1,6 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.resources.Varis.comprovarVulnerabilitatContrasenya;
 import static com.example.keyly_projecte_intermodular.resources.Varis.dataKey;
 import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.resources.Varis.publicKey;
@@ -12,6 +13,7 @@ import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -29,7 +31,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +64,7 @@ import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
 import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
@@ -83,10 +89,12 @@ import retrofit2.Response;
 
 public class ItemActivity extends AppCompatActivity {
 
+    private View includeItemVulnerat, includeItemRepetit;
     private LinearLayout llNomItem, llPassword, llActions;
-    private TextView txtTitle, txtUrl, txtNomUsuari, txtNotes;
+    private TextView txtTitolAvisVulnerat, txtTitolAvisRepetit, txtTitle, txtUrl, txtNomUsuari, txtNotes;
     private EditText etTitolItem, etLlocItem, etNomUsuariItem, etPassword, etNotes;
-    private ImageButton imgBtnLogOut, imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
+    private ImageView imgVAvisVulnerat, imgVAvisRepetit;
+    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
     // TODO añadir botón de editar y eliminar
     private Button btnCompartir, btnGuardarEliminarItem, btnBack;
     private int edit = 0;
@@ -97,6 +105,12 @@ public class ItemActivity extends AppCompatActivity {
     private ArrayList<Usuari> usuaris = new ArrayList<>();
     private ArrayList<Usuari> usuarisSeleccionats = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
+    private ArrayList<String> permisos = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +123,52 @@ public class ItemActivity extends AppCompatActivity {
             return insets;
         });
 
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            android.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
+        });
+
         imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
         imgBtnLogOut.setOnClickListener(v -> {
             logOut(this);
@@ -116,6 +176,12 @@ public class ItemActivity extends AppCompatActivity {
 
         /* Camps */
         // Layouts
+        includeItemVulnerat = findViewById(R.id.includeAvisVulnerada);
+        imgVAvisVulnerat = includeItemVulnerat.findViewById(R.id.imgVAvis);
+        txtTitolAvisVulnerat = includeItemVulnerat.findViewById(R.id.txtTitolAvis);
+        includeItemRepetit = findViewById(R.id.includeAvisRepetida);
+        imgVAvisRepetit = includeItemRepetit.findViewById(R.id.imgVAvis);
+        txtTitolAvisRepetit = includeItemRepetit.findViewById(R.id.txtTitolAvis);
         llNomItem = findViewById(R.id.ll_nom_item);
         llPassword = findViewById(R.id.ll_password);
         llActions = findViewById(R.id.llActions);
@@ -189,6 +255,7 @@ public class ItemActivity extends AppCompatActivity {
         actualitzarPantalla(add_edit, favActual, uuid);
 
         // Accés ítem
+        String titolItem = getIntent().getStringExtra("title");
         Call<Item> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).accessItem(uuid);
         call.enqueue(new Callback<Item>() {
             @Override
@@ -196,21 +263,20 @@ public class ItemActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(ItemActivity.this, "Ítem accés", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(ItemActivity.this, "No s'ha pogut accedir a l'ítem", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoAcces, titolItem), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Item> call, Throwable t) {
-                Toast.makeText(ItemActivity.this, "No s'ha pogut accedir a l'ítem", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoAcces, titolItem), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
     }
 
     private void carregarInfo() throws Exception {
-
         // Otenir dades de l'item
         uuid = getIntent().getStringExtra("uuid");
         String title = getIntent().getStringExtra("title");
@@ -230,17 +296,17 @@ public class ItemActivity extends AppCompatActivity {
         }
 
         if (url != null && !url.equals("")) {
-            txtUrl.setText("Lloc: " + url);
+            txtUrl.setText(getString(R.string.etiquetaLlocWebOmplerta) + " " + url);
             etLlocItem.setText(url);
         } else {
-            txtUrl.setText("Lloc:");
+            txtUrl.setText(getString(R.string.etiquetaLlocWebBuida));
         }
 
         if (nom_usuari != null && !nom_usuari.equals("")) {
-            txtNomUsuari.setText("Nom d'usuari: " + nom_usuari);
+            txtNomUsuari.setText(getString(R.string.etiquetaNomUsuariOmplert) + " " + nom_usuari);
             etNomUsuariItem.setText(nom_usuari);
         } else {
-            txtNomUsuari.setText("Nom d'usuari:");
+            txtNomUsuari.setText(getString(R.string.etiquetaNomUsuariBuit));
         }
 
         if (favActual.get()) {
@@ -275,7 +341,7 @@ public class ItemActivity extends AppCompatActivity {
             ClipData clipData = ClipData.newPlainText("contrasenya", etPassword.getText());
             clipboardManager.setPrimaryClip(clipData);
 
-            Toast.makeText(this, "Contrasenya copiada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toastContrasenyaCopiada), Toast.LENGTH_SHORT).show();
         });
 
         isPasswordVisible = false;
@@ -288,6 +354,10 @@ public class ItemActivity extends AppCompatActivity {
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT);
             }
         });
+
+        // TODO mostrar si la contraseña es vulnerada o no
+        comprovarVulnerabilitatContrasenya(etPassword.getText().toString(), ItemActivity.this,
+                includeItemVulnerat, false, null, 0);
 
         imgBtnGenerate.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -351,13 +421,6 @@ public class ItemActivity extends AppCompatActivity {
         });
 
         // Notes/Descripció Item
-//        txtNotes = findViewById(R.id.txtNotes);
-//        if(notes == null || notes.equals("")) {
-//            txtNotes.setHint("Notes...");
-//        } else {
-//            txtNotes.setText(notes);
-//        }
-
         if(notes == null || notes.equals("")) {
             etNotes.setHint("Notes...");
         } else {
@@ -442,12 +505,12 @@ public class ItemActivity extends AppCompatActivity {
             }
 
             // Botó Guardar Eliminar Item
-            btnGuardarEliminarItem.setText("Guardar");
+            btnGuardarEliminarItem.setText(getString(R.string.btnGuardar));
             btnGuardarEliminarItem.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
             btnGuardarEliminarItem.setOnClickListener(v -> {
 
                 if (compartirObligatori && usuarisSeleccionats.size() <= 0){
-                    Toast.makeText(ItemActivity.this, "No s'han seleccionat usuaris", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ItemActivity.this, getString(R.string.toastUsuarisNoSeleccionats), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -511,7 +574,7 @@ public class ItemActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<Item> call, Response<Item> response) {
                             if (response.isSuccessful()) {
-                                Toast.makeText(ItemActivity.this, "Ítem afegit", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemCreat, titol), Toast.LENGTH_SHORT).show();
                                 itemCreat = response.body();
                                 if (usuarisSeleccionats.size() > 0) {
                                     ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
@@ -532,10 +595,11 @@ public class ItemActivity extends AppCompatActivity {
                                         encryptedDataKeys.add(edk);
                                     }
 
-                                    for (Usuari usuari : usuarisSeleccionats) {
+                                    for (int i = 0; i < usuarisSeleccionats.size(); i++) {
+                                        Permisos permis = Permisos.valueOf(permisos.get(i));
                                         usuarisCompartitRequest.add(new UsuariCompartitRequest(
-                                                usuari.getUuid(),
-                                                Permisos.LECTURA,
+                                                usuarisSeleccionats.get(i).getUuid(),
+                                                permis,
                                                 encryptedDataKeys));
                                     }
 
@@ -548,14 +612,14 @@ public class ItemActivity extends AppCompatActivity {
 
                                 finish();
                             } else {
-                                Toast.makeText(ItemActivity.this, "No s'ha pogut afegir l'ítem", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoCreat, titol), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Item> call, Throwable t) {
-                            Toast.makeText(ItemActivity.this, "No s'ha pogut afegir l'ítem", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoCreat, titol), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
@@ -566,7 +630,7 @@ public class ItemActivity extends AppCompatActivity {
                         public void onResponse(Call<Item> call, Response<Item> response) {
                             if (response.isSuccessful()) {
                                 itemActual = response.body();
-                                Toast.makeText(ItemActivity.this, "Ítem actualitzat", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemEditat, titol), Toast.LENGTH_SHORT).show();
                                 if (usuarisSeleccionats.size() > 0) {
                                     ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
                                     // TODO compartir item
@@ -586,10 +650,11 @@ public class ItemActivity extends AppCompatActivity {
                                         encryptedDataKeys.add(edk);
                                     }
 
-                                    for (Usuari usuari : usuarisSeleccionats) {
+                                    for (int i = 0; i < usuarisSeleccionats.size(); i++) {
+                                        Permisos permis = Permisos.valueOf(permisos.get(i));
                                         usuarisCompartitRequest.add(new UsuariCompartitRequest(
-                                                usuari.getUuid(),
-                                                Permisos.LECTURA,
+                                                usuarisSeleccionats.get(i).getUuid(),
+                                                permis,
                                                 encryptedDataKeys));
                                     }
 
@@ -600,21 +665,21 @@ public class ItemActivity extends AppCompatActivity {
                                     }
                                 }
                             } else {
-                                Toast.makeText(ItemActivity.this, "No s'ha pogut actualitzar l'ítem", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEditat, titol), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Item> call, Throwable t) {
-                            Toast.makeText(ItemActivity.this, "No s'ha pogut actualitzar l'ítem", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEditat, titol), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
 
                     txtTitle.setText(titol);
-                    txtUrl.setText("Lloc: " + nouUrl);
-                    txtNomUsuari.setText("Nom d'usuari: " + nou_NomUsuari);
+                    txtUrl.setText(getString(R.string.etiquetaLlocWebOmplerta) + nouUrl);
+                    txtNomUsuari.setText(getString(R.string.etiquetaNomUsuariOmplert) + nou_NomUsuari);
                     etNotes.setText(novesNotes);
                     etPassword.setText(novaContrasenya);
 
@@ -633,7 +698,7 @@ public class ItemActivity extends AppCompatActivity {
                 });
             }
 
-        } else if (add_edit == 0) {
+        } else if (add_edit == 0) { // Mode visualització
             // Layout Nom Item
             llNomItem.setGravity(Gravity.CENTER);
             ViewGroup.MarginLayoutParams params =
@@ -670,7 +735,8 @@ public class ItemActivity extends AppCompatActivity {
                 Log.d("EDITAR", "EDITAR");
                 edit = 2;
                 actualitzarPantalla(2, favActual, uuid);
-                Toast.makeText(ItemActivity.this, "Edicó", Toast.LENGTH_SHORT);
+                // TODO ver qué hace esto para quitarlo
+                Toast.makeText(ItemActivity.this, "Edició", Toast.LENGTH_SHORT);
             });
 
             // Lloc i Propietari Item
@@ -702,50 +768,74 @@ public class ItemActivity extends AppCompatActivity {
             etNotes.setBackground(ContextCompat.getDrawable(this, R.drawable.backgroung_edit_text_password));
 
             // Botó Guardar Eliminar Item
-            btnGuardarEliminarItem.setText("Eliminar");
+            btnGuardarEliminarItem.setText(getString(R.string.btnEliminar));
             btnGuardarEliminarItem.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
             btnGuardarEliminarItem.setOnClickListener(v -> {
                 String titolItem = txtTitle.getText().toString();
-                boolean item_carpeta = getIntent().getBooleanExtra("item_carpeta", false);
-                if (item_carpeta) {
-                    String uuidCarpeta = getIntent().getStringExtra("uuidCarpeta");
-                    Call<Void> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).eliminarItemCarpeta(uuidCarpeta, uuid);
+                boolean esCompartit = getIntent().getBooleanExtra("esCompartit", false);
+                String uuidCompartit = getIntent().getStringExtra("uuidCompartit");
+                if (esCompartit) {
+                    Call<Void> call = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).eliminarCompartit(uuidCompartit);
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (response.isSuccessful()) {
-                                Toast.makeText(ItemActivity.this, "Ítem " + titolItem + " eliminat", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemEliminat, titolItem), Toast.LENGTH_SHORT).show();
                                 finish();
                             } else {
-                                Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEliminat, titolItem), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
+
                         @Override
                         public void onFailure(Call<Void> call, Throwable t) {
-                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEliminat, titolItem), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
                 } else {
-                    Call<Void> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).deleteItem(uuid);
-                    call.enqueue(new Callback<Void>() {
-                        @Override
-                        public void onResponse(Call<Void> call, Response<Void> response) {
-                            if (response.isSuccessful()) {
-                                Toast.makeText(ItemActivity.this, "Ítem " + titolItem + " eliminat", Toast.LENGTH_SHORT).show();
-                                finish();
-                            } else {
-                                Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
-                                Log.d("ERROR_RESPONSE", response.message());
+                    boolean item_carpeta = getIntent().getBooleanExtra("item_carpeta", false);
+                    if (item_carpeta) {
+                        String uuidCarpeta = getIntent().getStringExtra("uuidCarpeta");
+                        Call<Void> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).eliminarItemCarpeta(uuidCarpeta, uuid);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(ItemActivity.this, getString(R.string.toastItemEliminat, titolItem), Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEliminat, titolItem), Toast.LENGTH_SHORT).show();
+                                    Log.d("ERROR_RESPONSE", response.message());
+                                }
                             }
-                        }
-                        @Override
-                        public void onFailure(Call<Void> call, Throwable t) {
-                            Toast.makeText(ItemActivity.this, "No s'ha pogut eliminar l'ítem " + titolItem, Toast.LENGTH_SHORT).show();
-                            Log.d("ERROR_FAILURE", t.getMessage());
-                        }
-                    });
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEliminat, titolItem), Toast.LENGTH_SHORT).show();
+                                Log.d("ERROR_FAILURE", t.getMessage());
+                            }
+                        });
+                    } else {
+                        Call<Void> call = ItemDTO.obtenirJSONItem().create(ItemDTO.RequestItem.class).deleteItem(uuid);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(ItemActivity.this, getString(R.string.toastItemEliminat, titolItem), Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEliminat, titolItem), Toast.LENGTH_SHORT).show();
+                                    Log.d("ERROR_RESPONSE", response.message());
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemActivity.this, getString(R.string.toastItemNoEliminat, titolItem), Toast.LENGTH_SHORT).show();
+                                Log.d("ERROR_FAILURE", t.getMessage());
+                            }
+                        });
+                    }
                 }
             });
 
@@ -813,17 +903,15 @@ public class ItemActivity extends AppCompatActivity {
             ClipData clipData = ClipData.newPlainText("contrasenya", etPassword.getText());
             clipboardManager.setPrimaryClip(clipData);
 
-            Toast.makeText(this, "Contrasenya copiada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toastContrasenyaCopiada), Toast.LENGTH_SHORT).show();
         });
 
         btnUsar.setOnClickListener(v -> {
-            // TODO guardar contrasenya
             etPassword.setText(etContrasenyaGenerada.getText());
             alertDialog.dismiss();
         });
 
         btnGenerar.setOnClickListener(v -> {
-            // TODO generar contrasenya
             int longitut = Integer.parseInt(txtLongitud.getText().toString());
             int longitutRestant = longitut;
             int qtyMin = 0, qtyMay = 0, qtyNum = 0, qtyEspcials = 0;
@@ -909,10 +997,11 @@ public class ItemActivity extends AppCompatActivity {
                             encryptedDataKeys.add(edk);
                         }
 
-                        for (Usuari usuari : usuarisSeleccionats) {
+                        for (int i = 0; i < usuarisSeleccionats.size(); i++) {
+                            Permisos permis = Permisos.valueOf(permisos.get(i));
                             usuarisCompartitRequest.add(new UsuariCompartitRequest(
-                                    usuari.getUuid(),
-                                    Permisos.LECTURA,
+                                    usuarisSeleccionats.get(i).getUuid(),
+                                    permis,
                                     encryptedDataKeys));
                         }
 
@@ -943,13 +1032,13 @@ public class ItemActivity extends AppCompatActivity {
         alertDialog.show();
 
         // Elements del AlertDialog
-        AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarUsuaris);
-        RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerUsuaris);
+        AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarCompartir);
+        RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerCompartir);
         Button btnGuardar = view.findViewById(R.id.btnGuardarUsuaris);
         Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
         recyclerUsuaris.setLayoutManager(new LinearLayoutManager(ItemActivity.this));
-        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, null, this);
+        RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null, usuarisSeleccionats, permisos, this);
         recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
         // Carregar usuaris
@@ -1003,11 +1092,11 @@ public class ItemActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String seleccionat = parent.getItemAtPosition(position).toString();
 
-                // TODO afegir usuaris al recycler
-
                 for (Usuari usuari : usuaris) {
                     if (usuari.getNom().equals(seleccionat) && !usuarisSeleccionats.contains(usuari)) {
                         usuarisSeleccionats.add(usuari);
+                        // Afegir permisos per defecte
+                        permisos.add(Permisos.LECTURA.toString());
                     }
                 }
 
@@ -1019,13 +1108,12 @@ public class ItemActivity extends AppCompatActivity {
 
         btnGuardar.setOnClickListener(v -> {
             // TODO guarda ítem en carpeta si es desitja
-            // TODO guardar usuaris
             if (view_add_edit == 1) { // Mode visualitzar ítem existent
                 obtenirItemUUID(uuid);
             }
 
             if (compartirObligatori && usuarisSeleccionats.size() <= 0){
-                Toast.makeText(ItemActivity.this, "No s'han seleccionat usuaris", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItemActivity.this, getString(R.string.toastUsuarisNoSeleccionats), Toast.LENGTH_SHORT).show();
                 return;
             }
             alertDialog.dismiss();
@@ -1045,7 +1133,7 @@ public class ItemActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     if (view) {
-                        Toast.makeText(ItemActivity.this, "Ítem " + item.getTitol() + " compartit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ItemActivity.this, getString(R.string.toastItemCompartit), Toast.LENGTH_SHORT).show();
                     }
                     Log.e("ITEM_COMPARTIT", "Item " + item.getTitol() + " compartit");
                 } else {

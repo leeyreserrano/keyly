@@ -11,12 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.caverock.androidsvg.SVG;
@@ -111,26 +113,50 @@ public class UsuariAdpater extends RecyclerView.Adapter<UsuariAdpater.ViewHolder
         int pos = holder.getBindingAdapterPosition();
 
         holder.imgBtnEliminar.setOnClickListener(v -> {
-            Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).eliminarUsuari(usuari.getUuid().toString());
-            call.enqueue(new Callback<Usuari>() {
-                @Override
-                public void onResponse(Call<Usuari> call, Response<Usuari> response) {
-                    if (response.isSuccessful()) {
-                        usuariList.remove(pos);
-                        notifyItemRemoved(pos);
-                        notifyItemRangeChanged(pos, usuariList.size());
-                        Toast.makeText(context, "Usuari eliminat", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "No s'ha pogut eliminar l'usuari", Toast.LENGTH_SHORT).show();
-                        Log.d("ERROR_RESPONSE", response.message());
-                    }
-                }
+            AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+            LayoutInflater inflater2 = LayoutInflater.from(context);
+            View view2 = inflater2.inflate(R.layout.layout_eliminar, null);
 
-                @Override
-                public void onFailure(Call<Usuari> call, Throwable t) {
-                    Toast.makeText(context, "No s'ha pogut eliminar l'usuari", Toast.LENGTH_SHORT).show();
-                    Log.d("ERROR_FAILURE", t.getMessage());
-                }
+            builder2.setView(view2);
+
+            AlertDialog alertDialog2 = builder2.create();
+            alertDialog2.show();
+
+            // Elements del AlertDialog
+            TextView txtPregunta = view2.findViewById(R.id.txtPregunta);
+            Button btnEliminar = view2.findViewById(R.id.btnEliminar);
+            Button btnCancelar = view2.findViewById(R.id.btnCancelar);
+
+            String nomUsuari = usuari.getNom();
+            txtPregunta.setText(context.getString(R.string.etiquetaEliminarUsuari) + nomUsuari + "\" ?");
+
+            btnEliminar.setOnClickListener(v2 -> {
+                Call<Usuari> call = UsuariDTO.obtenirJSONUsuari().create(UsuariDTO.RequestUsuari.class).eliminarUsuari(usuari.getUuid().toString());
+                call.enqueue(new Callback<Usuari>() {
+                    @Override
+                    public void onResponse(Call<Usuari> call, Response<Usuari> response) {
+                        if (response.isSuccessful()) {
+                            usuariList.remove(pos);
+                            notifyItemRemoved(pos);
+                            notifyItemRangeChanged(pos, usuariList.size());
+                            alertDialog2.dismiss();
+                            Toast.makeText(context, context.getString(R.string.toastUsuariEliminat, nomUsuari), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.toastUsuariNoEliminat, nomUsuari), Toast.LENGTH_SHORT).show();
+                            Log.d("ERROR_RESPONSE", response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Usuari> call, Throwable t) {
+                        Toast.makeText(context, context.getString(R.string.toastUsuariNoEliminat, nomUsuari), Toast.LENGTH_SHORT).show();
+                        Log.d("ERROR_FAILURE", t.getMessage());
+                    }
+                });
+            });
+
+            btnCancelar.setOnClickListener(v2 -> {
+                alertDialog2.dismiss();
             });
         });
     }

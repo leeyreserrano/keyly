@@ -43,13 +43,19 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
     @Override
     public RecercaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (itemList != null) {
-            // Infla el layout de cada ítem de la lista
+            // Infla el layout de cada ítem de la llista
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.layout_cerques, parent, false);
+            return new RecercaAdapter.ViewHolder(view);
+        }
+        if (carpetaList != null) {
+            // Infla el layout de cada carpeta de la llista
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_cerques, parent, false);
             return new RecercaAdapter.ViewHolder(view);
         }
         if (usuariList != null) {
-            // Infla el layout de cada usuari de la lista
+            // Infla el layout de cada usuari de la llista
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_cerques, parent, false);
             return new RecercaAdapter.ViewHolder(view);
@@ -61,16 +67,25 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
     public void onBindViewHolder(@NonNull RecercaAdapter.ViewHolder holder, int position) {
         if (itemList != null) {
             Item item = itemList.get(position);
-            holder.itemUsuariTextView.setText(item.getTitol());
+            holder.itemCarpetaUsuariTextView.setText(item.getTitol());
             holder.flPermisos.setVisibility(View.GONE);
             holder.imgBtnX.setOnClickListener(v -> {
                 // Eliminar ítem de la llista
                 itemList.remove(position);
                 notifyItemRemoved(position);
             });
+        } else if (carpetaList != null) {
+            Carpeta carpeta = carpetaList.get(position);
+            holder.itemCarpetaUsuariTextView.setText(carpeta.getNom());
+            holder.flPermisos.setVisibility(View.GONE);
+            holder.imgBtnX.setOnClickListener(v -> {
+                // Eliminar carpeta de la llista
+                carpetaList.remove(position);
+                notifyItemRemoved(position);
+            });
         } else if (usuariList != null) {
             Usuari usuari = usuariList.get(position);
-            holder.itemUsuariTextView.setText(usuari.getNom());
+            holder.itemCarpetaUsuariTextView.setText(usuari.getNom());
 
             // Permisos usuaris
             holder.flPermisos.setVisibility(View.VISIBLE);
@@ -124,14 +139,14 @@ public class RecercaAdapter extends RecyclerView.Adapter<RecercaAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView itemUsuariTextView;
+        TextView itemCarpetaUsuariTextView;
         FrameLayout flPermisos;
         Spinner spPermisos;
         ImageButton imgBtnX;
 
         public ViewHolder(@NonNull View recercaView) {
             super(recercaView);
-            itemUsuariTextView = recercaView.findViewById(R.id.txtNom);
+            itemCarpetaUsuariTextView = recercaView.findViewById(R.id.txtNom);
             flPermisos = recercaView.findViewById(R.id.flPermisos);
             spPermisos = recercaView.findViewById(R.id.spPermisos);
             imgBtnX = recercaView.findViewById(R.id.imgBtnX);

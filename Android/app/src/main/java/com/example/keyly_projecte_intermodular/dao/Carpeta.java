@@ -17,6 +17,9 @@ public class Carpeta extends Elements implements Serializable {
     private String nom;
     private boolean favorit;
     private String dataCreacio;
+    private String dataEditat;
+    private String ultimAccess;
+    private int comptadorAccess;
     private List<Item> items;
 
     public Carpeta(String nom, boolean favorit) {

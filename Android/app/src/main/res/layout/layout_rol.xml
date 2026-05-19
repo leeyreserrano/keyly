@@ -37,7 +37,7 @@
             android:layout_marginEnd="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:hint="Nom rol"
+            android:hint="@string/hintRol"
             android:background="@drawable/background_text_notes"
             android:visibility="visible"/>
 
@@ -76,7 +76,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Sucursals:"
+            android:text="@string/titolSucursals"
             android:fontFamily="sans-serif-medium"
             android:textSize="18dp"
             android:textColor="@color/black"

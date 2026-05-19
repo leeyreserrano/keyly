@@ -4,8 +4,10 @@ import static com.example.keyly_projecte_intermodular.resources.Varis.privateKey
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
+import static com.example.keyly_projecte_intermodular.utils.GestionsCompartits.obtenirUsuaris;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,11 +21,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +51,7 @@ import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
 import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
 import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
@@ -55,7 +59,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -71,14 +77,21 @@ public class CarpetaActivity extends AppCompatActivity {
     private TextView nomCarpeta, dataCreacio;
     private EditText etCercar;
     private ImageView imgBtnFiltres;
-    private ImageButton imgBtnLogOut, imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
+    private ImageButton imgBtnCompartir, imgBtnIdioma, imgBtnLogOut, imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
     private int itemAfegit = 0;
     private String uuid;
     private boolean filtrat = false;
     private Carpeta carpetaActual;
     private ArrayList<Item> items, totalItems = new ArrayList<>(), itemsSeleccionats = new ArrayList<>();
-    private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>();
+    private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>(),
+        usuarisActuals = new ArrayList<>(), getUsuarisActualsSeleccionats = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
+    private ArrayList<String> permisos = new ArrayList<>(), permisosActuals = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +102,54 @@ public class CarpetaActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnCompartir = findViewById(R.id.imgBtnCompartir);
+
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            android.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
@@ -117,6 +178,7 @@ public class CarpetaActivity extends AppCompatActivity {
         nomCarpeta.setText(nom);
 
         dataCreacio = findViewById(R.id.dataCreacio);
+        // TODO hacer que muestre hace cuanto se creó/editó la carpeta
         dataCreacio.setText(data_creacio);
 
         imgBtnStar = findViewById(R.id.imgBtnStar);
@@ -190,7 +252,7 @@ public class CarpetaActivity extends AppCompatActivity {
                 }
             });
 
-            btnGuardarCarpeta.setText("Guardar carpeta");
+            btnGuardarCarpeta.setText(getString(R.string.btnGuardar));
             btnGuardarCarpeta.setOnClickListener(c -> {
                 Carpeta carpeta = new Carpeta(etNomCarpeta.getText().toString(), favActual.get());
 
@@ -220,17 +282,19 @@ public class CarpetaActivity extends AppCompatActivity {
                                 }
                             });
 
-                            Toast.makeText(CarpetaActivity.this, "Carpeta " + etNomCarpeta.getText().toString() + " editada", Toast.LENGTH_SHORT).show();
+                            // TODO borrar lo comentado si funciona
+                            //Toast.makeText(CarpetaActivity.this, "Carpeta " + etNomCarpeta.getText().toString() + " editada", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
                             alertDialog.dismiss();
                         } else {
-                            Toast.makeText(CarpetaActivity.this, "No s'ha pogut editar la carpeta", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_RESPONSE", response.message());
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Carpeta> call, Throwable t) {
-                        Toast.makeText(CarpetaActivity.this, "No s'ha pogut editar la carpeta", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
                         Log.d("ERROR_FAILURE",t.getMessage());
                     }
                 });
@@ -257,27 +321,55 @@ public class CarpetaActivity extends AppCompatActivity {
             Button btnEliminar = view.findViewById(R.id.btnEliminar);
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
-            txtPregunta.setText("Desitja eliminar la carpeta \"" + nom + "\" ?");
+            txtPregunta.setText(getString(R.string.etiquetaEliminarCarpeta) + " " + nom + "\" ?");
 
             btnEliminar.setOnClickListener(e -> {
-                Call<Void> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).eliminarCarpeta(uuid);
-                call.enqueue(new Callback<Void>() {
-                   @Override
-                   public void onResponse(Call<Void> call, Response<Void> response) {
-                       if (response.isSuccessful()) {
-                           Toast.makeText(CarpetaActivity.this, "Carpeta " + nom + " eliminada", Toast.LENGTH_SHORT).show();
-                           finish();
-                       } else {
-                           Toast.makeText(CarpetaActivity.this, "No s'ha pogut eliminar la carpeta " + nom, Toast.LENGTH_SHORT).show();
-                           Log.d("ERROR_RESPONSE", response.message());
-                       }
-                   }
-                   @Override
-                   public void onFailure(Call<Void> call, Throwable t) {
-                       Log.d("ERROR_FAILURE", t.getMessage());
-                       Toast.makeText(CarpetaActivity.this, "No s'ha pogut eliminar la carpeta " + nom, Toast.LENGTH_SHORT).show();
-                   }
-                });
+                boolean esCompartit = getIntent().getBooleanExtra("esCompartit", false);
+                String uuidCompartit = getIntent().getStringExtra("uuidCompartit");
+                if (esCompartit) {
+                    Call<Void> call = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).eliminarCompartit(uuidCompartit);
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                // TODO borrar lo comentado si funciona la traducción
+                                //Toast.makeText(CarpetaActivity.this, "Carpeta " + nom + " eliminada", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaEliminada, nom), Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEliminada, nom), Toast.LENGTH_SHORT).show();
+                                Log.d("ERROR_RESPONSE", response.message());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.d("ERROR_FAILURE", t.getMessage());
+                            Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEliminada, nom), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Call<Void> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).eliminarCarpeta(uuid);
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                // TODO borrar lo comentado si funciona la traducción
+                                //Toast.makeText(CarpetaActivity.this, "Carpeta " + nom + " eliminada", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaEliminada, nom), Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEliminada, nom), Toast.LENGTH_SHORT).show();
+                                Log.d("ERROR_RESPONSE", response.message());
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.d("ERROR_FAILURE", t.getMessage());
+                            Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEliminada, nom) + nom, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             });
 
             btnCancelar.setOnClickListener(c -> {
@@ -321,7 +413,7 @@ public class CarpetaActivity extends AppCompatActivity {
 
             LinearLayout llAfegirUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
             llAfegirUsuaris.setVisibility(View.VISIBLE);
-            LinearLayout llContingutUsuaris = view.findViewById(R.id.llContigutUsuaris);
+            LinearLayout llContingutUsuaris = view.findViewById(R.id.llContigutCompartir);
             llContingutUsuaris.setVisibility(View.GONE);
 
             View vSeparador3 = view.findViewById(R.id.vSeparador3);
@@ -356,9 +448,9 @@ public class CarpetaActivity extends AppCompatActivity {
             });
 
             AutoCompleteTextView aCTVCercarItems = view.findViewById(R.id.aCTVCercarItems);
-            AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarUsuaris);
+            AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarCompartir);
             RecyclerView recyclerItems = view.findViewById(R.id.recyclerItems);
-            RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerUsuaris);
+            RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerCompartir);
             Button btnGuardarCarpeta = view.findViewById(R.id.btnGuardarCarpeta);
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
@@ -420,19 +512,6 @@ public class CarpetaActivity extends AppCompatActivity {
                             recercaAdapterItems.notifyDataSetChanged();
                             recyclerItems.setAdapter(recercaAdapterItems);
                         });
-//                        items = new ArrayList<>();
-//                        items.addAll(response.body());
-//                        //Log.d("ITEMS_CARPETA", items.toString());
-//
-//                        // Cercador d'ítems
-//                        ArrayList<String> titols = new ArrayList<>();
-//
-//                        for (Item item : items) {
-//                            titols.add(item.getTitol());
-//                        }
-//
-//                        ArrayAdapter<String> adapter = new ArrayAdapter<>(CarpetaActivity.this, android.R.layout.simple_dropdown_item_1line, titols);
-//                        aCTVCercarItems.setAdapter(adapter);
                     } else {
                         Log.d("ERROR_RESPONSE", response.message());
                     }
@@ -443,40 +522,6 @@ public class CarpetaActivity extends AppCompatActivity {
                     Log.d("ERROR_FAILURE", t.getMessage());
                 }
             });
-
-//            // Cercador d'ítems
-//            aCTVCercarItems.addTextChangedListener(new TextWatcher() {
-//                @Override
-//                public void afterTextChanged(Editable s) {
-//                    aCTVCercarItems.showDropDown();
-//                }
-//
-//                @Override
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//                }
-//
-//                @Override
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//                }
-//            });
-
-//            aCTVCercarItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    String seleccionat = parent.getItemAtPosition(position).toString();
-//
-//                    for (Item item : items) {
-//                        if (item.getTitol().equals(seleccionat) && !itemsSeleccionats.contains(item)) {
-//                            itemsSeleccionats.add(item);
-//                        }
-//                    }
-//
-//                    recercaAdapterItems.notifyDataSetChanged();
-//                    recyclerItems.setAdapter(recercaAdapterItems);
-//                }
-//            });
             /* ************************************************************************************* */
 
             /* ************************************** Usuaris ************************************** */
@@ -526,6 +571,8 @@ public class CarpetaActivity extends AppCompatActivity {
                 }
             });
 
+
+            permisos.clear();
             aCTVCercarUsuaris.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -533,7 +580,8 @@ public class CarpetaActivity extends AppCompatActivity {
                     for (Usuari usuari : usuaris) {
                         if (usuari.getNom().equals(seleccionat) && !usuarisSeleccionats.contains(usuari)) {
                             usuarisSeleccionats.add(usuari);
-                            //UsuariCompartitRequest usuariCompartitRequest = new UsuariCompartitRequest(usuari.getUuid(), Permisos.LECTURA);
+                            // Afegir permisos per defecte
+                            permisos.add(Permisos.LECTURA.toString());
                         }
                     }
                     recercaAdapterUsuaris.notifyDataSetChanged();
@@ -542,7 +590,7 @@ public class CarpetaActivity extends AppCompatActivity {
             });
             /* ************************************************************************************* */
 
-            btnGuardarCarpeta.setText("Afegir ítems");
+            btnGuardarCarpeta.setText(getString(R.string.btnAfegirItems));
             btnGuardarCarpeta.setOnClickListener(c -> {
 
                 if (usuarisSeleccionats.size() > 0) {
@@ -570,7 +618,7 @@ public class CarpetaActivity extends AppCompatActivity {
                                     Log.d("ITEMS_AFEGITS", itemsSeleccionats.toString());
                                     items.add(itemsSeleccionats.get(itemAfegit));
                                     if (itemAfegit == itemsSeleccionats.size() - 1) {
-                                        runOnUiThread(() -> actulitzarItems(items, uuid));
+                                        runOnUiThread(() -> actualitzarItems(items, uuid));
                                     }
                                     itemAfegit++;
                                 } else {
@@ -586,26 +634,6 @@ public class CarpetaActivity extends AppCompatActivity {
                     }
                 }
                 alertDialog.dismiss();
-
-//                for (int i = 0; i < itemsSeleccionats.size(); i++) {
-//                    Call<Item> callAddItem = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).afegirItemCarpeta(uuid, itemsSeleccionats.get(i).getUuid().toString());
-//                    callAddItem.enqueue(new Callback<Item>() {
-//                        @Override
-//                        public void onResponse(Call<Item> callAddItem, Response<Item> response) {
-//                            if (response.isSuccessful()) {
-//                                Log.d("ITEMS_AFEGITS", itemsSeleccionats.toString());
-//                                alertDialog.dismiss();
-//                            } else {
-//                                Log.d("ERROR_RESPONSE", response.message());
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<Item> callAddItem, Throwable t) {
-//                            Log.d("ERROR_FAILURE", t.getMessage());
-//                        }
-//                    });
-//                }
             });
 
             btnCancelar.setOnClickListener(c -> {
@@ -616,7 +644,78 @@ public class CarpetaActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        actulitzarItems(items, uuid);
+        actualitzarItems(items, uuid);
+
+        imgBtnCompartir.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_compartir_item, null);
+
+            builder.setView(view);
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            LinearLayout llDesplegableUsuaris = view.findViewById(R.id.llDesplegableCompartir);
+            AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarUsuaris);
+            RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerUsuaris);
+
+            LinearLayout llDesplegableCompartir = view.findViewById(R.id.llDesplegableCompartir);
+            AutoCompleteTextView aCTVCercarCompartir = view.findViewById(R.id.aCTVCercarCompartir);
+            RecyclerView recyclerCompartir = view.findViewById(R.id.recyclerCompartir);
+
+            Button btnGuardar = view.findViewById(R.id.btnGuardarUsuaris);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            // Mostrar els usuaris compartits
+            llDesplegableUsuaris.setOnClickListener(c -> {
+                if (llDesplegableCompartir.getVisibility() == View.VISIBLE) {
+                    llDesplegableCompartir.setVisibility(View.GONE);
+                    llDesplegableUsuaris.setVisibility(View.VISIBLE);
+                } else if (llDesplegableCompartir.getVisibility() == View.GONE) {
+                    if (llDesplegableUsuaris.getVisibility() == View.VISIBLE) {
+                        llDesplegableUsuaris.setVisibility(View.GONE);
+                    } else {
+                        llDesplegableUsuaris.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
+            // Mostrar el cercador d'usuaris per compartir
+            llDesplegableCompartir.setOnClickListener(c -> {
+                if (llDesplegableUsuaris.getVisibility() == View.VISIBLE) {
+                    llDesplegableUsuaris.setVisibility(View.GONE);
+                    llDesplegableCompartir.setVisibility(View.VISIBLE);
+                } else if (llDesplegableUsuaris.getVisibility() == View.GONE) {
+                    if (llDesplegableCompartir.getVisibility() == View.VISIBLE) {
+                        llDesplegableCompartir.setVisibility(View.GONE);
+                    } else {
+                        llDesplegableCompartir.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
+            permisos.clear();
+
+            // Obtenir usuaris compartits
+            recyclerUsuaris.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
+            RecercaAdapter recercaAdapterUsuaris = new RecercaAdapter(null, null,
+                    getUsuarisActualsSeleccionats, permisosActuals, this);
+            recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
+
+            obtenirUsuaris(usuarisActuals, getUsuarisActualsSeleccionats, permisosActuals, recyclerUsuaris,
+                    recercaAdapterUsuaris, aCTVCercarCompartir, CarpetaActivity.this, true);
+
+            // Cercar usuaris per compartir
+            recyclerCompartir.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
+            RecercaAdapter recercaAdapterCompartir = new RecercaAdapter(null, null,
+                    usuarisSeleccionats, permisos, this);
+            recyclerCompartir.setAdapter(recercaAdapterCompartir);
+
+            obtenirUsuaris(usuaris, usuarisSeleccionats, permisos, recyclerCompartir,
+                    recercaAdapterCompartir, aCTVCercarCompartir, CarpetaActivity.this, false);
+        });
 
         etCercar = findViewById(R.id.aCTVCercarItems);
         etCercar.addTextChangedListener(new TextWatcher() {
@@ -648,64 +747,70 @@ public class CarpetaActivity extends AppCompatActivity {
             alertDialog.show();
 
             // Elements del AlertDialog
-            CheckBox cbTots = view.findViewById(R.id.cbTots);
-            CheckBox cbUltimsUsats = view.findViewById(R.id.cbUltimsUsats);
-            CheckBox cbMesUsats = view.findViewById(R.id.cbMesUsats);
+            RadioButton cbTots = view.findViewById(R.id.cbTots);
+            RadioButton cbUltimsUsats = view.findViewById(R.id.cbUltimsUsats);
+            RadioButton cbMesUsats = view.findViewById(R.id.cbMesUsats);
             CheckBox cbFavorits = view.findViewById(R.id.cbFavorits);
             Button btnFiltrar = view.findViewById(R.id.btnFiltrar);
             Button btnCancelar = view.findViewById(R.id.btnCancelar);
 
-            // Marcar i descarmar tots els filtres a l'hora
-            cbTots.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (filtrat) return;
-                filtrat = true;
-
-                cbUltimsUsats.setChecked(isChecked);
-                cbMesUsats.setChecked(isChecked);
-                cbFavorits.setChecked(isChecked);
-
-                filtrat = false;
-            });
-
-            // Marcar i desmarcar l'opció Tots, segons els filtres marcats
-            CompoundButton.OnCheckedChangeListener listener = (buttonView, isChecked) -> {
-                if (filtrat) return;
-                filtrat = true;
-
-                // Si alguno se desmarca → quitar "Todos"
-                if (!cbUltimsUsats.isChecked() || !cbMesUsats.isChecked() || !cbFavorits.isChecked()) {
-                    cbTots.setChecked(false);
-                }
-
-                // Si los 3 están marcados → activar "Todos"
-                if (cbUltimsUsats.isChecked() && cbMesUsats.isChecked() && cbFavorits.isChecked()) {
-                    cbTots.setChecked(true);
-                }
-
-                filtrat = false;
-            };
-
-            cbUltimsUsats.setOnCheckedChangeListener(listener);
-            cbMesUsats.setOnCheckedChangeListener(listener);
-            cbFavorits.setOnCheckedChangeListener(listener);
-
             // Obtenir resultats
             btnFiltrar.setOnClickListener(f -> {
-                ArrayList<Integer> filtres = new ArrayList<>();
+                ArrayList<Item> filtres = new ArrayList<>();
 
                 if (cbTots.isChecked()) {
-                    filtres.add(0);
+                    filtres = items;
+                    if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
+                        ArrayList<Item> itemsFav = new ArrayList<>();
+                        for (Item item : filtres) {
+                            if (item.isFavorit()) {
+                                itemsFav.add(item);
+                            }
+                        }
+                        actualitzarItems(itemsFav, uuid);
+                    } else {
+                        actualitzarItems(filtres, uuid);
+                    }
                 } else if (cbUltimsUsats.isChecked()) {
-                    filtres.add(1);
+                    DateTimeFormatter formatter =
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    for (Item item : items) {
+                        if (item.getUltimAccess() != null) {
+                            filtres.add(item);
+                        }
+                    }
+                    filtres.sort(
+                            Comparator.comparing(
+                                    (Item i) ->
+                                            LocalDateTime.parse(i.getUltimAccess())
+                            ).reversed()
+                    );
+                    if (cbFavorits.isChecked()) {
+                        ArrayList<Item> itemsFav = new ArrayList<>();
+                        for (Item item : filtres) {
+                            if (item.isFavorit()) {
+                                itemsFav.add(item);
+                            }
+                        }
+                        actualitzarItems(itemsFav, uuid);
+                    } else {
+                        actualitzarItems(filtres, uuid);
+                    }
                 } else if (cbMesUsats.isChecked()) {
-                    filtres.add(2);
-                } else if (cbFavorits.isChecked()) {
-                    filtres.add(3);
+                    filtres = items;
+                    filtres.sort(Comparator.comparing(Item::getComptadorAccess).reversed());
+                    if (cbFavorits.isChecked()) {
+                        ArrayList<Item> itemsFav = new ArrayList<>();
+                        for (Item item : filtres) {
+                            if (item.isFavorit()) {
+                                itemsFav.add(item);
+                            }
+                        }
+                        actualitzarItems(itemsFav, uuid);
+                    } else {
+                        actualitzarItems(filtres, uuid);
+                    }
                 }
-
-                ArrayList<Item> itemsFiltrats = filtrarItems(filtres);
-
-                actulitzarItems(itemsFiltrats, uuid);
 
                 alertDialog.dismiss();
             });
@@ -716,6 +821,12 @@ public class CarpetaActivity extends AppCompatActivity {
             });
 
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        actualitzarItems(items, uuid);
     }
 
     private void compartirCarpeta(Carpeta carpeta) {
@@ -822,12 +933,6 @@ public class CarpetaActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        actulitzarItems(items, uuid);
-    }
-
     //TODO arreglar el formateo de la fecha
     private String formatDataCreacio(String dataCreacio) {
 
@@ -886,40 +991,10 @@ public class CarpetaActivity extends AppCompatActivity {
             }
         }
 
-        actulitzarItems(llistaFiltradaItems, uuidCarpeta);
+        actualitzarItems(llistaFiltradaItems, uuidCarpeta);
     }
 
-    private ArrayList<Item> filtrarItems(ArrayList<Integer> filtres) {
-        ArrayList<Item> llistaFiltradaItems = new ArrayList<>();
-
-        for (int i = 0; i < filtres.size(); i++) {
-            for (int j = 0; j < items.size(); j++) {
-                switch (filtres.get(i)) {
-                    case 0:
-                        return items;
-                    case 1:
-                        Log.d("Filtre 1", "Últims usats");
-                        break;
-                    case 2:
-                        Log.d("Filtre 2", "Més usats");
-                        break;
-                    case 3:
-                        Log.d("Filtre 3", "Favorits");
-                        if (items.get(j).isFavorit()) {
-                            llistaFiltradaItems.add(items.get(j));
-                        }
-                        break;
-                    default:
-                        Log.e("ERROR", "No existeix aquesta opció");
-
-                }
-            }
-        }
-
-        return llistaFiltradaItems;
-    }
-
-    private void actulitzarItems(ArrayList<Item> items, String uuidCarpeta) {
+    private void actualitzarItems(ArrayList<Item> items, String uuidCarpeta) {
         itemAdapter = new ItemAdapter(items, uuidCarpeta, item -> {
             Intent intent = new Intent(this, ItemActivity.class);
             intent.putExtra("uuid", item.getUuid().toString());

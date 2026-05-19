@@ -8,6 +8,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.keyly_projecte_intermodular.R;
 import com.example.keyly_projecte_intermodular.dao.Departament;
 import com.example.keyly_projecte_intermodular.dao.Rol;
 import com.example.keyly_projecte_intermodular.dao.Sucursal;
@@ -26,7 +27,7 @@ import retrofit2.Response;
 
 public class GestionsUsuaris {
     public static void obtenirSucursalUUID(UUID uuid, LinearLayout llSucursal, TextView txtSucursal,
-                                           Spinner spinner, ArrayList<Sucursal> sucursals) {
+                                           Spinner spinner, ArrayList<Sucursal> sucursals, Context context) {
         Call<Sucursal> call = SucursalDTO.obtenirJSONSucursal().create(SucursalDTO.RequestSucursal.class).getSucursal(uuid.toString());
         call.enqueue(new Callback<Sucursal>() {
             @Override
@@ -43,7 +44,7 @@ public class GestionsUsuaris {
                             }
                         }
                     } else {
-                        txtSucursal.setText("Sense sucursal");
+                        txtSucursal.setText(context.getString(R.string.etiqeutaSenseSucursal));
                         spinner.setSelection(0);
                     }
                 }
@@ -57,7 +58,7 @@ public class GestionsUsuaris {
     }
 
     public static void obtenirDepartamentUUID(UUID uuid, LinearLayout llDepartament, TextView txtDepartament,
-                                              Spinner spinner, ArrayList<Departament> departaments) {
+                                              Spinner spinner, ArrayList<Departament> departaments, Context context) {
         Call<Departament> call = DepartamentDTO.obtenirJSONDepartament().create(DepartamentDTO.RequestDepartament.class).getDepartament(uuid.toString());
         call.enqueue(new Callback<Departament>() {
             @Override
@@ -74,7 +75,7 @@ public class GestionsUsuaris {
                             }
                         }
                     } else {
-                        txtDepartament.setText("Sense departament");
+                        txtDepartament.setText(context.getString(R.string.etiqeutaSenseDepartament));
                         spinner.setSelection(0);
                     }
                 }
@@ -88,7 +89,7 @@ public class GestionsUsuaris {
     }
 
     public static void obtenirRolUUID(UUID uuid, LinearLayout llRol, TextView txtRol,
-                                      Spinner spinner, ArrayList<Rol> rols) {
+                                      Spinner spinner, ArrayList<Rol> rols, Context context) {
         Call<Rol> call = RolDTO.obtenirJSONRol().create(RolDTO.RequestRol.class).getRol(uuid.toString());
         call.enqueue(new Callback<Rol>() {
             @Override
@@ -105,7 +106,7 @@ public class GestionsUsuaris {
                             }
                         }
                     } else {
-                        txtRol.setText("Sense rol");
+                        txtRol.setText(context.getString(R.string.etiqeutaSenseRol));
                         spinner.setSelection(0);
                     }
                 }

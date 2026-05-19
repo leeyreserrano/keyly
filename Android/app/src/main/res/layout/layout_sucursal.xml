@@ -36,7 +36,7 @@
             android:layout_marginEnd="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:hint="Nom sucursal"
+            android:hint="@string/hintSucursals"
             android:background="@drawable/background_text_notes"
             android:visibility="gone"/>
 

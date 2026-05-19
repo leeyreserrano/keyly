@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Ítems"
+                android:text="@string/titolItems"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/white"/>
@@ -138,7 +138,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Carpetes"
+                android:text="@string/titolCarpetes"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/white"/>
@@ -234,7 +234,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Afegir usuaris"
+                android:text="@string/titolCompartirItems"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/white"/>
@@ -249,7 +249,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llContigutUsuaris"
+            android:id="@+id/llContigutCompartir"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -268,7 +268,7 @@
                 android:background="@drawable/background_text_notes">
 
                 <AutoCompleteTextView
-                    android:id="@+id/aCTVCercarUsuaris"
+                    android:id="@+id/aCTVCercarCompartir"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
@@ -288,7 +288,7 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerUsuaris"
+                android:id="@+id/recyclerCompartir"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="15dp"/>

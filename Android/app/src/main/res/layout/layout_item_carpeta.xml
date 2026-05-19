@@ -13,7 +13,7 @@
         android:id="@+id/imgView"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/icon_notification"/>
+        android:src="@drawable/key_violeta"/>
 
     <LinearLayout
         android:layout_width="0dp"

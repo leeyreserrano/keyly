@@ -122,7 +122,7 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
                 String nomSucursal = sucursal.getNom();
-                txtPregunta.setText("Desitja eliminar el departament \"" + nomSucursal + "\" ?");
+                txtPregunta.setText(context.getString(R.string.etiquetaEliminarSucursal) + nomSucursal + "\" ?");
 
                 btnEliminar.setOnClickListener(v1 -> {
                    alertDialog2.dismiss();
@@ -135,16 +135,16 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                                 sucursalList.remove(sucursal);
                                 notifyItemRemoved(position);
                                 notifyItemRangeChanged(position, sucursalList.size());
-                                Toast.makeText(context, "Sucursal " + nomSucursal + " eliminada", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastSucursalEliminada, nomSucursal), Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "No s'ha pogut eliminar la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastSucursalNoEliminada, nomSucursal), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Sucursal> call, Throwable t) {
-                            Toast.makeText(context, "No s'ha pogut eliminar la sucursal" + nomSucursal, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.toastSucursalNoEliminada, nomSucursal), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
@@ -175,7 +175,7 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
                 String nomDepartament = departament.getNom();
-                txtPregunta.setText("Desitja eliminar el departament \"" + nomDepartament + "\" ?");
+                txtPregunta.setText(context.getString(R.string.etiquetaEliminarDepartament) + nomDepartament + "\" ?");
 
                 btnEliminar.setOnClickListener(v1 -> {
                     Call<Departament> call = DepartamentDTO.obtenirJSONDepartament().create(DepartamentDTO.RequestDepartament.class).eliminarDepartament(departament.getUuid().toString());
@@ -187,16 +187,16 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                                 notifyItemRemoved(position);
                                 notifyItemRangeChanged(position, departamentList.size());
                                 alertDialog2.dismiss();
-                                Toast.makeText(context, "Departament " + nomDepartament + " eliminat", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastDepartamentEliminat, nomDepartament), Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "No s'ha pogut eliminar el departament " + nomDepartament, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastDepartamentNoEliminat, nomDepartament), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Departament> call, Throwable t) {
-                            Toast.makeText(context, "No s'ha pogut eliminar el departament " + nomDepartament, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.toastDepartamentNoEliminat, nomDepartament), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
@@ -230,7 +230,7 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
                 String nomRol = rol.getNom();
-                txtPregunta.setText("Desitja eliminar el departament \"" + nomRol + "\" ?");
+                txtPregunta.setText(context.getString(R.string.etiquetaEliminarRol) + nomRol + "\" ?");
 
                 btnEliminar.setOnClickListener(c -> {
                     Call<Rol> call = RolDTO.obtenirJSONRol().create(RolDTO.RequestRol.class).eliminarRol(rol.getUuid().toString());
@@ -242,16 +242,16 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                                 notifyItemRemoved(position);
                                 notifyItemRangeChanged(position, rolList.size());
                                 alertDialog2.dismiss();
-                                Toast.makeText(context, "Rol " + nomRol + " eliminat", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastRolEliminat, nomRol), Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "No s'ha pogut eliminar el rol " + nomRol, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastRolNoEliminat, nomRol), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Rol> call, Throwable t) {
-                            Toast.makeText(context, "No s'ha pogut eliminar el rol " + nomRol, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.toastRolNoEliminat, nomRol), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });
@@ -285,7 +285,7 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
                 String nomDomini = domini.getDomini();
-                txtPregunta.setText("Desitja eliminar el departament \"" + nomDomini + "\" ?");
+                txtPregunta.setText(context.getString(R.string.etiquetaEliminarDomini) + nomDomini + "\" ?");
 
                 btnEliminar.setOnClickListener(c -> {
                     Call<Domini> call = DominiDTO.obtenirJSONDomini().create(DominiDTO.RequestDomini.class).eliminarDomini(domini.getUuid().toString());
@@ -297,16 +297,16 @@ public class SDRDAdapter extends RecyclerView.Adapter<SDRDAdapter.ViewHolder> {
                                 notifyItemRemoved(position);
                                 notifyItemRangeChanged(position, dominiList.size());
                                 alertDialog2.dismiss();
-                                Toast.makeText(context, "Domini " + nomDomini + " eliminat", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastDominiEliminat, nomDomini), Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "No s'ha pogut eliminar el domini " + nomDomini, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, context.getString(R.string.toastDominiNoEliminat, nomDomini), Toast.LENGTH_SHORT).show();
                                 Log.d("ERROR_RESPONSE", response.message());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Domini> call, Throwable t) {
-                            Toast.makeText(context, "No s'ha pogut eliminar el domini " + nomDomini, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.toastDominiNoEliminat, nomDomini), Toast.LENGTH_SHORT).show();
                             Log.d("ERROR_FAILURE", t.getMessage());
                         }
                     });

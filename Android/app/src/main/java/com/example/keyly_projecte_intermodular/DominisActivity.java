@@ -2,6 +2,7 @@ package com.example.keyly_projecte_intermodular;
 
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +37,7 @@ import com.example.keyly_projecte_intermodular.dto.DominiDTO;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
 import com.example.keyly_projecte_intermodular.request.DominiRequest;
 import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
+import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -48,11 +52,16 @@ public class DominisActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private SDRDAdapter dominiAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnLogOut, imgBtnBack, imgBtnAfegirDomini;
+    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirDomini;
     private UUID uuidSucursal = null;
     private Sucursal sucursalDomini = null;
     private ArrayList<Domini> dominis = new ArrayList<>();
     private ArrayList<Sucursal> sucursals = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(GestionsIdiomes.aplicarIdioma(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +72,52 @@ public class DominisActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
+        imgBtnIdioma.setOnClickListener(v -> {
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_idiomes, null);
+
+            builder.setView(view);
+
+            android.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            // Elements del AlertDialog
+            RadioGroup rgIdioma = view.findViewById(R.id.rgIdioma);
+            RadioButton rbCA = view.findViewById(R.id.rbCA); // Català
+            RadioButton rbEN = view.findViewById(R.id.rbEN); // Anglès
+            RadioButton rbES = view.findViewById(R.id.rbES); // Castellà/Espanyol
+            Button btnTraduccio = view.findViewById(R.id.btnTraduccio);
+            Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+            String idiomaActual = GestionsIdiomes.obtenirIdioma(this);
+            if (idiomaActual.equals("ca")) {
+                rbCA.setChecked(true);
+            } else if (idiomaActual.equals("en")) {
+                rbEN.setChecked(true);
+            } else if (idiomaActual.equals("es")) {
+                rbES.setChecked(true);
+            }
+
+            btnTraduccio.setOnClickListener(c -> {
+                // TODO traducir
+                if (rgIdioma.getCheckedRadioButtonId() == R.id.rbCA) {
+                    GestionsIdiomes.canviarIdioma(this, "ca");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
+                    GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                }
+                alertDialog.dismiss();
+            });
+
+            btnCancelar.setOnClickListener(c -> {
+                alertDialog.dismiss();
+            });
         });
 
         imgBtnLogOut = findViewById(R.id.imgBtnLogOut);
@@ -215,8 +270,6 @@ public class DominisActivity extends AppCompatActivity {
             // Nom domini
             if (domini.getDomini() != null && !domini.getDomini().isEmpty()) {
                 txtNomDomini.setText(domini.getDomini());
-            } else {
-                txtNomDomini.setText("No té nom");
             }
 
             if (domini.getSucursal() != null) {
@@ -240,32 +293,42 @@ public class DominisActivity extends AppCompatActivity {
 
                             // Direcció sucursal
                             if (sucursalDomini.getDireccio() != null && !sucursalDomini.getDireccio().isEmpty()) {
-                                String direccioSucursal = txtDireccioSucursal.getText().toString() + " " + sucursalDomini.getDireccio();
+                                String direccioSucursal = getString(R.string.etiquetaAdrecaOmplerta) + " " + sucursalDomini.getDireccio();
                                 txtDireccioSucursal.setText(direccioSucursal);
+                            } else {
+                                txtDireccioSucursal.setText(getString(R.string.etiquetaAdrecaBuida));
                             }
 
                             // Ciutat sucursal
                             if (sucursalDomini.getCiutat() != null && !sucursalDomini.getCiutat().isEmpty()) {
-                                String ciutatSucursal = txtCiutatSucursal.getText().toString() + " " + sucursalDomini.getCiutat();
+                                String ciutatSucursal = getString(R.string.etiquetaCiutatOmplerta) + " " + sucursalDomini.getCiutat();
                                 txtCiutatSucursal.setText(ciutatSucursal);
+                            } else {
+                                txtCiutatSucursal.setText(getString(R.string.etiquetaCiutatBuida));
                             }
 
                             // Pais sucursal
                             if (sucursalDomini.getPais() != null && !sucursalDomini.getPais().isEmpty()) {
-                                String paisSucursal = txtPaisSucursal.getText().toString() + " " + sucursalDomini.getPais();
+                                String paisSucursal = getString(R.string.etiquetaPaisOmplert) + " " + sucursalDomini.getPais();
                                 txtPaisSucursal.setText(paisSucursal);
+                            } else {
+                                txtPaisSucursal.setText(getString(R.string.etiquetaPaisBuit));
                             }
 
                             // Telèfon sucursal
                             if (sucursalDomini.getTelefon() != null && !sucursalDomini.getTelefon().isEmpty()) {
-                                String tlfSucursal = txtTlfSucursal.getText().toString() + " " + sucursalDomini.getTelefon();
+                                String tlfSucursal = getString(R.string.etiquetaTlfOmplert) + " " + sucursalDomini.getTelefon();
                                 txtTlfSucursal.setText(tlfSucursal);
+                            } else {
+                                txtTlfSucursal.setText(getString(R.string.etiquetaTlfBuit));
                             }
 
                             // Correu sucursal
                             if (sucursalDomini.getCorreu() != null && !sucursalDomini.getCorreu().isEmpty()) {
-                                String correuSucursal = txtCorreuSucursal.getText().toString() + " " + sucursalDomini.getCorreu();
+                                String correuSucursal = getString(R.string.etiquetaCorreuOmplert) + " " + sucursalDomini.getCorreu();
                                 txtCorreuSucursal.setText(correuSucursal);
+                            } else {
+                                txtCorreuSucursal.setText(getString(R.string.etiquetaCorreuBuit));
                             }
                         } else {
                             Log.d("ERROR_RESPONSE", response.message());
@@ -283,7 +346,7 @@ public class DominisActivity extends AppCompatActivity {
                 includeSurcursal.setVisibility(View.GONE);
             }
 
-            btnGuardarEliminarDomini.setText("Eliminar");
+            btnGuardarEliminarDomini.setText(getString(R.string.btnEliminar));
             btnGuardarEliminarDomini.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnGuardarEliminarDomini.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_eliminar));
             btnGuardarEliminarDomini.setOnClickListener(v -> {
@@ -303,7 +366,7 @@ public class DominisActivity extends AppCompatActivity {
                 Button btnEliminar = view2.findViewById(R.id.btnEliminar);
                 Button btnCancelar = view2.findViewById(R.id.btnCancelar);
 
-                txtPregunta.setText("Desitja eliminar el domini \"" + domini.getDomini() + "\" ?");
+                txtPregunta.setText(getString(R.string.etiquetaEliminarDomini) + " " + domini.getDomini() + "\" ?");
                 btnEliminar.setOnClickListener(c -> {
                     eliminarDomini(domini, alertDialog2);
                     alertDialog.dismiss();
@@ -316,7 +379,7 @@ public class DominisActivity extends AppCompatActivity {
                 });
             });
 
-            btnBackCancelar.setText("Enrere");
+            btnBackCancelar.setText(getString(R.string.btnEnrere));
             btnBackCancelar.setOnClickListener(v -> {
                 alertDialog.dismiss();
             });
@@ -333,7 +396,7 @@ public class DominisActivity extends AppCompatActivity {
             spSucursals.setVisibility(View.VISIBLE);
 
             // Botó guardar domini
-            btnGuardarEliminarDomini.setText("Guardar");
+            btnGuardarEliminarDomini.setText(getString(R.string.btnGuardar));
             btnGuardarEliminarDomini.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnGuardarEliminarDomini.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_purple));
 
@@ -371,7 +434,7 @@ public class DominisActivity extends AppCompatActivity {
             btnGuardarEliminarDomini.setOnClickListener(v -> {
                 String nomDomini = etNomDomini.getText().toString().trim();
                 if (nomDomini.isEmpty()) {
-                    etNomDomini.setError("Nom domini obligatori");
+                    etNomDomini.setError(getString(R.string.setErrorNomDomini));
                     return;
                 }
                 DominiRequest dominiRequest = new DominiRequest(uuidSucursal, nomDomini);
@@ -382,7 +445,7 @@ public class DominisActivity extends AppCompatActivity {
                 }
             });
 
-            btnBackCancelar.setText("Cancel·lar");
+            btnBackCancelar.setText(getString(R.string.btnCancelar));
             btnBackCancelar.setOnClickListener(v -> alertDialog.dismiss());
         }
     }
@@ -396,18 +459,18 @@ public class DominisActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     dominis.add(response.body());
                     dominiAdapter.notifyDataSetChanged();
-                    Toast.makeText(DominisActivity.this, "Domini " + nomDomini + " afegit", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, getString(R.string.toastDominiCreat, nomDomini), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(DominisActivity.this, "No s'ha pogut afegir el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, getString(R.string.toastDominiNoCreat, nomDomini), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Domini> call, Throwable t) {
-                Toast.makeText(DominisActivity.this, "No s'ha pogut afegir el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DominisActivity.this, getString(R.string.toastDominiNoCreat, nomDomini), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
@@ -421,18 +484,18 @@ public class DominisActivity extends AppCompatActivity {
             public void onResponse(Call<Domini> call, Response<Domini> response) {
                 if (response.isSuccessful()) {
                     dominiAdapter.notifyDataSetChanged();
-                    Toast.makeText(DominisActivity.this, "Domini " + nomDomini + " actualitzat", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, getString(R.string.toastDominiEditat, nomDomini), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     veureCrearEditarDomini(0, response.body());
                 } else {
-                    Toast.makeText(DominisActivity.this, "No s'ha pogut actualitzar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, getString(R.string.toastDominiNoEditat, nomDomini), Toast.LENGTH_SHORT).show();
                     Log.d("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Domini> call, Throwable t) {
-                Toast.makeText(DominisActivity.this, "No s'ha pogut actualitzar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DominisActivity.this, getString(R.string.toastDominiNoEditat, nomDomini), Toast.LENGTH_SHORT).show();
                 Log.d("ERROR_FAILURE", t.getMessage());
             }
         });
@@ -447,18 +510,18 @@ public class DominisActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     dominis.remove(domini);
                     dominiAdapter.notifyDataSetChanged();
-                    Toast.makeText(DominisActivity.this, "Domini " + nomDomini + " eliminat", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, getString(R.string.toastDominiEliminat, nomDomini), Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
                     onResume();
                 } else {
-                    Toast.makeText(DominisActivity.this, "No s'ha pogut eliminar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DominisActivity.this, getString(R.string.toastDominiNoEliminat, nomDomini), Toast.LENGTH_SHORT).show();
                     Log.e("ERROR_RESPONSE", response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<Domini> call, Throwable t) {
-                Toast.makeText(DominisActivity.this, "No s'ha pogut eliminar el domini" + nomDomini, Toast.LENGTH_SHORT).show();
+                Toast.makeText(DominisActivity.this, getString(R.string.toastDominiNoEliminat, nomDomini), Toast.LENGTH_SHORT).show();
                 Log.e("ERROR_FAILURE", t.getMessage());
                 Log.e("ERROR_FAILURE", "Error complet", t);
             }
