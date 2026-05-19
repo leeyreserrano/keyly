@@ -48,3 +48,13 @@ type DataKey = {
 ### `ItemPayload`
 
 Subconjunt d'`Item` usat per a creació i actualització. Inclou els camps xifrats (`contrasenya`, `iv`) i la DataKey xifrada per a cada destinatari.
+
+## pwnedapi.ts
+
+Fitxer: `src/api/pwnedapi.ts`
+
+| Mètode | Endpoint | Descripció |
+|---|---|---|
+| `checkPassword(prefix, suffix)` | `GET /utils/pwned/password/{prefix}/{suffix}` | Consulta la base de dades HIBP. Retorna llista de `PwnedHash[]` |
+
+`PwnedHash` té els camps `hash` (hash SHA-1 complet) i `count` (nombre de filtracions). La consulta envia els primers 5 caràcters del hash (k-anonymity) i un parell de caràcters addicionals com a filtre. La validació final es fa al navegador comparant el hash complet.

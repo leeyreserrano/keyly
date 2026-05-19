@@ -97,6 +97,7 @@ export type CompartitCarpeta = {
 };
 
 export type Compartit = {
+  usuari: any;
   uuid: string;
   usuariCreador: CompartitUsuari;
   usuariReceptor: CompartitUsuari;

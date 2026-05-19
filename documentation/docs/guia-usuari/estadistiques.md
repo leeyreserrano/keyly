@@ -1,88 +1,41 @@
 # Estadístiques de seguretat
 
-Fitxer: `src/pages/Stadistics.tsx`
+La secció **Estadístiques** analitza les teves credencials i genera un informe de seguretat. Les contrasenyes es desxifren al navegador per a l'anàlisi i es comproven contra la base de dades HIBP (*Have I Been Pwned*) sense enviar mai la contrasenya en text pla.
 
-La secció **Estadístiques** mostra informació sobre la seguretat de les credencials desxifrades de l'usuari.
+## Puntuació de seguretat global
 
-## Càrrega de dades
+Valor entre 0 i 100 que representa la qualitat mitjana de totes les teves contrasenyes. El color indica l'estat:
 
-En carregar la pàgina:
-
-1. Es recuperen els ítems amb `itemsApi.fetchItems()`.
-2. Es desxifren les contrasenyes utilitzant:
-   - `rsaDecrypt`
-   - `decryptPasswordWithDataKey`
-3. Es comprova si les contrasenyes estan compromeses amb `isPasswordPwned`.
-
-Les contrasenyes desxifrades es guarden en un `Map<string, string>` i els UUID compromesos en un `Set<string>`.
-
-## Targetes d'estadístiques
-
-Es mostren quatre targetes principals:
-
-| Targeta | Descripció |
-|---|---|
-| Total | Nombre total d'ítems |
-| Compromeses | Contrasenyes detectades com vulnerades |
-| Reutilitzades | Credencials amb contrasenyes repetides |
-| Puntuació mitjana | Valor de seguretat global |
-
-## Puntuació de seguretat
-
-La puntuació mitjana es calcula amb `useDashboardStats`.
-
-El color varia segons el valor:
-
-- Verd: puntuació igual o superior a 70.
-- Lila: puntuació entre 40 i 69.
-- Vermell: puntuació inferior a 40.
-
-També es mostra:
-
-- Barra de progrés.
-- Nombre de contrasenyes segures.
-- Nombre de contrasenyes febles.
-- Nombre de contrasenyes compromeses.
-
-## Gràfic de distribució
-
-Es mostra un gràfic circular amb:
-
-- Contrasenyes segures.
-- Contrasenyes febles.
-- Contrasenyes compromeses.
-
-El gràfic utilitza components de `recharts`:
-
-- `PieChart`
-- `Pie`
-- `Cell`
-- `Legend`
-- `ResponsiveContainer`
+- Verd (≥ 70) — bon nivell de seguretat.
+- Taronja (40–69) — cal millorar.
+- Vermell (< 40) — risc alt.
 
 ## Alertes de seguretat
 
-Quan existeixen contrasenyes compromeses o reutilitzades es mostren components `SecurityAlert`.
+Si l'anàlisi detecta problemes, apareixeran alertes a la part superior:
 
-Les alertes permeten navegar a:
+- **Alerta vermella — Contrasenyes compromeses**: indica que una o més de les teves contrasenyes han aparegut en filtracions de dades conegudes. Prem **Revisar** per veure la llista d'ítems afectats.
+- **Alerta groga — Contrasenyes reutilitzades**: indica que la mateixa contrasenya s'usa en més d'un ítem.
 
-- `/Items`
-- `/Duplicats`
+## Indicadors
+
+| Indicador | Descripció |
+|---|---|
+| Compromeses | Contrasenyes detectades a la base de dades HIBP (consulta real contra el servidor) |
+| Reutilitzades | Contrasenyes idèntiques usades en més d'un ítem |
+| Febles | Contrasenyes que no superen el mínim de complexitat |
+| Segures | Contrasenyes que compleixen tots els criteris |
+
+## Gràfic de distribució
+
+El gràfic de sectors mostra la proporció entre credencials segures, febles i compromeses.
 
 ## Ítems recents
 
-Es mostren els 5 ítems més recents segons `dataEditat`.
+Llistat dels darrers ítems accedits, amb l'opció d'anar directament a cada credencial.
 
-Cada element mostra:
+## Contrasenyes compromeses (pàgina Pwned)
 
-- Inicial del títol.
-- Títol.
-- Nom d'usuari.
-- Temps relatiu amb `getTimeAgo`.
-- Indicador de contrasenya compromesa si correspon.
+En prémer **Revisar** a l'alerta de contrasenyes compromeses, s'obre la pàgina de contrasenyes compromeses. Mostra únicament els ítems les contrasenyes dels quals han aparegut en filtracions reals. Pots cercar per títol o nom d'usuari, i eliminar directament qualsevol ítem afectat des d'aquí.
 
-En prémer un ítem es navega a:
-
-```txt
-/Item
-```
+La comprovació usa el mètode k-anonymity: s'envia al servidor únicament un prefix de 5 caràcters del hash SHA-1 de la contrasenya. Mai s'envia la contrasenya ni el hash complet.

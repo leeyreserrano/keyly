@@ -1,42 +1,43 @@
 # Configuració i perfil
 
-La secció **Configuració** és accessible des del Sidebar. Conté pestanyes que varien segons el rol de l'usuari.
+La secció **Configuració** és accessible des del Sidebar. Les pestanyes disponibles varien segons el rol de l'usuari.
 
 ## Perfil
 
-Pots actualitzar la foto de perfil, el nom d'usuari i el correu electrònic. Els canvis es desen de forma individual.
+Disponible per a tots els rols. Mostra l'avatar, el nom, el correu i el rol intern de l'usuari. Des d'aquí pots:
 
-## Canviar la contrasenya mestra
+- Canviar la foto de perfil fent clic a la icona de llapis sobre l'avatar.
+- Canviar la contrasenya mestra omplint els camps de contrasenya actual, nova contrasenya i confirmació.
 
-La contrasenya mestra protegeix la teva clau privada RSA. Per canviar-la:
-
-1. Introdueix la contrasenya actual per verificar la identitat.
-2. Introdueix la nova contrasenya i confirma-la.
-3. L'aplicació deriva una nova clau criptogràfica i re-xifra la clau privada al navegador.
-4. El servidor només rep la clau privada re-xifrada, mai la contrasenya en text pla.
+En canviar la contrasenya mestra, l'aplicació genera un nou parell de claus RSA i re-xifra la clau privada amb la nova contrasenya al navegador. El servidor mai rep la contrasenya en text pla.
 
 !!! warning "Atenció"
     Si perds la nova contrasenya mestra, les teves credencials xifrades no es podran recuperar.
 
-## Administració d'usuaris
+## Ítems (CAP i ADMIN)
 
-Visible per a usuaris amb rol `CAP` o `ADMIN`. Permet crear usuaris, editar les seves dades i assignar rol, sucursal i departament.
+Mostra tots els ítems que has compartit, agrupats per ítem i receptor. Permet veure qui té accés a cada credencial, afegir nous compartits i revocar l'accés per ítem.
 
-| Camp | Descripció |
-|---|---|
-| Nom | Nom visible |
-| Correu | Identificador d'accés |
-| Rol | `USUARI`, `CAP` o `ADMIN` |
-| Sucursal | Oficina assignada |
-| Departament | Departament de l'organigrama |
-| Pot administrar | Permís per gestionar compartits de tota l'organització |
+## Carpetes (CAP i ADMIN)
 
-En crear un usuari, l'aplicació genera automàticament el seu parell de claus RSA.
+Igual que la pestanya d'ítems però per a carpetes compartides. Permet gestionar qui té accés a cada carpeta i amb quin nivell de permís.
 
-## Departaments i sucursals
+## Usuaris (ADMIN)
 
-Visible per a usuaris amb rol `CAP` o `ADMIN`.
+Permet crear, editar i eliminar usuaris de l'organització. En crear un usuari, l'aplicació genera automàticament el seu parell de claus RSA. Els camps disponibles són nom, correu, rol intern, sucursal, departament, rol organitzatiu i contrasenya inicial.
 
-Els **departaments** agrupen usuaris per àrees funcionals. Quan es comparteix una credencial amb un departament, tots els membres reben accés automàticament.
+## Departaments (ADMIN)
 
-Les **sucursals** representen ubicacions físiques o delegacions de l'empresa i s'assignen a usuaris per facilitar la segmentació organitzativa.
+Gestió dels departaments de l'organització. Cada departament pertany a una sucursal. Permet crear, editar i eliminar departaments.
+
+## Sucursals (ADMIN)
+
+Gestió de les sucursals de l'organització. Cada sucursal té nom, adreça, telèfon i correu. Des d'aquí també es pot configurar la política de dominis de la sucursal: permetre tots els dominis o restringir-los a la llista de dominis aprovats, i definir els dies d'expiració de contrasenyes.
+
+## Dominis (ADMIN)
+
+Llista de dominis de correu autoritzats per a cada sucursal (per exemple, `@keyly.com`). Permet afegir i eliminar dominis per controlar quins correus poden registrar-se.
+
+## Rols (ADMIN)
+
+Gestió dels rols organitzatius personalitzats per sucursal. Distints del `rol_intern` del sistema (`ADMIN`, `CAP`, `USUARI`), aquests rols representen càrrecs o funcions dins de l'empresa.
