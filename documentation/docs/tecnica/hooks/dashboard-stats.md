@@ -2,61 +2,40 @@
 
 Fitxer: `src/hooks/useDashboardstats.ts`
 
-Hook que calcula estadístiques de seguretat a partir dels ítems i de les contrasenyes desxifrades.
-
-La lògica es calcula dins d'un `useMemo`.
+Hook que calcula les estadístiques de seguretat a partir de la llista d'ítems desxifrats. Tota la lògica és al client, dins d'un `useMemo`.
 
 ## Interfície `DashboardStats`
 
 | Camp | Tipus | Descripció |
 |---|---|---|
-| `totalItems` | `number` | Total d'ítems |
-| `pwnedCount` | `number` | Nombre de contrasenyes compromeses |
-| `reusedCount` | `number` | Nombre de contrasenyes reutilitzades |
-| `weakCount` | `number` | Nombre de contrasenyes febles |
-| `secureCount` | `number` | Nombre de contrasenyes segures |
-| `avgSecurityScore` | `number` | Puntuació mitjana |
-| `recentItems` | `Item[]` | 5 ítems més recents |
+| `totalItems` | `number` | Total d'ítems analitzats |
+| `compromisedCount` | `number` | Contrasenyes que coincideixen amb la llista de contrasenyes comunes |
+| `reusedCount` | `number` | Contrasenyes idèntiques usades en més d'un ítem |
+| `weakCount` | `number` | Contrasenyes amb puntuació inferior a 40 |
+| `secureCount` | `number` | Contrasenyes amb puntuació igual o superior a 70 |
+| `avgSecurityScore` | `number` | Puntuació mitjana (0–100) |
+| `recentItems` | `Item[]` | Darrers 5 ítems accedits |
 
-## Funció `getPasswordStrengthScore(password)`
-
-Calcula una puntuació de seguretat entre 0 i 100.
-
-### Criteris
+## Criteris de puntuació (`evaluatePasswordStrength`)
 
 | Criteri | Punts |
 |---|---|
-| Longitud ≥ 8 | +20 |
-| Longitud ≥ 12 | +10 |
-| Longitud ≥ 16 | +10 |
-| Conté minúscules | +10 |
-| Conté majúscules | +10 |
-| Conté números | +15 |
-| Conté símbols | +25 |
+| Longitud ≥ 12 caràcters | +30 |
+| Longitud ≥ 8 caràcters | +15 |
+| Conté majúscules | +20 |
+| Conté números | +20 |
+| Conté símbols | +30 |
 
-La puntuació màxima és 100.
+La puntuació màxima és 100. Les contrasenyes amb longitud inferior a 8 no sumen punts per longitud.
 
-## Contrasenyes reutilitzades
+## Detecció de contrasenyes comunes
 
-Es crea un objecte `passwordFrequency` amb el nombre de vegades que apareix cada contrasenya.
+Es compara la contrasenya (en minúscules) contra una llista de 10 contrasenyes molt usades: `123456`, `password`, `qwerty`, `admin`, etc.
 
-Una contrasenya es considera reutilitzada quan apareix més d'una vegada.
+## Integració amb HIBP
 
-## Contrasenyes segures i febles
+A partir d'aquesta versió, el comptador `compromisedCount` ja no es basa en una llista local de contrasenyes comunes, sinó en consultes reals a la base de dades HIBP via `isPasswordPwned` de `pwnedUtils.ts`.
 
-Durant el càlcul:
+`isPasswordPwned(plainPassword)` calcula el hash SHA-1 de la contrasenya al navegador, n'extreu el prefix de 5 caràcters i consulta `pwnedApi.checkPassword(prefix, suffix)`. Compara el hash complet amb els resultats retornats pel servidor. Si hi ha coincidència, la contrasenya es considera compromesa.
 
-- `secureCount` augmenta quan la puntuació és igual o superior a 70.
-- `weakCount` augmenta quan la puntuació és inferior a 70.
-
-## Puntuació mitjana
-
-La puntuació mitjana es calcula amb:
-
-```ts
-Math.round(totalScore / items.length)
-```
-
-## Ítems recents
-
-Els ítems es ordenen per dataEditat de forma descendent i es retornen els 5 primers.
+La pàgina `Pwned` (`/Pwned`) mostra únicament els ítems compromesos i permet eliminar-los directament.

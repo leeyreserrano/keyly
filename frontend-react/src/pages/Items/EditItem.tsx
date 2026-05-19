@@ -40,7 +40,7 @@ export default function EditItem() {
   const esCompartit = !!compartitUuid;
 
   const [item, setItem] = useState<Item | CompartitItem | null>(null);
-  const [compartit, setCompartit] = useState<Compartit | null>(null);
+  const [, setCompartit] = useState<Compartit | null>(null);
   const [openGenerateModal, setOpenGenerateModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

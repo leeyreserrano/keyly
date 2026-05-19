@@ -52,6 +52,7 @@ nav:
         - compartitsapi.ts: tecnica/api/compartits.md
         - usuarisapi.ts: tecnica/api/usuaris.md
         - loginapi.ts: tecnica/api/login.md
+        - APIs d'administració: tecnica/api/admin.md
       - Components principals:
         - Layout i Sidebar: tecnica/components/layout-sidebar.md
         - Header: tecnica/components/header.md

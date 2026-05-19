@@ -2,7 +2,7 @@
 
 ## Iniciar sessió
 
-A la pantalla d'inici trobaràs el formulari d'accés. Introdueix el teu correu electrònic corporatiu i la contrasenya mestra.
+La pantalla de login té dues zones: un panell de marca a l'esquerra i el formulari d'accés a la dreta. Introdueix el teu correu electrònic corporatiu i la contrasenya mestra i prem **Iniciar sessió**.
 
 L'opció **Recorda'm** manté la sessió activa fins que tanquis sessió manualment. Si no la marques, la sessió s'esborrarà quan tanquis el navegador.
 

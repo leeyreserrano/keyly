@@ -6,7 +6,7 @@ L'aplicació fa servir React Router v7 amb una estructura de dos nivells definid
 
 | Ruta | Component | Descripció |
 |---|---|---|
-| `/` | `Login` | Pantalla d'accés |
+| `/` | `Login` | Pantalla d'accés (layout split-screen) |
 
 ## Rutes protegides
 
@@ -15,19 +15,20 @@ Totes les rutes internes estan embolcallades per `ProtectedRoute`, que comprova 
 | Ruta | Component | Descripció |
 |---|---|---|
 | `/home` | `Home` | Tauler principal |
-| `/items` | `Items` | Llistat de credencials |
-| `/item` | `Item` | Detall d'una credencial |
-| `/additem` | `AddItem` | Formulari de creació |
-| `/edititem` | `EditItem` | Formulari d'edició |
-| `/duplicats` | `Duplicats` | Duplicar una credencial |
-| `/choosetype` | `ChooseType` | Selector ítem o carpeta |
-| `/carpetes` | `Carpetes` | Llistat de carpetes |
-| `/carpeta` | `Carpeta` | Detall d'una carpeta |
-| `/addcarpeta` | `AddCarpeta` | Creació de carpeta |
-| `/editcarpeta` | `EditCarpeta` | Edició de carpeta |
-| `/compartits` | `Compartits` | Credencials compartides |
-| `/stadistics` | `Stadistics` | Estadístiques de seguretat |
-| `/settings` | `UserConfig` | Configuració i perfil |
+| `/Items` | `Items` | Llistat de credencials |
+| `/Item` | `Item` | Detall d'una credencial |
+| `/AddItem` | `AddItem` | Formulari de creació |
+| `/EditItem` | `EditItem` | Formulari d'edició |
+| `/Duplicats` | `Duplicats` | Duplicar una credencial |
+| `/Pwned` | `Pwned` | Credencials compromeses (HIBP) |
+| `/ChooseType` | `ChooseType` | Selector ítem o carpeta |
+| `/Carpetes` | `Carpetes` | Llistat de carpetes |
+| `/Carpeta` | `Carpeta` | Detall d'una carpeta |
+| `/AddCarpeta` | `AddCarpeta` | Creació de carpeta |
+| `/EditCarpeta` | `EditCarpeta` | Edició de carpeta |
+| `/Compartits` | `Compartits` | Credencials compartides |
+| `/Stadistics` | `Stadistics` | Estadístiques de seguretat |
+| `/Settings` | `UserConfig` | Configuració i perfil |
 
 Qualsevol ruta no reconeguda redirigeix a `/home`.
 
