@@ -184,7 +184,7 @@ public class ItemsActivity extends AppCompatActivity {
 
         Log.d("ITEMS_JSON", new Gson().toJson(items));
 
-        actualitzarItems(items, itemAdapter, ItemsActivity.this, recyclerView);
+        actualitzarItems(items, itemAdapter, ItemsActivity.this, recyclerView, false);
 
         etCercar = findViewById(R.id.aCTVCercarItems);
         etCercar.addTextChangedListener(new TextWatcher() {
@@ -203,7 +203,7 @@ public class ItemsActivity extends AppCompatActivity {
             }
         });
 
-        btnFiltres = findViewById(R.id.imgBtnFiltres);
+        btnFiltres = findViewById(R.id.imgBtnFiltresAmbMi);
         btnFiltres.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -236,9 +236,9 @@ public class ItemsActivity extends AppCompatActivity {
                                 itemsFav.add(item);
                             }
                         }
-                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView);
+                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView, false);
                     } else {
-                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView);
+                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView, false);
                     }
                 } else if (cbUltimsUsats.isChecked()) { // Mostrar els últims ítems utilitzats
                     for (Item item : items) {
@@ -259,9 +259,9 @@ public class ItemsActivity extends AppCompatActivity {
                                 itemsFav.add(item);
                             }
                         }
-                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView);
+                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView, false);
                     } else {
-                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView);
+                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView, false);
                     }
                 } else if (cbMesUsats.isChecked()) { // Mostrar els ítems més usats
                     filtres = items;
@@ -273,9 +273,9 @@ public class ItemsActivity extends AppCompatActivity {
                                 itemsFav.add(item);
                             }
                         }
-                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView);
+                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView, false);
                     } else {
-                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView);
+                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView, false);
                     }
                 }
 
@@ -308,7 +308,7 @@ public class ItemsActivity extends AppCompatActivity {
                     items.clear();
                     items.addAll(response.body());
                     //itemAdapter.notifyDataSetChanged();
-                    actualitzarItems(items, itemAdapter, ItemsActivity.this, recyclerView);
+                    actualitzarItems(items, itemAdapter, ItemsActivity.this, recyclerView, false);
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
                 } else {
                     recyclerView.setVisibility(View.GONE);
@@ -334,6 +334,6 @@ public class ItemsActivity extends AppCompatActivity {
             }
         }
 
-        actualitzarItems(llistaFiltradaItems, itemAdapter, ItemsActivity.this, recyclerView);
+        actualitzarItems(llistaFiltradaItems, itemAdapter, ItemsActivity.this, recyclerView, false);
     }
 }

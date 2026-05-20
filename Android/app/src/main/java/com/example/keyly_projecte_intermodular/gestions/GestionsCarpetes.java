@@ -399,6 +399,109 @@ public class GestionsCarpetes {
         });
     }
 
+    public static void editarCarpeta(Context context, String nom, String uuid, AtomicBoolean favActual,
+                                     TextView nomCarpeta, ImageView imgBtnStar) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.layout_carpeta_editar, null);
+
+        builder.setView(view);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        // Elements del AlertDialog
+        LinearLayout llNomCarpeta = view.findViewById(R.id.llNomCarpeta);
+        llNomCarpeta.setVisibility(View.VISIBLE);
+
+        View vSeparador = view.findViewById(R.id.vSeparador1);
+        vSeparador.setVisibility(View.GONE);
+
+        LinearLayout llAfegirItems = view.findViewById(R.id.llDesplegableItems);
+        llAfegirItems.setVisibility(View.GONE);
+
+        View vSeparador2 = view.findViewById(R.id.vSeparador2);
+        vSeparador2.setVisibility(View.GONE);
+
+        LinearLayout llAfegirUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
+        llAfegirUsuaris.setVisibility(View.GONE);
+
+        View vSeparador3 = view.findViewById(R.id.vSeparador3);
+        vSeparador3.setVisibility(View.GONE);
+
+        ImageButton imgBtnStarEdit = view.findViewById(R.id.imgBtnStar);
+        EditText etNomCarpeta = view.findViewById(R.id.etNomCarpeta);
+        Button btnGuardarCarpeta = view.findViewById(R.id.btnGuardarCarpeta);
+        Button btnCancelar = view.findViewById(R.id.btnCancelar);
+
+        etNomCarpeta.setText(nom);
+
+        if (favActual.get()) {
+            imgBtnStarEdit.setImageResource(R.drawable.filled_star);
+        } else {
+            imgBtnStarEdit.setImageResource(R.drawable.star);
+        }
+        imgBtnStarEdit.setOnClickListener(c -> {
+            // TODO hacer que se guarde el favoritos
+            if (favActual.get()) {
+                imgBtnStarEdit.setImageResource(R.drawable.star);
+                favActual.set(false);
+            } else {
+                imgBtnStarEdit.setImageResource(R.drawable.filled_star);
+                favActual.set(true);
+            }
+        });
+
+        btnGuardarCarpeta.setText(context.getString(R.string.btnGuardar));
+        btnGuardarCarpeta.setOnClickListener(c -> {
+            Carpeta carpeta = new Carpeta(etNomCarpeta.getText().toString(), favActual.get());
+
+            Call<Carpeta> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).editarCarpeta(uuid, carpeta);
+            call.enqueue(new Callback<Carpeta>() {
+                @Override
+                public void onResponse(Call<Carpeta> call, Response<Carpeta> response) {
+                    if (response.isSuccessful()) {
+                        nomCarpeta.setText(response.body().getNom());
+
+                        AtomicBoolean favActual = new AtomicBoolean(response.body().isFavorit());
+
+                        if (favActual.get()) {
+                            imgBtnStar.setImageResource(R.drawable.filled_star);
+                        } else {
+                            imgBtnStar.setImageResource(R.drawable.star);
+                        }
+                        imgBtnStar.setOnClickListener(v -> {
+                            // TODO hacer que se guarde el favoritos
+                            if (favActual.get()) {
+                                imgBtnStar.setImageResource(R.drawable.star);
+                                favActual.set(false);
+                            } else {
+                                imgBtnStar.setImageResource(R.drawable.filled_star);
+                                favActual.set(true);
+                            }
+                        });
+
+                        Toast.makeText(context, context.getString(R.string.toastCarpetaEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
+                        alertDialog.dismiss();
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.toastCarpetaNoEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
+                        Log.d("ERROR_RESPONSE", response.message());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Carpeta> call, Throwable t) {
+                    Toast.makeText(context, context.getString(R.string.toastCarpetaNoEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
+                    Log.d("ERROR_FAILURE",t.getMessage());
+                }
+            });
+        });
+
+        btnCancelar.setOnClickListener(c -> {
+            alertDialog.dismiss();
+        });
+    }
+
     public static void obtenirCarpetes(ArrayList<Carpeta> carpetes, RecyclerView recyclerView,
                                         int filtre, boolean fav, LinearLayout layoutError,
                                         TextView txtTitolError, TextView txtDescripcioError,

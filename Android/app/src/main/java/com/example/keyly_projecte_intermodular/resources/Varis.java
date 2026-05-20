@@ -39,7 +39,11 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -126,31 +130,49 @@ public class Varis {
 
 //        LocalDateTime fechaCreacion = LocalDateTime.parse(data);
 
-        Log.d("fecha", data);
-
         if (data.contains(".")) {
             String[] parts = data.split("\\.");
-            String decimals = parts[1].length() > 3 ? parts[1].substring(0, 3) : parts[1];
+            String decimals = parts[1].length() > 3
+                    ? parts[1].substring(0, 3)
+                    : parts[1];
+
             data = parts[0] + "." + decimals;
         }
 
         DateTimeFormatter formatter;
+
         if (editatAlMoment) {
             formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
         } else {
             formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         }
 
-        LocalDateTime fechaCreacion =
+        // Parsear com UTC
+        LocalDateTime utcDateTime =
                 LocalDateTime.parse(data, formatter);
 
-        LocalDateTime ahora = LocalDateTime.now();
+        // Convertir a ZonedDateTime UTC
+        ZonedDateTime utcZoned =
+                utcDateTime.atZone(ZoneOffset.UTC);
 
-        long segundos = Duration.between(fechaCreacion, ahora).getSeconds();
+        // Convertir a hora local del dispositiu
+        ZonedDateTime localDateTime =
+                utcZoned.withZoneSameInstant(
+                        ZoneId.systemDefault()
+                );
 
-        Log.d("Fecha creación: ", fechaCreacion.toString());
-        Log.d("Ahora: ", ahora.toString());
-        Log.d("Segundos: ", segundos + "");
+        // Hora actual local
+        ZonedDateTime ahora =
+                ZonedDateTime.now();
+
+        long segundos =
+                Duration.between(localDateTime, ahora)
+                        .getSeconds();
+
+        Log.d("Fecha UTC", utcZoned.toString());
+        Log.d("Fecha Local", localDateTime.toString());
+        Log.d("Ahora", ahora.toString());
+        Log.d("Segundos", segundos + "");
 
         if (segundos < 60) {
             if (editat) {

@@ -1,5 +1,6 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.actualitzarCompartits;
 import static com.example.keyly_projecte_intermodular.resources.Varis.obtenirTotalVulnerades;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.actualitzarCarpetes;
@@ -272,10 +273,10 @@ public class HomeActivity extends AppCompatActivity {
                     txtTotalsQty.setText(String.valueOf(items.size())); // Mostrar total d'ítems
                     if (items.size() > 0) {
                         if (filtre == 0) { // Mostrar tots els ítems
-                            actualizarItems(items);
+                            actualitzarItems(items);
                         } else if (filtre == 1) { // Mostrar els ítems més usats
                             items.sort(Comparator.comparing(Item::getComptadorAccess).reversed());
-                            actualizarItems(items);
+                            actualitzarItems(items);
                         } else if (filtre == 2) { // Mostrar els ítems favorits
                             ArrayList<Item> itemsFavorits = new ArrayList<>();
                             for (Item item : items) {
@@ -283,7 +284,7 @@ public class HomeActivity extends AppCompatActivity {
                                     itemsFavorits.add(item);
                                 }
                             }
-                            actualizarItems(itemsFavorits);
+                            actualitzarItems(itemsFavorits);
                         }
                         itemAdapter.notifyDataSetChanged();
                         recyclerViewItems.setVisibility(RecyclerView.VISIBLE);
@@ -412,10 +413,12 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     if (compartits.size() > 0) {
                         if (filtre == 0) { // Mostrar tots els compartits
-                            actualizarCompartits(compartits);
+                            actualitzarCompartits(HomeActivity.this, compartits,
+                                    compartitAdapter, recyclerViewCompartits, false);
                         } else if (filtre == 1) { // Mostrar els compartits més usats
                             compartits.sort(Comparator.comparing(Compartit::getComptadorAccess).reversed());
-                            actualizarCompartits(compartits);
+                            actualitzarCompartits(HomeActivity.this, compartits,
+                                    compartitAdapter, recyclerViewCompartits, false);
                         } else if (filtre == 2) { // Mostrar els compartits favorits
                             ArrayList<Compartit> compartitsFavorits = new ArrayList<>();
                             for (Compartit compartit : compartits) {
@@ -429,9 +432,10 @@ public class HomeActivity extends AppCompatActivity {
                                     }
                                 }
                             }
-                            actualizarCompartits(compartitsFavorits);
+                            actualitzarCompartits(HomeActivity.this, compartitsFavorits,
+                                    compartitAdapter, recyclerViewCompartits, false);
                         }
-                        compartitAdapter.notifyDataSetChanged();
+                        //compartitAdapter.notifyDataSetChanged();
                         recyclerViewCompartits.setVisibility(RecyclerView.VISIBLE);
                         layoutErrorCompartits.setVisibility(View.GONE);
                     } else {
@@ -468,7 +472,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void actualizarItems(ArrayList<Item> items) {
+    private void actualitzarItems(ArrayList<Item> items) {
         // Mostrar ítems
         itemAdapter = new ItemAdapter(items, item -> {
             Intent intent = new Intent(this, ItemActivity.class);
@@ -502,35 +506,35 @@ public class HomeActivity extends AppCompatActivity {
 //        recyclerViewCarpetes.setAdapter(carpetaAdapter);
 //    }
 
-    private void actualizarCompartits(ArrayList<Compartit> compartits) {
-        // Mostrar compartits
-        compartitAdapter = new CompartitAdapter(compartits, compartit -> {
-            if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
-                Carpeta carpeta = compartit.getCarpeta();
-                Intent intentCarpeta = new Intent(this, CarpetaActivity.class);
-                intentCarpeta.putExtra("carpeta", carpeta);
-                intentCarpeta.putExtra("uuid", carpeta.getUuid().toString());
-                intentCarpeta.putExtra("nom", carpeta.getNom());
-                intentCarpeta.putExtra("favorit", carpeta.isFavorit());
-                intentCarpeta.putExtra("items", new ArrayList<>(carpeta.getItems()));
-                intentCarpeta.putExtra("data_creacio", carpeta.getDataCreacio());
-                startActivity(intentCarpeta);
-            } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
-                Item item = compartit.getItem();
-                Intent intentItem = new Intent(this, ItemActivity.class);
-                intentItem.putExtra("uuid", item.getUuid().toString());
-                intentItem.putExtra("title", item.getTitol());
-                intentItem.putExtra("url", item.getUrl());
-                intentItem.putExtra("nom_usuari", item.getNomUsuari());
-                intentItem.putExtra("password", item.getContrasenya());
-                intentItem.putExtra("notes", item.getNotes());
-                intentItem.putExtra("fav", item.isFavorit());
-                intentItem.putExtra("add_edit", 0);
-                intentItem.putExtra("iv", item.getIv());
-                intentItem.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
-                startActivity(intentItem);
-            }
-        }, HomeActivity.this);
-        recyclerViewCompartits.setAdapter(compartitAdapter);
-    }
+//    private void actualitzarCompartits(ArrayList<Compartit> compartits) {
+//        // Mostrar compartits
+//        compartitAdapter = new CompartitAdapter(compartits, compartit -> {
+//            if (compartit.getTipusEntitat() == TipusEntitat.CARPETA) {
+//                Carpeta carpeta = compartit.getCarpeta();
+//                Intent intentCarpeta = new Intent(this, CarpetaActivity.class);
+//                intentCarpeta.putExtra("carpeta", carpeta);
+//                intentCarpeta.putExtra("uuid", carpeta.getUuid().toString());
+//                intentCarpeta.putExtra("nom", carpeta.getNom());
+//                intentCarpeta.putExtra("favorit", carpeta.isFavorit());
+//                intentCarpeta.putExtra("items", new ArrayList<>(carpeta.getItems()));
+//                intentCarpeta.putExtra("data_creacio", carpeta.getDataCreacio());
+//                startActivity(intentCarpeta);
+//            } else if (compartit.getTipusEntitat() == TipusEntitat.ITEM) {
+//                Item item = compartit.getItem();
+//                Intent intentItem = new Intent(this, ItemActivity.class);
+//                intentItem.putExtra("uuid", item.getUuid().toString());
+//                intentItem.putExtra("title", item.getTitol());
+//                intentItem.putExtra("url", item.getUrl());
+//                intentItem.putExtra("nom_usuari", item.getNomUsuari());
+//                intentItem.putExtra("password", item.getContrasenya());
+//                intentItem.putExtra("notes", item.getNotes());
+//                intentItem.putExtra("fav", item.isFavorit());
+//                intentItem.putExtra("add_edit", 0);
+//                intentItem.putExtra("iv", item.getIv());
+//                intentItem.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
+//                startActivity(intentItem);
+//            }
+//        }, HomeActivity.this);
+//        recyclerViewCompartits.setAdapter(compartitAdapter);
+//    }
 }

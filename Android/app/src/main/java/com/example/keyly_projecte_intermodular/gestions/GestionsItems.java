@@ -14,7 +14,8 @@ import java.util.ArrayList;
 
 public class GestionsItems {
     public static void actualitzarItems(ArrayList<Item> items, ItemAdapter itemAdapter,
-                                        Context context, RecyclerView recyclerView) {
+                                        Context context, RecyclerView recyclerView,
+                                        boolean esCompartit) {
         itemAdapter = new ItemAdapter(items, item -> {
             Intent intent = new Intent(context, ItemActivity.class);
             intent.putExtra("uuid", item.getUuid().toString());
@@ -27,6 +28,8 @@ public class GestionsItems {
             intent.putExtra("add_edit", 0);
             intent.putExtra("iv", item.getIv());
             intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
+            intent.putExtra("esCompartit", esCompartit);
+            intent.putExtra("esMeu", esMeu);
             intent.putExtra("data_creacio", item.getDataCreacio());
             intent.putExtra("data_edicio", item.getDataEditat());
             context.startActivity(intent);

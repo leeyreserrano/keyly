@@ -1,7 +1,8 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.editarCarpeta;
 import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.mostrarLlistaCompartits;
-import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartits;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartitsAmbMi;
 import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.resources.Varis.tempsCreatEditat;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
@@ -86,7 +87,7 @@ public class CarpetaActivity extends AppCompatActivity {
             imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
     private int itemAfegit = 0;
     private String uuid;
-    private boolean editat;
+    private boolean editat, esMeu, esCompartit;
     private Carpeta carpetaActual;
     private ArrayList<Item> items, totalItems = new ArrayList<>(), itemsSeleccionats = new ArrayList<>();
     private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>(),
@@ -175,6 +176,9 @@ public class CarpetaActivity extends AppCompatActivity {
             logOut(this);
         });
 
+        esMeu = getIntent().getBooleanExtra("esMeu", false);
+        esCompartit = getIntent().getBooleanExtra("esCompartit", false);
+
         uuid = getIntent().getStringExtra("uuid");
         String nom = getIntent().getStringExtra("nom");
 
@@ -222,110 +226,27 @@ public class CarpetaActivity extends AppCompatActivity {
         });
 
         imgBtnEditar = findViewById(R.id.imgBtnEdit);
-        imgBtnEditar.setOnClickListener(v -> {
-            // TODO editar la carpeta
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater = getLayoutInflater();
-            View view = inflater.inflate(R.layout.layout_carpeta_editar, null);
-
-            builder.setView(view);
-
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-
-            // Elements del AlertDialog
-            LinearLayout llNomCarpeta = view.findViewById(R.id.llNomCarpeta);
-            llNomCarpeta.setVisibility(View.VISIBLE);
-
-            View vSeparador = view.findViewById(R.id.vSeparador1);
-            vSeparador.setVisibility(View.GONE);
-
-            LinearLayout llAfegirItems = view.findViewById(R.id.llDesplegableItems);
-            llAfegirItems.setVisibility(View.GONE);
-
-            View vSeparador2 = view.findViewById(R.id.vSeparador2);
-            vSeparador2.setVisibility(View.GONE);
-
-            LinearLayout llAfegirUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
-            llAfegirUsuaris.setVisibility(View.GONE);
-
-            View vSeparador3 = view.findViewById(R.id.vSeparador3);
-            vSeparador3.setVisibility(View.GONE);
-
-            ImageButton imgBtnStarEdit = view.findViewById(R.id.imgBtnStar);
-            EditText etNomCarpeta = view.findViewById(R.id.etNomCarpeta);
-            Button btnGuardarCarpeta = view.findViewById(R.id.btnGuardarCarpeta);
-            Button btnCancelar = view.findViewById(R.id.btnCancelar);
-
-            etNomCarpeta.setText(nom);
-
-            if (favActual.get()) {
-                imgBtnStarEdit.setImageResource(R.drawable.filled_star);
-            } else {
-                imgBtnStarEdit.setImageResource(R.drawable.star);
-            }
-            imgBtnStarEdit.setOnClickListener(c -> {
-                // TODO hacer que se guarde el favoritos
-                if (favActual.get()) {
-                    imgBtnStarEdit.setImageResource(R.drawable.star);
-                    favActual.set(false);
+        imgBtnAfegirItem = findViewById(R.id.imgBtnAfegirItem);
+        if (esMeu) {
+            imgBtnEditar.setVisibility(View.VISIBLE);
+            imgBtnAfegirItem.setVisibility(View.VISIBLE);
+        } else {
+            // TODO mirar si tiene edicion o admin de permiso
+            //Compartit compartitReceptor = getIntent().getSerializableExtra("compartitReceptor", Compartit.class);
+            Permisos permis = (Permisos) getIntent().getSerializableExtra("permisCompartit");
+            if (permis != null) {
+                Log.d("PERMISOS_COMPARTIT_REQUEST", permis.toString());
+                if (permis.equals(Permisos.ESCRIPTURA) || permis.equals(Permisos.ADMINISTRADOR)) {
+                    imgBtnEditar.setVisibility(View.VISIBLE);
+                    imgBtnAfegirItem.setVisibility(View.VISIBLE);
                 } else {
-                    imgBtnStarEdit.setImageResource(R.drawable.filled_star);
-                    favActual.set(true);
+                    imgBtnEditar.setVisibility(View.GONE);
+                    imgBtnAfegirItem.setVisibility(View.GONE);
                 }
-            });
-
-            btnGuardarCarpeta.setText(getString(R.string.btnGuardar));
-            btnGuardarCarpeta.setOnClickListener(c -> {
-                Carpeta carpeta = new Carpeta(etNomCarpeta.getText().toString(), favActual.get());
-
-                Call<Carpeta> call = CarpetaDTO.obtenirJSONCarpeta().create(CarpetaDTO.RequestCarpeta.class).editarCarpeta(uuid, carpeta);
-                call.enqueue(new Callback<Carpeta>() {
-                    @Override
-                    public void onResponse(Call<Carpeta> call, Response<Carpeta> response) {
-                        if (response.isSuccessful()) {
-                            editat = true;
-                            nomCarpeta.setText(response.body().getNom());
-
-                            AtomicBoolean favActual = new AtomicBoolean(response.body().isFavorit());
-
-                            if (favActual.get()) {
-                                imgBtnStar.setImageResource(R.drawable.filled_star);
-                            } else {
-                                imgBtnStar.setImageResource(R.drawable.star);
-                            }
-                            imgBtnStar.setOnClickListener(v -> {
-                                // TODO hacer que se guarde el favoritos
-                                if (favActual.get()) {
-                                    imgBtnStar.setImageResource(R.drawable.star);
-                                    favActual.set(false);
-                                } else {
-                                    imgBtnStar.setImageResource(R.drawable.filled_star);
-                                    favActual.set(true);
-                                }
-                            });
-
-                            // TODO borrar lo comentado si funciona
-                            //Toast.makeText(CarpetaActivity.this, "Carpeta " + etNomCarpeta.getText().toString() + " editada", Toast.LENGTH_SHORT).show();
-                            Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
-                            alertDialog.dismiss();
-                        } else {
-                            Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
-                            Log.d("ERROR_RESPONSE", response.message());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Carpeta> call, Throwable t) {
-                        Toast.makeText(CarpetaActivity.this, getString(R.string.toastCarpetaNoEditada, etNomCarpeta.getText().toString()), Toast.LENGTH_SHORT).show();
-                        Log.d("ERROR_FAILURE",t.getMessage());
-                    }
-                });
-            });
-
-            btnCancelar.setOnClickListener(c -> {
-                alertDialog.dismiss();
-            });
+            }
+        }
+        imgBtnEditar.setOnClickListener(v -> {
+            editarCarpeta(CarpetaActivity.this, nom, uuid, favActual, nomCarpeta, imgBtnStar);
         });
 
         imgBtnEliminar = findViewById(R.id.imgBtnEliminar);
@@ -347,7 +268,6 @@ public class CarpetaActivity extends AppCompatActivity {
             txtPregunta.setText(getString(R.string.etiquetaEliminarCarpeta) + " " + nom + "\" ?");
 
             btnEliminar.setOnClickListener(e -> {
-                boolean esCompartit = getIntent().getBooleanExtra("esCompartit", false);
                 String uuidCompartit = getIntent().getStringExtra("uuidCompartit");
                 if (esCompartit) {
                     Call<Void> call = CompartitDTO.obtenirJSONCompartit().create(CompartitDTO.RequestCompartit.class).eliminarCompartit(uuidCompartit);
@@ -405,7 +325,6 @@ public class CarpetaActivity extends AppCompatActivity {
             finish();
         });
 
-        imgBtnAfegirItem = findViewById(R.id.imgBtnAfegirItem);
         imgBtnAfegirItem.setOnClickListener(v -> {
             itemsSeleccionats.clear();
             usuarisSeleccionats.clear();
@@ -738,7 +657,7 @@ public class CarpetaActivity extends AppCompatActivity {
             obtenirUsuaris(usuarisActuals, getUsuarisActualsSeleccionats, permisosActuals, recyclerUsuaris,
                     recercaAdapterUsuaris, aCTVCercarCompartir, CarpetaActivity.this,
                     true,
-                    () -> obtenirCompartits(CarpetaActivity.this, compartitsActuals, 0, false,
+                    () -> obtenirCompartitsAmbMi(CarpetaActivity.this, compartitsActuals, 0, false,
                             null, recyclerView, false, usuarisActuals, usuarisCompartits,
                             permisosActuals, () -> mostrarLlistaCompartits(CarpetaActivity.this,
                                     usuarisCompartits, permisosActuals, aCTVCercarUsuaris,
@@ -762,7 +681,7 @@ public class CarpetaActivity extends AppCompatActivity {
             }
         });
 
-        imgBtnFiltres = findViewById(R.id.imgBtnFiltres);
+        imgBtnFiltres = findViewById(R.id.imgBtnFiltresAmbMi);
         imgBtnFiltres.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 

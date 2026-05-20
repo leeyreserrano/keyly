@@ -35,6 +35,10 @@ public class CompartitDTO {
         @GET("/api/compartit/get/all")
         Call<ArrayList<Compartit>> getAllCompartit();
 
+        // Obté tots els meus compartits
+        @GET("/api/compartit/get/all/creats")
+        Call<ArrayList<Compartit>> getAllCompartitCreats();
+
         // Crear compartits amb múltiples usuaris
         @POST("/api/compartit/add")
         Call<Void> compartir(@Body CompartitRequest compartitRequest);

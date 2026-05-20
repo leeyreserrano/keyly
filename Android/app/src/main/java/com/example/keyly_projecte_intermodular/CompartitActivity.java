@@ -1,7 +1,8 @@
 package com.example.keyly_projecte_intermodular;
 
 import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.crearCarpeta;
-import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartits;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartitsAmbMi;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartitsMeus;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.app.AlertDialog;
@@ -18,11 +19,13 @@ import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -43,15 +46,17 @@ import java.util.ArrayList;
 public class CompartitActivity extends AppCompatActivity {
 
     private BottomNavigationView menu;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerViewAmbMi, recyclerViewMeus;
     private ImageView imgBtnFiltres;
     private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnCompartir,
             imgBtnCompartirItems, imgBtnCompartirCarpetes;
-    private CompartitAdapter compartitAdapter;
+    private Button btnCompartitAmbMi, btnCompartitMeus;
+    private CompartitAdapter compartitAdapterAmbMi, compartitAdapterMeus;
     private FrameLayout main;
+    private LinearLayout llCompartitsAmbMi, llCompartitsMeus;
     private Carpeta carpetaCreada;
     private boolean filtrat = false;
-    private ArrayList<Compartit> compartits = new ArrayList<>();
+    private ArrayList<Compartit> compartitsAmbMi = new ArrayList<>(), compartitsMeus = new ArrayList<>();
     private ArrayList<Item> items = new ArrayList<>();
     private ArrayList<Item> itemsSeleccionats = new ArrayList<>();
     private ArrayList<Carpeta> carpetes = new ArrayList<>();
@@ -163,15 +168,48 @@ public class CompartitActivity extends AppCompatActivity {
             return false;
         });
 
-        recyclerView = findViewById(R.id.recyclerItemsCarpetes);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewAmbMi = findViewById(R.id.recyclerItemsCarpetesAmbMi);
+        recyclerViewAmbMi.setLayoutManager(new LinearLayoutManager(this));
 
-        // Mostrar ítems i carpetes compartits
-        obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                compartitAdapter, recyclerView, true, null, null,
+        recyclerViewMeus = findViewById(R.id.recyclerItemsCarpetesMeus);
+        recyclerViewMeus.setLayoutManager(new LinearLayoutManager(this));
+
+        // Obtenir ítems i carpetes compartits amb mí
+        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 0, false,
+                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                 null, null);
 
-        imgBtnFiltres = findViewById(R.id.imgBtnFiltres);
+        // Obtenir ítems i carpetes compartits meus
+        obtenirCompartitsMeus(CompartitActivity.this, compartitsMeus, 0, false,
+                compartitAdapterMeus, recyclerViewMeus, true, null, null,
+                null, null);
+
+        llCompartitsAmbMi = findViewById(R.id.llCompartitsAmbMi);
+        llCompartitsMeus = findViewById(R.id.llCompartitsMeus);
+
+        // Mostrar compartits amb mí
+        btnCompartitAmbMi = findViewById(R.id.btnCompartitAmbMi);
+        btnCompartitAmbMi.setOnClickListener(v -> {
+            btnCompartitAmbMi.setBackground(ContextCompat.getDrawable(CompartitActivity.this,
+                    R.drawable.background_btn_filtres_home_selected));
+            btnCompartitMeus.setBackground(ContextCompat.getDrawable(CompartitActivity.this,
+                    R.drawable.background_btn_filtres_home));
+            llCompartitsAmbMi.setVisibility(View.VISIBLE);
+            llCompartitsMeus.setVisibility(View.GONE);
+        });
+
+        // Mostrar compartits meus
+        btnCompartitMeus = findViewById(R.id.btnCompartitMeus);
+        btnCompartitMeus.setOnClickListener(v -> {
+            btnCompartitMeus.setBackground(ContextCompat.getDrawable(CompartitActivity.this,
+                    R.drawable.background_btn_filtres_home_selected));
+            btnCompartitAmbMi.setBackground(ContextCompat.getDrawable(CompartitActivity.this,
+                    R.drawable.background_btn_filtres_home));
+            llCompartitsMeus.setVisibility(View.VISIBLE);
+            llCompartitsAmbMi.setVisibility(View.GONE);
+        });
+
+        imgBtnFiltres = findViewById(R.id.imgBtnFiltresAmbMi);
         imgBtnFiltres.setOnClickListener(v -> {
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
@@ -195,32 +233,32 @@ public class CompartitActivity extends AppCompatActivity {
             btnFiltrar.setOnClickListener(f -> {
                 if (cbTots.isChecked()) {
                     if (cbFavorits.isChecked()) {
-                        obtenirCompartits(CompartitActivity.this, compartits, 0, true,
-                                compartitAdapter, recyclerView, true, null, null,
+                        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 0, true,
+                                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                                 null, null);
                     } else {
-                        obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                                compartitAdapter, recyclerView, true, null, null,
+                        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 0, false,
+                                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                                 null, null);
                     }
                 } else if (cbUltimsUsats.isChecked()) { // Mostrar els últims ítems utilitzats
                     if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
-                        obtenirCompartits(CompartitActivity.this, compartits, 1, true,
-                                compartitAdapter, recyclerView, true, null, null,
+                        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 1, true,
+                                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                                 null, null);
                     } else {
-                        obtenirCompartits(CompartitActivity.this, compartits, 1, false,
-                                compartitAdapter, recyclerView, true, null, null,
+                        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 1, false,
+                                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                                 null, null);
                     }
                 } else if (cbMesUsats.isChecked()) { // Mostrar els ítems més usats
                     if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
-                        obtenirCompartits(CompartitActivity.this, compartits, 2, true,
-                                compartitAdapter, recyclerView, true, null, null,
+                        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 2, true,
+                                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                                 null, null);
                     } else {
-                        obtenirCompartits(CompartitActivity.this, compartits, 2, false,
-                                compartitAdapter, recyclerView, true, null, null,
+                        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 2, false,
+                                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                                 null, null);
                     }
                 }
@@ -284,11 +322,11 @@ public class CompartitActivity extends AppCompatActivity {
                     usuarisCompartitRequest,
                     carpetaCreada,
                     carpetes,
-                    recyclerView,
+                    recyclerViewAmbMi,
                     null,
                     true,
-                    () -> obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                            compartitAdapter, recyclerView, true, null, null,
+                    () -> obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 0, false,
+                            compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                             null, null),
                     null,
                     null,
@@ -301,8 +339,8 @@ public class CompartitActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                compartitAdapter, recyclerView, true, null, null,
+        obtenirCompartitsAmbMi(CompartitActivity.this, compartitsAmbMi, 0, false,
+                compartitAdapterAmbMi, recyclerViewAmbMi, true, null, null,
                 null, null);
     }
 }

@@ -190,7 +190,7 @@ public class CarpetesActivity extends AppCompatActivity {
                 CarpetesActivity.this
         );
 
-        btnFiltres = findViewById(R.id.imgBtnFiltres);
+        btnFiltres = findViewById(R.id.imgBtnFiltresAmbMi);
         btnFiltres.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = getLayoutInflater();
