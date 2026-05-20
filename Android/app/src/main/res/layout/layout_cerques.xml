@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/background_dialog"
+    android:elevation="5dp"
+    android:padding="8dp"
+    android:layout_marginBottom="15dp"
+    android:gravity="left|center">
+
+    <LinearLayout
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="Item"
+            android:textSize="20dp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/airbnb_cereal_w_bd"/>
+
+        <FrameLayout
+            android:id="@+id/flPermisos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp">
+
+            <Spinner
+                android:id="@+id/spPermisos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:background="@drawable/background_layout_gestions"
+                android:padding="5dp"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/back"
+                android:rotation="270"
+                android:clickable="false"
+                android:focusable="false"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/imgBtnX"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:src="@drawable/x"
+        android:backgroundTint="@color/transparent"
+        android:scaleType="centerCrop"/>
+
+</LinearLayout>

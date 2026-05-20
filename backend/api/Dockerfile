@@ -22,6 +22,8 @@ WORKDIR /app
 
 COPY --from=build /build/target/*.jar app.jar
 
+COPY assets /app/uploads/profile-pictures
+
 EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","app.jar"]

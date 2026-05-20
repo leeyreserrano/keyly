@@ -9,33 +9,25 @@ import com.keyly.model.enums.TipusEntitat;
 
 public record CompartitResponse(
         UUID uuid,
-        UsuariResponse usuari,
+        UsuariResponse usuariCreador,
+        UsuariResponse usuariReceptor,
         TipusEntitat tipusEntitat,
-        CarpetaResponse carpetaUuid,
-        ItemResponse itemUuid,
         Permisos permisos,
+        CarpetaResponse carpeta,
+        ItemResponse item,
         LocalDateTime dataCreacio) {
 
-    public CompartitResponse(Compartit c, CarpetaResponse carpeta) {
-        this(
+        public CompartitResponse(Compartit c, UsuariResponse creador, CarpetaResponse carpeta, ItemResponse item) {
+            this(
                 c.getUuid(),
+                creador,
                 new UsuariResponse(c.getUsuari()),
                 c.getTipusEntitat(),
+                c.getPermisos(),
                 carpeta,
-                null,
-                c.getPermisos(),
-                c.getDataCreacio());
-    }
-
-    public CompartitResponse(Compartit c, ItemResponse item) {
-        this(
-                c.getUuid(),
-                new UsuariResponse(c.getUsuari()),
-                c.getTipusEntitat(),
-                null,
                 item,
-                c.getPermisos(),
-                c.getDataCreacio());
-    }
+                c.getDataCreacio()
+            );
+        }
 
 }

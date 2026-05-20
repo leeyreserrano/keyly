@@ -1,0 +1,17 @@
+{
+  "add_new": "+ Afegir",
+  "save": "Desar",
+  "saving": "Desant...",
+  "cancel": "Cancel·lar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "close": "Tancar",
+  "back": "Tornar",
+  "confirm": "Confirmar",
+  "search": "Cercar",
+  "loading": "Carregant...",
+  "error_loading": "Error carregant les dades",
+  "no_results": "Sense resultats",
+  "delete_modal.title": "Confirmar eliminació",
+  "delete_modal.description": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer."
+}

@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,15 +43,11 @@ public class Carpeta {
     private Long id;
 
     @UuidGenerator
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID uuid;
 
-    @ManyToMany
-    @JoinTable(
-        name = "Carpetes_Items", 
-        joinColumns = @JoinColumn(name = "carpeta_id"), 
-        inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(name = "Carpetes_Items", joinColumns = @JoinColumn(name = "carpeta_id"), inverseJoinColumns = @JoinColumn(name = "item_id"))
     @JsonBackReference
     private Set<Item> items = new HashSet<>();
 
@@ -61,9 +58,21 @@ public class Carpeta {
     @Column(name = "nom")
     private String nom;
 
+    @Column(name = "favorit")
+    private Boolean favorit;
+
     @CreationTimestamp
-    @Column(name = "data_creacio")
+    @Column(name = "data_creacio", updatable = false)
     private LocalDateTime dataCreacio;
+
+    @Column(name = "data_editat", updatable = true)
+    private LocalDateTime dataEditat;
+
+    @Column(name = "ultim_access", updatable = true)
+    private LocalDateTime ultimAccess;
+
+    @Column(name = "comptador_access")
+    private Long comptadorAccess = 0L;
 
     public void addItem(Item item) {
         items.add(item);

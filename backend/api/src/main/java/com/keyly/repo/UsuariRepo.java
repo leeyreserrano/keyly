@@ -1,5 +1,6 @@
 package com.keyly.repo;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,10 +17,14 @@ public interface UsuariRepo extends JpaRepository<Usuari, Long> {
 
     Optional<Usuari> findByUuid(UUID uuid);
 
+    Optional<Usuari> findByCorreu(String correu);
+
+    List<Usuari> findBySucursalId(Long sucursalId);
+
     @Modifying
     @Transactional
     void deleteByUuid(UUID uuid);
-    
+
     boolean existsByCorreu(String correu);
 
 }

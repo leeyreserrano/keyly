@@ -1,0 +1,21 @@
+{
+  "title": "Inici",
+  "add_new": "+ Afegir",
+  "tabs": {
+    "latest": "Últims usats",
+    "most_used": "Més usats",
+    "favorites": "Favorits"
+  },
+  "empty": {
+    "favorites": "No tens cap favorit",
+    "no_items": "No tens cap element guardat",
+    "add_first": "+ Afegir el primer"
+  },
+  "error": {
+    "loading": "Error carregant les dades"
+  },
+  "toast": {
+    "delete_success": "Eliminat correctament",
+    "delete_error": "Error en eliminar"
+  }
+}

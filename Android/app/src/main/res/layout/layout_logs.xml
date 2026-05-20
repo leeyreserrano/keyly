@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutError"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    android:background="@drawable/background_log_error"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:visibility="visible">
+
+    <LinearLayout
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtTitolError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ERROR"
+            android:textColor="@color/black"
+            android:fontFamily="@font/airbnb_cereal_w_bd"
+            android:textSize="25dp"/>
+
+        <TextView
+            android:id="@+id/txtDescripcioError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hi ha connexió"
+            android:textColor="@color/black"
+            android:fontFamily="@font/manrope_regular"
+            android:textSize="20dp"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgVError"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:src="@drawable/logout"/>
+
+</LinearLayout>

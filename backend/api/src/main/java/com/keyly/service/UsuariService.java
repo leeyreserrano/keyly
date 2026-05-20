@@ -1,23 +1,35 @@
 package com.keyly.service;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.keyly.exception.CorreuExistentException;
+import com.keyly.exception.CorreuException;
 import com.keyly.exception.EntitatNoTrobadaException;
+import com.keyly.exception.ImageException;
+import com.keyly.exception.UsuariException;
 import com.keyly.mapper.UsuariMapper;
 import com.keyly.model.Departament;
 import com.keyly.model.Rol;
 import com.keyly.model.Sucursal;
 import com.keyly.model.Usuari;
+import com.keyly.model.enums.RolIntern;
 import com.keyly.model.request.UsuariRequest;
+import com.keyly.model.response.ConfigResponse;
+import com.keyly.model.response.DominiResponse;
 import com.keyly.model.response.UsuariResponse;
 import com.keyly.repo.UsuariRepo;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UsuariService {
@@ -32,6 +44,12 @@ public class UsuariService {
     private DepartamentService departamentService;
 
     @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private DominiService dominiService;
+
+    @Autowired
     private RolService rolService;
 
     @Autowired
@@ -40,72 +58,236 @@ public class UsuariService {
     @Autowired
     private UsuariMapper mapper;
 
+    private final String IMAGES_PATH = "/app/uploads/profile-pictures/";
+
+    private final Path root = Paths.get(IMAGES_PATH);
+
     public List<UsuariResponse> getAllUsuaris() {
-        return repo.findAll()
-                .stream()
-                .map(usuari -> new UsuariResponse(usuari))
-                .toList();
+        return repo
+            .findAll()
+            .stream()
+            .map(usuari -> new UsuariResponse(usuari))
+            .toList();
+    }
+
+    public List<UsuariResponse> getAllUsuarisBySucursal(UUID usuariUuid) {
+        return repo
+            .findBySucursalId(
+                getUsuariEntityByUuid(usuariUuid).getSucursal().getId()
+            )
+            .stream()
+            .map(usuari -> new UsuariResponse(usuari))
+            .toList();
     }
 
     public UsuariResponse getByUuid(UUID uuid) {
-        Usuari usuari = repo.findByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid));
+        Usuari usuari = repo
+            .findByUuid(uuid)
+            .orElseThrow(() ->
+                new EntitatNoTrobadaException(
+                    "Usuari no trobat amb el uuid: " + uuid
+                )
+            );
 
         return new UsuariResponse(usuari);
     }
 
     public Usuari getUsuariEntityByUuid(UUID uuid) {
-        return repo.findByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el uuid: " + uuid));
+        return repo
+            .findByUuid(uuid)
+            .orElseThrow(() ->
+                new EntitatNoTrobadaException(
+                    "Usuari no trobat amb el uuid: " + uuid
+                )
+            );
+    }
+
+    public Usuari getUsuariEntityByMail(String mail) {
+        return repo
+            .findByCorreu(mail)
+            .orElseThrow(() ->
+                new EntitatNoTrobadaException(
+                    "Usuari no trobat amb el correu: " + mail
+                )
+            );
     }
 
     public UsuariResponse save(UsuariRequest u) {
         Sucursal s = sucursalService.getSucursalEntityByUuid(u.sucursalUuid());
-        Departament d = departamentService.getDepartamentEntityByUuid(u.departamentUuid());
+        Departament d = departamentService.getDepartamentEntityByUuid(
+            u.departamentUuid()
+        );
         Rol r = rolService.getRolEntityByUuid(u.rolUuid());
 
-        if (repo.existsByCorreu(u.correu()))
-            throw new CorreuExistentException("El correu: " + u.correu() + " ja existeix.");
-
-        // if (correuValid(u.correu()) && u.correu() != null)
-        //     throw new CorreuExistentException("El correu: " + u.correu() + " no és un correu valid.");
-
         Usuari usuari = new Usuari(s, d, r, u);
+
+        if (!correuValid(usuari)) throw new CorreuException(
+            "El correu " + usuari.getCorreu() + " no es válid."
+        );
 
         String contrasenyaCruda = u.contrasenya();
         String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
         usuari.setContrasenya(contrasenyaEncriptada);
 
+        usuari.setImatge(
+            IMAGES_PATH + u.nom().toUpperCase().charAt(0) + ".svg"
+        );
+
         return new UsuariResponse(repo.save(usuari));
     }
 
+    public UsuariResponse save(Usuari cap, UsuariRequest nouUsuari) {
+        if (!cap.getPotAdministrar()) throw new UsuariException(
+            "El cap " + cap.getNom() + " no pot crear usuaris."
+        );
+
+        Sucursal s = sucursalService.getSucursalEntityByUuid(
+            cap.getSucursal().getUuid()
+        );
+        Departament d = departamentService.getDepartamentEntityByUuid(
+            cap.getDepartament().getUuid()
+        );
+        Rol r = rolService.getRolEntityByUuid(cap.getRol().getUuid());
+
+        Usuari usuari = new Usuari(s, d, r, nouUsuari);
+
+        if (
+            usuari.getRolIntern() != RolIntern.USUARI
+        ) throw new UsuariException(
+            "Un cap no pot crear a un usuari que no sigui USUARI"
+        );
+
+        if (!correuValid(usuari)) throw new CorreuException(
+            "El correu " + usuari.getCorreu() + " no es válid."
+        );
+
+        String contrasenyaCruda = nouUsuari.contrasenya();
+        String contrasenyaEncriptada = passwordEncoder.encode(contrasenyaCruda);
+        usuari.setContrasenya(contrasenyaEncriptada);
+
+        usuari.setImatge(
+            IMAGES_PATH + nouUsuari.nom().toUpperCase().charAt(0) + ".svg"
+        );
+
+        return new UsuariResponse(repo.save(usuari));
+    }
+
+    public void saveImage(UUID uuid, MultipartFile file) {
+        try {
+            String originalName = file.getOriginalFilename();
+            String uniqueName = UUID.randomUUID() + "_" + originalName;
+
+            String fileName = IMAGES_PATH + uniqueName;
+            Path destinationFile = root.resolve(fileName);
+
+            Files.copy(file.getInputStream(), destinationFile);
+
+            uploadImage(uuid, fileName);
+        } catch (IOException e) {
+            throw new ImageException("La imatge no s'ha pogut guardar.");
+        }
+    }
+
     public UsuariResponse update(UUID uuid, UsuariRequest request) {
-        Sucursal s = null;
-        Departament d = null;
-        Rol r = null;
-
-        // if (correuValid(request.correu()) && request.correu() != null)
-        //     throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-        if (request.departamentUuid() != null)
-            d = departamentService.getDepartamentEntityByUuid(request.departamentUuid());
-        if (request.rolUuid() != null)
-            r = rolService.getRolEntityByUuid(request.rolUuid());
-
         Usuari usuari = getUsuariEntityByUuid(uuid);
 
-        if (s != null)
-            usuari.setSucursal(s);
-        if (d != null)
-            usuari.setDepartament(d);
-        if (r != null)
-            usuari.setRol(r);
+        if (request.sucursalUuid() != null) usuari.setSucursal(
+            sucursalService.getSucursalEntityByUuid(request.sucursalUuid())
+        );
+        if (request.departamentUuid() != null) usuari.setDepartament(
+            departamentService.getDepartamentEntityByUuid(
+                request.departamentUuid()
+            )
+        );
+        if (request.rolUuid() != null) usuari.setRol(
+            rolService.getRolEntityByUuid(request.rolUuid())
+        );
 
         mapper.updateUsuariFromDto(request, usuari);
 
+        if (request.correu() != null) if (
+            !correuValid(usuari)
+        ) throw new CorreuException(
+            "El correu " + usuari.getCorreu() + " no es válid."
+        );
+
         return new UsuariResponse(repo.save(usuari));
+    }
+
+    public UsuariResponse update(Usuari cap, UUID uuid, UsuariRequest request) {
+        if (!cap.getPotAdministrar()) throw new UsuariException(
+            "El cap " + cap.getNom() + " no pot actualitzar usuaris."
+        );
+
+        Usuari usuari = getUsuariEntityByUuid(uuid);
+
+        if (
+            !cap
+                .getDepartament()
+                .getUuid()
+                .equals(usuari.getDepartament().getUuid())
+        ) throw new UsuariException(
+            "Un cap no pot actualitzar a usuaris d'un diferent departament."
+        );
+
+        if (usuari.getRolIntern() == RolIntern.ADMIN) throw new UsuariException(
+            "Un cap no pot actualitzar a un administrador"
+        );
+
+        if (request.sucursalUuid() != null) usuari.setSucursal(
+            sucursalService.getSucursalEntityByUuid(request.sucursalUuid())
+        );
+        if (request.departamentUuid() != null) usuari.setDepartament(
+            departamentService.getDepartamentEntityByUuid(
+                request.departamentUuid()
+            )
+        );
+        if (request.rolUuid() != null) usuari.setRol(
+            rolService.getRolEntityByUuid(request.rolUuid())
+        );
+
+        mapper.updateUsuariFromDto(request, usuari);
+
+        if (request.correu() != null) if (
+            !correuValid(usuari)
+        ) throw new CorreuException(
+            "El correu " + request.correu() + " no es válid."
+        );
+
+        return new UsuariResponse(repo.save(usuari));
+    }
+
+    public ResponseEntity<Resource> getImatge(UUID userUuid) {
+        try {
+            Path imagePath = Paths.get(root.toString()).resolve(
+                getByUuid(userUuid).imatge()
+            );
+
+            if (!Files.exists(imagePath)) {
+                throw new ImageException("Imatge no trobada");
+            }
+
+            Resource resource = new FileSystemResource(imagePath);
+
+            String contentType = Files.probeContentType(imagePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+        } catch (IOException e) {
+            throw new ImageException("Imatge no trobada");
+        }
+    }
+
+    private void uploadImage(UUID requesterUuid, String urlImage) {
+        Usuari usuari = getUsuariEntityByUuid(requesterUuid);
+
+        usuari.setImatge(urlImage);
+
+        repo.save(usuari);
     }
 
     public UsuariResponse deleteByUuid(UUID uuid) {
@@ -116,84 +298,64 @@ public class UsuariService {
         return usuari;
     }
 
-    public boolean login(UUID uuid, String contrasenya) {
-        Usuari u = repo.findByUuid(uuid)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + uuid));
+    public UsuariResponse deleteByUuid(Usuari cap, UUID uuid) {
+        if (!cap.getPotAdministrar()) throw new UsuariException(
+            "El cap " + cap.getNom() + " no pot eliminar usuaris."
+        );
 
-        String contrasenyaBD = u.getContrasenya();
+        UsuariResponse usuari = getByUuid(uuid);
 
-        return passwordEncoder.matches(contrasenya, contrasenyaBD);
-    }
+        if (
+            !cap.getDepartament().getUuid().equals(usuari.departament().uuid())
+        ) throw new UsuariException(
+            "Un cap no pot actualitzar a usuaris d'un diferent departament."
+        );
 
-    // TODO CAMBIAR REGEX
+        if (usuari.rolIntern() == RolIntern.ADMIN) throw new UsuariException(
+            "Un cap no pot actualitzar a un administrador"
+        );
 
-    public boolean correuValid(String correu) {
-        final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-
-        return Pattern.matches(EMAIL_REGEX, correu);
-    }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public UsuariResponse getById(Long id) {
-        return new UsuariResponse(repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id)));
-    }
-
-    public Usuari getUsuariEntityById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id));
-    }
-
-    @Deprecated
-    public UsuariResponse update(Long id, UsuariRequest request) {
-        Sucursal s = null;
-        Departament d = null;
-        Rol r = null;
-
-        // if (correuValid(request.correu()) && request.correu() != null)
-        //     throw new CorreuExistentException("El correu: " + request.correu() + " no és un correu valid.");
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-        if (request.departamentUuid() != null)
-            d = departamentService.getDepartamentEntityByUuid(request.departamentUuid());
-        if (request.rolUuid() != null)
-            r = rolService.getRolEntityByUuid(request.rolUuid());
-
-        Usuari usuari = getUsuariEntityById(id);
-
-        if (s != null)
-            usuari.setSucursal(s);
-        if (d != null)
-            usuari.setDepartament(d);
-        if (r != null)
-            usuari.setRol(r);
-
-        mapper.updateUsuariFromDto(request, usuari);
-
-        return new UsuariResponse(repo.save(usuari));
-    }
-
-    @Deprecated
-    public UsuariResponse deleteById(Long id) {
-        UsuariResponse usuari = getById(id);
-
-        repo.deleteById(id);
+        repo.deleteByUuid(uuid);
 
         return usuari;
     }
 
-    @Deprecated
-    public boolean login(Long id, String contrasenya) {
-        Usuari u = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Usuari no trobat amb el id: " + id));
+    public void actualitzarUltimLogin(Usuari u) {
+        u.setDataUltimLogin(LocalDateTime.now());
 
-        String contrasenyaBD = u.getContrasenya();
-
-        return passwordEncoder.matches(contrasenya, contrasenyaBD);
+        repo.save(u);
     }
 
+    /**
+     * Comprova que un correu no existeixi i que el seu domini estigui permés
+     *
+     * @param correu Correu del usuari
+     * @return Si es valid
+     */
+    public boolean correuValid(Usuari u) {
+        if (repo.existsByCorreu(u.getCorreu())) throw new CorreuException(
+            "El correu: " + u.getCorreu() + " ja existeix."
+        );
+
+        ConfigResponse configResponse = configService.getConfigBySucursalUuid(
+            u.getSucursal().getUuid()
+        );
+
+        if (configResponse.permetreTotsDominis()) return true;
+
+        List<DominiResponse> dominiResponse =
+            dominiService.getDominisBySucursalUuid(u.getSucursal().getUuid());
+
+        String dominiCorreuUsuari = u
+            .getCorreu()
+            .substring(u.getCorreu().indexOf('@'));
+
+        if (!dominiService.esDominiValid(dominiCorreuUsuari)) return false;
+
+        for (DominiResponse domini : dominiResponse) {
+            if (domini.domini().equals(dominiCorreuUsuari)) return true;
+        }
+
+        return false;
+    }
 }

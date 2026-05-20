@@ -1,0 +1,17 @@
+{
+  "add_new": "+ Add New",
+  "save": "Save",
+  "saving": "Saving...",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "close": "Close",
+  "back": "Back",
+  "confirm": "Confirm",
+  "search": "Search",
+  "loading": "Loading...",
+  "error_loading": "Error loading data",
+  "no_results": "No results",
+  "delete_modal.title": "Confirm deletion",
+  "delete_modal.description": "Are you sure you want to delete this item? This action cannot be undone."
+}

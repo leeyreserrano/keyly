@@ -47,14 +47,27 @@ public class DominiService {
                 .orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el uuid: " + uuid));
     }
 
+    /**
+     * Entrega tots els dominis que estiguin relacionats amb la sucursal indicada
+     * 
+     * @param uuid Identificador de la sucursal
+     * @return Dominis de la sucursal
+     */
+    public List<DominiResponse> getDominisBySucursalUuid(UUID uuid) {
+        List<Domini> dominis = repo.findBySucursalUuid(uuid)
+                .orElseThrow(() -> new EntitatNoTrobadaException("Sucursal no trobada amb el uuid: " + uuid));
+
+        return dominis.stream().map(domini -> new DominiResponse(domini)).toList();
+    }
+
     public DominiResponse save(DominiRequest d) {
         if (!esDominiValid(d.domini()))
             throw new DominiInvalidException("El domini " + d.domini() + " no és un domini válid.");
 
-        if (repo.existsByDomini(d.domini()))
-            throw new DominiInvalidException("El domini " + d.domini() + " ja existeix.");
-
         Sucursal s = sucursalService.getSucursalEntityByUuid(d.sucursalUuid());
+
+        if (repo.existsByDominiAndSucursalUuid(d.domini(), s.getUuid()))
+            throw new DominiInvalidException("El domini " + d.domini() + " ja existeix.");
 
         Domini domini = new Domini();
 
@@ -72,15 +85,10 @@ public class DominiService {
         if (repo.existsByDomini(request.domini()))
             throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
 
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Domini domini = getDominiEntityByUuid(uuid);
 
-        if (s != null)
-            domini.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            domini.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateDominiFromDto(request, domini);
 
@@ -99,53 +107,6 @@ public class DominiService {
         final String EMAIL_REGEX = "^@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$";
 
         return Pattern.matches(EMAIL_REGEX, domini);
-    }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public DominiResponse getById(Long id) {
-        Domini domini = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el id: " + id));
-
-        return new DominiResponse(domini);
-    }
-
-    @Deprecated
-    public Domini getDominiEntityById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Domini no trobat amb el id: " + id));
-
-    }
-
-    @Deprecated
-    public DominiResponse update(Long id, DominiRequest request) {
-        if (!esDominiValid(request.domini()) && request.domini() != null) {
-            throw new DominiInvalidException("El domini " + request.domini() + " no és un domini válid.");
-        }
-
-        if (repo.existsByDomini(request.domini()))
-            throw new DominiInvalidException("El domini " + request.domini() + " ja existeix.");
-
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
-        Domini domini = getDominiEntityById(id);
-
-        domini.setSucursal(s);
-
-        mapper.updateDominiFromDto(request, domini);
-
-        return new DominiResponse(repo.save(domini));
-    }
-
-    @Deprecated
-    public DominiResponse deleteById(Long id) {
-        DominiResponse domini = getById(id);
-
-        repo.deleteById(id);
-
-        return domini;
     }
 
 }

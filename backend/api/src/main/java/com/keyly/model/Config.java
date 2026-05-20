@@ -28,7 +28,7 @@ public class Config {
     private Long id;
 
     @UuidGenerator
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID uuid;
 
     @OneToOne
@@ -37,5 +37,8 @@ public class Config {
 
     @Column(name = "permetre_tots_dominis")
     private Boolean permetreTotsDominis;
+
+    @Column(name = "dies_expiracio")
+    private int diesExpiracio;
 
 }

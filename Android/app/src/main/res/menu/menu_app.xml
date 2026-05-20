@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home"
+        android:title="Home"
+        app:itemIconTint="@null"
+        app:itemTextColor="@null"/>
+
+    <item
+        android:id="@+id/nav_items_folders"
+        android:icon="@drawable/passwords"
+        android:title="Passwords"
+        app:itemIconTint="@null"
+        app:itemTextColor="@null">
+    </item>
+
+    <item
+        android:id="@+id/nav_shared"
+        android:icon="@drawable/compartit_violeta"
+        android:title="Compartit"
+        app:itemIconTint="@null"
+        app:itemTextColor="@null"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/perfil"
+        android:title="Perfil"
+        app:itemIconTint="@null"
+        app:itemTextColor="@null"/>
+
+</menu>

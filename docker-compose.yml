@@ -1,18 +1,17 @@
 services:
   backend:
     build: ./backend/api
-    container_name: springboot
-    # ports:
-    #   - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
+    container_name: keyly-springboot
+    ports:
+      - "${SPRINGBOOT_PORT_LOCAL}:${SPRINGBOOT_PORT_DOCKER}"
     networks:
       - network
-    depends_on:
-      db:
-        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
 
   db:
     image: mysql:8.0
-    container_name: mysql-container
+    container_name: keyly-mysql
     env_file:
       - .env
     environment:
@@ -20,6 +19,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      LANG: C.UTF-8
     ports:
       - "${MYSQL_PORT_LOCAL}:${MYSQL_PORT_DOCKER}"
     volumes:
@@ -27,41 +27,41 @@ services:
       - ./db/mysql-init:/docker-entrypoint-initdb.d
     networks:
       - network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 30s
-
-  swagger-ui:
-    image: swaggerapi/swagger-ui:v5.32.0
-    container_name: swagger
-    # ports:
-    #   - "${SWAGGER_PORT_LOCAL}:${SWAGGER_PORT_DOCKER}"
-    volumes:
-      - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
+    command: 
+      --character-set-server=utf8mb4
+  
+  cassandra:
+    image: cassandra:5.0.8
+    container_name: keyly-cassandra
+    ports:
+      - "${CASSANDRA_PORT_LOCAL}:${CASSANDRA_PORT_DOCKER}"
     environment:
-      SWAGGER_JSON_URL: /swagger/openapi.json
+      - MAX_HEAP_SIZE=1G
+      - HEAP_NEWSIZE=256M
+      - CASSANDRA_USER=${CASSANDRA_USER}
+      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
+    volumes:
+      - cassandra-data:/var/lib/cassandra
     networks:
       - network
 
   nginx:
-    image: nginx:alpine
-    container_name: nginx
+    build: 
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    container_name: keyly-nginx
     ports:
       - "${NGINX_PORT_LOCAL}:${NGINX_PORT_DOCKER}"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./backend/swagger/openapi.json:/usr/share/nginx/html/openapi.json
-      # - ./frontend/build:/usr/share/nginx/html/frontend # cuando tengas frontend
+      - ./documentation/site:/usr/share/nginx/html/docs:ro
     networks:
       - network
-    depends_on:
-      - backend
 
 volumes:
   mysql-data:
+  cassandra-data:
+  uploads:
 
 networks:
   network:

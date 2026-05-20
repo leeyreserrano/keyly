@@ -1,0 +1,266 @@
+<resources>
+    <string name="app_name">Keyly_Projecte_Intermodular</string>
+
+    <!-- Global -->
+    <string name="cercador">Cercar</string>
+    <string name="btnCancelar">Cancel·lar</string>
+    <string name="etiquetaTots">Tots</string>
+    <string name="etiquetaUltimsUsats">Últims utilitzats</string>
+    <string name="etiquetaMesUsats">Més utilitzats</string>
+    <string name="etiquetaFavorits">Favorits</string>
+    <string name="hintCorreu">correu@domini.cat</string>
+    <string name="titolItems">Ítems</string>
+    <string name="titolCarpetes">Carpetes</string>
+    <string name="btnAfegirCarpetes">Afegir carpeta</string>
+    <string name="btnAfegirItems">Afegir ítems</string>
+
+    <!-- ActivtyLogin -->
+    <string name="btnLogin">Iniciar sessió</string>
+    <string name="toastLogin">Benvingut/da %s!</string>
+    <string name="toastNoLogin">No s\'ha pogut iniciar sessió</string>
+    <string name="toastLogout">Fins aviat %s!</string>
+    <string name="toastErrorConnexio">Error connexio</string>
+    <string name="toastErrorRelogueig">Error relogueig: %s</string>
+    <string name="toastNoUsuariNoContrasenya">Usuari o contrasenya incorrecta</string>
+
+    <!-- ActivtyHome -->
+    <string name="titolResum">Resum</string>
+    <string name="etiquetaTotalItems">Totals</string>
+    <string name="etiquetaVulnerades">Vulnerades</string>
+    <string name="etiquetaRepetides">Repetides</string>
+
+    <!-- ActivtyItemCarpetaSelector -->
+    <string name="titolItemCarpetaSelector">Ítems i carpetes</string>
+
+    <!-- ActivtyItem -->
+    <string name="hintNomItem">Nom ítem</string>
+    <string name="etiquetaLlocWebOmplerta">Lloc:</string>
+    <string name="etiquetaLlocWebBuida">Lloc web: no en té</string>
+    <string name="hintLlocWeb">https://domini.cat</string>
+    <string name="etiquetaNomUsuariOmplert">Nom d\'usuari:</string>
+    <string name="etiquetaNomUsuariBuit">Nom d\'usuari: no té cap</string>
+    <string name="hintContrasenya">Contrasenya</string>
+    <string name="hintNotes">Notes...</string>
+    <string name="btnCompartir">Compartir</string>
+    <string name="btnGuardar">Guardar</string>
+    <string name="btnEnrere">Enrere</string>
+    <string name="toastItemCreat">Ítem %s creat</string>
+    <string name="toastItemNoCreat">No s\'ha pogut crear l\'ítem %s</string>
+    <string name="toastItemEditat">Ítem %s editat</string>
+    <string name="toastItemNoEditat">No s\'ha pogut editar l\'ítem %s</string>
+    <string name="toastItemEliminat">Ítem %s eliminat</string>
+    <string name="toastItemNoEliminat">No s\'ha pogut eliminar l\'ítem %s</string>
+    <string name="toastItemCompartit">Ítem %s compartit</string>
+    <string name="toastItemNoCompartit">No s\'ha pogut copmartir l\'ítem %s</string>
+    <string name="toastItemNoAcces">No s\'ha pogut accedir a l\'ítem %s</string>
+    <string name="toastContrasenyaCopiada">Contrasenya copiada</string>
+
+    <!-- ActivtyCarpeta -->
+    <string name="toastCarpetaCreada">Carpeta %s creada</string>
+    <string name="toastCarpetaNoCreada">No s\'ha pogut crear la carpeta %s</string>
+    <string name="toastCarpetaEditada">Carpeta %s editada</string>
+    <string name="toastCarpetaNoEditada">No s\'ha pogut editar la carpeta %s</string>
+    <string name="toastCarpetaEliminada">Carpeta %s eliminada</string>
+    <string name="toastCarpetaNoEliminada">No s\'ha pogut eliminar la carpeta %s</string>
+
+    <!-- ActivityCompartits -->
+    <string name="titolCompartits">Compartits</string>
+
+    <!-- ActivityPerfil -->
+    <string name="hintNomUsuari">Nom usuari</string>
+    <string name="cbAdministrar">Pot administrar?</string>
+    <string name="llGestioUsuaris">Gestió d\'usuaris</string>
+    <string name="llGestioSucursals">Gestió de sucursals</string>
+    <string name="llGestioDepartaments">Gestió de departaments</string>
+    <string name="llGestioRols">Gestió de rols</string>
+    <string name="llGestioDominis">Gestió de dominis</string>
+    <string name="llInformes">Informes</string>
+    <string name="llTempsExpItems">Temps d\'expiració dels ítems</string>
+    <string name="toastUsuariCreat">Usuari %s creat</string>
+    <string name="toastUsuariNoCreat">No s\'ha pogut crear l\'usuari %s</string>
+    <string name="toastUsuariEditat">Usuari %s editat</string>
+    <string name="toastUsuariNoEditat">No s\'ha pogut editar l\'usuari %s</string>
+    <string name="toastUsuariEliminat">Usuari %s eliminat</string>
+    <string name="toastUsuariNoEliminat">No s\'ha pogut eliminar l\'usuari %s</string>
+    <string name="toastImatgePerfil">Imatge de perfil actualitzada</string>
+    <string name="toastNoImatgePerfil">No s\'ha pogut actualitzar l\'imatge de perfil</string>
+    <string name="setErrorNomUsuari">Has d\'omplir el nom d\'usuari!</string>
+    <string name="setErrorCorreuBuit">Has d\'omplir el correu!</string>
+    <string name="setErrorCorreuDomini">Domini del correu erroni!</string>
+    <string name="setErrorClauMestra">Has d\'omplir la clau mestra!</string>
+    <string name="toastClauMestra">Clau mestra</string>
+    <string name="toastClauMestraCopiada">Clau mestra copiada</string>
+    <string name="etiqeutaSenseSucursal">Sense sucursal</string>
+    <string name="etiqeutaSenseDepartament">Sense departament</string>
+    <string name="etiqeutaSenseRol">Sense rol</string>
+
+    <!-- ActivityUsuaris -->
+    <string name="titolUsuaris">Usuaris</string>
+
+    <!-- ActivitySucursals -->
+    <string name="titolSucursals">Sucursals</string>
+    <string name="toastSucursalCreada">Sucursal %s creada</string>
+    <string name="toastSucursalNoCreada">No s\'ha pogut crear la sucursal %s</string>
+    <string name="toastSucursalEditada">Sucursal %s editada</string>
+    <string name="toastSucursalNoEditada">No s\'ha pogut editar la sucursal %s</string>
+    <string name="toastSucursalEliminada">Sucursal %s eliminada</string>
+    <string name="toastSucursalNoEliminada">No s\'ha pogut eliminar la sucursal %s</string>
+    <string name="setErrorNomSucursal">Has d\'omplir el nom de la sucursal!</string>
+
+    <!-- ActivityDepartaments -->
+    <string name="titolDepartaments">Departaments</string>
+    <string name="toastDepartamentCreat">Departament %s creat</string>
+    <string name="toastDepartamentNoCreat">No s\'ha pogut crear el departament %s</string>
+    <string name="toastDepartamentEditat">Departament %s editat</string>
+    <string name="toastDepartamentNoEditat">No s\'ha pogut editar el departament %s</string>
+    <string name="toastDepartamentEliminat">Departament %s eliminat</string>
+    <string name="toastDepartamentNoEliminat">No s\'ha pogut eliminar el departament %s</string>
+    <string name="setErrorNomDepartament">Has d\'omplir el nom del departament!</string>
+
+    <!-- ActivityRols -->
+    <string name="titolRols">Rols</string>
+    <string name="toastRolCreat">Rol %s creat</string>
+    <string name="toastRolNoCreat">No s\'ha pogut crear el rol %s</string>
+    <string name="toastRolEditat">Rol %s editat</string>
+    <string name="toastRolNoEditat">No s\'ha pogut editar el rol %s</string>
+    <string name="toastRolEliminat">Rol %s eliminat</string>
+    <string name="toastRolNoEliminat">No s\'ha pogut eliminar el rol %s</string>
+    <string name="setErrorNomRol">Has d\'omplir el nom del rol!</string>
+
+    <!-- ActivityDominis -->
+    <string name="titolDominis">Dominis</string>
+    <string name="toastDominiCreat">Domini %s creat</string>
+    <string name="toastDominiNoCreat">No s\'ha pogut crear el domini %s</string>
+    <string name="toastDominiEditat">Domini %s editat</string>
+    <string name="toastDominiNoEditat">No s\'ha pogut editar el domini %s</string>
+    <string name="toastDominiEliminat">Domini %s eliminat</string>
+    <string name="toastDominiNoEliminat">No s\'ha pogut eliminar el domini %s</string>
+    <string name="setErrorNomDomini">Has d\'omplir el nom del domini!</string>
+
+    <!-- LayoutIdiomes -->
+    <string name="titolIdiomes">Tria l\'idioma:</string>
+    <string name="bntTraduir">Traduir</string>
+
+    <!-- LayoutGenerarContrasenya -->
+    <string name="etiquetaComBaixa">Complexitat baixa</string>
+    <string name="etiquetaComMitjana">Complexitat mitjana</string>
+    <string name="etiquetaComAlta">Complexitat alta</string>
+    <string name="etiquetaPersonalitzada">Personalitzada</string>
+
+    <!-- LayoutConstrasenyaPersonalitzada -->
+    <string name="titolPersonalitzada">Personalitzar contrasenya</string>
+    <string name="etiquetaLongitud">Longitud</string>
+    <string name="etiquetaTipusCaracters">Tipus caràcters</string>
+    <string name="etiquetaMin">Minúscules (a-z)</string>
+    <string name="etiquetaMaj">Majúscules (A-Z)</string>
+    <string name="etiquetaNum">Números (0-9)</string>
+    <string name="etiquetaCaracEsp">Caràcters especials (!@#...)</string>
+    <string name="etiquetaPrevisualitzacio">Previsualització</string>
+    <string name="btnUtilitzar">Utilitzar</string>
+    <string name="btnGenerar">Generar</string>
+
+    <!-- LayoutCareptesEditar -->
+    <string name="hintNomCarpeta">Nom carpeta</string>
+    <string name="llItems">Afegir ítems</string>
+    <string name="llUsuaris">Compartir amb...</string>
+
+    <!-- LayoutEliminar -->
+    <string name="etiquetaEliminarItem">Desitja eliminar l\'ítem "</string>
+    <string name="etiquetaEliminarCarpeta">Desitja eliminar la carpeta "</string>
+    <string name="etiquetaEliminarUsuari">Desitja eliminar l\'usuari "</string>
+    <string name="etiquetaEliminarSucursal">Desitja eliminar la sucursal "</string>
+    <string name="etiquetaEliminarDepartament">Desitja eliminar el departament "</string>
+    <string name="etiquetaEliminarRol">Desitja eliminar el rol "</string>
+    <string name="etiquetaEliminarDomini">Desitja eliminar el domini "</string>
+    <string name="btnEliminar">Eliminar</string>
+
+    <!-- LayoutFiltres -->
+    <string name="titolFiltres">Filtrar per:</string>
+    <string name="btnFiltrar">Filtrar</string>
+
+    <!-- LayoutCompartirItems -->
+    <string name="titolCompartirItems">Compartir amb...</string>
+    <string name="toastUsuarisNoSeleccionats">No s\'ha seleccionat cap usuari</string>
+
+    <!-- LayoutSucursal -->
+    <string name="hintSucursals">Nom sucursal</string>
+
+    <!-- LayoutInfoSucursal -->
+    <string name="etiquetaAdrecaOmplerta">Adreça:</string>
+    <string name="etiquetaAdrecaBuida">Adreça: no en té</string>
+    <string name="hintAdreca">Carrer d\'Osca, 95-105</string>
+    <string name="etiquetaCiutatOmplerta">Ciutat:</string>
+    <string name="etiquetaCiutatBuida">Ciutat: no en té</string>
+    <string name="hintCiutat">Barcelona</string>
+    <string name="etiquetaPaisOmplert">Pais:</string>
+    <string name="etiquetaPaisBuit">Pais: no en té</string>
+    <string name="hintPais">Espanya</string>
+    <string name="etiquetaTlfOmplert">Telèfon:</string>
+    <string name="etiquetaTlfBuit">Adreça: no en té</string>
+    <string name="hintTlf">936 56 00 00</string>
+    <string name="etiquetaCorreuOmplert">Correu electrònic:</string>
+    <string name="etiquetaCorreuBuit">Correu electrònic: no en té</string>
+
+    <!-- LayoutDepartament -->
+    <string name="hintDepartament">Nom departament</string>
+
+    <!-- LayoutRols -->
+    <string name="hintRol">Nom rol</string>
+
+    <!-- LayoutDominis -->
+    <string name="hintDominiCorreu">@domini.cat</string>
+
+    <!-- LayoutErrors -->
+    <string name="titolItemsBuits">Sense ítems</string>
+    <string name="etiquetaItemsBuits">Aquest usuari no té cap ítem</string>
+    <string name="etiquetaItemsError">No s\'han pogut obtenir els ítems</string>
+    <string name="titolCarpetesBuides">Sense carpetes</string>
+    <string name="etiquetaCarpetesBuides">Aquest usuari no té cap carpeta</string>
+    <string name="etiquetaCarpetesError">No s\'han pogut obtenir les carpetes</string>
+    <string name="titolCompartitsBuits">Sense compartits</string>
+    <string name="etiquetaCompartitsBuits">Aquest usuari no té cap compartit</string>
+    <string name="etiquetaCompartitsError">No s\'han pogut obtenir els compartits</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
+        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
+        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
+        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
+        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
+        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
+        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
+        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
+        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
+        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
+        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
+        bibendum, vel congue leo egestas.\n\n
+        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
+        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
+        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
+        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
+        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
+        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
+        est.\n\n
+        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
+        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
+        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
+        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
+        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
+        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
+        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
+        convallis.\n\n
+        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
+        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
+        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
+        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
+        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
+        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
+        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
+    </string>
+</resources>

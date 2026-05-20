@@ -60,21 +60,16 @@ public class DepartamentService {
         Departament departament = new Departament();
 
         departament.setSucursal(s);
-        departament.setDomini(request.nom());
+        departament.setDepartament(request.nom());
 
         return new DepartamentResponse(repo.save(departament));
     }
 
     public DepartamentResponse update(UUID uuid, DepartamentRequest request) {
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Departament d = getDepartamentEntityByUuid(uuid);
 
-        if (s != null)
-            d.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            d.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateDepartamentFromDto(request, d);
 
@@ -85,41 +80,6 @@ public class DepartamentService {
         DepartamentResponse departament = getByUuid(uuid);
 
         repo.deleteByUuid(uuid);
-
-        return departament;
-    }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public DepartamentResponse getById(Long id) {
-        Departament departament = repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Departament no trobat amb el id: " + id));
-
-        return new DepartamentResponse(departament);
-    }
-
-    @Deprecated
-    public DepartamentResponse update(Long id, DepartamentRequest request) {
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
-        Departament d = getDepartamentEntityById(id);
-
-        if (s != null)
-            d.setSucursal(s);
-
-        mapper.updateDepartamentFromDto(request, d);
-
-        return new DepartamentResponse(repo.save(d));
-    }
-
-    @Deprecated
-    public DepartamentResponse deleteById(Long id) {
-        DepartamentResponse departament = getById(id);
-
-        repo.deleteById(id);
 
         return departament;
     }

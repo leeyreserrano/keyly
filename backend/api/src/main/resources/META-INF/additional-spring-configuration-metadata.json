@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "JWT Secret 'jwt.secret'"
+  },
+  {
+    "name": "jwt.expiration-ms",
+    "type": "java.lang.String",
+    "description": "Expiration of JWT 'jwt.expiration-ms'"
+  },
+  {
+    "name": "file.storage.path",
+    "type": "java.lang.String",
+    "description": "A description for 'file.storage.path'"
+  }
+]}

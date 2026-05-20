@@ -55,11 +55,10 @@ public class RolService {
     }
 
     public RolResponse update(UUID uuid, RolRequest request) {
-        Sucursal s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
         Rol rol = getRolEntityByUuid(uuid);
 
-        rol.setSucursal(s);
+        if (request.sucursalUuid() != null)
+            rol.setSucursal(sucursalService.getSucursalEntityByUuid(request.sucursalUuid()));
 
         mapper.updateRolFromDto(request, rol);
 
@@ -70,49 +69,6 @@ public class RolService {
         RolResponse rol = getByUuid(uuid);
 
         repo.deleteByUuid(uuid);
-
-        return rol;
-    }
-
-    /*
-     * Métodos que desaparecerán en futuras versiones
-     */
-
-    @Deprecated
-    public RolResponse getById(Long id) {
-        return new RolResponse(
-                repo.findById(id).orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el id: " + id)));
-    }
-
-    @Deprecated
-    public Rol getRolEntityById(Long id) {
-        return repo.findById(id)
-                .orElseThrow(() -> new EntitatNoTrobadaException("Rol no trobat amb el id: " + id));
-
-    }
-
-    @Deprecated
-    public RolResponse update(Long id, RolRequest request) {
-        Sucursal s = null;
-
-        if (request.sucursalUuid() != null)
-            s = sucursalService.getSucursalEntityByUuid(request.sucursalUuid());
-
-        Rol rol = getRolEntityById(id);
-
-        if (s != null)
-            rol.setSucursal(s);
-
-        mapper.updateRolFromDto(request, rol);
-
-        return new RolResponse(repo.save(rol));
-    }
-
-    @Deprecated
-    public RolResponse deleteById(Long id) {
-        RolResponse rol = getById(id);
-
-        repo.deleteById(id);
 
         return rol;
     }
