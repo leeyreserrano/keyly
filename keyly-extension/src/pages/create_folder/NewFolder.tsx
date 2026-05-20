@@ -87,7 +87,7 @@ function NewFolder() {
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 pt-4">
         <button
           type="submit"
-          form="newItem"
+          form="newCarpeta"
           className="bg-purple-500 text-white py-2 px-10 rounded-lg hover:bg-purple-600">
           Guardar
         </button>
