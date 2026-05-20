@@ -1,14 +1,14 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.utils.GestionsCarpetes.crearCarpeta;
-import static com.example.keyly_projecte_intermodular.utils.GestionsCompartits.obtenirCompartits;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.crearCarpeta;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartits;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,27 +33,19 @@ import com.example.keyly_projecte_intermodular.dao.Carpeta;
 import com.example.keyly_projecte_intermodular.dao.Compartit;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
-import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
 import com.example.keyly_projecte_intermodular.adapters.CompartitAdapter;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
-import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CompartitActivity extends AppCompatActivity {
 
     private BottomNavigationView menu;
     private RecyclerView recyclerView;
     private ImageView imgBtnFiltres;
-    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnCompartir,
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnCompartir,
             imgBtnCompartirItems, imgBtnCompartirCarpetes;
     private CompartitAdapter compartitAdapter;
     private FrameLayout main;
@@ -83,6 +75,13 @@ public class CompartitActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -121,6 +120,9 @@ public class CompartitActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();
@@ -166,7 +168,8 @@ public class CompartitActivity extends AppCompatActivity {
 
         // Mostrar ítems i carpetes compartits
         obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                compartitAdapter, recyclerView, true);
+                compartitAdapter, recyclerView, true, null, null,
+                null, null);
 
         imgBtnFiltres = findViewById(R.id.imgBtnFiltres);
         imgBtnFiltres.setOnClickListener(v -> {
@@ -193,26 +196,32 @@ public class CompartitActivity extends AppCompatActivity {
                 if (cbTots.isChecked()) {
                     if (cbFavorits.isChecked()) {
                         obtenirCompartits(CompartitActivity.this, compartits, 0, true,
-                                compartitAdapter, recyclerView, true);
+                                compartitAdapter, recyclerView, true, null, null,
+                                null, null);
                     } else {
                         obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                                compartitAdapter, recyclerView, true);
+                                compartitAdapter, recyclerView, true, null, null,
+                                null, null);
                     }
                 } else if (cbUltimsUsats.isChecked()) { // Mostrar els últims ítems utilitzats
                     if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
                         obtenirCompartits(CompartitActivity.this, compartits, 1, true,
-                                compartitAdapter, recyclerView, true);
+                                compartitAdapter, recyclerView, true, null, null,
+                                null, null);
                     } else {
                         obtenirCompartits(CompartitActivity.this, compartits, 1, false,
-                                compartitAdapter, recyclerView, true);
+                                compartitAdapter, recyclerView, true, null, null,
+                                null, null);
                     }
                 } else if (cbMesUsats.isChecked()) { // Mostrar els ítems més usats
                     if (cbFavorits.isChecked()) { // Mostrar els ítems favorits
                         obtenirCompartits(CompartitActivity.this, compartits, 2, true,
-                                compartitAdapter, recyclerView, true);
+                                compartitAdapter, recyclerView, true, null, null,
+                                null, null);
                     } else {
                         obtenirCompartits(CompartitActivity.this, compartits, 2, false,
-                                compartitAdapter, recyclerView, true);
+                                compartitAdapter, recyclerView, true, null, null,
+                                null, null);
                     }
                 }
                 alertDialog.dismiss();
@@ -279,7 +288,8 @@ public class CompartitActivity extends AppCompatActivity {
                     null,
                     true,
                     () -> obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                            compartitAdapter, recyclerView, true),
+                            compartitAdapter, recyclerView, true, null, null,
+                            null, null),
                     null,
                     null,
                     null,
@@ -292,6 +302,7 @@ public class CompartitActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         obtenirCompartits(CompartitActivity.this, compartits, 0, false,
-                compartitAdapter, recyclerView, true);
+                compartitAdapter, recyclerView, true, null, null,
+                null, null);
     }
 }

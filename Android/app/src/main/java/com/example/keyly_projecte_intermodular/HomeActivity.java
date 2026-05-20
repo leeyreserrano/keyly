@@ -2,10 +2,12 @@ package com.example.keyly_projecte_intermodular;
 
 import static com.example.keyly_projecte_intermodular.resources.Varis.obtenirTotalVulnerades;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.actualitzarCarpetes;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,7 +39,7 @@ import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.adapters.CarpetaAdapter;
 import com.example.keyly_projecte_intermodular.adapters.CompartitAdapter;
 import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -58,7 +60,7 @@ public class HomeActivity extends AppCompatActivity {
             txtTitolErrorCompartits, txtDescripcioErrorCompartits;
     private ImageView imgVErrorItems, imgVErrorCarpetes, imgVErrorCompartits;
     private Button btnFiltrarTot, btnFiltrarMesUsats, btnFiltrarFavorits;
-    private ImageButton imgBtnIdioma, imgBtnLogOut;
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut;
     private BottomNavigationView menu;
     private ItemAdapter itemAdapter;
     private CarpetaAdapter carpetaAdapter;
@@ -83,6 +85,13 @@ public class HomeActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -121,6 +130,9 @@ public class HomeActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();
@@ -321,10 +333,12 @@ public class HomeActivity extends AppCompatActivity {
                     carpetes.addAll(response.body());
                     if (carpetes.size() > 0) {
                         if (filtre == 0) { // Mostrar tots les carpetes
-                            actualizarCarpetes(carpetes);
+                            actualitzarCarpetes(carpetes, carpetaAdapter, HomeActivity.this,
+                                    recyclerViewCarpetes);
                         } else if (filtre == 1) { // Mostrar les carpetes més utilitzades
                             carpetes.sort(Comparator.comparing(Carpeta::getComptadorAccess).reversed());
-                            actualizarCarpetes(carpetes);
+                            actualitzarCarpetes(carpetes, carpetaAdapter, HomeActivity.this,
+                                    recyclerViewCarpetes);
                         } else if (filtre == 2) { // Mostrar les carpetes utilitzades
                             ArrayList<Carpeta> carpetesFavorit = new ArrayList<>();
                             for (Carpeta carpeta : carpetes) {
@@ -332,9 +346,10 @@ public class HomeActivity extends AppCompatActivity {
                                     carpetesFavorit.add(carpeta);
                                 }
                             }
-                            actualizarCarpetes(carpetesFavorit);
+                            actualitzarCarpetes(carpetes, carpetaAdapter, HomeActivity.this,
+                                    recyclerViewCarpetes);
                         }
-                        carpetaAdapter.notifyDataSetChanged();
+                        //carpetaAdapter.notifyDataSetChanged();
                         recyclerViewCarpetes.setVisibility(RecyclerView.VISIBLE);
                         layoutErrorCarpetes.setVisibility(View.GONE);
                     } else {
@@ -472,20 +487,20 @@ public class HomeActivity extends AppCompatActivity {
         recyclerViewItems.setAdapter(itemAdapter);
     }
 
-    private void actualizarCarpetes(ArrayList<Carpeta> carpetes) {
-        // Mostrar carpetes
-        carpetaAdapter = new CarpetaAdapter(carpetes, carpeta -> {
-            Intent intent = new Intent(this, CarpetaActivity.class);
-            intent.putExtra("carpeta", carpeta);
-            intent.putExtra("uuid", carpeta.getUuid().toString());
-            intent.putExtra("nom", carpeta.getNom());
-            intent.putExtra("favorit", carpeta.isFavorit());
-            intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
-            intent.putExtra("data_creacio", carpeta.getDataCreacio());
-            startActivity(intent);
-        }, HomeActivity.this);
-        recyclerViewCarpetes.setAdapter(carpetaAdapter);
-    }
+//    private void actualizarCarpetes(ArrayList<Carpeta> carpetes) {
+//        // Mostrar carpetes
+//        carpetaAdapter = new CarpetaAdapter(carpetes, carpeta -> {
+//            Intent intent = new Intent(this, CarpetaActivity.class);
+//            intent.putExtra("carpeta", carpeta);
+//            intent.putExtra("uuid", carpeta.getUuid().toString());
+//            intent.putExtra("nom", carpeta.getNom());
+//            intent.putExtra("favorit", carpeta.isFavorit());
+//            intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
+//            intent.putExtra("data_creacio", carpeta.getDataCreacio());
+//            startActivity(intent);
+//        }, HomeActivity.this);
+//        recyclerViewCarpetes.setAdapter(carpetaAdapter);
+//    }
 
     private void actualizarCompartits(ArrayList<Compartit> compartits) {
         // Mostrar compartits

@@ -38,6 +38,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
@@ -75,6 +79,115 @@ public class Varis {
     private static int qtyVulnerablesResum = 0;
     public static Drawable svgPerfilAltre = null;
     public static Bitmap imatgePerfilAltre = null;
+
+    public static String tempsCreatEditat(String data, boolean editat, boolean editatAlMoment) {
+//        LocalDateTime dataCreacio = LocalDateTime.parse(data);
+//        LocalDateTime dataActual = LocalDateTime.now();
+//
+//        long segundos = Duration.between(dataCreacio, dataActual).getSeconds();
+//
+//        if (segundos < 60) {
+//            return "Creado hace " + segundos + " segundos";
+//        }
+//
+//        long minutos = segundos / 60;
+//
+//        if (minutos < 60) {
+//            return "Creado hace " + minutos + " minutos";
+//        }
+//
+//        long horas = minutos / 60;
+//
+//        if (horas < 24) {
+//            return "Creado hace " + horas + " horas";
+//        }
+//
+//        long dias = horas / 24;
+//
+//        if (dias < 7) {
+//            return "Creado hace " + dias + " días";
+//        }
+//
+//        long semanas = dias / 7;
+//
+//        if (semanas < 4) {
+//            return "Creado hace " + semanas + " semanas";
+//        }
+//
+//        long meses = ChronoUnit.MONTHS.between(dataCreacio, dataActual);
+//
+//        if (meses < 12) {
+//            return "Creado hace " + meses + " meses";
+//        }
+//
+//        long años = ChronoUnit.YEARS.between(dataCreacio, dataActual);
+//
+//        return "Creado hace " + años + " años";
+
+//        LocalDateTime fechaCreacion = LocalDateTime.parse(data);
+
+        Log.d("fecha", data);
+
+        if (data.contains(".")) {
+            String[] parts = data.split("\\.");
+            String decimals = parts[1].length() > 3 ? parts[1].substring(0, 3) : parts[1];
+            data = parts[0] + "." + decimals;
+        }
+
+        DateTimeFormatter formatter;
+        if (editatAlMoment) {
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        } else {
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        }
+
+        LocalDateTime fechaCreacion =
+                LocalDateTime.parse(data, formatter);
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        long segundos = Duration.between(fechaCreacion, ahora).getSeconds();
+
+        Log.d("Fecha creación: ", fechaCreacion.toString());
+        Log.d("Ahora: ", ahora.toString());
+        Log.d("Segundos: ", segundos + "");
+
+        if (segundos < 60) {
+            if (editat) {
+                return "Editado hace " + segundos + " segundos";
+            } else {
+                return "Creado hace " + segundos + " segundos";
+            }
+        }
+
+        long minutos = segundos / 60;
+
+        if (minutos < 60) {
+            if (editat) {
+                return "Editado hace " + minutos + " minutos";
+            } else {
+                return "Creado hace " + minutos + " minutos";
+            }
+        }
+
+        long horas = minutos / 60;
+
+        if (horas < 24) {
+            if (editat) {
+                return "Editado hace " + horas + " horas";
+            } else {
+                return "Creado hace " + horas + " horas";
+            }
+        }
+
+        long dias = horas / 24;
+
+        if (editat) {
+            return "Editado hace " + dias + " días";
+        } else {
+            return "Creado hace " + dias + " días";
+        }
+    }
 
     public static void getImage(Consumer<ResponseBody> onResult) {
         // TODO obtenir imatge perfil

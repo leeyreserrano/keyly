@@ -1,26 +1,18 @@
 package com.example.keyly_projecte_intermodular;
 
-import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
-import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
-import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
-import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
-import static com.example.keyly_projecte_intermodular.utils.GestionsCarpetes.actualitzarCarpetes;
-import static com.example.keyly_projecte_intermodular.utils.GestionsCarpetes.crearCarpeta;
-import static com.example.keyly_projecte_intermodular.utils.GestionsCarpetes.obtenirCarpetes;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.actualitzarCarpetes;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.crearCarpeta;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCarpetes.obtenirCarpetes;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -30,12 +22,10 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -43,32 +33,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
-import com.example.keyly_projecte_intermodular.dao.EncryptedDataKey;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
-import com.example.keyly_projecte_intermodular.dto.CarpetaDTO;
-import com.example.keyly_projecte_intermodular.dto.CompartitDTO;
-import com.example.keyly_projecte_intermodular.dto.ItemDTO;
-import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
-import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
 import com.example.keyly_projecte_intermodular.adapters.CarpetaAdapter;
-import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
-import com.example.keyly_projecte_intermodular.utils.Permisos;
-import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CarpetesActivity extends AppCompatActivity {
 
@@ -79,7 +51,7 @@ public class CarpetesActivity extends AppCompatActivity {
     private TextView txtTitolError, txtDescripcioError;
     private EditText etCercar;
     private ImageView imgVError, btnFiltres, btnAfegirCarpeta;
-    private ImageButton imgBtnIdioma, imgBtnLogOut;
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut;
     private BottomNavigationView menu;
     private int posItemCompartit = 0;
     private static int filtreActual = 0;
@@ -115,6 +87,13 @@ public class CarpetesActivity extends AppCompatActivity {
         imgVError = includeLogsCarpetes.findViewById(R.id.imgVError);
         recyclerView = findViewById(R.id.recyclerCarpetes);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
         imgBtnIdioma.setOnClickListener(v -> {
@@ -152,6 +131,9 @@ public class CarpetesActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();

@@ -6,6 +6,7 @@ import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.adapters.UsuariAdpater;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,7 @@ public class UsuarisActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private UsuariAdpater usuariAdpater;
     private EditText etCercar;
-    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirUsuari;
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirUsuari;
     private ArrayList<Usuari> usuaris = new ArrayList<>(), totalUsuaris = new ArrayList<>(),
             usuarisSeleccionats = new ArrayList<>();
 
@@ -62,6 +63,13 @@ public class UsuarisActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -100,6 +108,9 @@ public class UsuarisActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();

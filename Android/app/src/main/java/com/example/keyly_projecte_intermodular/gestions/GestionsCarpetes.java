@@ -1,6 +1,6 @@
-package com.example.keyly_projecte_intermodular.utils;
+package com.example.keyly_projecte_intermodular.gestions;
 
-import static com.example.keyly_projecte_intermodular.utils.GestionsCompartits.compartirCarpeta;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.compartirCarpeta;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.CarpetaActivity;
-import com.example.keyly_projecte_intermodular.CarpetesActivity;
 import com.example.keyly_projecte_intermodular.R;
 import com.example.keyly_projecte_intermodular.adapters.CarpetaAdapter;
 import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
@@ -37,6 +36,7 @@ import com.example.keyly_projecte_intermodular.dto.CarpetaDTO;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
+import com.example.keyly_projecte_intermodular.utils.Permisos;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -489,6 +489,8 @@ public class GestionsCarpetes {
             intent.putExtra("favorit", carpeta.isFavorit());
             intent.putExtra("items", new ArrayList<>(carpeta.getItems()));
             intent.putExtra("data_creacio", carpeta.getDataCreacio());
+            intent.putExtra("data_edicio", carpeta.getDataEditat());
+            Log.d("DATA_CREACIO", carpeta.getDataCreacio());
             context.startActivity(intent);
         }, context);
         recyclerView.setAdapter(carpetesAdapter);

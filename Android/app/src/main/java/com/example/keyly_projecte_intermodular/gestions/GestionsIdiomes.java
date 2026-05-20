@@ -1,4 +1,4 @@
-package com.example.keyly_projecte_intermodular.utils;
+package com.example.keyly_projecte_intermodular.gestions;
 
 import android.content.Context;
 import android.content.res.Configuration;

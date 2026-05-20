@@ -11,9 +11,9 @@ import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarCla
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.generarClauDerivada;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.generarKdfSalt;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.generarKeyPair;
-import static com.example.keyly_projecte_intermodular.utils.GestionsUsuaris.obtenirDepartamentUUID;
-import static com.example.keyly_projecte_intermodular.utils.GestionsUsuaris.obtenirRolUUID;
-import static com.example.keyly_projecte_intermodular.utils.GestionsUsuaris.obtenirSucursalUUID;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsUsuaris.obtenirDepartamentUUID;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsUsuaris.obtenirRolUUID;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsUsuaris.obtenirSucursalUUID;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.app.Activity;
@@ -74,7 +74,7 @@ import com.example.keyly_projecte_intermodular.dto.UsuariDTO;
 import com.example.keyly_projecte_intermodular.dto.UtilsDTO;
 import com.example.keyly_projecte_intermodular.request.UsuariRequest;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.LoginService;
 import com.example.keyly_projecte_intermodular.utils.RolIntern;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -107,7 +107,7 @@ public class PerfilActivity extends AppCompatActivity {
     private EditText etNomUsuari, etCorreu, etClauMestra;
     private Spinner spRolIntern, spSucursal, spDepartament, spRol, spTempsExpItems;
     private CheckBox cbAdministrar;
-    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnAddImg, imgBtnEditarUsuari, imgBtnCopy, imgBtnEye, imgBtnGenerate,
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnAddImg, imgBtnEditarUsuari, imgBtnCopy, imgBtnEye, imgBtnGenerate,
             imgBtnGuardarTempsExpItems;
     private Button btnModificarGuardarContra, btnCancelarPass, btnGuardar, btnCancelar, btnEliminar;
     private BottomNavigationView menu;
@@ -150,6 +150,13 @@ public class PerfilActivity extends AppCompatActivity {
             return insets;
         });
 
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        });
+
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
         imgBtnIdioma.setOnClickListener(v -> {
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
@@ -186,6 +193,9 @@ public class PerfilActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();
@@ -584,15 +594,15 @@ public class PerfilActivity extends AppCompatActivity {
                 flRolIntern.setVisibility(View.GONE);
                 spRolIntern.setVisibility(View.GONE);
                 txtCorreu.setVisibility(View.GONE);
-                txtSucursal.setVisibility(View.GONE);
-                txtDepartament.setVisibility(View.GONE);
-                txtRol.setVisibility(View.GONE);
+                flSucursal.setVisibility(View.GONE);
+                flDepartament.setVisibility(View.GONE);
+                flRol.setVisibility(View.GONE);
 
                 etCorreu.setVisibility(View.VISIBLE);
                 cbAdministrar.setVisibility(View.GONE);
-                flSucursal.setVisibility(View.VISIBLE);
-                flDepartament.setVisibility(View.VISIBLE);
-                flRol.setVisibility(View.VISIBLE);
+                txtSucursal.setVisibility(View.VISIBLE);
+                txtDepartament.setVisibility(View.VISIBLE);
+                txtRol.setVisibility(View.VISIBLE);
             } else {
                 txtRolInternUsuari.setVisibility(View.GONE);
                 etCorreu.setVisibility(View.GONE);
@@ -759,14 +769,20 @@ public class PerfilActivity extends AppCompatActivity {
                 // Obtenir els altres
                 omplirSpDepartaments(spDepartament, spSucursal);
                 obtenirRols(spRol, spSucursal);
-                if (!esCreant && usuariActual.getRolIntern().equals("ADMIN")) {
-                    obtenirSucursalUUID(usuariActual.getSucursal().getUuid(),
-                            llSucursal,
-                            txtSucursal,
-                            spSucursal,
-                            sucursals,
-                            PerfilActivity.this
-                    );
+                if (!esCreant) {
+                    if (usuariActual.getRolIntern().equals("ADMIN")) {
+                        obtenirSucursalUUID(usuariActual.getSucursal().getUuid(),
+                                llSucursal,
+                                txtSucursal,
+                                spSucursal,
+                                sucursals,
+                                PerfilActivity.this
+                        );
+                    }
+//                    else {
+//                        String sucursalActual = txtSucursal.getText().toString();
+//                        spSucursal.setSelection(sucursals.indexOf(sucursalActual));
+//                    }
                 }
             }
 
@@ -852,6 +868,17 @@ public class PerfilActivity extends AppCompatActivity {
                 etCorreu.setText(usuariActual.getCorreu());
 
             etClauMestra.setText(clauMestraActual);
+
+            if (!usuariActual.getRolIntern().equals("ADMIN")) {
+                if (usuariActual.getSucursal() != null) {
+                    for (Sucursal s : sucursals) {
+                        if (s.getUuid().equals(usuariActual.getSucursal().getUuid())) {
+                            spSucursal.setSelection(sucursals.indexOf(s) + 1);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         btnGuardar.setOnClickListener(v -> {
@@ -863,15 +890,17 @@ public class PerfilActivity extends AppCompatActivity {
             Rol rol = null;
 
             for (Sucursal sucursal1 : sucursals) {
-                if (sucursal1.getNom().equals(spSucursal.getSelectedItem().toString())) {
-                    sucursal = sucursal1;
-                    break;
+                if (!esCreant && usuariP) {
+                    if (sucursal1.getNom().equals(txtSucursal.getText().toString())) {
+                        sucursal = sucursal1;
+                        break;
+                    }
+                } else {
+                    if (sucursal1.getNom().equals(spSucursal.getSelectedItem().toString())) {
+                        sucursal = sucursal1;
+                        break;
+                    }
                 }
-            }
-
-            if (sucursal == null) {
-                Toast.makeText(this, getString(R.string.setErrorNomSucursal), Toast.LENGTH_SHORT).show();
-                return;
             }
 
             for (Departament departament1 : departaments) {
@@ -881,11 +910,6 @@ public class PerfilActivity extends AppCompatActivity {
                 }
             }
 
-            if (departament == null) {
-                Toast.makeText(this, getString(R.string.setErrorNomDepartament), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             for (Rol rol1 : rols) {
                 if (rol1.getNom().equals(spRol.getSelectedItem().toString())) {
                     rol = rol1;
@@ -893,9 +917,25 @@ public class PerfilActivity extends AppCompatActivity {
                 }
             }
 
-            if (rol == null) {
-                Toast.makeText(this, getString(R.string.setErrorNomRol), Toast.LENGTH_SHORT).show();
-                return;
+            RolIntern rolIntern = null;
+            if (!esCreant && !usuariP) {
+                if (sucursal == null) {
+                    Toast.makeText(this, getString(R.string.setErrorNomSucursal), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (departament == null) {
+                    Toast.makeText(this, getString(R.string.setErrorNomDepartament), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (rol == null) {
+                    Toast.makeText(this, getString(R.string.setErrorNomRol), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (spRolIntern.getSelectedItem().toString().equals("Sense rol intern")) {
+                    Toast.makeText(this, getString(R.string.setErrorNomRol), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                rolIntern = RolIntern.valueOf(spRolIntern.getSelectedItem().toString());
             }
 
             if (nomUsuari.isEmpty()) {
@@ -910,13 +950,6 @@ public class PerfilActivity extends AppCompatActivity {
             } else {
                 obtenirDominis(correu, sucursal);
             }
-
-            if (spRolIntern.getSelectedItem().toString().equals("Sense rol intern")) {
-                Toast.makeText(this, getString(R.string.setErrorNomRol), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            RolIntern rolIntern = RolIntern.valueOf(spRolIntern.getSelectedItem().toString());
 
             boolean potAdministrar = cbAdministrar.isChecked();
 
@@ -994,19 +1027,35 @@ public class PerfilActivity extends AppCompatActivity {
                     );
                 }
             } else {
-                usuariRequest = new UsuariRequest(
-                        sucursal.getUuid(), // UUID de sucursal
-                        departament.getUuid(), // UUID de departament
-                        rol.getUuid(), // UUID de rol
-                        nomUsuari, // Nom usuari
-                        correu, // Correu usuari
-                        clauMestraActual, // Clau mestra usuari
-                        kdfSaltB64, // kdfSalt
-                        publicKey, // publicKey
-                        clauPrivadaEncriptada, // encryptedPrivateKey
-                        rolIntern, // Rol intern (ADMIN, CAP, USUARI)
-                        potAdministrar // potAdministrar
-                );
+                if (!usuariP) {
+                    usuariRequest = new UsuariRequest(
+                            sucursal.getUuid(), // UUID de sucursal
+                            departament.getUuid(), // UUID de departament
+                            rol.getUuid(), // UUID de rol
+                            nomUsuari, // Nom usuari
+                            correu, // Correu usuari
+                            clauMestraActual, // Clau mestra usuari
+                            kdfSaltB64, // kdfSalt
+                            publicKey, // publicKey
+                            clauPrivadaEncriptada, // encryptedPrivateKey
+                            rolIntern, // Rol intern (ADMIN, CAP, USUARI)
+                            potAdministrar // potAdministrar
+                    );
+                } else {
+                    usuariRequest = new UsuariRequest(
+                            null, // UUID de sucursal
+                            null, // UUID de departament
+                            null, // UUID de rol
+                            nomUsuari, // Nom usuari
+                            correu, // Correu usuari
+                            clauMestraActual, // Clau mestra usuari
+                            kdfSaltB64, // kdfSalt
+                            publicKey, // publicKey
+                            clauPrivadaEncriptada, // encryptedPrivateKey
+                            rolIntern, // Rol intern (ADMIN, CAP, USUARI)
+                            potAdministrar // potAdministrar
+                    );
+                }
             }
 
             if (!esCreant) {
@@ -1019,7 +1068,6 @@ public class PerfilActivity extends AppCompatActivity {
             Log.d("USUARI_REQUEST", usuariRequest.toString());
 
             // Pujar-lo al servidor
-            pujarUsuari(usuariRequest);
             pujarUsuari(usuariRequest);
         });
     }

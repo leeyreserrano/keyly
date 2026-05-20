@@ -147,19 +147,20 @@
                     android:gravity="center">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/txtTitleItem"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Nom Item"
                             android:fontFamily="@font/airbnb_cereal_w_bd"
                             android:textSize="20dp"
                             android:textColor="@color/black"
-                            android:visibility="gone"/>
+                            android:visibility="visible"/>
 
                         <EditText
                             android:id="@+id/etNomItem"
@@ -171,7 +172,7 @@
                             android:layout_marginBottom="5dp"
                             android:hint="@string/hintNomItem"
                             android:background="@drawable/background_text_notes"
-                            android:visibility="visible"/>
+                            android:visibility="gone"/>
 
                     </LinearLayout>
 
@@ -181,9 +182,19 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/star"
                         android:backgroundTint="@color/transparent"
-                        android:visibility="gone"/>
+                        android:visibility="visible"/>
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Data"
+                    android:fontFamily="@font/manrope_regular"
+                    android:textSize="15dp"
+                    android:textColor="@color/light_grey"
+                    android:visibility="visible"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -198,7 +209,7 @@
                         android:fontFamily="@font/manrope_regular"
                         android:textSize="15dp"
                         android:textColor="@color/light_grey"
-                        android:visibility="gone"/>
+                        android:visibility="visible"/>
 
                     <EditText
                         android:id="@+id/etLlocItem"
@@ -209,7 +220,7 @@
                         android:layout_marginBottom="5dp"
                         android:hint="@string/hintLlocWeb"
                         android:background="@drawable/background_text_notes"
-                        android:visibility="visible"/>
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 
@@ -226,7 +237,7 @@
                         android:fontFamily="@font/manrope_regular"
                         android:textSize="15dp"
                         android:textColor="@color/light_grey"
-                        android:visibility="gone"/>
+                        android:visibility="visible"/>
 
                     <EditText
                         android:id="@+id/etNomUsuariItem"
@@ -236,7 +247,7 @@
                         android:layout_marginEnd="5dp"
                         android:hint="@string/hintCorreu"
                         android:background="@drawable/background_text_notes"
-                        android:visibility="visible"/>
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 
@@ -317,7 +328,7 @@
                 android:backgroundTint="@color/transparent"
                 android:scaleType="fitXY"
                 android:layout_gravity="center"
-                android:visibility="visible"/>
+                android:visibility="gone"/>
             
         </LinearLayout>
 

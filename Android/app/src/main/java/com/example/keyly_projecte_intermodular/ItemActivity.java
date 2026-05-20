@@ -4,6 +4,7 @@ import static com.example.keyly_projecte_intermodular.resources.Varis.comprovarV
 import static com.example.keyly_projecte_intermodular.resources.Varis.dataKey;
 import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
 import static com.example.keyly_projecte_intermodular.resources.Varis.publicKey;
+import static com.example.keyly_projecte_intermodular.resources.Varis.tempsCreatEditat;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.cypherIV;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarContrasenya2;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
@@ -14,6 +15,8 @@ import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -64,7 +67,7 @@ import com.example.keyly_projecte_intermodular.request.ItemRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
 import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
 import com.example.keyly_projecte_intermodular.utils.Encrypt;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
@@ -91,10 +94,10 @@ public class ItemActivity extends AppCompatActivity {
 
     private View includeItemVulnerat, includeItemRepetit;
     private LinearLayout llNomItem, llPassword, llActions;
-    private TextView txtTitolAvisVulnerat, txtTitolAvisRepetit, txtTitle, txtUrl, txtNomUsuari, txtNotes;
+    private TextView txtTitolAvisVulnerat, txtTitolAvisRepetit, txtTitle, txtData, txtUrl, txtNomUsuari, txtNotes;
     private EditText etTitolItem, etLlocItem, etNomUsuariItem, etPassword, etNotes;
     private ImageView imgVAvisVulnerat, imgVAvisRepetit;
-    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnStar, imgBtnEditStar, imgButtonCopy, imgBtnEye, imgBtnGenerate;
     // TODO añadir botón de editar y eliminar
     private Button btnCompartir, btnGuardarEliminarItem, btnBack;
     private int edit = 0;
@@ -121,6 +124,13 @@ public class ItemActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -160,6 +170,9 @@ public class ItemActivity extends AppCompatActivity {
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
                     recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
+                    recreate();
                 }
                 alertDialog.dismiss();
             });
@@ -189,6 +202,24 @@ public class ItemActivity extends AppCompatActivity {
         // Nom Item
         txtTitle = findViewById(R.id.txtTitleItem);
         etTitolItem = findViewById(R.id.etNomItem);
+
+        // Data
+        txtData = findViewById(R.id.txtData);
+        String dataCreacio = getIntent().getStringExtra("data_creacio");
+        String dataEdicio = getIntent().getStringExtra("data_edicio");
+        if (dataCreacio != null) {
+            if (dataEdicio == null) {
+                String dataFormatejada = tempsCreatEditat(dataCreacio, false, false);
+                Log.d("DATA", dataFormatejada);
+                txtData.setText(dataFormatejada);
+            } else {
+                String dataFormatejada = tempsCreatEditat(dataEdicio, true, false);
+                Log.d("DATA", dataFormatejada);
+                txtData.setText(dataFormatejada);
+            }
+        } else {
+            txtData.setText("");
+        }
 
         // Lloc/URL Item
         txtUrl = findViewById(R.id.txtLlocItem);
@@ -461,6 +492,9 @@ public class ItemActivity extends AppCompatActivity {
                 }
             });
 
+            // Data
+            txtData.setVisibility(View.GONE);
+
             // Lloc i Propietari Item
             txtUrl.setVisibility(View.GONE);
             etLlocItem.setVisibility(View.VISIBLE);
@@ -630,6 +664,11 @@ public class ItemActivity extends AppCompatActivity {
                         public void onResponse(Call<Item> call, Response<Item> response) {
                             if (response.isSuccessful()) {
                                 itemActual = response.body();
+                                if (itemActual.getDataEditat() != null) {
+                                    String dataFormatejada = tempsCreatEditat(itemActual.getDataEditat(), true, true);
+                                    Log.d("DATA_ITEM", dataFormatejada);
+                                    txtData.setText(dataFormatejada);
+                                }
                                 Toast.makeText(ItemActivity.this, getString(R.string.toastItemEditat, titol), Toast.LENGTH_SHORT).show();
                                 if (usuarisSeleccionats.size() > 0) {
                                     ArrayList<EncryptedDataKey> encryptedDataKeys = new ArrayList<>();
@@ -738,6 +777,9 @@ public class ItemActivity extends AppCompatActivity {
                 // TODO ver qué hace esto para quitarlo
                 Toast.makeText(ItemActivity.this, "Edició", Toast.LENGTH_SHORT);
             });
+
+            // Data
+            txtData.setVisibility(View.VISIBLE);
 
             // Lloc i Propietari Item
             txtUrl.setVisibility(View.VISIBLE);

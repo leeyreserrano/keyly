@@ -1,14 +1,18 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.mostrarLlistaCompartits;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsCompartits.obtenirCompartits;
 import static com.example.keyly_projecte_intermodular.resources.Varis.privateKeyDecrypt;
+import static com.example.keyly_projecte_intermodular.resources.Varis.tempsCreatEditat;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.desencriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.encriptarDataKey;
 import static com.example.keyly_projecte_intermodular.utils.Encrypt.stringToPublicKey;
-import static com.example.keyly_projecte_intermodular.utils.GestionsCompartits.obtenirUsuaris;
+import static com.example.keyly_projecte_intermodular.gestions.GestionsUsuaris.obtenirUsuaris;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,6 +44,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.keyly_projecte_intermodular.dao.Carpeta;
+import com.example.keyly_projecte_intermodular.dao.Compartit;
 import com.example.keyly_projecte_intermodular.dao.EncryptedDataKey;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dao.Usuari;
@@ -51,7 +56,7 @@ import com.example.keyly_projecte_intermodular.request.CompartitRequest;
 import com.example.keyly_projecte_intermodular.request.UsuariCompartitRequest;
 import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
 import com.example.keyly_projecte_intermodular.adapters.RecercaAdapter;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.Permisos;
 import com.example.keyly_projecte_intermodular.utils.TipusEntitat;
 
@@ -74,17 +79,20 @@ public class CarpetaActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
-    private TextView nomCarpeta, dataCreacio;
+    private TextView nomCarpeta, txtDataCreacioEdicio;
     private EditText etCercar;
     private ImageView imgBtnFiltres;
-    private ImageButton imgBtnCompartir, imgBtnIdioma, imgBtnLogOut, imgBtnStar, imgBtnEditar, imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
+    private ImageButton imgBtnCompartir, imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnStar, imgBtnEditar,
+            imgBtnEliminar, imgBtnBack, imgBtnAfegirItem;
     private int itemAfegit = 0;
     private String uuid;
-    private boolean filtrat = false;
+    private boolean editat;
     private Carpeta carpetaActual;
     private ArrayList<Item> items, totalItems = new ArrayList<>(), itemsSeleccionats = new ArrayList<>();
     private ArrayList<Usuari> usuaris = new ArrayList<>(), usuarisSeleccionats = new ArrayList<>(),
-        usuarisActuals = new ArrayList<>(), getUsuarisActualsSeleccionats = new ArrayList<>();
+        usuarisActuals = new ArrayList<>(), getUsuarisActualsSeleccionats = new ArrayList<>(),
+        usuarisCompartits = new ArrayList<>();
+    private ArrayList<Compartit> compartitsActuals = new ArrayList<>();
     private ArrayList<UsuariCompartitRequest> usuarisCompartitRequest = new ArrayList<>();
     private ArrayList<String> permisos = new ArrayList<>(), permisosActuals = new ArrayList<>();
 
@@ -105,6 +113,13 @@ public class CarpetaActivity extends AppCompatActivity {
         });
 
         imgBtnCompartir = findViewById(R.id.imgBtnCompartir);
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
         imgBtnIdioma.setOnClickListener(v -> {
@@ -143,6 +158,9 @@ public class CarpetaActivity extends AppCompatActivity {
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
                     recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
+                    recreate();
                 }
                 alertDialog.dismiss();
             });
@@ -162,8 +180,11 @@ public class CarpetaActivity extends AppCompatActivity {
 
         carpetaActual = new Carpeta(UUID.fromString(uuid), nom);
 
+        txtDataCreacioEdicio = findViewById(R.id.dataCreacio);
+
         boolean favorit = getIntent().getBooleanExtra("favorit", false);
         String data_creacio = getIntent().getStringExtra("data_creacio");
+        String data_edicio = getIntent().getStringExtra("data_edicio");
 
         items = (ArrayList<Item>) getIntent().getSerializableExtra("items");
         Log.e("ITEMS_CARPETA" + nom, items.toString());
@@ -171,15 +192,17 @@ public class CarpetaActivity extends AppCompatActivity {
         AtomicBoolean favActual = new AtomicBoolean(favorit);
 
         // Formatejar data
-        String dataFormatejada = formatDataCreacio(data_creacio);
-        Log.d("DATA", dataFormatejada);
+        if (data_creacio != null) {
+            // TODO mirar si se editó o no
+            String dataFormatejada = tempsCreatEditat(data_edicio, false, false);
+            Log.d("DATA", dataFormatejada);
+            txtDataCreacioEdicio.setText(dataFormatejada);
+        } else {
+            txtDataCreacioEdicio.setText("");
+        }
 
         nomCarpeta = findViewById(R.id.nomCarpeta);
         nomCarpeta.setText(nom);
-
-        dataCreacio = findViewById(R.id.dataCreacio);
-        // TODO hacer que muestre hace cuanto se creó/editó la carpeta
-        dataCreacio.setText(data_creacio);
 
         imgBtnStar = findViewById(R.id.imgBtnStar);
         if (favActual.get()) {
@@ -261,7 +284,7 @@ public class CarpetaActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Carpeta> call, Response<Carpeta> response) {
                         if (response.isSuccessful()) {
-
+                            editat = true;
                             nomCarpeta.setText(response.body().getNom());
 
                             AtomicBoolean favActual = new AtomicBoolean(response.body().isFavorit());
@@ -657,11 +680,13 @@ public class CarpetaActivity extends AppCompatActivity {
             alertDialog.show();
 
             // Elements del AlertDialog
-            LinearLayout llDesplegableUsuaris = view.findViewById(R.id.llDesplegableCompartir);
+            LinearLayout llDesplegableUsuaris = view.findViewById(R.id.llDesplegableUsuaris);
+            LinearLayout llContingutUsuaris = view.findViewById(R.id.llContigutUsuaris);
             AutoCompleteTextView aCTVCercarUsuaris = view.findViewById(R.id.aCTVCercarUsuaris);
             RecyclerView recyclerUsuaris = view.findViewById(R.id.recyclerUsuaris);
 
             LinearLayout llDesplegableCompartir = view.findViewById(R.id.llDesplegableCompartir);
+            LinearLayout llContingutCompartir = view.findViewById(R.id.llContigutCompartir);
             AutoCompleteTextView aCTVCercarCompartir = view.findViewById(R.id.aCTVCercarCompartir);
             RecyclerView recyclerCompartir = view.findViewById(R.id.recyclerCompartir);
 
@@ -670,28 +695,28 @@ public class CarpetaActivity extends AppCompatActivity {
 
             // Mostrar els usuaris compartits
             llDesplegableUsuaris.setOnClickListener(c -> {
-                if (llDesplegableCompartir.getVisibility() == View.VISIBLE) {
-                    llDesplegableCompartir.setVisibility(View.GONE);
-                    llDesplegableUsuaris.setVisibility(View.VISIBLE);
-                } else if (llDesplegableCompartir.getVisibility() == View.GONE) {
-                    if (llDesplegableUsuaris.getVisibility() == View.VISIBLE) {
-                        llDesplegableUsuaris.setVisibility(View.GONE);
+                if (llContingutCompartir.getVisibility() == View.VISIBLE) {
+                    llContingutCompartir.setVisibility(View.GONE);
+                    llContingutUsuaris.setVisibility(View.VISIBLE);
+                } else if (llContingutCompartir.getVisibility() == View.GONE) {
+                    if (llContingutUsuaris.getVisibility() == View.VISIBLE) {
+                        llContingutUsuaris.setVisibility(View.GONE);
                     } else {
-                        llDesplegableUsuaris.setVisibility(View.VISIBLE);
+                        llContingutUsuaris.setVisibility(View.VISIBLE);
                     }
                 }
             });
 
             // Mostrar el cercador d'usuaris per compartir
             llDesplegableCompartir.setOnClickListener(c -> {
-                if (llDesplegableUsuaris.getVisibility() == View.VISIBLE) {
-                    llDesplegableUsuaris.setVisibility(View.GONE);
-                    llDesplegableCompartir.setVisibility(View.VISIBLE);
-                } else if (llDesplegableUsuaris.getVisibility() == View.GONE) {
-                    if (llDesplegableCompartir.getVisibility() == View.VISIBLE) {
-                        llDesplegableCompartir.setVisibility(View.GONE);
+                if (llContingutUsuaris.getVisibility() == View.VISIBLE) {
+                    llContingutUsuaris.setVisibility(View.GONE);
+                    llContingutCompartir.setVisibility(View.VISIBLE);
+                } else if (llContingutUsuaris.getVisibility() == View.GONE) {
+                    if (llContingutCompartir.getVisibility() == View.VISIBLE) {
+                        llContingutCompartir.setVisibility(View.GONE);
                     } else {
-                        llDesplegableCompartir.setVisibility(View.VISIBLE);
+                        llContingutCompartir.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -704,17 +729,20 @@ public class CarpetaActivity extends AppCompatActivity {
                     getUsuarisActualsSeleccionats, permisosActuals, this);
             recyclerUsuaris.setAdapter(recercaAdapterUsuaris);
 
-            obtenirUsuaris(usuarisActuals, getUsuarisActualsSeleccionats, permisosActuals, recyclerUsuaris,
-                    recercaAdapterUsuaris, aCTVCercarCompartir, CarpetaActivity.this, true);
-
             // Cercar usuaris per compartir
             recyclerCompartir.setLayoutManager(new LinearLayoutManager(CarpetaActivity.this));
             RecercaAdapter recercaAdapterCompartir = new RecercaAdapter(null, null,
                     usuarisSeleccionats, permisos, this);
             recyclerCompartir.setAdapter(recercaAdapterCompartir);
 
-            obtenirUsuaris(usuaris, usuarisSeleccionats, permisos, recyclerCompartir,
-                    recercaAdapterCompartir, aCTVCercarCompartir, CarpetaActivity.this, false);
+            obtenirUsuaris(usuarisActuals, getUsuarisActualsSeleccionats, permisosActuals, recyclerUsuaris,
+                    recercaAdapterUsuaris, aCTVCercarCompartir, CarpetaActivity.this,
+                    true,
+                    () -> obtenirCompartits(CarpetaActivity.this, compartitsActuals, 0, false,
+                            null, recyclerView, false, usuarisActuals, usuarisCompartits,
+                            permisosActuals, () -> mostrarLlistaCompartits(CarpetaActivity.this,
+                                    usuarisCompartits, permisosActuals, aCTVCercarUsuaris,
+                                    recyclerUsuaris, recercaAdapterUsuaris)));
         });
 
         etCercar = findViewById(R.id.aCTVCercarItems);

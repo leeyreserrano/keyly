@@ -2,6 +2,8 @@ package com.example.keyly_projecte_intermodular;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Base64;
 
 import android.os.Bundle;
@@ -22,7 +24,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.keyly_projecte_intermodular.dao.Usuari;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.example.keyly_projecte_intermodular.utils.LoginService;
 
 import java.security.KeyFactory;
@@ -39,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private Context context;
     private EditText txtUsuari, txtContrasenya;
     private Button btnLogin;
-    private ImageButton imgBtnIdioma;
+    private ImageButton imgBtnAjuda, imgBtnIdioma;
     private String json, nomUsuari = null, password = null;
     private ArrayList<Usuari> usuaris = new ArrayList<>();
 
@@ -57,6 +59,13 @@ public class LoginActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -95,6 +104,9 @@ public class LoginActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();

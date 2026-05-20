@@ -1,0 +1,267 @@
+<resources>
+    <string name="app_name">Keyly_Projecte_Intermodular</string>
+
+    <!-- Global -->
+    <string name="cercador">Buscar</string>
+    <string name="btnCancelar">Cancelar</string>
+    <string name="etiquetaTots">Todos</string>
+    <string name="etiquetaUltimsUsats">Últimos utilizados</string>
+    <string name="etiquetaMesUsats">Más utilizados</string>
+    <string name="etiquetaFavorits">Favoritos</string>
+    <string name="hintCorreu">correo@dominio.es</string>
+    <string name="titolItems">Ítems</string>
+    <string name="titolCarpetes">Carpetas</string>
+    <string name="btnAfegirCarpetes">Añadir carpeta</string>
+    <string name="btnAfegirItems">Añadir ítems</string>
+
+    <!-- ActivtyLogin -->
+    <string name="btnLogin">Iniciar sesión</string>
+    <string name="toastLogin">¡Bienvenido/a %s!</string>
+    <string name="toastNoLogin">No se ha podido iniciar sesión</string>
+    <string name="toastLogout">¡Hasta pronto %s!</string>
+    <string name="toastErrorConnexio">Error de conexión</string>
+    <string name="toastErrorRelogueig">Error de relogueo: %s</string>
+    <string name="toastNoUsuariNoContrasenya">Usuario o contraseña incorrecta</string>
+
+    <!-- ActivtyHome -->
+    <string name="titolResum">Resumen</string>
+    <string name="etiquetaTotalItems">Totales</string>
+    <string name="etiquetaVulnerades">Vulneradas</string>
+    <string name="etiquetaRepetides">Repetidas</string>
+
+    <!-- ActivtyItemCarpetaSelector -->
+    <string name="titolItemCarpetaSelector">Ítems y carpetas</string>
+
+    <!-- ActivtyItem -->
+    <string name="hintNomItem">Nombre ítem</string>
+    <string name="etiquetaLlocWebOmplerta">Sitio:</string>
+    <string name="etiquetaLlocWebBuida">Sitio web: no tiene</string>
+    <string name="hintLlocWeb">https://dominio.es</string>
+    <string name="etiquetaNomUsuariOmplert">Nombre de usuario:</string>
+    <string name="etiquetaNomUsuariBuit">Nombre de usuario: no tiene ninguno</string>
+    <string name="hintContrasenya">Contraseña</string>
+    <string name="hintNotes">Notas...</string>
+    <string name="btnCompartir">Compartir</string>
+    <string name="btnGuardar">Guardar</string>
+    <string name="btnEnrere">Atrás</string>
+    <string name="toastItemCreat">Ítem %s creado</string>
+    <string name="toastItemNoCreat">No se ha podido crear el ítem %s</string>
+    <string name="toastItemEditat">Ítem %s editado</string>
+    <string name="toastItemNoEditat">No se ha podido editar el ítem %s</string>
+    <string name="toastItemEliminat">Ítem %s eliminado</string>
+    <string name="toastItemNoEliminat">No se ha podido eliminar el ítem %s</string>
+    <string name="toastItemCompartit">Ítem %s compartido</string>
+    <string name="toastItemNoCompartit">No se ha podido compartir el ítem %s</string>
+    <string name="toastItemNoAcces">No se ha podido acceder al ítem %s</string>
+    <string name="toastContrasenyaCopiada">Contraseña copiada</string>
+
+    <!-- ActivtyCarpeta -->
+    <string name="toastCarpetaCreada">Carpeta %s creada</string>
+    <string name="toastCarpetaNoCreada">No se ha podido crear la carpeta %s</string>
+    <string name="toastCarpetaEditada">Carpeta %s editada</string>
+    <string name="toastCarpetaNoEditada">No se ha podido editar la carpeta %s</string>
+    <string name="toastCarpetaEliminada">Carpeta %s eliminada</string>
+    <string name="toastCarpetaNoEliminada">No se ha podido eliminar la carpeta %s</string>
+
+    <!-- ActivityCompartits -->
+    <string name="titolCompartits">Compartidos</string>
+
+    <!-- ActivityPerfil -->
+    <string name="hintNomUsuari">Nombre usuario</string>
+    <string name="cbAdministrar">¿Puede administrar?</string>
+    <string name="llGestioUsuaris">Gestión de usuarios</string>
+    <string name="llGestioSucursals">Gestión de sucursales</string>
+    <string name="llGestioDepartaments">Gestión de departamentos</string>
+    <string name="llGestioRols">Gestión de roles</string>
+    <string name="llGestioDominis">Gestión de dominios</string>
+    <string name="llInformes">Informes</string>
+    <string name="llTempsExpItems">Tiempo de expiración de los ítems</string>
+    <string name="toastUsuariCreat">Usuario %s creado</string>
+    <string name="toastUsuariNoCreat">No se ha podido crear el usuario %s</string>
+    <string name="toastUsuariEditat">Usuario %s editado</string>
+    <string name="toastUsuariNoEditat">No se ha podido editar el usuario %s</string>
+    <string name="toastUsuariEliminat">Usuario %s eliminado</string>
+    <string name="toastUsuariNoEliminat">No se ha podido eliminar el usuario %s</string>
+    <string name="toastImatgePerfil">Imagen de perfil actualizada</string>
+    <string name="toastNoImatgePerfil">No se ha podido actualizar la imagen de perfil</string>
+    <string name="setErrorNomUsuari">¡Debes rellenar el nombre de usuario!</string>
+    <string name="setErrorCorreuBuit">¡Debes rellenar el correo!</string>
+    <string name="setErrorCorreuDomini">¡Dominio del correo incorrecto!</string>
+    <string name="setErrorClauMestra">¡Debes rellenar la clave maestra!</string>
+    <string name="toastClauMestra">Clave maestra</string>
+    <string name="toastClauMestraCopiada">Clave maestra copiada</string>
+    <string name="etiqeutaSenseSucursal">Sin sucursal</string>
+    <string name="etiqeutaSenseDepartament">Sin departamento</string>
+    <string name="etiqeutaSenseRol">Sin rol</string>
+
+    <!-- ActivityUsuaris -->
+    <string name="titolUsuaris">Usuarios</string>
+
+    <!-- ActivitySucursals -->
+    <string name="titolSucursals">Sucursales</string>
+    <string name="toastSucursalCreada">Sucursal %s creada</string>
+    <string name="toastSucursalNoCreada">No se ha podido crear la sucursal %s</string>
+    <string name="toastSucursalEditada">Sucursal %s editada</string>
+    <string name="toastSucursalNoEditada">No se ha podido editar la sucursal %s</string>
+    <string name="toastSucursalEliminada">Sucursal %s eliminada</string>
+    <string name="toastSucursalNoEliminada">No se ha podido eliminar la sucursal %s</string>
+    <string name="setErrorNomSucursal">¡Debes rellenar el nombre de la sucursal!</string>
+
+    <!-- ActivityDepartaments -->
+    <string name="titolDepartaments">Departamentos</string>
+    <string name="toastDepartamentCreat">Departamento %s creado</string>
+    <string name="toastDepartamentNoCreat">No se ha podido crear el departamento %s</string>
+    <string name="toastDepartamentEditat">Departamento %s editado</string>
+    <string name="toastDepartamentNoEditat">No se ha podido editar el departamento %s</string>
+    <string name="toastDepartamentEliminat">Departamento %s eliminado</string>
+    <string name="toastDepartamentNoEliminat">No se ha podido eliminar el departamento %s</string>
+    <string name="setErrorNomDepartament">¡Debes rellenar el nombre del departamento!</string>
+
+    <!-- ActivityRols -->
+    <string name="titolRols">Roles</string>
+    <string name="toastRolCreat">Rol %s creado</string>
+    <string name="toastRolNoCreat">No se ha podido crear el rol %s</string>
+    <string name="toastRolEditat">Rol %s editado</string>
+    <string name="toastRolNoEditat">No se ha podido editar el rol %s</string>
+    <string name="toastRolEliminat">Rol %s eliminado</string>
+    <string name="toastRolNoEliminat">No se ha podido eliminar el rol %s</string>
+    <string name="setErrorNomRol">¡Debes rellenar el nombre del rol!</string>
+
+    <!-- ActivityDominis -->
+    <string name="titolDominis">Dominios</string>
+    <string name="toastDominiCreat">Dominio %s creado</string>
+    <string name="toastDominiNoCreat">No se ha podido crear el dominio %s</string>
+    <string name="toastDominiEditat">Dominio %s editado</string>
+    <string name="toastDominiNoEditat">No se ha podido editar el dominio %s</string>
+    <string name="toastDominiEliminat">Dominio %s eliminado</string>
+    <string name="toastDominiNoEliminat">No se ha podido eliminar el dominio %s</string>
+    <string name="setErrorNomDomini">¡Debes rellenar el nombre del dominio!</string>
+
+    <!-- LayoutIdiomes -->
+    <string name="titolIdiomes">Elige el idioma:</string>
+    <string name="bntTraduir">Traducir</string>
+
+    <!-- LayoutGenerarContrasenya -->
+    <string name="etiquetaComBaixa">Complejidad baja</string>
+    <string name="etiquetaComMitjana">Complejidad media</string>
+    <string name="etiquetaComAlta">Complejidad alta</string>
+    <string name="etiquetaPersonalitzada">Personalizada</string>
+
+    <!-- LayoutConstrasenyaPersonalitzada -->
+    <string name="titolPersonalitzada">Personalizar contraseña</string>
+    <string name="etiquetaLongitud">Longitud</string>
+    <string name="etiquetaTipusCaracters">Tipo de caracteres</string>
+    <string name="etiquetaMin">Minúsculas (a-z)</string>
+    <string name="etiquetaMaj">Mayúsculas (A-Z)</string>
+    <string name="etiquetaNum">Números (0-9)</string>
+    <string name="etiquetaCaracEsp">Caracteres especiales (!@#...)</string>
+    <string name="etiquetaPrevisualitzacio">Previsualización</string>
+    <string name="btnUtilitzar">Utilizar</string>
+    <string name="btnGenerar">Generar</string>
+
+    <!-- LayoutCareptesEditar -->
+    <string name="hintNomCarpeta">Nombre carpeta</string>
+    <string name="llItems">Añadir ítems</string>
+    <string name="llUsuaris">Compartir con...</string>
+
+    <!-- LayoutEliminar -->
+    <string name="etiquetaEliminarItem">¿Desea eliminar el ítem: "</string>
+    <string name="etiquetaEliminarCarpeta">¿Desea eliminar la carpeta: "</string>
+    <string name="etiquetaEliminarUsuari">¿Desea eliminar el usuario: "</string>
+    <string name="etiquetaEliminarSucursal">¿Desea eliminar la sucursal: "</string>
+    <string name="etiquetaEliminarDepartament">¿Desea eliminar el departamento: "</string>
+    <string name="etiquetaEliminarRol">¿Desea eliminar el rol: "</string>
+    <string name="etiquetaEliminarDomini">¿Desea eliminar el dominio: "</string>
+    <string name="btnEliminar">Eliminar</string>
+
+    <!-- LayoutFiltres -->
+    <string name="titolFiltres">Filter by:</string>
+    <string name="btnFiltrar">Filter</string>
+
+    <!-- LayoutCompartirItems -->
+    <string name="titolCompartirItems">Share with...</string>
+    <string name="toastUsuarisNoSeleccionats">no user selected</string>
+
+    <!-- LayoutSucursal -->
+    <string name="hintSucursals">Branch name</string>
+
+    <!-- LayoutInfoSucursal -->
+    <string name="etiquetaAdrecaOmplerta">Address:</string>
+    <string name="etiquetaAdrecaBuida">Address: it doesn\'t have any</string>
+    <string name="hintAdreca">221B Baker Street</string>
+    <string name="etiquetaCiutatOmplerta">City:</string>
+    <string name="etiquetaCiutatBuida">City: it doesn\'t have any</string>
+    <string name="hintCiutat">London</string>
+    <string name="etiquetaPaisOmplert">Country:</string>
+    <string name="etiquetaPaisBuit">Country: it doesn\'t have any</string>
+    <string name="hintPais">United Kingdom</string>
+    <string name="etiquetaTlfOmplert">Phone:</string>
+    <string name="etiquetaTlfBuit">Phone: it doesn\'t have any</string>
+    <string name="hintTlf">+44 20 7845 9300</string>
+    <string name="etiquetaCorreuOmplert">Email:</string>
+    <string name="etiquetaCorreuBuit">Email: it doesn\'t have any</string>
+
+    <!-- LayoutDepartament -->
+    <string name="hintDepartament">Department name</string>
+
+    <!-- LayoutRols -->
+    <string name="hintRol">Role name</string>
+
+    <!-- LayoutDominis -->
+    <string name="hintDominiCorreu">@domain.com</string>
+
+    <!-- LayoutErrors -->
+    <string name="titolItemsBuits">No items</string>
+    <string name="etiquetaItemsBuits">This user has no items</string>
+    <string name="etiquetaItemsError">Unable to retrieve items</string>
+    <string name="titolCarpetesBuides">No folders</string>
+    <string name="etiquetaCarpetesBuides">This user has no folders</string>
+    <string name="etiquetaCarpetesError">Unable to retrieve folders</string>
+    <string name="titolCompartitsBuits">No shares</string>
+    <string name="etiquetaCompartitsBuits">This user has no shares</string>
+    <string name="etiquetaCompartitsError">Unable to retrieve shares</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
+        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
+        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
+        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
+        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
+        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
+        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
+        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
+        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
+        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
+        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
+        bibendum, vel congue leo egestas.\n\n
+        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
+        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
+        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
+        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
+        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
+        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
+        est.\n\n
+        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
+        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
+        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
+        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
+        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
+        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
+        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
+        convallis.\n\n
+        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
+        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
+        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
+        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
+        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
+        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
+        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
+    </string>
+
+</resources>

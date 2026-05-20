@@ -3,6 +3,8 @@ package com.example.keyly_projecte_intermodular;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,7 +39,7 @@ import com.example.keyly_projecte_intermodular.dto.DepartamentDTO;
 import com.example.keyly_projecte_intermodular.dto.SucursalDTO;
 import com.example.keyly_projecte_intermodular.request.DepartamentRequest;
 import com.example.keyly_projecte_intermodular.adapters.SDRDAdapter;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -52,7 +54,7 @@ public class DepartamentsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private SDRDAdapter departamentAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirDepartament;
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, imgBtnBack, imgBtnAfegirDepartament;
     private UUID uuidSucursal = null;
     private Sucursal sucursalDepartament = null;
     private ArrayList<Departament> departaments = new ArrayList<>();
@@ -72,6 +74,13 @@ public class DepartamentsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -110,6 +119,9 @@ public class DepartamentsActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();

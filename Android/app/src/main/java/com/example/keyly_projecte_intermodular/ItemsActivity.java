@@ -1,9 +1,11 @@
 package com.example.keyly_projecte_intermodular;
 
+import static com.example.keyly_projecte_intermodular.gestions.GestionsItems.actualitzarItems;
 import static com.example.keyly_projecte_intermodular.utils.LogOutService.logOut;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,12 +33,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.keyly_projecte_intermodular.dao.Item;
 import com.example.keyly_projecte_intermodular.dto.ItemDTO;
 import com.example.keyly_projecte_intermodular.adapters.ItemAdapter;
-import com.example.keyly_projecte_intermodular.utils.GestionsIdiomes;
+import com.example.keyly_projecte_intermodular.gestions.GestionsIdiomes;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -51,7 +51,7 @@ public class ItemsActivity extends AppCompatActivity {
     private LinearLayout layoutError;
     private ItemAdapter itemAdapter;
     private EditText etCercar;
-    private ImageButton imgBtnIdioma, imgBtnLogOut, btnAddItem;
+    private ImageButton imgBtnAjuda, imgBtnIdioma, imgBtnLogOut, btnAddItem;
     private ImageView btnFiltres;
     private BottomNavigationView menu;
     private boolean filtrat = false;
@@ -71,6 +71,13 @@ public class ItemsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        imgBtnAjuda = findViewById(R.id.imgBtnAjuda);
+        imgBtnAjuda.setOnClickListener(v -> {
+            String url = "https://10.147.17.250:8081/docs/";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
         });
 
         imgBtnIdioma = findViewById(R.id.imgBtnIdioma);
@@ -109,6 +116,9 @@ public class ItemsActivity extends AppCompatActivity {
                     recreate();
                 } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbEN) {
                     GestionsIdiomes.canviarIdioma(this, "en");
+                    recreate();
+                } else if (rgIdioma.getCheckedRadioButtonId() == R.id.rbES) {
+                    GestionsIdiomes.canviarIdioma(this, "es");
                     recreate();
                 }
                 alertDialog.dismiss();
@@ -158,7 +168,7 @@ public class ItemsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     items.clear();
                     items.addAll(response.body());
-                    itemAdapter.notifyDataSetChanged();
+                    //itemAdapter.notifyDataSetChanged();
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
                 } else {
                     Log.d("ERROR_RESPONSE", response.message());
@@ -174,7 +184,7 @@ public class ItemsActivity extends AppCompatActivity {
 
         Log.d("ITEMS_JSON", new Gson().toJson(items));
 
-        actualitzarItems(items);
+        actualitzarItems(items, itemAdapter, ItemsActivity.this, recyclerView);
 
         etCercar = findViewById(R.id.aCTVCercarItems);
         etCercar.addTextChangedListener(new TextWatcher() {
@@ -226,9 +236,9 @@ public class ItemsActivity extends AppCompatActivity {
                                 itemsFav.add(item);
                             }
                         }
-                        actualitzarItems(itemsFav);
+                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView);
                     } else {
-                        actualitzarItems(filtres);
+                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView);
                     }
                 } else if (cbUltimsUsats.isChecked()) { // Mostrar els últims ítems utilitzats
                     for (Item item : items) {
@@ -249,9 +259,9 @@ public class ItemsActivity extends AppCompatActivity {
                                 itemsFav.add(item);
                             }
                         }
-                        actualitzarItems(itemsFav);
+                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView);
                     } else {
-                        actualitzarItems(filtres);
+                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView);
                     }
                 } else if (cbMesUsats.isChecked()) { // Mostrar els ítems més usats
                     filtres = items;
@@ -263,9 +273,9 @@ public class ItemsActivity extends AppCompatActivity {
                                 itemsFav.add(item);
                             }
                         }
-                        actualitzarItems(itemsFav);
+                        actualitzarItems(itemsFav, itemAdapter, ItemsActivity.this, recyclerView);
                     } else {
-                        actualitzarItems(filtres);
+                        actualitzarItems(filtres, itemAdapter, ItemsActivity.this, recyclerView);
                     }
                 }
 
@@ -297,8 +307,8 @@ public class ItemsActivity extends AppCompatActivity {
                     Log.d("RAW_JSON", response.body().toString());
                     items.clear();
                     items.addAll(response.body());
-                    itemAdapter.notifyDataSetChanged();
-                    actualitzarItems(items);
+                    //itemAdapter.notifyDataSetChanged();
+                    actualitzarItems(items, itemAdapter, ItemsActivity.this, recyclerView);
                     recyclerView.setVisibility(RecyclerView.VISIBLE);
                 } else {
                     recyclerView.setVisibility(View.GONE);
@@ -324,24 +334,6 @@ public class ItemsActivity extends AppCompatActivity {
             }
         }
 
-        actualitzarItems(llistaFiltradaItems);
-    }
-
-    private void actualitzarItems(ArrayList<Item> items) {
-        itemAdapter = new ItemAdapter(items, item -> {
-            Intent intent = new Intent(this, ItemActivity.class);
-            intent.putExtra("uuid", item.getUuid().toString());
-            intent.putExtra("title", item.getTitol());
-            intent.putExtra("url", item.getUrl());
-            intent.putExtra("nom_usuari", item.getNomUsuari());
-            intent.putExtra("password", item.getContrasenya());
-            intent.putExtra("notes", item.getNotes());
-            intent.putExtra("fav", item.isFavorit());
-            intent.putExtra("add_edit", 0);
-            intent.putExtra("iv", item.getIv());
-            intent.putExtra("edk", item.getEncryptedDataKey().getEncryptedDataKey());
-            startActivity(intent);
-        }, ItemsActivity.this);
-        recyclerView.setAdapter(itemAdapter);
+        actualitzarItems(llistaFiltradaItems, itemAdapter, ItemsActivity.this, recyclerView);
     }
 }
