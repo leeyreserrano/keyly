@@ -1,0 +1,138 @@
+[
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_idiomes.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_idiomes.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_rol.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_rol.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_perfil.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_perfil.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_rols.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_rols.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_compartir.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_compartir.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_compartir_item.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_compartir_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_carpeta.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_carpeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_items.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_items.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_departament.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_departament.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_cerques.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_cerques.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_avis_item_vulneracio.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_avis_item_vulneracio.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_domini.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_domini.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_generar_contrasenya.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_generar_contrasenya.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_usuaris.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_usuaris.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_compartit.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_compartit.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_sucursal.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_sucursal.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_sucursal_info.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_sucursal_info.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_item_carpeta_selector.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_item_carpeta_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_departaments.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_departaments.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_item.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_home.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_item_folder_selector.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_item_folder_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_item_carpeta.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_item_carpeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_contrasenya_personalitzada.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_contrasenya_personalitzada.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_carpeta_editar.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_carpeta_editar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_logs.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_logs.xml"
+    },
+    {
+        "merged": "com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:/layout/activity_compartit.xml",
+        "source": "com.example.keyly_projecte_intermodular.app-main-52:/layout/activity_compartit.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_avis_item_repetit.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_avis_item_repetit.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_filtres.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_filtres.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_sucursals.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_sucursals.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\layout_eliminar.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_eliminar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_login.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_carpetes.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_carpetes.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-mergeDebugResources-49:\\layout\\activity_dominis.xml",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_dominis.xml"
+    }
+]

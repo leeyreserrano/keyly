@@ -1,0 +1,490 @@
+[
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\raw_certificate.crt.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\raw\\certificate.crt"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_ajuda.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\ajuda.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_x.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\x.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\xml\\data_extraction_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_desplegable.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_desplegable.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_log_empty.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_log_empty.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_eliminar.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_eliminar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_generar_contrasenya.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_generar_contrasenya.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_visibility_off.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\visibility_off.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_perfil.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\perfil.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_login.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-xhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_compartir_item.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_compartir_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_avisos.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_avisos.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\raw_prueba.json.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\raw\\prueba.json"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_avis_item_repetit.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_avis_item_repetit.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_compartit.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_compartit.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_copy.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\copy.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_item_folder_selector.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_item_folder_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_lupa.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\lupa.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_angles.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\angles.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_button_circle_white.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_button_circle_white.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\menu_menu_app.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\menu\\menu_app.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_button_eliminar.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_button_eliminar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_icon_avis.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_icon_avis.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_sucursal.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_sucursal.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_cerques.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_cerques.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_editar.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\editar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_contrasenya_personalitzada.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_contrasenya_personalitzada.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_key_blanca.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\key_blanca.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_error.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\error.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_item_carpeta_selector.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_item_carpeta_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_button_circle_purple.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_button_circle_purple.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_item_carpeta.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_item_carpeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_btn_filtres_home.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_btn_filtres_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_compartit_violeta.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\compartit_violeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-xxxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_logo_keyly.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\logo_keyly.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_sucursal_info.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_sucursal_info.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_compartir.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_compartir.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_perfil.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_perfil.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_passwords.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\passwords.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_btn_filtres_home_selected.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_btn_filtres_home_selected.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_carpeta.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_carpeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-xhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\font_airbnb_cereal_w_bd.otf.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\font\\airbnb_cereal_w_bd.otf"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_layout_gestions.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_layout_gestions.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_item.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_usuaris.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_usuaris.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_icon_notification.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\icon_notification.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_avis_blanc.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\avis_blanc.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_key_violeta.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\key_violeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_departament.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_departament.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_backgroung_edit_text_password.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\backgroung_edit_text_password.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-mdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_compartir.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\compartir.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_logout.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\logout.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_carpetes.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_carpetes.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_text_notes.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_text_notes.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_avis_negre.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\avis_negre.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_avis.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\avis.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_home.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\home.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_carpeta_violeta.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\carpeta_violeta.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_logs.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_logs.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_add.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\add.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_back.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\back.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_dialog.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_dialog.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_key_negra.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\key_negra.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-xxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.keyly_projecte_intermodular.app-debug-50:/layout_activity_compartit.xml.flat",
+        "source": "com.example.keyly_projecte_intermodular.app-main-52:/layout/activity_compartit.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_resum.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_resum.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_layout_settings.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_layout_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-xxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-hdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_domini.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_domini.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_dominis.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_dominis.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_delete.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\delete.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_section_logo_login.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\section_logo_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_button_purple.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_button_purple.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_home.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_home.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_carpeta_editar.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_carpeta_editar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\font_manrope_regular.ttf.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\font\\manrope_regular.ttf"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_rols.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_rols.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_sucursals.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_sucursals.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_titol_gris.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_titol_gris.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_edit_text_enabled.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\edit_text_enabled.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-hdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_check.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\check.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\xml\\backup_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_visibility.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\visibility.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_rol.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_rol.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_items_folders_button.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_items_folders_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_button_normal.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_button_normal.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_star.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\star.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\xml_security_prova.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\xml\\security_prova.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_filled_star.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\filled_star.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_items.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_items.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_carpeta_blanca.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\carpeta_blanca.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_compartit_negre.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\compartit_negre.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_avis_item_vulneracio.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_avis_item_vulneracio.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_carpeta_negra.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\carpeta_negra.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_catala.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\catala.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_items_folder.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_items_folder.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_filtres.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_filtres.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_desplegar.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\desplegar.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\font_airbnb_cereal_w_bk.otf.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\font\\airbnb_cereal_w_bk.otf"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_log_error.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_log_error.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_activity_departaments.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\activity_departaments.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_foto_perfil.png.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\foto_perfil.png"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_logo_keyly_sin_letras.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\logo_keyly_sin_letras.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-mdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_background_search.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\background_search.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_idioma.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\idioma.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\layout_layout_idiomes.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\layout\\layout_idiomes.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_generate_password.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\generate_password.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_filtre_ralles.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\filtre_ralles.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-debug-50:\\drawable_add_foto_perfil.xml.flat",
+        "source": "C:\\Users\\ycaza\\.gradle\\daemon\\8.13\\com.example.keyly_projecte_intermodular.app-main-52:\\drawable\\add_foto_perfil.xml"
+    }
+]
