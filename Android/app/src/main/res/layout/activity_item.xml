@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ItemActivity"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/logo_keyly"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/logo_keyly_sin_letras"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/imgBtnAjuda"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/ajuda"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/imgBtnIdioma"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/idioma"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/imgBtnLogOut"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:srcCompat="@drawable/logout"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="@color/transparent"/>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:src="@drawable/key_violeta"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include
+                    layout="@layout/layout_avis_item_vulneracio"
+                    android:id="@+id/includeAvisVulnerada"
+                    android:layout_width="160dp"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="7dp"
+                    android:visibility="gone"/>
+
+                <include
+                    layout="@layout/layout_avis_item_vulneracio"
+                    android:id="@+id/includeAvisRepetida"
+                    android:layout_width="160dp"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="7dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:elevation="8dp"
+        android:background="@drawable/background_layout_settings">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp">
+
+            <ImageButton
+                android:id="@+id/imgBtnEditStar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/editar"
+                android:backgroundTint="@color/transparent"
+                android:layout_gravity="right|top"
+                android:scaleType="fitXY"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/ll_nom_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="55dp"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtTitleItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Nom Item"
+                            android:fontFamily="@font/airbnb_cereal_w_bd"
+                            android:textSize="20dp"
+                            android:textColor="@color/black"
+                            android:visibility="visible"/>
+
+                        <EditText
+                            android:id="@+id/etNomItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:paddingStart="12dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:hint="@string/hintNomItem"
+                            android:background="@drawable/background_text_notes"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/imgBtnStar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/star"
+                        android:backgroundTint="@color/transparent"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Data"
+                    android:fontFamily="@font/manrope_regular"
+                    android:textSize="15dp"
+                    android:textColor="@color/light_grey"
+                    android:visibility="visible"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtLlocItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lloc:"
+                        android:fontFamily="@font/manrope_regular"
+                        android:textSize="15dp"
+                        android:textColor="@color/light_grey"
+                        android:visibility="visible"/>
+
+                    <EditText
+                        android:id="@+id/etLlocItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:paddingStart="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:hint="@string/hintLlocWeb"
+                        android:background="@drawable/background_text_notes"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtNomUsuariItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nom d'usuari:"
+                        android:fontFamily="@font/manrope_regular"
+                        android:textSize="15dp"
+                        android:textColor="@color/light_grey"
+                        android:visibility="visible"/>
+
+                    <EditText
+                        android:id="@+id/etNomUsuariItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:paddingStart="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:hint="@string/hintCorreu"
+                        android:background="@drawable/background_text_notes"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#f3f3f3"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp">
+
+            <LinearLayout
+                android:id="@+id/ll_password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                android:orientation="horizontal"
+                android:background="@drawable/backgroung_edit_text_password">
+
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="1dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:paddingStart="15dp"
+                    android:textColor="@color/not_enabled"
+                    android:hint="@string/hintContrasenya"
+                    android:enabled="false"
+                    android:inputType="textPassword"
+                    android:background="@color/transparent"/>
+
+                <LinearLayout
+                    android:id="@+id/llActions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="right|center"
+                    android:visibility="visible">
+
+                    <ImageButton
+                        android:id="@+id/imbBtnCopy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/copy"
+                        android:backgroundTint="@color/transparent"
+                        android:scaleType="fitXY"/>
+
+                    <ImageButton
+                        android:id="@+id/imgBtnEye"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/visibility"
+                        android:backgroundTint="@color/transparent"
+                        android:scaleType="fitXY"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/imgBtnGenerate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/generate_password"
+                android:backgroundTint="@color/transparent"
+                android:scaleType="fitXY"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+            
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtNotes"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:gravity="start|top"
+            android:text="Notes..."
+            android:textSize="18dp"
+            android:background="@drawable/backgroung_edit_text_password"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/etNotes"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:hint="@string/hintNotes"
+            android:textColor="@color/not_enabled"
+            android:enabled="false"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:background="@drawable/background_text_notes"
+            android:visibility="visible"/>
+
+        <Button
+            android:id="@+id/btnCompartir"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/btnCompartir"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:fontFamily="@font/airbnb_cereal_w_bd"
+            android:background="@drawable/background_button_purple"
+            app:backgroundTint="@null"/>
+
+        <Button
+            android:id="@+id/btnGuardarItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/btnGuardar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:fontFamily="@font/airbnb_cereal_w_bd"
+            android:background="@drawable/background_button_purple"
+            app:backgroundTint="@null"/>
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/btnEnrere"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:fontFamily="@font/airbnb_cereal_w_bd"
+            android:background="@drawable/background_button_purple"
+            app:backgroundTint="@null"/>
+
+    </LinearLayout>
+
+</LinearLayout>
