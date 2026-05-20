@@ -1,2 +1,0 @@
-
-- Contraseñas vulneradas: Arreglar
